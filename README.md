@@ -294,7 +294,7 @@ Thiết kế này cố ý: việc nhanh đặt ở commit, việc chậm đặt 
 
 Hook tự sửa file được thì nó sửa và stage lại luôn. Sửa không được thì chặn commit và in lỗi ra.
 
-> **Đừng dùng `--no-verify` để né hook.** Hook chặn nghĩa là code thật sự có vấn đề — né được ở máy bạn nhưng CI trên GitHub sẽ chặn tiếp, chỉ tốn thêm thời gian.
+> **Đừng dùng `--no-verify` để né hook.** Hook chặn nghĩa là code thật sự có vấn đề — né được ở máy bạn nhưng CI trên GitHub sẽ chặn tiếp, chỉ tốn thêm thời gian
 
 ---
 
