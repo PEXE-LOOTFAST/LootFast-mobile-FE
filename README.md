@@ -323,7 +323,7 @@ CI sẽ tự chạy `typecheck` + `lint` trên mỗi PR. Phải xanh mới đư�
 
 ---
 
-## Biến môi trường
+## Biến môi trường.
 
 File `.env` (đã nằm trong `.gitignore`, không commit):
 
