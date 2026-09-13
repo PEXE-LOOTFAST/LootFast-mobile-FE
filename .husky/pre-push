@@ -1,1 +1,16 @@
+branch=$(git rev-parse --abbrev-ref HEAD)
+
+if [ "$branch" = "main" ]; then
+  echo ""
+  echo "  [CHAN] Khong duoc push thang len main."
+  echo ""
+  echo "  main la nhanh phat hanh, chi nhan code qua Pull Request."
+  echo "  Hay lam nhu sau:"
+  echo ""
+  echo "    git switch dev"
+  echo "    git switch -c feat/ten-viec"
+  echo ""
+  exit 1
+fi
+
 npm run typecheck
