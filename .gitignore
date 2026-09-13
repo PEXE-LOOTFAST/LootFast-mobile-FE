@@ -7,8 +7,9 @@ node_modules/
 .expo/
 dist/
 web-build/
-expo-env.d.ts
-/app-example
+
+# expo-env.d.ts CỐ Ý được commit (không ignore): file này chỉ sinh ra khi chạy
+# `expo start`, nên CI và máy vừa clone sẽ thiếu nó và `tsc --noEmit` fail.
 
 # Native
 .kotlin/
