@@ -2,6 +2,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import { useColorScheme } from 'react-native';
 
+import { AuthModal } from '@/features/auth/components/auth-modal';
 import { queryClient } from '@/lib/query-client';
 
 // Không gọi SplashScreen.preventAutoHideAsync() ở đây: lệnh hideAsync() tương ứng
@@ -16,6 +17,7 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="(auth)" />
         </Stack>
+        <AuthModal />
       </ThemeProvider>
     </QueryClientProvider>
   );

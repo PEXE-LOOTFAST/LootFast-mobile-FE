@@ -1,28 +1,19 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AuthBackdrop } from '@/features/auth/components/auth-backdrop';
 import { AuthHeader } from '@/features/auth/components/auth-header';
-import { AuthNotice } from '@/features/auth/components/auth-notice';
-import { AuthTabs } from '@/features/auth/components/auth-tabs';
-import { LoginForm } from '@/features/auth/components/login-form';
-import { RegisterForm } from '@/features/auth/components/register-form';
-import type { AuthTab, RegisterValues } from '@/features/auth/types';
+import { AuthPanel } from '@/features/auth/components/auth-panel';
 import { useTheme } from '@/hooks/use-theme';
+import { signIn } from '@/lib/auth-session';
 
 export function LoginScreen() {
   const theme = useTheme();
-  const [tab, setTab] = useState<AuthTab>('login');
-  const [registeredEmail, setRegisteredEmail] = useState<string>();
 
-  // Chưa có API xác thực: tạm vào thẳng app để các màn phía sau phát triển song song được.
-  const enterApp = () => router.replace('/');
-
-  const handleRegistered = ({ email }: RegisterValues) => {
-    setRegisteredEmail(email.trim());
-    setTab('login');
+  const enterApp = () => {
+    signIn();
+    router.replace('/');
   };
 
   return (
@@ -46,24 +37,7 @@ export function LoginScreen() {
               { backgroundColor: theme.backgroundElement, borderColor: theme.border },
             ]}
           >
-            <AuthTabs value={tab} onChange={setTab} />
-
-            <View style={styles.cardBody}>
-              {tab === 'login' ? (
-                <>
-                  {registeredEmail ? (
-                    <AuthNotice message="Tạo tài khoản thành công. Đăng nhập để bắt đầu săn deal nhé!" />
-                  ) : null}
-                  <LoginForm
-                    initialIdentifier={registeredEmail}
-                    onSubmit={enterApp}
-                    onTryDemo={enterApp}
-                  />
-                </>
-              ) : (
-                <RegisterForm onSubmit={handleRegistered} />
-              )}
-            </View>
+            <AuthPanel onAuthenticated={enterApp} />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -83,5 +57,4 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     boxShadow: '0px 18px 40px rgba(23, 33, 27, 0.08)',
   },
-  cardBody: { gap: 20, padding: 20 },
 });

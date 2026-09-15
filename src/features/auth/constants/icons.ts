@@ -5,6 +5,7 @@ export type AuthIconName = Extract<SymbolViewProps['name'], object>;
 // SF Symbols chỉ có trên iOS, Android và web dùng Material Symbols — mỗi icon phải khai báo đủ cả hai tên.
 export const AuthIcons = {
   back: { ios: 'chevron.left', android: 'arrow_back', web: 'arrow_back' },
+  close: { ios: 'xmark', android: 'close', web: 'close' },
   leaf: { ios: 'leaf', android: 'eco', web: 'eco' },
   mail: { ios: 'envelope', android: 'mail', web: 'mail' },
   person: { ios: 'person', android: 'person', web: 'person' },

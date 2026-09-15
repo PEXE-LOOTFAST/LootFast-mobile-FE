@@ -1,7 +1,7 @@
-import { router, useFocusEffect } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 import { setStatusBarStyle } from 'expo-status-bar';
 import { useCallback } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 
 import { MaxContentWidth } from '@/constants/theme';
 import { DealCard } from '@/features/home/components/deal-card';
@@ -19,12 +19,15 @@ import {
   MOCK_UNREAD_NOTIFICATIONS,
 } from '@/features/home/data/mock-deals';
 import { useDealFilters } from '@/features/home/hooks/use-deal-filters';
+import { useAuthSession } from '@/hooks/use-auth-session';
 import { useTheme } from '@/hooks/use-theme';
+import { requireAuth, signOut, withAuth } from '@/lib/auth-session';
 
 const HORIZONTAL_INSET = 16;
 
 export function HomeScreen() {
   const theme = useTheme();
+  const { isAuthenticated } = useAuthSession();
   const {
     categoryId,
     setCategoryId,
@@ -45,6 +48,19 @@ export function HomeScreen() {
     }, []),
   );
 
+  const handlePressProfile = () => {
+    // Không truyền thao tác chờ: nếu không, đăng nhập xong sẽ bật ngay hộp thoại đăng xuất.
+    if (!isAuthenticated) {
+      requireAuth();
+      return;
+    }
+
+    Alert.alert('Tài khoản', 'Bạn muốn đăng xuất khỏi LootFast?', [
+      { text: 'Huỷ', style: 'cancel' },
+      { text: 'Đăng xuất', style: 'destructive', onPress: signOut },
+    ]);
+  };
+
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
       <ScrollView
@@ -54,22 +70,30 @@ export function HomeScreen() {
       >
         <HomeHeader
           address={MOCK_LOCATION.address}
-          onPressProfile={() => router.push('/login')}
+          onPressNotifications={withAuth()}
+          onPressProfile={handlePressProfile}
           unreadCount={MOCK_UNREAD_NOTIFICATIONS}
         />
 
         <View style={styles.body}>
           <SearchPanel
             categories={DEAL_CATEGORIES}
+            isSearchLocked={!isAuthenticated}
             onChangeQuery={setQuery}
-            onSelectCategory={setCategoryId}
+            onPressLockedSearch={withAuth()}
+            onPressRadius={withAuth()}
+            onSelectCategory={(id) => requireAuth(() => setCategoryId(id))}
             query={query}
             radiusKm={MOCK_LOCATION.radiusKm}
             selectedCategoryId={categoryId}
           />
 
           {isFiltering ? null : (
-            <LowStockSection deals={lowStockDeals} horizontalInset={HORIZONTAL_INSET} />
+            <LowStockSection
+              deals={lowStockDeals}
+              horizontalInset={HORIZONTAL_INSET}
+              onPressDeal={withAuth()}
+            />
           )}
 
           <View style={styles.section}>
@@ -80,13 +104,21 @@ export function HomeScreen() {
                   ? `${filteredDeals.length} deal phù hợp`
                   : 'Ưu tiên món gần, tiết kiệm và được đánh giá cao'
               }
-              action={<IconButton accessibilityLabel="Bộ lọc nâng cao" icon={HomeIcons.filter} />}
+              action={
+                <IconButton
+                  accessibilityLabel="Bộ lọc nâng cao"
+                  icon={HomeIcons.filter}
+                  onPress={withAuth()}
+                />
+              }
             />
 
             {filteredDeals.length > 0 ? (
-              filteredDeals.map((deal) => <DealCard key={deal.id} deal={deal} />)
+              filteredDeals.map((deal) => (
+                <DealCard key={deal.id} deal={deal} onPress={withAuth()} />
+              ))
             ) : (
-              <EmptyDeals onReset={resetFilters} />
+              <EmptyDeals onReset={withAuth(resetFilters)} />
             )}
           </View>
         </View>

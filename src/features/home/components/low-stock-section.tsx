@@ -7,9 +7,10 @@ import type { Deal } from '@/features/home/types';
 type LowStockSectionProps = {
   deals: Deal[];
   horizontalInset: number;
+  onPressDeal?: (deal: Deal) => void;
 };
 
-export function LowStockSection({ deals, horizontalInset }: LowStockSectionProps) {
+export function LowStockSection({ deals, horizontalInset, onPressDeal }: LowStockSectionProps) {
   if (deals.length === 0) return null;
 
   return (
@@ -24,7 +25,11 @@ export function LowStockSection({ deals, horizontalInset }: LowStockSectionProps
         style={{ marginHorizontal: -horizontalInset }}
       >
         {deals.map((deal) => (
-          <LowStockCard key={deal.id} deal={deal} />
+          <LowStockCard
+            key={deal.id}
+            deal={deal}
+            onPress={onPressDeal ? () => onPressDeal(deal) : undefined}
+          />
         ))}
       </ScrollView>
     </View>
