@@ -14,6 +14,8 @@ type SearchPanelProps = {
   selectedCategoryId: DealCategoryId;
   onSelectCategory: (id: DealCategoryId) => void;
   onPressRadius?: () => void;
+  isSearchLocked?: boolean;
+  onPressLockedSearch?: () => void;
 };
 
 export function SearchPanel({
@@ -24,6 +26,8 @@ export function SearchPanel({
   selectedCategoryId,
   onSelectCategory,
   onPressRadius,
+  isSearchLocked = false,
+  onPressLockedSearch,
 }: SearchPanelProps) {
   const theme = useTheme();
 
@@ -46,21 +50,30 @@ export function SearchPanel({
           <HomeIcon name={HomeIcons.chevronDown} color={theme.textSecondary} size={16} />
         </Pressable>
 
-        <View
+        <Pressable
+          accessibilityLabel={isSearchLocked ? 'Tìm món hoặc quán' : undefined}
+          accessibilityRole={isSearchLocked ? 'button' : undefined}
+          disabled={!isSearchLocked}
+          onPress={onPressLockedSearch}
           style={[styles.search, { backgroundColor: theme.background, borderColor: theme.border }]}
         >
           <HomeIcon name={HomeIcons.search} color={theme.textSecondary} />
-          <TextInput
-            accessibilityLabel="Tìm món hoặc quán"
-            autoCorrect={false}
-            onChangeText={onChangeQuery}
-            placeholder="Tìm món hoặc quán"
-            placeholderTextColor={theme.textSecondary}
-            returnKeyType="search"
-            style={[styles.input, { color: theme.text }]}
-            value={query}
-          />
-          {query ? (
+          {/* Khi bị khoá, ô nhập không nhận chạm để cú bấm rơi xuống Pressable bọc ngoài
+              thay vì mở bàn phím. */}
+          <View style={[styles.inputWrapper, isSearchLocked && styles.passThrough]}>
+            <TextInput
+              accessibilityLabel="Tìm món hoặc quán"
+              autoCorrect={false}
+              editable={!isSearchLocked}
+              onChangeText={onChangeQuery}
+              placeholder="Tìm món hoặc quán"
+              placeholderTextColor={theme.textSecondary}
+              returnKeyType="search"
+              style={[styles.input, { color: theme.text }]}
+              value={query}
+            />
+          </View>
+          {query && !isSearchLocked ? (
             <Pressable
               accessibilityLabel="Xoá từ khoá"
               accessibilityRole="button"
@@ -70,7 +83,7 @@ export function SearchPanel({
               <HomeIcon name={HomeIcons.clear} color={theme.textSecondary} />
             </Pressable>
           ) : null}
-        </View>
+        </Pressable>
       </View>
 
       <CategoryChips
@@ -110,6 +123,8 @@ const styles = StyleSheet.create({
     borderRadius: 23,
     paddingHorizontal: 14,
   },
+  inputWrapper: { flex: 1, minWidth: 0 },
+  passThrough: { pointerEvents: 'none' },
   // Trình duyệt tự vẽ viền focus riêng, lệch khỏi khung bo tròn của ô tìm kiếm.
-  input: { flex: 1, minWidth: 0, height: 44, fontSize: 14, outlineWidth: 0 },
+  input: { height: 44, fontSize: 14, outlineWidth: 0 },
 });
