@@ -3,9 +3,20 @@ import { useState } from 'react';
 import { LOW_STOCK_THRESHOLD } from '@/features/home/constants/deals';
 import type { Deal, DealCategoryId } from '@/features/home/types';
 
+// Dải U+0300–U+036F là các dấu thanh/dấu phụ tách ra sau khi normalize('NFD').
+const COMBINING_MARKS = new RegExp(
+  `[${String.fromCharCode(0x0300)}-${String.fromCharCode(0x036f)}]`,
+  'g',
+);
+
 function normalizeText(value: string) {
   // Người dùng hay gõ không dấu ("com tam") — bỏ dấu ở cả hai phía để vẫn khớp "Cơm tấm".
-  return value.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/gi, 'd').toLowerCase().trim();
+  return value
+    .normalize('NFD')
+    .replace(COMBINING_MARKS, '')
+    .replace(/đ/gi, 'd')
+    .toLowerCase()
+    .trim();
 }
 
 export function useDealFilters(deals: Deal[]) {
