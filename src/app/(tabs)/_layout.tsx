@@ -16,8 +16,10 @@ export default function TabsLayout() {
   return (
     <NativeTabs
       backgroundColor={colors.background}
-      indicatorColor={colors.backgroundElement}
-      labelStyle={{ selected: { color: colors.text } }}
+      iconColor={colors.textSecondary}
+      indicatorColor={colors.background}
+      labelStyle={{ selected: { color: colors.textSecondary } }}
+      tintColor={colors.textSecondary}
     >
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>Trang chủ</NativeTabs.Trigger.Label>
@@ -43,6 +45,19 @@ export default function TabsLayout() {
           src={require('@/assets/images/tabIcons/explore.png')}
           renderingMode="template"
         />
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger
+        disabled={!isAuthenticated}
+        listeners={{
+          tabPress: (event) => {
+            if (event.data?.isPrevented) requireAuth(() => router.navigate('/profile'));
+          },
+        }}
+        name="profile"
+      >
+        <NativeTabs.Trigger.Label>Hồ sơ</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="person.fill" md="person" renderingMode="template" />
       </NativeTabs.Trigger>
     </NativeTabs>
   );
