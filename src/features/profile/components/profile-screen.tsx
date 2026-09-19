@@ -1,3 +1,4 @@
+import { router, type Href } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
 import { useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -9,7 +10,8 @@ import { signOut } from '@/lib/auth-session';
 import type { SymbolViewProps } from 'expo-symbols';
 
 type ProfileIconName = Extract<SymbolViewProps['name'], object>;
-type ProfileItem = { icon: ProfileIconName; title: string; subtitle: string };
+// href: mục mở sang route/tab khác khi bấm (vd. Đơn hàng của tôi → tab Đơn hàng).
+type ProfileItem = { icon: ProfileIconName; title: string; subtitle: string; href?: Href };
 
 const ProfileIcons = {
   premium: { ios: 'crown.fill', android: 'workspace_premium', web: 'workspace_premium' },
@@ -39,7 +41,7 @@ const BENEFITS: ProfileItem[] = [
 ];
 
 const ACCOUNT_ITEMS: ProfileItem[] = [
-  { icon: ProfileIcons.orders, title: 'Đơn hàng của tôi', subtitle: '' },
+  { icon: ProfileIcons.orders, title: 'Đơn hàng của tôi', subtitle: '', href: '/orders' },
   { icon: ProfileIcons.location, title: 'Bản đồ và địa chỉ', subtitle: '' },
   { icon: ProfileIcons.favorites, title: 'Món yêu thích', subtitle: '' },
   { icon: ProfileIcons.payment, title: 'Phương thức thanh toán', subtitle: '' },
@@ -94,7 +96,13 @@ function ProfileSection({
         <View key={item.title}>
           <ProfileItemRow
             item={item}
-            onPress={item.title === 'Gói Người mua Cao cấp' ? onPremiumPress : undefined}
+            onPress={
+              item.href
+                ? () => router.navigate(item.href!)
+                : item.title === 'Gói Người mua Cao cấp'
+                  ? onPremiumPress
+                  : undefined
+            }
           />
           {index < items.length - 1 ? (
             <View style={[styles.divider, { backgroundColor: theme.border }]} />
