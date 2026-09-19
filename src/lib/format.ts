@@ -17,3 +17,9 @@ export function formatDiscount(price: number, originalPrice: number): string | n
 
   return `-${Math.round((1 - price / originalPrice) * 100)}%`;
 }
+
+export function formatRadius(km: number): string {
+  if (km < 1) return `${Math.round(km * 1000)}m`;
+
+  return `${km}km`;
+}

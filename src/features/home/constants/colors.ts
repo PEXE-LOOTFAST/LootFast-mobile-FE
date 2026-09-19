@@ -5,6 +5,7 @@ export const HomeHeaderColors = {
   decoration: '#1D8A52',
   text: '#FFFFFF',
   textMuted: '#CFEBDA',
-  controlBackground: 'rgba(255, 255, 255, 0.14)',
-  controlBorder: 'rgba(255, 255, 255, 0.24)',
 } as const;
+
+// Sao đánh giá dùng xanh dương để tách khỏi màu giá (xanh lá) và nhãn giảm giá (đỏ).
+export const RatingColor = '#1B9FC9';

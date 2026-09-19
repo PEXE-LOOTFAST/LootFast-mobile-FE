@@ -29,13 +29,16 @@ export function CategoryChips({ categories, selectedId, onSelect }: CategoryChip
             onPress={() => onSelect(category.id)}
             style={[
               styles.chip,
-              {
-                backgroundColor: isSelected ? theme.primary : theme.background,
-                borderColor: isSelected ? theme.primary : theme.border,
-              },
+              { backgroundColor: isSelected ? theme.primary : theme.primarySoft },
             ]}
           >
-            <Text style={[styles.label, { color: isSelected ? theme.background : theme.text }]}>
+            <Text
+              style={[
+                styles.label,
+                { color: isSelected ? '#FFFFFF' : theme.text },
+                isSelected && styles.labelSelected,
+              ]}
+            >
               {category.label}
             </Text>
           </Pressable>
@@ -46,7 +49,8 @@ export function CategoryChips({ categories, selectedId, onSelect }: CategoryChip
 }
 
 const styles = StyleSheet.create({
-  container: { gap: 8, paddingHorizontal: 14 },
-  chip: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 16, paddingVertical: 9 },
-  label: { fontSize: 14, fontWeight: '700' },
+  container: { gap: 8, paddingHorizontal: 10 },
+  chip: { borderRadius: 999, paddingHorizontal: 14, paddingVertical: 7 },
+  label: { fontSize: 13, fontWeight: '600' },
+  labelSelected: { fontWeight: '800' },
 });

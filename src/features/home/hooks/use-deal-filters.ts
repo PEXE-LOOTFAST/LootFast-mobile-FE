@@ -1,45 +1,54 @@
 import { useState } from 'react';
 
-import { LOW_STOCK_THRESHOLD } from '@/features/home/constants/deals';
-import type { Deal, DealCategoryId } from '@/features/home/types';
+import {
+  DEFAULT_DISCOUNT,
+  DEFAULT_RADIUS_KM,
+  PICKUP_SPLIT_TIME,
+} from '@/features/home/constants/deals';
+import type { Deal, DealCategoryId, DiscountFilter, PickupFilter } from '@/features/home/types';
+import { normalizeText } from '@/lib/text';
 
-// Dải U+0300–U+036F là các dấu thanh/dấu phụ tách ra sau khi normalize('NFD').
-const COMBINING_MARKS = new RegExp(
-  `[${String.fromCharCode(0x0300)}-${String.fromCharCode(0x036f)}]`,
-  'g',
-);
+function getDiscountPercent(deal: Deal) {
+  if (deal.originalPrice <= 0) return 0;
 
-function normalizeText(value: string) {
-  // Người dùng hay gõ không dấu ("com tam") — bỏ dấu ở cả hai phía để vẫn khớp "Cơm tấm".
-  return value
-    .normalize('NFD')
-    .replace(COMBINING_MARKS, '')
-    .replace(/đ/gi, 'd')
-    .toLowerCase()
-    .trim();
+  return Math.round((1 - deal.price / deal.originalPrice) * 100);
+}
+
+function matchesPickup(deal: Deal, pickup: PickupFilter) {
+  if (pickup === 'before-20') return deal.pickupWindow.start < PICKUP_SPLIT_TIME;
+  if (pickup === 'after-20') return deal.pickupWindow.end > PICKUP_SPLIT_TIME;
+
+  return true;
 }
 
 export function useDealFilters(deals: Deal[]) {
   const [categoryId, setCategoryId] = useState<DealCategoryId>('all');
   const [query, setQuery] = useState('');
+  const [radiusKm, setRadiusKm] = useState(DEFAULT_RADIUS_KM);
+  const [minDiscount, setMinDiscount] = useState<DiscountFilter>(DEFAULT_DISCOUNT);
+  const [pickup, setPickup] = useState<PickupFilter>('any');
 
   const keyword = normalizeText(query);
-  const isFiltering = categoryId !== 'all' || keyword.length > 0;
+  const hasAdvancedFilters = minDiscount !== DEFAULT_DISCOUNT || pickup !== 'any';
+  // Bán kính là bối cảnh "gần bạn" chứ không phải bộ lọc, nên không tính vào đây.
+  const isFiltering = categoryId !== 'all' || keyword.length > 0 || hasAdvancedFilters;
 
   const filteredDeals = deals
+    .filter((deal) => deal.distanceKm <= radiusKm)
     .filter((deal) => categoryId === 'all' || deal.categoryId === categoryId)
     .filter(
       (deal) => !keyword || normalizeText(`${deal.name} ${deal.store.name}`).includes(keyword),
     )
+    .filter((deal) => getDiscountPercent(deal) >= minDiscount)
+    .filter((deal) => matchesPickup(deal, pickup))
     .sort((a, b) => a.distanceKm - b.distanceKm);
-
-  const lowStockDeals = deals
-    .filter((deal) => deal.remaining <= LOW_STOCK_THRESHOLD)
-    .sort((a, b) => a.remaining - b.remaining);
 
   const resetFilters = () => {
     setCategoryId('all');
     setQuery('');
+    setRadiusKm(DEFAULT_RADIUS_KM);
+    setMinDiscount(DEFAULT_DISCOUNT);
+    setPickup('any');
   };
 
   return {
@@ -47,9 +56,15 @@ export function useDealFilters(deals: Deal[]) {
     setCategoryId,
     query,
     setQuery,
+    radiusKm,
+    setRadiusKm,
+    minDiscount,
+    setMinDiscount,
+    pickup,
+    setPickup,
+    hasAdvancedFilters,
     isFiltering,
     filteredDeals,
-    lowStockDeals,
     resetFilters,
   };
 }
