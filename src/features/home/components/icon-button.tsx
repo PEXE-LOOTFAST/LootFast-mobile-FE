@@ -1,3 +1,4 @@
+import type { Ref } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { HomeIcon } from '@/features/home/components/home-icon';
@@ -11,6 +12,9 @@ type IconButtonProps = {
   onPress?: () => void;
   tone?: 'header' | 'surface';
   badgeCount?: number;
+  /** Tô nổi nút khi tính năng nó điều khiển đang bật (vd. bộ lọc đang áp dụng). */
+  isActive?: boolean;
+  ref?: Ref<View>;
 };
 
 export function IconButton({
@@ -19,30 +23,33 @@ export function IconButton({
   onPress,
   tone = 'surface',
   badgeCount = 0,
+  isActive = false,
+  ref,
 }: IconButtonProps) {
   const theme = useTheme();
   const onHeader = tone === 'header';
+  const iconColor = onHeader ? HomeHeaderColors.text : isActive ? theme.primary : theme.text;
+  const surface = isActive
+    ? { backgroundColor: theme.primarySoft, borderColor: theme.primary }
+    : { backgroundColor: theme.backgroundElement, borderColor: theme.border };
 
   return (
     <Pressable
+      ref={ref}
       accessibilityLabel={
         badgeCount > 0 ? `${accessibilityLabel}, ${badgeCount} mục mới` : accessibilityLabel
       }
       accessibilityRole="button"
+      accessibilityState={{ selected: isActive }}
       hitSlop={4}
       onPress={onPress}
       style={({ pressed }) => [
         styles.button,
-        onHeader
-          ? {
-              backgroundColor: HomeHeaderColors.controlBackground,
-              borderColor: HomeHeaderColors.controlBorder,
-            }
-          : { backgroundColor: theme.backgroundElement, borderColor: theme.border },
+        onHeader ? styles.headerButton : surface,
         pressed && styles.pressed,
       ]}
     >
-      <HomeIcon name={icon} color={onHeader ? HomeHeaderColors.text : theme.text} size={20} />
+      <HomeIcon name={icon} color={iconColor} size={onHeader ? 24 : 20} />
 
       {badgeCount > 0 ? (
         <View
@@ -70,11 +77,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 14,
   },
+  headerButton: { backgroundColor: 'transparent', borderColor: 'transparent' },
   pressed: { opacity: 0.8 },
   badge: {
     position: 'absolute',
-    top: -6,
-    right: -6,
+    top: 2,
+    right: 2,
     minWidth: 20,
     height: 20,
     alignItems: 'center',

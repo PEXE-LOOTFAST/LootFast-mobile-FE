@@ -79,7 +79,7 @@ export function OrderListScreen() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
-  content: { padding: 20, paddingBottom: 120 },
+  content: { padding: 20, paddingBottom: 32 },
   title: { marginTop: 10, fontSize: 28, fontWeight: '900', letterSpacing: -0.6 },
   subtitle: { marginTop: 7, fontSize: 14 },
   tabs: { flexDirection: 'row', alignItems: 'center', marginTop: 24, borderRadius: 16, padding: 4 },

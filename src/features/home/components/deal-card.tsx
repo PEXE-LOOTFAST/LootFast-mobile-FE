@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { DealImage } from '@/features/home/components/deal-image';
 import { DealMeta } from '@/features/home/components/deal-meta';
 import { HomeIcon } from '@/features/home/components/home-icon';
+import { RatingColor } from '@/features/home/constants/colors';
 import { LOW_STOCK_THRESHOLD } from '@/features/home/constants/deals';
 import { HomeIcons } from '@/features/home/constants/icons';
 import type { Deal } from '@/features/home/types';
@@ -41,12 +42,13 @@ export function DealCard({ deal, onPress }: DealCardProps) {
           </View>
         ) : null}
 
-        <View style={[styles.stock, isLowStock && { backgroundColor: theme.accent }]}>
-          {isLowStock ? <HomeIcon name={HomeIcons.flame} color={LOW_STOCK_TEXT} size={14} /> : null}
-          <Text style={[styles.stockText, isLowStock && { color: LOW_STOCK_TEXT }]}>
-            Còn {deal.remaining} phần
-          </Text>
-        </View>
+        {/* Chỉ báo số phần khi sắp hết, tránh che ảnh món ở những deal còn nhiều. */}
+        {isLowStock ? (
+          <View style={[styles.stock, { backgroundColor: theme.accent }]}>
+            <HomeIcon name={HomeIcons.flame} color={LOW_STOCK_TEXT} size={14} />
+            <Text style={styles.stockText}>Còn {deal.remaining} phần</Text>
+          </View>
+        ) : null}
       </View>
 
       <View style={styles.body}>
@@ -61,7 +63,7 @@ export function DealCard({ deal, onPress }: DealCardProps) {
             <HomeIcon name={HomeIcons.verified} color={theme.primary} size={15} />
           ) : null}
           <View style={styles.rating}>
-            <HomeIcon name={HomeIcons.star} color={theme.accent} size={15} />
+            <HomeIcon name={HomeIcons.star} color={RatingColor} size={14} />
             <Text style={[styles.ratingText, { color: theme.text }]}>
               {deal.store.rating.toFixed(1)}
             </Text>
@@ -79,12 +81,10 @@ export function DealCard({ deal, onPress }: DealCardProps) {
           </Text>
         </View>
 
-        <View style={[styles.divider, { backgroundColor: theme.border }]} />
-
         <View style={styles.metaRow}>
           <DealMeta
             icon={HomeIcons.clock}
-            label={`Nhận ${deal.pickupWindow.start}–${deal.pickupWindow.end}`}
+            label={`${deal.pickupWindow.start}–${deal.pickupWindow.end}`}
           />
           <DealMeta icon={HomeIcons.distance} label={formatDistance(deal.distanceKm)} />
         </View>
@@ -97,34 +97,33 @@ const styles = StyleSheet.create({
   card: {
     overflow: 'hidden',
     borderWidth: 1,
-    borderRadius: 24,
-    boxShadow: '0px 10px 24px rgba(23, 33, 27, 0.06)',
+    borderRadius: 20,
+    boxShadow: '0px 8px 20px rgba(23, 33, 27, 0.06)',
   },
   pressed: { transform: [{ scale: 0.985 }] },
-  media: { height: 184 },
+  media: { height: 170 },
   discount: {
     position: 'absolute',
-    top: 12,
-    right: 12,
+    top: 10,
+    right: 10,
     borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
   },
-  discountText: { color: '#FFFFFF', fontSize: 13, fontWeight: '900' },
+  discountText: { color: '#FFFFFF', fontSize: 12, fontWeight: '900' },
   stock: {
     position: 'absolute',
-    left: 12,
-    bottom: 12,
+    left: 10,
+    bottom: 10,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(23, 33, 27, 0.72)',
     borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
   },
-  stockText: { color: '#FFFFFF', fontSize: 12, fontWeight: '800' },
-  body: { gap: 8, padding: 16 },
+  stockText: { color: LOW_STOCK_TEXT, fontSize: 12, fontWeight: '800' },
+  body: { gap: 6, padding: 14 },
   storeRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   storeIcon: {
     width: 24,
@@ -136,10 +135,9 @@ const styles = StyleSheet.create({
   storeName: { flexShrink: 1, fontSize: 13, fontWeight: '600' },
   rating: { flexDirection: 'row', alignItems: 'center', gap: 3, marginLeft: 'auto' },
   ratingText: { fontSize: 13, fontWeight: '800' },
-  name: { fontSize: 18, fontWeight: '800', lineHeight: 24 },
+  name: { fontSize: 17, fontWeight: '800', lineHeight: 23 },
   priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 8 },
-  price: { fontSize: 22, fontWeight: '900' },
-  originalPrice: { fontSize: 14, textDecorationLine: 'line-through' },
-  divider: { height: StyleSheet.hairlineWidth, marginVertical: 2 },
-  metaRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
+  price: { fontSize: 20, fontWeight: '900' },
+  originalPrice: { fontSize: 13, textDecorationLine: 'line-through' },
+  metaRow: { flexDirection: 'row', flexWrap: 'wrap', columnGap: 16, rowGap: 4 },
 });

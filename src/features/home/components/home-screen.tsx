@@ -1,43 +1,35 @@
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { setStatusBarStyle } from 'expo-status-bar';
-import { useCallback } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { useCallback, useState } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { MaxContentWidth } from '@/constants/theme';
+import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { DealCard } from '@/features/home/components/deal-card';
+import { DealFilterButton } from '@/features/home/components/deal-filter-button';
 import { EmptyDeals } from '@/features/home/components/empty-deals';
 import { HomeHeader } from '@/features/home/components/home-header';
-import { IconButton } from '@/features/home/components/icon-button';
-import { LowStockSection } from '@/features/home/components/low-stock-section';
+import { NotificationSheet } from '@/features/home/components/notification-sheet';
 import { SearchPanel } from '@/features/home/components/search-panel';
 import { SectionHeader } from '@/features/home/components/section-header';
-import { HomeIcons } from '@/features/home/constants/icons';
-import {
-  DEAL_CATEGORIES,
-  MOCK_DEALS,
-  MOCK_LOCATION,
-  MOCK_UNREAD_NOTIFICATIONS,
-} from '@/features/home/data/mock-deals';
+import { DEAL_CATEGORIES, MOCK_DEALS } from '@/features/home/data/mock-deals';
+import { MOCK_NOTIFICATIONS } from '@/features/home/data/mock-notifications';
 import { useDealFilters } from '@/features/home/hooks/use-deal-filters';
+import { useNotifications } from '@/features/home/hooks/use-notifications';
+import type { Deal } from '@/features/home/types';
 import { useAuthSession } from '@/hooks/use-auth-session';
 import { useTheme } from '@/hooks/use-theme';
-import { requireAuth, signOut, withAuth } from '@/lib/auth-session';
+import { requireAuth, withAuth } from '@/lib/auth-session';
+import { formatRadius } from '@/lib/format';
 
 const HORIZONTAL_INSET = 16;
 
 export function HomeScreen() {
   const theme = useTheme();
   const { isAuthenticated } = useAuthSession();
-  const {
-    categoryId,
-    setCategoryId,
-    query,
-    setQuery,
-    isFiltering,
-    filteredDeals,
-    lowStockDeals,
-    resetFilters,
-  } = useDealFilters(MOCK_DEALS);
+  const filters = useDealFilters(MOCK_DEALS);
+  const { notifications, unreadCount, markAsRead } = useNotifications(MOCK_NOTIFICATIONS);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   // Header nền xanh đậm cần icon status bar màu sáng. Trả về 'auto' khi rời màn,
   // nếu không các màn nền sáng khác sẽ bị icon trắng chìm mất.
@@ -48,17 +40,8 @@ export function HomeScreen() {
     }, []),
   );
 
-  const handlePressProfile = () => {
-    // Không truyền thao tác chờ: nếu không, đăng nhập xong sẽ bật ngay hộp thoại đăng xuất.
-    if (!isAuthenticated) {
-      requireAuth();
-      return;
-    }
-
-    Alert.alert('Tài khoản', 'Bạn muốn đăng xuất khỏi LootFast?', [
-      { text: 'Huỷ', style: 'cancel' },
-      { text: 'Đăng xuất', style: 'destructive', onPress: signOut },
-    ]);
+  const openDeal = (deal: Deal) => {
+    requireAuth(() => router.navigate({ pathname: '/deal/[id]', params: { id: deal.id } }));
   };
 
   return (
@@ -69,74 +52,79 @@ export function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <HomeHeader
-          address={MOCK_LOCATION.address}
-          onPressNotifications={withAuth()}
-          onPressProfile={handlePressProfile}
-          unreadCount={MOCK_UNREAD_NOTIFICATIONS}
+          locationLabel={`Gần bạn · ${formatRadius(filters.radiusKm)}`}
+          onPressNotifications={() => requireAuth(() => setIsNotificationsOpen(true))}
+          unreadCount={unreadCount}
         />
 
         <View style={styles.body}>
           <SearchPanel
             categories={DEAL_CATEGORIES}
-            isSearchLocked={!isAuthenticated}
-            onChangeQuery={setQuery}
-            onPressLockedSearch={withAuth()}
-            onPressRadius={withAuth()}
-            onSelectCategory={(id) => requireAuth(() => setCategoryId(id))}
-            query={query}
-            radiusKm={MOCK_LOCATION.radiusKm}
-            selectedCategoryId={categoryId}
+            isLocked={!isAuthenticated}
+            onChangeQuery={filters.setQuery}
+            onChangeRadius={filters.setRadiusKm}
+            onPressLocked={withAuth()}
+            onSelectCategory={(id) => requireAuth(() => filters.setCategoryId(id))}
+            query={filters.query}
+            radiusKm={filters.radiusKm}
+            selectedCategoryId={filters.categoryId}
           />
-
-          {isFiltering ? null : (
-            <LowStockSection
-              deals={lowStockDeals}
-              horizontalInset={HORIZONTAL_INSET}
-              onPressDeal={withAuth()}
-            />
-          )}
 
           <View style={styles.section}>
             <SectionHeader
-              title={isFiltering ? 'Kết quả tìm kiếm' : 'Gợi ý gần bạn'}
+              title={filters.isFiltering ? 'Kết quả tìm kiếm' : 'Gợi ý gần bạn'}
               subtitle={
-                isFiltering
-                  ? `${filteredDeals.length} deal phù hợp`
+                filters.isFiltering
+                  ? `${filters.filteredDeals.length} deal phù hợp`
                   : 'Ưu tiên món gần, tiết kiệm và được đánh giá cao'
               }
               action={
-                <IconButton
-                  accessibilityLabel="Bộ lọc nâng cao"
-                  icon={HomeIcons.filter}
-                  onPress={withAuth()}
+                <DealFilterButton
+                  isActive={filters.hasAdvancedFilters}
+                  isLocked={!isAuthenticated}
+                  minDiscount={filters.minDiscount}
+                  onChangeDiscount={filters.setMinDiscount}
+                  onChangePickup={filters.setPickup}
+                  onPressLocked={withAuth()}
+                  pickup={filters.pickup}
                 />
               }
             />
 
-            {filteredDeals.length > 0 ? (
-              filteredDeals.map((deal) => (
-                <DealCard key={deal.id} deal={deal} onPress={withAuth()} />
+            {filters.filteredDeals.length > 0 ? (
+              filters.filteredDeals.map((deal) => (
+                <DealCard key={deal.id} deal={deal} onPress={() => openDeal(deal)} />
               ))
             ) : (
-              <EmptyDeals onReset={withAuth(resetFilters)} />
+              <EmptyDeals onReset={withAuth(filters.resetFilters)} />
             )}
           </View>
         </View>
       </ScrollView>
+
+      <AssistantFab />
+
+      <NotificationSheet
+        notifications={notifications}
+        onClose={() => setIsNotificationsOpen(false)}
+        onPressItem={markAsRead}
+        visible={isNotificationsOpen}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
-  content: { paddingBottom: 120 },
+  // Chừa chỗ để thẻ deal cuối không bị nút trợ lý nổi che mất.
+  content: { paddingBottom: 96 },
   body: {
     width: '100%',
     maxWidth: MaxContentWidth,
     alignSelf: 'center',
-    gap: 28,
-    marginTop: -44,
+    gap: 20,
+    marginTop: 16,
     paddingHorizontal: HORIZONTAL_INSET,
   },
-  section: { gap: 16 },
+  section: { gap: 14 },
 });
