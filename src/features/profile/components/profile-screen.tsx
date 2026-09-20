@@ -1,10 +1,9 @@
 import { router, type Href } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
-import { useState } from 'react';
+
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { PremiumScreen } from '@/features/profile/components/premium-screen';
 import { useTheme } from '@/hooks/use-theme';
 import { signOut } from '@/lib/auth-session';
 import type { SymbolViewProps } from 'expo-symbols';
@@ -32,6 +31,7 @@ const BENEFITS: ProfileItem[] = [
     icon: ProfileIcons.premium,
     title: 'Gói Người mua Cao cấp',
     subtitle: 'Quản lý gói và quyền lợi Cao cấp',
+    href: { pathname: '/premium', params: { from: '/profile' } },
   },
   {
     icon: ProfileIcons.rewards,
@@ -73,15 +73,7 @@ function ProfileItemRow({ item, onPress }: { item: ProfileItem; onPress?: () => 
   );
 }
 
-function ProfileSection({
-  items,
-  title,
-  onPremiumPress,
-}: {
-  items: ProfileItem[];
-  title: string;
-  onPremiumPress?: () => void;
-}) {
+function ProfileSection({ items, title }: { items: ProfileItem[]; title: string }) {
   const theme = useTheme();
 
   return (
@@ -96,13 +88,7 @@ function ProfileSection({
         <View key={item.title}>
           <ProfileItemRow
             item={item}
-            onPress={
-              item.href
-                ? () => router.navigate(item.href!)
-                : item.title === 'Gói Người mua Cao cấp'
-                  ? onPremiumPress
-                  : undefined
-            }
+            onPress={item.href ? () => router.navigate(item.href as Href) : undefined}
           />
           {index < items.length - 1 ? (
             <View style={[styles.divider, { backgroundColor: theme.border }]} />
@@ -115,7 +101,6 @@ function ProfileSection({
 
 export function ProfileScreen() {
   const theme = useTheme();
-  const [showPremium, setShowPremium] = useState(false);
 
   const handleSignOut = () => {
     Alert.alert('Đăng xuất', 'Bạn muốn đăng xuất khỏi LootFast?', [
@@ -123,10 +108,6 @@ export function ProfileScreen() {
       { text: 'Đăng xuất', style: 'destructive', onPress: signOut },
     ]);
   };
-
-  if (showPremium) {
-    return <PremiumScreen onBack={() => setShowPremium(false)} />;
-  }
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]} edges={['top']}>
@@ -182,11 +163,7 @@ export function ProfileScreen() {
             <SymbolView name={ProfileIcons.camera} size={15} tintColor={theme.primary} />
           </View>
         </View>
-        <ProfileSection
-          items={BENEFITS}
-          onPremiumPress={() => setShowPremium(true)}
-          title="QUYỀN LỢI CỦA BẠN"
-        />
+        <ProfileSection items={BENEFITS} title="QUYỀN LỢI CỦA BẠN" />
         <ProfileSection items={ACCOUNT_ITEMS} title="TÀI KHOẢN NGƯỜI MUA" />
         <Pressable
           accessibilityLabel="Chuyển sang người bán"

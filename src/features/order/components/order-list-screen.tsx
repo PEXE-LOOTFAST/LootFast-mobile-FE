@@ -1,4 +1,4 @@
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { setStatusBarStyle } from 'expo-status-bar';
 import { useCallback, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -13,14 +13,12 @@ import { SavingsSummaryCard } from '@/features/order/components/savings-summary-
 import { MOCK_ORDERS } from '@/features/order/data/mock-orders';
 import { useOrderSavings } from '@/features/order/hooks/use-order-savings';
 import type { OrderStatus, SavingsView } from '@/features/order/types';
-import { PremiumScreen } from '@/features/profile/components/premium-screen';
 import { useTheme } from '@/hooks/use-theme';
 
 export function OrderListScreen() {
   const theme = useTheme();
   const [status, setStatus] = useState<OrderStatus>('pending');
   const [savingsView, setSavingsView] = useState<SavingsView>('week');
-  const [showPremium, setShowPremium] = useState(false);
   const savings = useOrderSavings(MOCK_ORDERS);
   const orders = MOCK_ORDERS.filter((order) => order.status === status);
 
@@ -31,10 +29,6 @@ export function OrderListScreen() {
       return () => setStatusBarStyle('auto');
     }, []),
   );
-
-  if (showPremium) {
-    return <PremiumScreen onBack={() => setShowPremium(false)} />;
-  }
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
@@ -62,7 +56,9 @@ export function OrderListScreen() {
           <SavingsStatsCard
             daily={savings.daily}
             onChangeView={setSavingsView}
-            onPressBenefits={() => setShowPremium(true)}
+            onPressBenefits={() =>
+              router.navigate({ pathname: '/premium', params: { from: '/orders' } })
+            }
             view={savingsView}
           />
         </View>

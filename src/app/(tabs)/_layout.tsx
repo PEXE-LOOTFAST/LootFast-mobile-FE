@@ -27,6 +27,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="map" listeners={guardTab('/map')} options={{ title: 'Bản đồ' }} />
       <Tabs.Screen name="profile" listeners={guardTab('/profile')} options={{ title: 'Hồ sơ' }} />
       <Tabs.Screen name="deal/[id]" options={{ href: null }} />
+      <Tabs.Screen name="premium" options={{ href: null }} />
     </Tabs>
   );
 }
