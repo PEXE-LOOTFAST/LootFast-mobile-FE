@@ -168,7 +168,7 @@ export function ProfileScreen() {
         <Pressable
           accessibilityLabel="Chuyển sang người bán"
           accessibilityRole="button"
-          onPress={() => Alert.alert('Người bán', 'Tính năng đang được phát triển.')}
+          onPress={() => router.navigate('/seller')}
           style={[
             styles.sellerButton,
             { backgroundColor: theme.backgroundElement, borderColor: theme.border },
