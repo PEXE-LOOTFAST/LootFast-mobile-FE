@@ -321,6 +321,30 @@ CI sẽ tự chạy `typecheck` + `lint` trên mỗi PR. Phải xanh mới đư�
 
 `develop` → `main` chỉ khi phát hành phiên bản.
 
+### Đặt tên nhánh
+
+```
+<loại>/<đối tượng>/<mô tả ngắn>
+```
+
+| Phần           | Giá trị                                                                                                       |
+| -------------- | ------------------------------------------------------------------------------------------------------------- |
+| `<loại>`       | `feat`, `fix`, `refactor`, `chore`, `docs`                                                                    |
+| `<đối tượng>`  | `buyer` (người mua), `seller` (người bán), `admin` (quản trị), `shared` (dùng chung: theme, tab bar, lib, CI) |
+| `<mô tả ngắn>` | không dấu, nối bằng `-`                                                                                       |
+
+```bash
+git switch -c feat/seller/overview-page-ui     # Tổng quan của người bán
+git switch -c feat/buyer/checkout-ui           # Thanh toán của người mua
+git switch -c feat/admin/store-approval-ui     # Duyệt quán của admin
+git switch -c fix/shared/tab-bar-safe-area     # Lỗi ở phần dùng chung
+```
+
+Một app có ba nhóm người dùng hoàn toàn khác nhau, nên nhìn tên nhánh phải biết ngay
+nó đụng vào màn hình của ai — `feat/order-page-ui` thì không nói được đó là đơn của
+người mua hay đơn của quán. Quy ước này **chỉ áp dụng cho nhánh tạo mới từ giờ**;
+các nhánh và PR đang mở giữ nguyên tên cũ, không đổi.
+
 ---
 
 ## Biến môi trường.
