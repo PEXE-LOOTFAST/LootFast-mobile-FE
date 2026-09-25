@@ -2,10 +2,12 @@ export type SessionStatus = 'guest' | 'authenticated';
 
 export type SessionState = {
   status: SessionStatus;
+  /** Phiên đăng nhập qua cổng quản trị — chỉ khi này mới được vào khu vực /admin. */
+  isAdmin: boolean;
   isAuthPromptOpen: boolean;
 };
 
-let state: SessionState = { status: 'guest', isAuthPromptOpen: false };
+let state: SessionState = { status: 'guest', isAdmin: false, isAuthPromptOpen: false };
 let pendingAction: (() => void) | null = null;
 const listeners = new Set<() => void>();
 
@@ -53,9 +55,16 @@ export function signIn() {
   if (action) setTimeout(action, 0);
 }
 
+// Tách khỏi signIn vì signIn được truyền thẳng làm callback của form (nhận giá trị form làm
+// tham số), thêm tham số vai trò vào đó sẽ bị nhận nhầm.
+export function signInAsAdmin() {
+  pendingAction = null;
+  setState({ status: 'authenticated', isAdmin: true, isAuthPromptOpen: false });
+}
+
 export function signOut() {
   pendingAction = null;
-  setState({ status: 'guest', isAuthPromptOpen: false });
+  setState({ status: 'guest', isAdmin: false, isAuthPromptOpen: false });
 }
 
 export function dismissAuthPrompt() {

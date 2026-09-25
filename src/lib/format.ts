@@ -23,3 +23,14 @@ export function formatRadius(km: number): string {
 
   return `${km}km`;
 }
+
+const WEEKDAY_NAMES = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+
+const pad = (value: number) => value.toString().padStart(2, '0');
+
+// "Chủ Nhật, 20/09/2026" — Intl trên Android/Hermes không có sẵn locale tiếng Việt nên tự dựng chuỗi.
+export function formatFullDate(date: Date): string {
+  const weekday = WEEKDAY_NAMES[date.getDay()] ?? '';
+
+  return `${weekday}, ${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
+}

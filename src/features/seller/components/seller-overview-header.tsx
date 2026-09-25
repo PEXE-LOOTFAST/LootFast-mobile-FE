@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HomeIcon } from '@/features/home/components/home-icon';
 import { HomeHeaderColors } from '@/features/home/constants/colors';
 import { SellerIcons } from '@/features/seller/constants/icons';
+import { formatFullDate } from '@/lib/format';
 
 type SellerOverviewHeaderProps = {
   shopName: string;
@@ -11,17 +12,6 @@ type SellerOverviewHeaderProps = {
   date: Date;
   onPressCreateDeal: () => void;
 };
-
-const WEEKDAY_NAMES = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-
-const pad = (value: number) => value.toString().padStart(2, '0');
-
-// "Chủ Nhật, 20/09/2026" — Intl trên Android/Hermes không có sẵn locale tiếng Việt nên tự dựng chuỗi.
-function formatFullDate(date: Date) {
-  const weekday = WEEKDAY_NAMES[date.getDay()] ?? '';
-
-  return `${weekday}, ${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
-}
 
 // Cùng kiểu header xanh đậm với Trang chủ và Đơn hàng để các tab chính đồng bộ.
 export function SellerOverviewHeader({
