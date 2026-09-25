@@ -5,8 +5,15 @@ import { HomeIcon } from '@/features/home/components/home-icon';
 import { HomeHeaderColors } from '@/features/home/constants/colors';
 import { SellerIcons } from '@/features/seller/constants/icons';
 
-// Cùng nền xanh đậm với các tab người bán khác, thêm nút quay lại cạnh tiêu đề.
-export function SellerReportHeader({ onPressBack }: { onPressBack: () => void }) {
+type SellerPageHeaderProps = {
+  title: string;
+  subtitle: string;
+  onPressBack: () => void;
+};
+
+// Cùng nền xanh đậm với các tab người bán khác, thêm nút quay lại cạnh tiêu đề. Dùng chung
+// cho trang Báo cáo và các trang con mở từ Hồ sơ quán.
+export function SellerPageHeader({ title, subtitle, onPressBack }: SellerPageHeaderProps) {
   const insets = useSafeAreaInsets();
 
   return (
@@ -27,9 +34,9 @@ export function SellerReportHeader({ onPressBack }: { onPressBack: () => void })
 
       <View style={styles.copy}>
         <Text accessibilityRole="header" style={styles.title}>
-          Báo cáo
+          {title}
         </Text>
-        <Text style={styles.subtitle}>Doanh thu từ deal và hiệu suất vận hành</Text>
+        <Text style={styles.subtitle}>{subtitle}</Text>
       </View>
     </View>
   );
@@ -76,6 +83,11 @@ const styles = StyleSheet.create({
   },
   copy: { flex: 1, gap: 4 },
   title: { color: HomeHeaderColors.text, fontSize: 22, fontWeight: '900', letterSpacing: -0.4 },
-  subtitle: { color: HomeHeaderColors.textMuted, fontSize: 13, fontWeight: '600' },
+  subtitle: {
+    color: HomeHeaderColors.textMuted,
+    fontSize: 13,
+    fontWeight: '600',
+    lineHeight: 18,
+  },
   pressed: { opacity: 0.7 },
 });

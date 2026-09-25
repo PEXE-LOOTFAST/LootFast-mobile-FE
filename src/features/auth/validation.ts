@@ -1,8 +1,8 @@
 import type { FormErrors, LoginValues, RegisterValues } from '@/features/auth/types';
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const USERNAME_PATTERN = /^[a-zA-Z0-9_.]{3,30}$/;
-const PHONE_PATTERN = /^0\d{9}$/;
+export const PHONE_PATTERN = /^0\d{9}$/;
 
 export const MIN_PASSWORD_LENGTH = 8;
 
