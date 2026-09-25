@@ -88,9 +88,7 @@ export function LoginForm({ initialIdentifier = '', onSubmit, onTryDemo }: Login
                 isSubmitting && styles.disabled,
               ]}
             >
-              <View style={[styles.demoIcon, { backgroundColor: theme.primarySoft }]}>
-                <FieldIcon name={account.icon} color={theme.primary} size={18} />
-              </View>
+              <FieldIcon name={account.icon} color={theme.primary} size={15} />
               <Text numberOfLines={1} style={[styles.demoLabel, { color: theme.text }]}>
                 {account.label}
               </Text>
@@ -109,27 +107,24 @@ const styles = StyleSheet.create({
   container: { gap: 20 },
   forgot: { alignSelf: 'flex-end', marginTop: -6 },
   forgotText: { fontSize: 13, fontWeight: '700' },
-  demo: { gap: 12 },
-  demoTitle: { fontSize: 12, fontWeight: '800', letterSpacing: 0.4, textAlign: 'center' },
-  demoRow: { flexDirection: 'row', gap: 10 },
+  // Cụm demo là phần tạm, sẽ xoá khi có tài khoản thật: mọi khoảng cách của nó nằm gọn
+  // trong styles.demo nên xoá cả khối <View style={styles.demo}> là đủ, không cần sửa gì thêm.
+  demo: { gap: 8 },
+  demoTitle: { fontSize: 11, fontWeight: '700', letterSpacing: 0.3, textAlign: 'center' },
+  demoRow: { flexDirection: 'row', gap: 8 },
   demoButton: {
     flex: 1,
-    alignItems: 'center',
-    gap: 6,
-    borderWidth: 1,
-    borderRadius: 16,
-    paddingHorizontal: 4,
-    paddingVertical: 12,
-  },
-  demoIcon: {
-    width: 36,
-    height: 36,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 18,
+    gap: 5,
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 6,
+    paddingVertical: 8,
   },
-  demoLabel: { fontSize: 13, fontWeight: '800' },
+  demoLabel: { fontSize: 12, fontWeight: '700' },
   pressed: { opacity: 0.8 },
   disabled: { opacity: 0.5 },
-  demoNote: { textAlign: 'center', fontSize: 13 },
+  demoNote: { textAlign: 'center', fontSize: 11 },
 });
