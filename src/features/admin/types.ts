@@ -40,3 +40,17 @@ export type AdminAlert = {
   /** Thời gian tương đối đã định dạng sẵn, vd. "10 phút trước". */
   timeLabel: string;
 };
+
+export type ManagedAccountKind = 'store' | 'user';
+
+export type ManagedAccountStatus = 'active' | 'locked';
+
+/** Một quán hoặc người dùng trong danh sách Quản lý. */
+export type ManagedAccount = {
+  id: string;
+  kind: ManagedAccountKind;
+  name: string;
+  /** Quán: quận/huyện, vd. "Q.10". Người dùng: số deal đã mua. */
+  detail: string;
+  status: ManagedAccountStatus;
+};
