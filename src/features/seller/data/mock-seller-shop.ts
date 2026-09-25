@@ -1,8 +1,27 @@
-import type { SellerDeal, SellerOrder, SellerPlan, SellerShop } from '@/features/seller/types';
+import type {
+  SellerDeal,
+  SellerOrder,
+  SellerOwner,
+  SellerPlan,
+  SellerShop,
+} from '@/features/seller/types';
 
 // Dữ liệu mẫu cho tới khi có API người bán. Giữ đúng shape của SellerDeal/SellerOrder để
 // lúc thay bằng hook TanStack Query không phải sửa lại component.
-export const MOCK_SELLER_SHOP: SellerShop = { name: 'Quán Ăn Tester', isVerified: true };
+export const MOCK_SELLER_SHOP: SellerShop = {
+  name: 'Quán Ăn Tester',
+  isVerified: true,
+  email: 'demo@lootfast.vn',
+  address: '3 đường 53B, TP.HCM',
+  categories: ['rice-noodle', 'banh-mi', 'drinks'],
+  openingHours: { open: '10:00', close: '23:59' },
+};
+
+export const MOCK_SELLER_OWNER: SellerOwner = {
+  fullName: 'Tài khoản Demo',
+  email: 'demo@lootfast.vn',
+  phone: '',
+};
 
 export const MOCK_SELLER_PLAN: SellerPlan = {
   name: 'Miễn phí',

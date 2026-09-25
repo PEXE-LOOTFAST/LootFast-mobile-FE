@@ -13,12 +13,9 @@ import { UpcomingPickupCard } from '@/features/seller/components/upcoming-pickup
 import { WeeklyPerformanceCard } from '@/features/seller/components/weekly-performance-card';
 import { WeeklySummaryCard } from '@/features/seller/components/weekly-summary-card';
 import { SellerIcons } from '@/features/seller/constants/icons';
-import {
-  MOCK_SELLER_DEALS,
-  MOCK_SELLER_ORDERS,
-  MOCK_SELLER_SHOP,
-} from '@/features/seller/data/mock-seller-shop';
+import { MOCK_SELLER_DEALS, MOCK_SELLER_ORDERS } from '@/features/seller/data/mock-seller-shop';
 import { useSellerOverview } from '@/features/seller/hooks/use-seller-overview';
+import { useSellerProfile } from '@/features/seller/hooks/use-seller-profile';
 import { useTheme } from '@/hooks/use-theme';
 import { formatPrice } from '@/lib/format';
 
@@ -27,6 +24,7 @@ export function SellerOverviewScreen() {
   // Chốt ngày lúc mount để dòng ngày trên header không nhảy giữa các lần render.
   const [today] = useState(() => new Date());
   const overview = useSellerOverview(MOCK_SELLER_DEALS, MOCK_SELLER_ORDERS);
+  const { shop } = useSellerProfile();
 
   // Header nền xanh đậm cần icon status bar màu sáng, trả về 'auto' khi rời màn.
   useFocusEffect(
@@ -41,9 +39,9 @@ export function SellerOverviewScreen() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <SellerOverviewHeader
           date={today}
-          isVerified={MOCK_SELLER_SHOP.isVerified}
+          isVerified={shop.isVerified}
           onPressCreateDeal={() => router.navigate('/seller/new-deal')}
-          shopName={MOCK_SELLER_SHOP.name}
+          shopName={shop.name}
         />
 
         <View style={styles.body}>
