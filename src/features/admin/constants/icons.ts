@@ -24,6 +24,9 @@ export const AdminIcons = {
     android: 'admin_panel_settings',
     web: 'admin_panel_settings',
   },
+  wallet: { ios: 'wallet.pass', android: 'account_balance_wallet', web: 'account_balance_wallet' },
+  trendUp: { ios: 'chart.line.uptrend.xyaxis', android: 'trending_up', web: 'trending_up' },
+  shieldCheck: { ios: 'checkmark.shield', android: 'verified_user', web: 'verified_user' },
   person: { ios: 'person.crop.circle', android: 'account_circle', web: 'account_circle' },
   logout: {
     ios: 'rectangle.portrait.and.arrow.right',
