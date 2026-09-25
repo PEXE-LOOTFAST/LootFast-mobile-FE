@@ -18,7 +18,8 @@ export type SellerDeal = {
   endedReason?: 'sold-out' | 'expired';
 };
 
-export type SellerOrderStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled';
+/** 'no-show': khách đã đặt nhưng hết khung nhận vẫn không tới lấy, khác với đơn bị huỷ. */
+export type SellerOrderStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no-show';
 
 export type SellerOrder = {
   id: string;

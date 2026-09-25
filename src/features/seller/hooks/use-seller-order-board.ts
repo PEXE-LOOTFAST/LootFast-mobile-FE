@@ -20,6 +20,7 @@ const BUCKET_BY_STATUS: Record<SellerOrderStatus, SellerPickupBucket> = {
   confirmed: 'waiting',
   completed: 'picked',
   cancelled: 'no-show',
+  'no-show': 'no-show',
 };
 
 const EMPTY_COUNTS: Record<SellerPickupBucket, number> = { waiting: 0, picked: 0, 'no-show': 0 };
