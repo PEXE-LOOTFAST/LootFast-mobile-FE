@@ -15,4 +15,5 @@ export const SellerIcons = {
   calendar: { ios: 'calendar', android: 'calendar_month', web: 'calendar_month' },
   code: { ios: 'number', android: 'tag', web: 'tag' },
   pause: { ios: 'pause.circle', android: 'pause_circle', web: 'pause_circle' },
+  back: { ios: 'chevron.left', android: 'arrow_back', web: 'arrow_back' },
 } satisfies Record<string, HomeIconName>;
