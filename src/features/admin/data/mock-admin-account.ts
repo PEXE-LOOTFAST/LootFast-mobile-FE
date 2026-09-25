@@ -4,3 +4,10 @@ export const MOCK_ADMIN_ACCOUNT = {
   email: 'admin@lootfast.vn',
   password: 'admin123',
 } as const;
+
+// Hồ sơ hiển thị ở trang Cài đặt, tách khỏi thông tin đăng nhập ở trên.
+export const MOCK_ADMIN_PROFILE = {
+  name: 'Nguyễn Quản Trị',
+  email: MOCK_ADMIN_ACCOUNT.email,
+  role: 'Super Admin',
+} as const;

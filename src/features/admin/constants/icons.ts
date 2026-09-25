@@ -30,6 +30,7 @@ export const AdminIcons = {
   trendUp: { ios: 'chart.line.uptrend.xyaxis', android: 'trending_up', web: 'trending_up' },
   shieldCheck: { ios: 'checkmark.shield', android: 'verified_user', web: 'verified_user' },
   person: { ios: 'person.crop.circle', android: 'account_circle', web: 'account_circle' },
+  chevronRight: { ios: 'chevron.right', android: 'chevron_right', web: 'chevron_right' },
   logout: {
     ios: 'rectangle.portrait.and.arrow.right',
     android: 'logout',
