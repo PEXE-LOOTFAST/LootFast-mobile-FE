@@ -14,4 +14,7 @@ export const AuthIcons = {
   show: { ios: 'eye', android: 'visibility', web: 'visibility' },
   hide: { ios: 'eye.slash', android: 'visibility_off', web: 'visibility_off' },
   success: { ios: 'checkmark.seal.fill', android: 'check_circle', web: 'check_circle' },
+  buyer: { ios: 'bag', android: 'shopping_bag', web: 'shopping_bag' },
+  seller: { ios: 'storefront', android: 'storefront', web: 'storefront' },
+  admin: { ios: 'checkmark.shield', android: 'admin_panel_settings', web: 'admin_panel_settings' },
 } satisfies Record<string, AuthIconName>;
