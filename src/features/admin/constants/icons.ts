@@ -3,6 +3,8 @@ import type { HomeIconName } from '@/features/home/constants/icons';
 // SF Symbols chỉ có trên iOS, Android và web dùng Material Symbols — mỗi icon phải khai báo đủ cả hai tên.
 export const AdminIcons = {
   bell: { ios: 'bell', android: 'notifications', web: 'notifications' },
+  search: { ios: 'magnifyingglass', android: 'search', web: 'search' },
+  clear: { ios: 'xmark.circle.fill', android: 'close', web: 'close' },
   food: { ios: 'fork.knife', android: 'restaurant', web: 'restaurant' },
   store: { ios: 'storefront', android: 'storefront', web: 'storefront' },
   phone: { ios: 'phone', android: 'call', web: 'call' },
