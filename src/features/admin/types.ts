@@ -15,3 +15,28 @@ export type StoreApplication = {
   hasFoodSafetyCert: boolean;
   status: StoreApplicationStatus;
 };
+
+export type AdminStatTone = 'primary' | 'accent';
+
+/** Một ô số liệu toàn sàn trên trang Tổng quan. `value` đã định dạng sẵn để hiển thị. */
+export type AdminStat = {
+  id: string;
+  label: string;
+  value: string;
+  caption: string;
+  icon: 'store' | 'people' | 'food' | 'wallet';
+  tone: AdminStatTone;
+};
+
+/** Số deal được duyệt trong một ngày, dùng cho biểu đồ 7 ngày. */
+export type DailyDealApproval = { key: string; label: string; count: number };
+
+export type AdminAlertKind = 'warning' | 'info';
+
+export type AdminAlert = {
+  id: string;
+  kind: AdminAlertKind;
+  message: string;
+  /** Thời gian tương đối đã định dạng sẵn, vd. "10 phút trước". */
+  timeLabel: string;
+};
