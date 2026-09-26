@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { MaxContentWidth } from '@/constants/theme';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
@@ -9,17 +9,90 @@ import { SellerMenuList, type SellerMenuItem } from '@/features/seller/component
 import { SellerShopHeader } from '@/features/seller/components/seller-shop-header';
 import { ShopInfoSheet } from '@/features/seller/components/shop-info-sheet';
 import { SellerIcons } from '@/features/seller/constants/icons';
-import { updateSellerShop } from '@/features/seller/data/seller-profile-store';
+import {
+  openCloseToSlots,
+  slotsToOpenClose,
+  useMerchantShop,
+} from '@/features/seller/hooks/use-merchant-shop';
+import { useMerchantImageUpload } from '@/features/seller/hooks/use-merchant-image-upload';
+import type { SellerShop, SellerShopCategory } from '@/features/seller/types';
 import { useLightStatusBar } from '@/features/seller/hooks/use-light-status-bar';
-import { useSellerProfile } from '@/features/seller/hooks/use-seller-profile';
 import { useTheme } from '@/hooks/use-theme';
 
-// Tab Hồ sơ quán là trang trung chuyển: mỗi mục mở một trang con có nút quay lại về đây.
+function mapErrorCode(code: string): string {
+  const messages: Record<string, string> = {
+    UNAUTHORIZED: 'Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.',
+    FORBIDDEN: 'Tài khoản chưa được cấp quyền Người bán.',
+    MERCHANT_PROFILE_NOT_FOUND: 'Chưa tìm thấy hồ sơ quán.',
+    VALIDATION_FAILED: 'Thông tin không hợp lệ. Vui lòng kiểm tra lại.',
+    OPENING_HOURS_OVERLAP: 'Khung giờ mở cửa trong ngày không được trùng nhau.',
+    FILE_TOO_LARGE: 'Ảnh vượt quá 5 MB. Vui lòng chọn ảnh nhỏ hơn.',
+    UPLOAD_RATE_LIMIT_EXCEEDED: 'Đổi ảnh quá nhiều lần. Thử lại sau 1 giờ.',
+    SERVICE_UNAVAILABLE: 'Dịch vụ tạm thời bảo trì. Thử lại sau.',
+  };
+  return messages[code] ?? 'Đã có lỗi xảy ra. Vui lòng thử lại.';
+}
+
 export function SellerShopScreen() {
   const theme = useTheme();
-  const { shop } = useSellerProfile();
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   useLightStatusBar();
+
+  const {
+    profile,
+    location,
+    openingHours,
+    isLoading,
+    isSaving,
+    refetch,
+    updateProfile,
+    updateLocation,
+    updateOpeningHours,
+  } = useMerchantShop();
+
+  const { pickAndUpload } = useMerchantImageUpload();
+
+  const shopForForm: SellerShop = {
+    name: profile?.storeName ?? '',
+    isVerified: profile !== undefined,
+    email: profile?.contactEmail ?? '',
+    address: location?.addressLine ?? '',
+    categories: profile?.businessCategory ? [profile.businessCategory as SellerShopCategory] : [],
+    openingHours: slotsToOpenClose(openingHours),
+  };
+
+  async function handleSave(partial: Partial<SellerShop>) {
+    try {
+      if (partial.name !== undefined || partial.categories !== undefined) {
+        await updateProfile({
+          storeName: partial.name?.trim() ?? profile?.storeName ?? '',
+          description: profile?.description ?? undefined,
+          businessCategory: partial.categories?.[0] ?? profile?.businessCategory ?? '',
+          contactEmail: profile?.contactEmail ?? '',
+          contactPhone: profile?.contactPhone ?? '',
+        });
+      }
+      if (partial.address !== undefined) {
+        await updateLocation({
+          addressLine: partial.address.trim(),
+          ward: location?.ward ?? '',
+          district: location?.district ?? '',
+          city: location?.city ?? '',
+          latitude: location?.latitude ?? 0,
+          longitude: location?.longitude ?? 0,
+        });
+      }
+      if (partial.openingHours !== undefined) {
+        await updateOpeningHours(
+          openCloseToSlots(partial.openingHours.open, partial.openingHours.close),
+        );
+      }
+      setIsInfoOpen(false);
+    } catch (err) {
+      const code = err instanceof Error ? err.message : 'UNKNOWN_ERROR';
+      Alert.alert('Lỗi lưu thông tin', mapErrorCode(code));
+    }
+  }
 
   const menuItems: SellerMenuItem[] = [
     {
@@ -64,14 +137,22 @@ export function SellerShopScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={refetch}
+            tintColor={theme.primary}
+            colors={[theme.primary]}
+          />
+        }
+      >
         <SellerShopHeader
-          email={shop.email}
-          // Chưa có thư viện chọn ảnh và API tải ảnh lên.
-          onPressAvatar={() =>
-            Alert.alert('Ảnh đại diện', 'Tính năng đổi ảnh quán đang được phát triển.')
-          }
-          shopName={shop.name}
+          email={isLoading ? '' : (profile?.contactEmail ?? '')}
+          onPressAvatar={() => pickAndUpload('logo')}
+          shopName={isLoading ? 'Đang tải...' : (profile?.storeName ?? '—')}
         />
 
         <View style={styles.body}>
@@ -97,9 +178,9 @@ export function SellerShopScreen() {
 
       <ShopInfoSheet
         onClose={() => setIsInfoOpen(false)}
-        onSave={updateSellerShop}
-        shop={shop}
-        visible={isInfoOpen}
+        onSave={handleSave}
+        shop={shopForForm}
+        visible={isInfoOpen && !isSaving}
       />
     </View>
   );

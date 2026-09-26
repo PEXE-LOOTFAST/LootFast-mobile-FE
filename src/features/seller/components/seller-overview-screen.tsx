@@ -15,18 +15,16 @@ import { WeeklySummaryCard } from '@/features/seller/components/weekly-summary-c
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { MOCK_SELLER_DEALS, MOCK_SELLER_ORDERS } from '@/features/seller/data/mock-seller-shop';
 import { useSellerOverview } from '@/features/seller/hooks/use-seller-overview';
-import { useSellerProfile } from '@/features/seller/hooks/use-seller-profile';
+import { useMerchantShop } from '@/features/seller/hooks/use-merchant-shop';
 import { useTheme } from '@/hooks/use-theme';
 import { formatPrice } from '@/lib/format';
 
 export function SellerOverviewScreen() {
   const theme = useTheme();
-  // Chốt ngày lúc mount để dòng ngày trên header không nhảy giữa các lần render.
   const [today] = useState(() => new Date());
   const overview = useSellerOverview(MOCK_SELLER_DEALS, MOCK_SELLER_ORDERS);
-  const { shop } = useSellerProfile();
+  const { profile } = useMerchantShop();
 
-  // Header nền xanh đậm cần icon status bar màu sáng, trả về 'auto' khi rời màn.
   useFocusEffect(
     useCallback(() => {
       setStatusBarStyle('light');
@@ -39,13 +37,12 @@ export function SellerOverviewScreen() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <SellerOverviewHeader
           date={today}
-          isVerified={shop.isVerified}
+          isVerified={profile !== undefined}
           onPressCreateDeal={() => router.navigate('/seller/new-deal')}
-          shopName={shop.name}
+          shopName={profile?.storeName ?? ''}
         />
 
         <View style={styles.body}>
-          {/* Số liệu đang tính từ dữ liệu mẫu trên máy, chưa đồng bộ với máy chủ. */}
           <Text style={[styles.storageNote, { color: theme.textSecondary }]}>
             Dữ liệu được lưu trên thiết bị này
           </Text>
@@ -121,7 +118,6 @@ export function SellerOverviewScreen() {
         </View>
       </ScrollView>
 
-      {/* Nâng lên trên thanh tab người bán để nút trợ lý không đè lên nút Đăng deal. */}
       <AssistantFab bottomOffset={96} />
     </View>
   );
