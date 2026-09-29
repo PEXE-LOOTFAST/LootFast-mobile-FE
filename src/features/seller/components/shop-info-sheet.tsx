@@ -14,15 +14,14 @@ import Animated, { SlideInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BrandButton } from '@/components/ui/brand-button';
-import type { FormErrors } from '@/features/auth/types';
-import { HomeIcon } from '@/features/home/components/home-icon';
-import type { HomeIconName } from '@/features/home/constants/icons';
-import { SellerFormField } from '@/features/seller/components/seller-form-field';
+import { Icon, type IconName } from '@/components/ui/icon';
+import { TextField } from '@/components/ui/text-field';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { SHOP_CATEGORY_OPTIONS } from '@/features/seller/constants/shop-categories';
 import type { SellerShop, SellerShopCategory } from '@/features/seller/types';
 import { validateShopInfo, type ShopInfoValues } from '@/features/seller/validation';
 import { useTheme } from '@/hooks/use-theme';
+import type { FormErrors } from '@/types/form';
 
 type ShopInfoSheetProps = {
   visible: boolean;
@@ -76,7 +75,7 @@ export function ShopInfoSheet({ visible, shop, onClose, onSave }: ShopInfoSheetP
 
           <View style={styles.header}>
             <View style={[styles.headerIcon, { backgroundColor: theme.primary }]}>
-              <HomeIcon name={SellerIcons.store} color="#FFFFFF" size={22} />
+              <Icon name={SellerIcons.store} color="#FFFFFF" size={22} />
             </View>
             <View style={styles.headerCopy}>
               <Text accessibilityRole="header" style={[styles.title, { color: theme.text }]}>
@@ -97,7 +96,7 @@ export function ShopInfoSheet({ visible, shop, onClose, onSave }: ShopInfoSheetP
                 pressed && styles.pressed,
               ]}
             >
-              <HomeIcon name={SellerIcons.close} color={theme.text} size={16} />
+              <Icon name={SellerIcons.close} color={theme.text} size={16} />
             </Pressable>
           </View>
 
@@ -159,14 +158,16 @@ function ShopInfoForm({
       showsVerticalScrollIndicator={false}
       style={styles.scroll}
     >
-      <SellerFormField
+      <TextField
+        size="compact"
         error={errors.name}
         label="Tên cửa hàng"
         onChangeText={(text) => setField('name', text)}
         placeholder="Tên quán hiển thị với khách"
         value={values.name}
       />
-      <SellerFormField
+      <TextField
+        size="compact"
         error={errors.address}
         label="Địa chỉ"
         onChangeText={(text) => setField('address', text)}
@@ -253,7 +254,7 @@ function ShopInfoForm({
             pressed && styles.pressed,
           ]}
         >
-          <HomeIcon name={SellerIcons.upload} color={theme.text} size={16} />
+          <Icon name={SellerIcons.upload} color={theme.text} size={16} />
           <Text style={[styles.uploadLabel, { color: theme.text }]}>
             Tải lên nếu đã có giấy phép
           </Text>
@@ -267,12 +268,12 @@ function ShopInfoForm({
   );
 }
 
-function GroupLabel({ icon, label }: { icon: HomeIconName; label: string }) {
+function GroupLabel({ icon, label }: { icon: IconName; label: string }) {
   const theme = useTheme();
 
   return (
     <View style={styles.groupLabelRow}>
-      <HomeIcon name={icon} color={theme.text} size={13} />
+      <Icon name={icon} color={theme.text} size={13} />
       <Text style={[styles.groupLabel, { color: theme.text }]}>{label}</Text>
     </View>
   );
@@ -298,14 +299,15 @@ function TimeField({
   };
 
   return (
-    <SellerFormField
+    <TextField
+      size="compact"
       accessibilityLabel={label}
       error={error}
       keyboardType="number-pad"
       maxLength={5}
       onChangeText={handleChange}
       placeholder="HH:mm"
-      trailing={<HomeIcon name={SellerIcons.clock} color={theme.text} size={16} />}
+      trailing={<Icon name={SellerIcons.clock} color={theme.text} size={16} />}
       value={value}
     />
   );

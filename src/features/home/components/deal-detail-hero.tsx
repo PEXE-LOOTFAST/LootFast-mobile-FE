@@ -1,9 +1,9 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Icon, type IconName } from '@/components/ui/icon';
 import { DealImage } from '@/features/home/components/deal-image';
-import { HomeIcon } from '@/features/home/components/home-icon';
-import { HomeIcons, type HomeIconName } from '@/features/home/constants/icons';
+import { HomeIcons } from '@/features/home/constants/icons';
 import type { Deal } from '@/features/home/types';
 import { useTheme } from '@/hooks/use-theme';
 import { formatDiscount } from '@/lib/format';
@@ -63,7 +63,7 @@ export function DealDetailHero({
 }
 
 type HeroButtonProps = {
-  icon: HomeIconName;
+  icon: IconName;
   accessibilityLabel: string;
   onPress: () => void;
   activeColor?: string;
@@ -83,7 +83,7 @@ function HeroButton({ icon, accessibilityLabel, onPress, activeColor }: HeroButt
         pressed && styles.pressed,
       ]}
     >
-      <HomeIcon name={icon} color="#FFFFFF" size={20} />
+      <Icon name={icon} color="#FFFFFF" size={20} />
     </Pressable>
   );
 }

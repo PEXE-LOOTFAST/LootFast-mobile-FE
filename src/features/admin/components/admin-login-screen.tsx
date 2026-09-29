@@ -10,10 +10,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Icon } from '@/components/ui/icon';
 import { AdminLoginForm } from '@/features/admin/components/admin-login-form';
 import { AdminIcons } from '@/features/admin/constants/icons';
 import { AuthBackdrop } from '@/features/auth/components/auth-backdrop';
-import { HomeIcon } from '@/features/home/components/home-icon';
 import { useAuthSession } from '@/hooks/use-auth-session';
 import { useTheme } from '@/hooks/use-theme';
 import { signInAsAdmin } from '@/lib/auth-session';
@@ -46,7 +46,7 @@ export function AdminLoginScreen() {
         >
           <View style={styles.header}>
             <View style={[styles.logo, { backgroundColor: theme.primary }]}>
-              <HomeIcon name={AdminIcons.shield} color="#FFFFFF" size={34} />
+              <Icon name={AdminIcons.shield} color="#FFFFFF" size={34} />
             </View>
 
             <View style={styles.brandRow}>

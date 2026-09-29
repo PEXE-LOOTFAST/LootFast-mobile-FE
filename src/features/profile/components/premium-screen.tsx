@@ -1,7 +1,8 @@
-import { SymbolView } from 'expo-symbols';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Icon } from '@/components/ui/icon';
+import { ProfileIcons } from '@/features/profile/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
 
 type PremiumScreenProps = {
@@ -33,17 +34,12 @@ const PREMIUM_BENEFITS: Benefit[] = [
   { label: 'Hỗ trợ ưu tiên' },
 ];
 
-const Icons = {
-  back: { ios: 'chevron.left', android: 'arrow_back', web: 'arrow_back' },
-  check: { ios: 'checkmark.circle', android: 'check_circle', web: 'check_circle' },
-} as const;
-
 function BenefitRow({ benefit, accent }: { benefit: Benefit; accent: string }) {
   const theme = useTheme();
 
   return (
     <View style={styles.benefitRow}>
-      <SymbolView name={Icons.check} size={16} tintColor={accent} />
+      <Icon name={ProfileIcons.check} color={accent} size={16} />
       <Text style={[styles.benefitLabel, { color: theme.text }]}>{benefit.label}</Text>
       {benefit.premiumLabel ? (
         <View style={[styles.badge, { backgroundColor: theme.backgroundElement }]}>
@@ -87,10 +83,10 @@ function PlanCard({
             {price}
           </Text>
         </View>
-        <SymbolView
-          name={Icons.check}
+        <Icon
+          name={ProfileIcons.check}
+          color={premium ? '#12659A' : theme.textSecondary}
           size={22}
-          tintColor={premium ? '#12659A' : theme.textSecondary}
         />
       </View>
       <View style={styles.benefits}>
@@ -128,7 +124,7 @@ export function PremiumScreen({ onBack }: PremiumScreenProps) {
             onPress={onBack}
             style={styles.backButton}
           >
-            <SymbolView name={Icons.back} size={20} tintColor="#FFFFFF" />
+            <Icon name={ProfileIcons.back} color="#FFFFFF" size={20} />
           </Pressable>
           <View style={styles.headerCopy}>
             <Text style={styles.headerTitle}>Gói cao cấp</Text>
@@ -136,11 +132,7 @@ export function PremiumScreen({ onBack }: PremiumScreenProps) {
               Quyền lợi thông minh cho trải nghiệm mua deal thuận tiện hơn
             </Text>
           </View>
-          <SymbolView
-            name={{ ios: 'crown.fill', android: 'workspace_premium', web: 'workspace_premium' }}
-            size={28}
-            tintColor="#FFFFFF"
-          />
+          <Icon name={ProfileIcons.premium} color="#FFFFFF" size={28} />
         </View>
 
         <View style={styles.body}>

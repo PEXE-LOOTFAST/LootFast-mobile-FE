@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
+import { Icon } from '@/components/ui/icon';
 import { CategoryChips } from '@/features/home/components/category-chips';
-import { HomeIcon } from '@/features/home/components/home-icon';
 import { RadiusMenu } from '@/features/home/components/radius-menu';
 import { HomeIcons } from '@/features/home/constants/icons';
 import type { DealCategory, DealCategoryId } from '@/features/home/types';
@@ -59,12 +59,12 @@ export function SearchPanel({
             { backgroundColor: theme.primarySoft, borderColor: theme.backgroundSelected },
           ]}
         >
-          <HomeIcon name={HomeIcons.location} color={theme.primary} size={15} />
+          <Icon name={HomeIcons.location} color={theme.primary} size={15} />
           <Text style={[styles.radiusLabel, { color: theme.text }]}>Gần bạn</Text>
           <Text style={[styles.radiusValue, { color: theme.textSecondary }]}>
             · {formatRadius(radiusKm)}
           </Text>
-          <HomeIcon name={HomeIcons.chevronDown} color={theme.textSecondary} size={15} />
+          <Icon name={HomeIcons.chevronDown} color={theme.textSecondary} size={15} />
         </Pressable>
 
         <Pressable
@@ -74,7 +74,7 @@ export function SearchPanel({
           onPress={onPressLocked}
           style={[styles.search, { backgroundColor: theme.background, borderColor: theme.border }]}
         >
-          <HomeIcon name={HomeIcons.search} color={theme.textSecondary} size={16} />
+          <Icon name={HomeIcons.search} color={theme.textSecondary} size={16} />
           {/* Khi bị khoá, ô nhập không nhận chạm để cú bấm rơi xuống Pressable bọc ngoài
               thay vì mở bàn phím. */}
           <View style={[styles.inputWrapper, isLocked && styles.passThrough]}>
@@ -97,7 +97,7 @@ export function SearchPanel({
               hitSlop={8}
               onPress={() => onChangeQuery('')}
             >
-              <HomeIcon name={HomeIcons.clear} color={theme.textSecondary} />
+              <Icon name={HomeIcons.clear} color={theme.textSecondary} />
             </Pressable>
           ) : null}
         </Pressable>

@@ -1,6 +1,4 @@
-import type { SymbolViewProps } from 'expo-symbols';
-
-export type HomeIconName = Extract<SymbolViewProps['name'], object>;
+import type { IconMap } from '@/components/ui/icon';
 
 // SF Symbols chỉ có trên iOS, Android và web dùng Material Symbols — mỗi icon phải khai báo đủ cả hai tên.
 export const HomeIcons = {
@@ -28,4 +26,4 @@ export const HomeIcons = {
   sparkles: { ios: 'sparkles', android: 'auto_awesome', web: 'auto_awesome' },
   refresh: { ios: 'arrow.clockwise', android: 'refresh', web: 'refresh' },
   send: { ios: 'paperplane.fill', android: 'send', web: 'send' },
-} satisfies Record<string, HomeIconName>;
+} satisfies IconMap;

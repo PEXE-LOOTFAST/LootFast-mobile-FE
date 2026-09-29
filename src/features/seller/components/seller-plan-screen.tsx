@@ -1,7 +1,7 @@
 import { Alert, StyleSheet, Text, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
-import { HomeIcon } from '@/features/home/components/home-icon';
+import { Icon } from '@/components/ui/icon';
 import { SellerBadge } from '@/features/seller/components/seller-badge';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import {
@@ -72,7 +72,7 @@ export function SellerPlanScreen({ onBack }: { onBack: () => void }) {
           ]}
         >
           <View style={[styles.featureIcon, { backgroundColor: theme.primarySoft }]}>
-            <HomeIcon name={feature.icon} color={theme.primary} size={18} />
+            <Icon name={feature.icon} color={theme.primary} size={18} />
           </View>
           <View style={styles.featureCopy}>
             {/* Nhãn "Cần backend" ngắn nên đứng cùng hàng tiêu đề, nhãn gói xuống dòng riêng. */}

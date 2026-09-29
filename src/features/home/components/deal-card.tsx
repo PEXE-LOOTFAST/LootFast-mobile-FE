@@ -1,8 +1,8 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { Icon } from '@/components/ui/icon';
 import { DealImage } from '@/features/home/components/deal-image';
 import { DealMeta } from '@/features/home/components/deal-meta';
-import { HomeIcon } from '@/features/home/components/home-icon';
 import { RatingColor } from '@/features/home/constants/colors';
 import { LOW_STOCK_THRESHOLD } from '@/features/home/constants/deals';
 import { HomeIcons } from '@/features/home/constants/icons';
@@ -45,7 +45,7 @@ export function DealCard({ deal, onPress }: DealCardProps) {
         {/* Chỉ báo số phần khi sắp hết, tránh che ảnh món ở những deal còn nhiều. */}
         {isLowStock ? (
           <View style={[styles.stock, { backgroundColor: theme.accent }]}>
-            <HomeIcon name={HomeIcons.flame} color={LOW_STOCK_TEXT} size={14} />
+            <Icon name={HomeIcons.flame} color={LOW_STOCK_TEXT} size={14} />
             <Text style={styles.stockText}>Còn {deal.remaining} phần</Text>
           </View>
         ) : null}
@@ -54,16 +54,16 @@ export function DealCard({ deal, onPress }: DealCardProps) {
       <View style={styles.body}>
         <View style={styles.storeRow}>
           <View style={[styles.storeIcon, { backgroundColor: theme.primarySoft }]}>
-            <HomeIcon name={HomeIcons.store} color={theme.primary} size={14} />
+            <Icon name={HomeIcons.store} color={theme.primary} size={14} />
           </View>
           <Text numberOfLines={1} style={[styles.storeName, { color: theme.textSecondary }]}>
             {deal.store.name}
           </Text>
           {deal.store.isVerified ? (
-            <HomeIcon name={HomeIcons.verified} color={theme.primary} size={15} />
+            <Icon name={HomeIcons.verified} color={theme.primary} size={15} />
           ) : null}
           <View style={styles.rating}>
-            <HomeIcon name={HomeIcons.star} color={RatingColor} size={14} />
+            <Icon name={HomeIcons.star} color={RatingColor} size={14} />
             <Text style={[styles.ratingText, { color: theme.text }]}>
               {deal.store.rating.toFixed(1)}
             </Text>

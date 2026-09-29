@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { Icon } from '@/components/ui/icon';
 import { AssistantPanel } from '@/features/home/components/assistant-panel';
-import { HomeIcon } from '@/features/home/components/home-icon';
 import { HomeIcons } from '@/features/home/constants/icons';
 import { useAssistantChat } from '@/features/home/hooks/use-assistant-chat';
 import { useAnchor } from '@/hooks/use-anchor';
@@ -29,7 +29,7 @@ export function AssistantFab({ bottomOffset = 16 }: AssistantFabProps) {
         onPress={() => setIsCollapsed(false)}
         style={[styles.handle, { bottom: bottomOffset + 2, backgroundColor: theme.primary }]}
       >
-        <HomeIcon name={HomeIcons.chevronLeft} color="#FFFFFF" size={20} />
+        <Icon name={HomeIcons.chevronLeft} color="#FFFFFF" size={20} />
       </Pressable>
     );
   }
@@ -47,7 +47,7 @@ export function AssistantFab({ bottomOffset = 16 }: AssistantFabProps) {
             { backgroundColor: theme.backgroundElement, borderColor: theme.border },
           ]}
         >
-          <HomeIcon name={HomeIcons.chevronRight} color={theme.text} size={18} />
+          <Icon name={HomeIcons.chevronRight} color={theme.text} size={18} />
         </Pressable>
 
         <Pressable
@@ -61,7 +61,7 @@ export function AssistantFab({ bottomOffset = 16 }: AssistantFabProps) {
             pressed && styles.pressed,
           ]}
         >
-          <HomeIcon name={HomeIcons.chat} color="#FFFFFF" size={26} />
+          <Icon name={HomeIcons.chat} color="#FFFFFF" size={26} />
         </Pressable>
       </View>
 

@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { Icon } from '@/components/ui/icon';
 import { DetailCard } from '@/features/home/components/detail-card';
-import { HomeIcon } from '@/features/home/components/home-icon';
 import { RatingColor } from '@/features/home/constants/colors';
 import { HomeIcons } from '@/features/home/constants/icons';
 import type { DealReview } from '@/features/home/types';
@@ -52,7 +52,7 @@ export function DealReviews({ reviews }: DealReviewsProps) {
                 <Text style={[styles.author, { color: theme.text }]}>{review.author}</Text>
                 <View accessibilityLabel={`${review.rating} sao`} style={styles.stars}>
                   {Array.from({ length: review.rating }, (_, starIndex) => (
-                    <HomeIcon key={starIndex} name={HomeIcons.star} color={RatingColor} size={12} />
+                    <Icon key={starIndex} name={HomeIcons.star} color={RatingColor} size={12} />
                   ))}
                 </View>
               </View>

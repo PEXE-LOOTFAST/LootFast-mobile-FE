@@ -13,8 +13,8 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Icon } from '@/components/ui/icon';
 import type { PopoverAnchor } from '@/components/ui/popover';
-import { HomeIcon } from '@/features/home/components/home-icon';
 import { HomeIcons } from '@/features/home/constants/icons';
 import type { ChatMessage } from '@/features/home/types';
 import { useTheme } from '@/hooks/use-theme';
@@ -91,7 +91,7 @@ export function AssistantPanel({
               ]}
             >
               <View style={[styles.header, { backgroundColor: theme.primary }]}>
-                <HomeIcon name={HomeIcons.sparkles} color="#FFFFFF" size={18} />
+                <Icon name={HomeIcons.sparkles} color="#FFFFFF" size={18} />
                 <Text accessibilityRole="header" style={styles.headerTitle}>
                   Trợ lý LootFast
                 </Text>
@@ -101,7 +101,7 @@ export function AssistantPanel({
                   hitSlop={8}
                   onPress={onReset}
                 >
-                  <HomeIcon name={HomeIcons.refresh} color="#FFFFFF" size={20} />
+                  <Icon name={HomeIcons.refresh} color="#FFFFFF" size={20} />
                 </Pressable>
                 <Pressable
                   accessibilityLabel="Đóng trợ lý"
@@ -109,7 +109,7 @@ export function AssistantPanel({
                   hitSlop={8}
                   onPress={onClose}
                 >
-                  <HomeIcon name={HomeIcons.close} color="#FFFFFF" size={22} />
+                  <Icon name={HomeIcons.close} color="#FFFFFF" size={22} />
                 </Pressable>
               </View>
 
@@ -184,7 +184,7 @@ export function AssistantPanel({
                     !canSend && styles.disabled,
                   ]}
                 >
-                  <HomeIcon name={HomeIcons.send} color="#FFFFFF" size={18} />
+                  <Icon name={HomeIcons.send} color="#FFFFFF" size={18} />
                 </Pressable>
               </View>
             </View>
@@ -206,7 +206,7 @@ export function AssistantPanel({
                 },
               ]}
             >
-              <HomeIcon name={HomeIcons.close} color="#FFFFFF" size={26} />
+              <Icon name={HomeIcons.close} color="#FFFFFF" size={26} />
             </Pressable>
           </>
         ) : null}

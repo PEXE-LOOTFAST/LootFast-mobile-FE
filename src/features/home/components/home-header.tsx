@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { HomeIcon } from '@/features/home/components/home-icon';
+import { Icon } from '@/components/ui/icon';
 import { IconButton } from '@/features/home/components/icon-button';
 import { HomeHeaderColors } from '@/features/home/constants/colors';
 import { HomeIcons } from '@/features/home/constants/icons';
@@ -29,7 +29,7 @@ export function HomeHeader({ locationLabel, unreadCount, onPressNotifications }:
             Deal cuối ngày
           </Text>
           <View style={styles.locationRow}>
-            <HomeIcon name={HomeIcons.location} color={HomeHeaderColors.textMuted} size={15} />
+            <Icon name={HomeIcons.location} color={HomeHeaderColors.textMuted} size={15} />
             <Text numberOfLines={1} style={styles.location}>
               {locationLabel}
             </Text>

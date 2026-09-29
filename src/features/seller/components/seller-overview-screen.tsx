@@ -14,8 +14,8 @@ import { WeeklyPerformanceCard } from '@/features/seller/components/weekly-perfo
 import { WeeklySummaryCard } from '@/features/seller/components/weekly-summary-card';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { MOCK_SELLER_DEALS, MOCK_SELLER_ORDERS } from '@/features/seller/data/mock-seller-shop';
-import { useSellerOverview } from '@/features/seller/hooks/use-seller-overview';
 import { useMerchantShop } from '@/features/seller/hooks/use-merchant-shop';
+import { useSellerOverview } from '@/features/seller/hooks/use-seller-overview';
 import { useTheme } from '@/hooks/use-theme';
 import { formatPrice } from '@/lib/format';
 

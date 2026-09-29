@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { HomeIcon } from '@/features/home/components/home-icon';
+import { Icon } from '@/components/ui/icon';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import type { SellerOrder } from '@/features/seller/types';
 import { useTheme } from '@/hooks/use-theme';
@@ -61,7 +61,7 @@ export function UpcomingPickupCard({
               ]}
             >
               <View style={[styles.rowIcon, { backgroundColor: theme.primarySoft }]}>
-                <HomeIcon name={SellerIcons.bag} color={theme.primary} size={16} />
+                <Icon name={SellerIcons.bag} color={theme.primary} size={16} />
               </View>
               <View style={styles.rowCopy}>
                 <Text numberOfLines={1} style={[styles.rowTitle, { color: theme.text }]}>
@@ -71,7 +71,7 @@ export function UpcomingPickupCard({
                   {order.code} · {order.pickupLabel}
                 </Text>
               </View>
-              <HomeIcon name={SellerIcons.chevronRight} color={theme.textSecondary} size={15} />
+              <Icon name={SellerIcons.chevronRight} color={theme.textSecondary} size={15} />
             </Pressable>
           ))}
         </View>

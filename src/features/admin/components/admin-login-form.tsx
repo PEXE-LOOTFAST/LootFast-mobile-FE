@@ -2,15 +2,14 @@ import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
+import { Icon } from '@/components/ui/icon';
+import { InlineAlert } from '@/components/ui/inline-alert';
+import { PasswordField } from '@/components/ui/password-field';
 import { TextField } from '@/components/ui/text-field';
-import { AdminIcons } from '@/features/admin/constants/icons';
 import { MOCK_ADMIN_ACCOUNT } from '@/features/admin/data/mock-admin-account';
 import { validateAdminLogin, type AdminLoginValues } from '@/features/admin/validation';
-import { FieldIcon } from '@/features/auth/components/field-icon';
-import { PasswordField } from '@/features/auth/components/password-field';
 import { AuthIcons } from '@/features/auth/constants/icons';
-import { useForm } from '@/features/auth/hooks/use-form';
-import { HomeIcon } from '@/features/home/components/home-icon';
+import { useForm } from '@/hooks/use-form';
 import { useTheme } from '@/hooks/use-theme';
 
 // Giả lập độ trễ gọi API để nút có trạng thái đang tải như khi nối thật.
@@ -65,7 +64,7 @@ export function AdminLoginForm({ onAuthenticated }: { onAuthenticated: () => voi
           error={errors.email}
           keyboardType="email-address"
           label="Email quản trị"
-          leading={<FieldIcon name={AuthIcons.mail} />}
+          leading={<Icon name={AuthIcons.mail} />}
           onChangeText={(text) => changeField('email', text)}
           placeholder="admin@lootfast.vn"
           returnKeyType="next"
@@ -84,15 +83,7 @@ export function AdminLoginForm({ onAuthenticated }: { onAuthenticated: () => voi
         />
       </View>
 
-      {formError ? (
-        <View
-          accessibilityLiveRegion="polite"
-          style={[styles.error, { backgroundColor: `${theme.danger}1F` }]}
-        >
-          <HomeIcon name={AdminIcons.warning} color={theme.danger} size={16} />
-          <Text style={[styles.errorText, { color: theme.danger }]}>{formError}</Text>
-        </View>
-      ) : null}
+      {formError ? <InlineAlert message={formError} /> : null}
 
       <BrandButton disabled={isEnteringDemo} loading={isSubmitting} onPress={() => void submit()}>
         Đăng nhập quản trị
@@ -118,8 +109,6 @@ export function AdminLoginForm({ onAuthenticated }: { onAuthenticated: () => voi
 const styles = StyleSheet.create({
   container: { gap: 20 },
   fields: { gap: 16 },
-  error: { flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 14, padding: 12 },
-  errorText: { flex: 1, fontSize: 13, fontWeight: '700' },
   demo: { gap: 12 },
   demoNote: { textAlign: 'center', fontSize: 13, lineHeight: 19 },
 });

@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { HomeIcon } from '@/features/home/components/home-icon';
+import { Icon } from '@/components/ui/icon';
 import { HomeHeaderColors } from '@/features/home/constants/colors';
 import { SellerIcons } from '@/features/seller/constants/icons';
 
@@ -29,7 +29,7 @@ export function SellerPageHeader({ title, subtitle, onPressBack }: SellerPageHea
         onPress={onPressBack}
         style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
       >
-        <HomeIcon name={SellerIcons.back} color={HomeHeaderColors.text} size={18} />
+        <Icon name={SellerIcons.back} color={HomeHeaderColors.text} size={18} />
       </Pressable>
 
       <View style={styles.copy}>

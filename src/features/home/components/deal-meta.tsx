@@ -1,11 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { HomeIcon } from '@/features/home/components/home-icon';
-import type { HomeIconName } from '@/features/home/constants/icons';
+import { Icon, type IconName } from '@/components/ui/icon';
 import { useTheme } from '@/hooks/use-theme';
 
 type DealMetaProps = {
-  icon: HomeIconName;
+  icon: IconName;
   label: string;
 };
 
@@ -14,7 +13,7 @@ export function DealMeta({ icon, label }: DealMetaProps) {
 
   return (
     <View style={styles.container}>
-      <HomeIcon name={icon} color={theme.textSecondary} size={15} />
+      <Icon name={icon} color={theme.textSecondary} size={15} />
       <Text style={[styles.label, { color: theme.textSecondary }]}>{label}</Text>
     </View>
   );

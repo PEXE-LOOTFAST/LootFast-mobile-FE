@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { HomeIcon } from '@/features/home/components/home-icon';
+import { Icon } from '@/components/ui/icon';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -10,7 +10,7 @@ export function AdvancedReportCard({ onPressPlan }: { onPressPlan: () => void })
 
   return (
     <View style={[styles.card, { backgroundColor: theme.primarySoft, borderColor: theme.primary }]}>
-      <HomeIcon name={SellerIcons.crown} color={theme.primary} size={20} />
+      <Icon name={SellerIcons.crown} color={theme.primary} size={20} />
 
       <View style={styles.copy}>
         <Text accessibilityRole="header" style={[styles.title, { color: theme.primary }]}>
@@ -30,7 +30,7 @@ export function AdvancedReportCard({ onPressPlan }: { onPressPlan: () => void })
             pressed && styles.pressed,
           ]}
         >
-          <HomeIcon name={SellerIcons.crown} color="#FFFFFF" size={14} />
+          <Icon name={SellerIcons.crown} color="#FFFFFF" size={14} />
           <Text style={styles.buttonLabel}>Xem gói Cao cấp</Text>
         </Pressable>
       </View>

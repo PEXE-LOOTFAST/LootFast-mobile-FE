@@ -10,7 +10,7 @@ import { useStoreApprovals } from '@/features/admin/hooks/use-store-approvals';
 import type { StoreApplicationStatus } from '@/features/admin/types';
 import { SegmentedTabs } from '@/features/seller/components/segmented-tabs';
 import { SellerEmptyCard } from '@/features/seller/components/seller-empty-card';
-import { useLightStatusBar } from '@/features/seller/hooks/use-light-status-bar';
+import { useLightStatusBar } from '@/hooks/use-light-status-bar';
 import { useTheme } from '@/hooks/use-theme';
 
 const EMPTY_STATES: Record<StoreApplicationStatus, { title: string; description: string }> = {

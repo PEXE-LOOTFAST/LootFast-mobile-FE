@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, Text } from 'react-native';
 
-import { HomeIcon } from '@/features/home/components/home-icon';
+import { Icon } from '@/components/ui/icon';
 import { SellerMenuList, type SellerMenuItem } from '@/features/seller/components/seller-menu-list';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import { SellerIcons } from '@/features/seller/constants/icons';
@@ -56,7 +56,7 @@ export function SellerSettingsScreen() {
           pressed && styles.pressed,
         ]}
       >
-        <HomeIcon name={SellerIcons.logout} color={theme.danger} size={16} />
+        <Icon name={SellerIcons.logout} color={theme.danger} size={16} />
         <Text style={[styles.signOutLabel, { color: theme.danger }]}>Đăng xuất</Text>
       </Pressable>
     </SellerPageScaffold>

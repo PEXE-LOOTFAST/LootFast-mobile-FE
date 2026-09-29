@@ -12,7 +12,7 @@ import {
   MOCK_DEAL_APPROVAL_GROWTH,
   MOCK_DEAL_APPROVALS,
 } from '@/features/admin/data/mock-admin-overview';
-import { useLightStatusBar } from '@/features/seller/hooks/use-light-status-bar';
+import { useLightStatusBar } from '@/hooks/use-light-status-bar';
 import { useTheme } from '@/hooks/use-theme';
 
 export function AdminOverviewScreen() {

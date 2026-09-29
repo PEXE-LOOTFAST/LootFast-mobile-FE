@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { HomeIcon } from '@/features/home/components/home-icon';
+import { Icon } from '@/components/ui/icon';
 import { SellerBadge } from '@/features/seller/components/seller-badge';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import { SellerIcons } from '@/features/seller/constants/icons';
@@ -25,7 +25,7 @@ export function SellerGrowthScreen() {
           { backgroundColor: theme.backgroundElement, borderColor: theme.border },
         ]}
       >
-        <HomeIcon name={SellerIcons.megaphone} color={theme.primary} size={20} />
+        <Icon name={SellerIcons.megaphone} color={theme.primary} size={20} />
         <View style={styles.copy}>
           <Text accessibilityRole="header" style={[styles.title, { color: theme.text }]}>
             Chưa có chương trình đang mở
@@ -43,7 +43,7 @@ export function SellerGrowthScreen() {
       <View
         style={[styles.note, { backgroundColor: theme.primarySoft, borderColor: theme.border }]}
       >
-        <HomeIcon name={SellerIcons.shield} color={theme.primary} size={15} />
+        <Icon name={SellerIcons.shield} color={theme.primary} size={15} />
         <Text style={[styles.noteText, { color: theme.textSecondary }]}>
           Mỗi chương trình sẽ hiển thị rõ điều kiện mở khóa và nguồn tài trợ; không dùng dữ liệu
           nhạy cảm của người mua.

@@ -1,8 +1,8 @@
-import { SymbolView } from 'expo-symbols';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { TabIcons } from '@/components/navigation/tab-icons';
+import { Icon } from '@/components/ui/icon';
 import { useTheme } from '@/hooks/use-theme';
 
 export function MapScreen() {
@@ -23,7 +23,7 @@ export function MapScreen() {
           ]}
         >
           <View style={[styles.iconWrap, { backgroundColor: theme.primarySoft }]}>
-            <SymbolView name={TabIcons.map} size={32} tintColor={theme.primary} />
+            <Icon name={TabIcons.map} color={theme.primary} size={32} />
           </View>
           <Text style={[styles.placeholderTitle, { color: theme.text }]}>
             Bản đồ đang được phát triển

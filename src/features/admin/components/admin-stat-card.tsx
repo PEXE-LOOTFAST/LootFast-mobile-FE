@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { Icon } from '@/components/ui/icon';
 import { AdminIcons } from '@/features/admin/constants/icons';
 import type { AdminStat } from '@/features/admin/types';
-import { HomeIcon } from '@/features/home/components/home-icon';
 import { useTheme } from '@/hooks/use-theme';
 
 // Thẻ số liệu toàn sàn, hai thẻ một hàng: icon tròn ở trên, con số lớn, nhãn và chú thích.
@@ -20,7 +20,7 @@ export function AdminStatCard({ stat }: { stat: AdminStat }) {
       style={[styles.card, { backgroundColor: theme.backgroundElement, borderColor: theme.border }]}
     >
       <View style={[styles.iconBadge, { backgroundColor: softColor }]}>
-        <HomeIcon name={AdminIcons[stat.icon]} color={color} size={18} />
+        <Icon name={AdminIcons[stat.icon]} color={color} size={18} />
       </View>
 
       <Text numberOfLines={1} style={[styles.value, { color }]}>

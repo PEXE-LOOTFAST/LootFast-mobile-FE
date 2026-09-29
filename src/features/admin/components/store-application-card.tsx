@@ -1,9 +1,8 @@
 import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { Icon, type IconName } from '@/components/ui/icon';
 import { AdminIcons } from '@/features/admin/constants/icons';
 import type { StoreApplication } from '@/features/admin/types';
-import { HomeIcon } from '@/features/home/components/home-icon';
-import type { HomeIconName } from '@/features/home/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
 
 type StoreApplicationCardProps = {
@@ -20,12 +19,12 @@ function formatSubmittedDate(value: string) {
   return `${day}/${month}/${year}`;
 }
 
-function InfoRow({ icon, label }: { icon: HomeIconName; label: string }) {
+function InfoRow({ icon, label }: { icon: IconName; label: string }) {
   const theme = useTheme();
 
   return (
     <View style={styles.infoRow}>
-      <HomeIcon name={icon} color={theme.textSecondary} size={15} />
+      <Icon name={icon} color={theme.textSecondary} size={15} />
       <Text numberOfLines={1} style={[styles.infoLabel, { color: theme.textSecondary }]}>
         {label}
       </Text>
@@ -55,7 +54,7 @@ export function StoreApplicationCard({
     >
       <View style={styles.headerRow}>
         <View style={[styles.avatar, { backgroundColor: theme.primarySoft }]}>
-          <HomeIcon name={AdminIcons.food} color={theme.primary} size={22} />
+          <Icon name={AdminIcons.food} color={theme.primary} size={22} />
         </View>
 
         <View style={styles.headerCopy}>
@@ -74,7 +73,7 @@ export function StoreApplicationCard({
                 { backgroundColor: hasFoodSafetyCert ? theme.primarySoft : warningSoft },
               ]}
             >
-              <HomeIcon
+              <Icon
                 name={hasFoodSafetyCert ? AdminIcons.document : AdminIcons.warning}
                 color={certColor}
                 size={12}
@@ -116,7 +115,7 @@ export function StoreApplicationCard({
               pressed && styles.pressed,
             ]}
           >
-            <HomeIcon name={AdminIcons.close} color={theme.danger} size={15} />
+            <Icon name={AdminIcons.close} color={theme.danger} size={15} />
             <Text style={[styles.actionLabel, { color: theme.danger }]}>Từ chối</Text>
           </Pressable>
           <Pressable
@@ -129,7 +128,7 @@ export function StoreApplicationCard({
               pressed && styles.pressed,
             ]}
           >
-            <HomeIcon name={AdminIcons.check} color={theme.backgroundElement} size={15} />
+            <Icon name={AdminIcons.check} color={theme.backgroundElement} size={15} />
             <Text style={[styles.actionLabel, { color: theme.backgroundElement }]}>Phê duyệt</Text>
           </Pressable>
         </View>

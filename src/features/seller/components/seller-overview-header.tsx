@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { HomeIcon } from '@/features/home/components/home-icon';
+import { Icon } from '@/components/ui/icon';
 import { HomeHeaderColors } from '@/features/home/constants/colors';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { formatFullDate } from '@/lib/format';
@@ -37,7 +37,7 @@ export function SellerOverviewHeader({
           {shopName}
         </Text>
         {isVerified ? (
-          <HomeIcon name={SellerIcons.verified} color={HomeHeaderColors.textMuted} size={14} />
+          <Icon name={SellerIcons.verified} color={HomeHeaderColors.textMuted} size={14} />
         ) : null}
         <Text style={styles.dot}>·</Text>
         <Text style={styles.date}>{formatFullDate(date)}</Text>
@@ -49,7 +49,7 @@ export function SellerOverviewHeader({
         onPress={onPressCreateDeal}
         style={({ pressed }) => [styles.createButton, pressed && styles.pressed]}
       >
-        <HomeIcon name={SellerIcons.plus} color={HomeHeaderColors.text} size={15} />
+        <Icon name={SellerIcons.plus} color={HomeHeaderColors.text} size={15} />
         <Text style={styles.createLabel}>Đăng deal mới</Text>
       </Pressable>
     </View>

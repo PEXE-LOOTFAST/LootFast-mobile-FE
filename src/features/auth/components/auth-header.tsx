@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { FieldIcon } from '@/features/auth/components/field-icon';
+import { Icon } from '@/components/ui/icon';
 import { AuthIcons } from '@/features/auth/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -25,7 +25,7 @@ export function AuthHeader({ onBack }: AuthHeaderProps) {
               { backgroundColor: theme.backgroundElement, borderColor: theme.border },
             ]}
           >
-            <FieldIcon name={AuthIcons.back} color={theme.text} />
+            <Icon name={AuthIcons.back} color={theme.text} />
           </Pressable>
         ) : null}
       </View>
@@ -39,7 +39,7 @@ export function AuthHeader({ onBack }: AuthHeaderProps) {
       </Text>
 
       <View style={styles.taglineRow}>
-        <FieldIcon name={AuthIcons.leaf} color={theme.primary} size={16} />
+        <Icon name={AuthIcons.leaf} color={theme.primary} size={16} />
         <Text style={[styles.tagline, { color: theme.textSecondary }]}>
           Ăn ngon - tiết kiệm - cứu thực phẩm
         </Text>

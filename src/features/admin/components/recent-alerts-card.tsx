@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { Icon } from '@/components/ui/icon';
 import { AdminIcons } from '@/features/admin/constants/icons';
 import type { AdminAlert } from '@/features/admin/types';
-import { HomeIcon } from '@/features/home/components/home-icon';
 import { useTheme } from '@/hooks/use-theme';
 
 // Danh sách sự kiện gần đây cần admin để ý: cảnh báo tô cam, thông tin thường tô xanh.
@@ -30,7 +30,7 @@ export function RecentAlertsCard({ alerts }: { alerts: AdminAlert[] }) {
                   { backgroundColor: isWarning ? warningSoft : theme.primarySoft },
                 ]}
               >
-                <HomeIcon
+                <Icon
                   name={isWarning ? AdminIcons.warning : AdminIcons.shieldCheck}
                   color={isWarning ? theme.accent : theme.primary}
                   size={16}

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { HomeIcon } from '@/features/home/components/home-icon';
+import { Icon } from '@/components/ui/icon';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import type { SellerOrder } from '@/features/seller/types';
 import { useTheme } from '@/hooks/use-theme';
@@ -13,7 +13,7 @@ export function SellerOrderRow({ order }: { order: SellerOrder }) {
   return (
     <View style={[styles.row, { borderColor: theme.border }]}>
       <View style={[styles.icon, { backgroundColor: theme.primarySoft }]}>
-        <HomeIcon name={SellerIcons.bag} color={theme.primary} size={16} />
+        <Icon name={SellerIcons.bag} color={theme.primary} size={16} />
       </View>
 
       <View style={styles.copy}>

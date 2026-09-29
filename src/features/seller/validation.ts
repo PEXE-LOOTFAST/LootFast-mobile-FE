@@ -1,8 +1,15 @@
-import type { FormErrors } from '@/features/auth/types';
-import { EMAIL_PATTERN, MIN_PASSWORD_LENGTH, PHONE_PATTERN } from '@/features/auth/validation';
 import type { SellerShopCategory } from '@/features/seller/types';
-
-const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
+import {
+  MIN_NAME_LENGTH,
+  MIN_PASSWORD_LENGTH,
+  checkEmail,
+  checkFullName,
+  checkPasswordMatch,
+  checkPhone,
+  checkRequired,
+  checkTime,
+} from '@/lib/validation';
+import type { FormErrors } from '@/types/form';
 
 export type ShopInfoValues = {
   name: string;
@@ -26,31 +33,21 @@ export type ChangePasswordValues = {
 
 export function validateShopInfo(values: ShopInfoValues): FormErrors<ShopInfoValues> {
   return {
-    name: values.name.trim().length >= 2 ? undefined : 'Vui lòng nhập tên cửa hàng',
-    address: values.address.trim() ? undefined : 'Vui lòng nhập địa chỉ nhận món',
+    name: values.name.trim().length >= MIN_NAME_LENGTH ? undefined : 'Vui lòng nhập tên cửa hàng',
+    address: checkRequired(values.address, 'Vui lòng nhập địa chỉ nhận món'),
     categories: values.categories.length > 0 ? undefined : 'Chọn ít nhất một danh mục món',
-    open: TIME_PATTERN.test(values.open) ? undefined : 'Giờ mở cửa dạng HH:mm',
+    open: checkTime(values.open, 'Giờ mở cửa dạng HH:mm'),
     // Cho phép giờ đóng nhỏ hơn giờ mở: quán mở xuyên đêm, vd. 18:00 - 02:00.
-    close: TIME_PATTERN.test(values.close) ? undefined : 'Giờ đóng cửa dạng HH:mm',
+    close: checkTime(values.close, 'Giờ đóng cửa dạng HH:mm'),
   };
 }
 
 export function validateOwnerInfo(values: OwnerInfoValues): FormErrors<OwnerInfoValues> {
-  const email = values.email.trim();
-  const phone = values.phone.trim();
-
   return {
-    fullName: values.fullName.trim().length >= 2 ? undefined : 'Vui lòng nhập họ và tên',
-    email: !email
-      ? 'Vui lòng nhập email'
-      : EMAIL_PATTERN.test(email)
-        ? undefined
-        : 'Email không hợp lệ',
+    fullName: checkFullName(values.fullName),
+    email: checkEmail(values.email),
     // Số điện thoại không bắt buộc với chủ quán, nhưng đã nhập thì phải đúng định dạng.
-    phone:
-      !phone || PHONE_PATTERN.test(phone)
-        ? undefined
-        : 'Số điện thoại gồm 10 chữ số, bắt đầu bằng 0',
+    phone: checkPhone(values.phone, { optional: true }),
   };
 }
 
@@ -65,15 +62,12 @@ export function validateChangePassword(
     /\d/.test(newPassword);
 
   return {
-    currentPassword: currentPassword ? undefined : 'Vui lòng nhập mật khẩu hiện tại',
+    currentPassword: checkRequired(currentPassword, 'Vui lòng nhập mật khẩu hiện tại'),
     newPassword: !isStrong
       ? `Từ ${MIN_PASSWORD_LENGTH} ký tự, có chữ hoa, chữ thường và số`
       : newPassword === currentPassword
         ? 'Mật khẩu mới phải khác mật khẩu hiện tại'
         : undefined,
-    confirmPassword:
-      confirmPassword && confirmPassword === newPassword
-        ? undefined
-        : 'Mật khẩu nhập lại không khớp',
+    confirmPassword: checkPasswordMatch(confirmPassword, newPassword),
   };
 }

@@ -1,30 +1,15 @@
 import { router, type Href } from 'expo-router';
-import { SymbolView } from 'expo-symbols';
 
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Icon, type IconName } from '@/components/ui/icon';
+import { ProfileIcons } from '@/features/profile/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
 import { confirmSignOut } from '@/lib/confirm-sign-out';
-import type { SymbolViewProps } from 'expo-symbols';
 
-type ProfileIconName = Extract<SymbolViewProps['name'], object>;
 // href: mục mở sang route/tab khác khi bấm (vd. Đơn hàng của tôi → tab Đơn hàng).
-type ProfileItem = { icon: ProfileIconName; title: string; subtitle: string; href?: Href };
-
-const ProfileIcons = {
-  premium: { ios: 'crown.fill', android: 'workspace_premium', web: 'workspace_premium' },
-  rewards: { ios: 'star.fill', android: 'stars', web: 'stars' },
-  orders: { ios: 'bag.fill', android: 'shopping_bag', web: 'shopping_bag' },
-  location: { ios: 'mappin.and.ellipse', android: 'location_on', web: 'location_on' },
-  favorites: { ios: 'heart.fill', android: 'favorite', web: 'favorite' },
-  payment: { ios: 'creditcard.fill', android: 'credit_card', web: 'credit_card' },
-  settings: { ios: 'gearshape.fill', android: 'settings', web: 'settings' },
-  support: { ios: 'questionmark.circle.fill', android: 'help', web: 'help' },
-  seller: { ios: 'storefront.fill', android: 'storefront', web: 'storefront' },
-  camera: { ios: 'camera.fill', android: 'photo_camera', web: 'photo_camera' },
-  chevronRight: { ios: 'chevron.right', android: 'chevron_right', web: 'chevron_right' },
-} satisfies Record<string, ProfileIconName>;
+type ProfileItem = { icon: IconName; title: string; subtitle: string; href?: Href };
 
 const BENEFITS: ProfileItem[] = [
   {
@@ -60,7 +45,7 @@ function ProfileItemRow({ item, onPress }: { item: ProfileItem; onPress?: () => 
       style={({ pressed }) => [styles.item, pressed && styles.pressed]}
     >
       <View style={[styles.itemIcon, { backgroundColor: theme.primarySoft }]}>
-        <SymbolView name={item.icon} size={19} tintColor={theme.primary} />
+        <Icon name={item.icon} color={theme.primary} size={19} />
       </View>
       <View style={styles.itemCopy}>
         <Text style={[styles.itemTitle, { color: theme.text }]}>{item.title}</Text>
@@ -68,7 +53,7 @@ function ProfileItemRow({ item, onPress }: { item: ProfileItem; onPress?: () => 
           <Text style={[styles.itemSubtitle, { color: theme.textSecondary }]}>{item.subtitle}</Text>
         ) : null}
       </View>
-      <SymbolView name={ProfileIcons.chevronRight} size={17} tintColor={theme.textSecondary} />
+      <Icon name={ProfileIcons.chevronRight} color={theme.textSecondary} size={17} />
     </Pressable>
   );
 }
@@ -129,7 +114,7 @@ export function ProfileScreen() {
           <View style={styles.heroAvatar}>
             <Text style={[styles.heroAvatarText, { color: theme.primary }]}>TT</Text>
             <View style={[styles.heroCamera, { backgroundColor: theme.backgroundElement }]}>
-              <SymbolView name={ProfileIcons.camera} size={13} tintColor={theme.primary} />
+              <Icon name={ProfileIcons.camera} color={theme.primary} size={13} />
             </View>
           </View>
         </View>
@@ -153,7 +138,7 @@ export function ProfileScreen() {
               { backgroundColor: theme.backgroundElement, borderColor: theme.primary },
             ]}
           >
-            <SymbolView name={ProfileIcons.camera} size={15} tintColor={theme.primary} />
+            <Icon name={ProfileIcons.camera} color={theme.primary} size={15} />
           </View>
         </View>
         <ProfileSection items={BENEFITS} title="QUYỀN LỢI CỦA BẠN" />
@@ -167,9 +152,9 @@ export function ProfileScreen() {
             { backgroundColor: theme.backgroundElement, borderColor: theme.border },
           ]}
         >
-          <SymbolView name={ProfileIcons.seller} size={18} tintColor={theme.text} />
+          <Icon name={ProfileIcons.seller} color={theme.text} size={18} />
           <Text style={[styles.sellerText, { color: theme.text }]}>Chuyển sang người bán</Text>
-          <SymbolView name={ProfileIcons.chevronRight} size={17} tintColor={theme.textSecondary} />
+          <Icon name={ProfileIcons.chevronRight} color={theme.textSecondary} size={17} />
         </Pressable>
         <Pressable
           accessibilityRole="button"

@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { HomeIcon } from '@/features/home/components/home-icon';
+import { Icon } from '@/components/ui/icon';
 import { OrderIcons } from '@/features/order/constants/icons';
 import type { DailySaving } from '@/features/order/hooks/use-order-savings';
 import type { SavingsView } from '@/features/order/types';
@@ -38,7 +38,7 @@ function BenefitsButton({ onPress, compact }: { onPress: () => void; compact?: b
       ]}
     >
       <Text style={styles.benefitsLabel}>Xem quyền lợi</Text>
-      <HomeIcon name={OrderIcons.arrowUpRight} color="#FFFFFF" size={13} />
+      <Icon name={OrderIcons.arrowUpRight} color="#FFFFFF" size={13} />
     </Pressable>
   );
 }
@@ -121,7 +121,7 @@ export function SavingsStatsCard({
             {view === 'week' ? 'Xem trước biểu đồ 7 ngày' : 'Xem trước theo danh mục'}
           </Text>
           <View style={[styles.lockBadge, { backgroundColor: theme.backgroundSelected }]}>
-            <HomeIcon name={OrderIcons.lock} color={theme.textSecondary} size={12} />
+            <Icon name={OrderIcons.lock} color={theme.textSecondary} size={12} />
             <Text style={[styles.lockBadgeText, { color: theme.textSecondary }]}>
               Khóa chi tiết
             </Text>

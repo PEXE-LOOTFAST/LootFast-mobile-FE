@@ -1,4 +1,4 @@
-import type { HomeIconName } from '@/features/home/constants/icons';
+import type { IconMap } from '@/components/ui/icon';
 
 // SF Symbols chỉ có trên iOS, Android và web dùng Material Symbols — mỗi icon phải khai báo đủ cả hai tên.
 export const AdminIcons = {
@@ -11,11 +11,7 @@ export const AdminIcons = {
   location: { ios: 'mappin.and.ellipse', android: 'location_on', web: 'location_on' },
   calendar: { ios: 'calendar', android: 'calendar_month', web: 'calendar_month' },
   document: { ios: 'doc.text', android: 'description', web: 'description' },
-  warning: {
-    ios: 'exclamationmark.triangle',
-    android: 'warning_amber',
-    web: 'warning_amber',
-  },
+  warning: { ios: 'exclamationmark.triangle', android: 'warning_amber', web: 'warning_amber' },
   check: { ios: 'checkmark', android: 'check', web: 'check' },
   close: { ios: 'xmark', android: 'close', web: 'close' },
   chart: { ios: 'chart.bar', android: 'bar_chart', web: 'bar_chart' },
@@ -36,4 +32,4 @@ export const AdminIcons = {
     android: 'logout',
     web: 'logout',
   },
-} satisfies Record<string, HomeIconName>;
+} satisfies IconMap;

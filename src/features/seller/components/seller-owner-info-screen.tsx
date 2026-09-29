@@ -2,12 +2,12 @@ import { router } from 'expo-router';
 import { ActivityIndicator, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
-import { useForm } from '@/features/auth/hooks/use-form';
+import { TextField } from '@/components/ui/text-field';
 import { SellerFormCard } from '@/features/seller/components/seller-form-card';
-import { SellerFormField } from '@/features/seller/components/seller-form-field';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import { useMerchantCurrentUser } from '@/features/seller/hooks/use-merchant-shop';
 import { validateOwnerInfo, type OwnerInfoValues } from '@/features/seller/validation';
+import { useForm } from '@/hooks/use-form';
 import { useTheme } from '@/hooks/use-theme';
 
 const goToSettings = () => router.navigate('/seller/settings');
@@ -49,7 +49,8 @@ export function SellerOwnerInfoScreen() {
       title="Thông tin & Liên hệ"
     >
       <SellerFormCard>
-        <SellerFormField
+        <TextField
+          size="compact"
           autoComplete="name"
           error={errors.fullName}
           label="Họ và tên"
@@ -57,7 +58,8 @@ export function SellerOwnerInfoScreen() {
           placeholder="Nguyễn Văn A"
           value={values.fullName}
         />
-        <SellerFormField
+        <TextField
+          size="compact"
           autoCapitalize="none"
           autoComplete="email"
           autoCorrect={false}
@@ -68,7 +70,8 @@ export function SellerOwnerInfoScreen() {
           placeholder="ban@email.com"
           value={values.email}
         />
-        <SellerFormField
+        <TextField
+          size="compact"
           autoComplete="tel"
           error={errors.phone}
           keyboardType="phone-pad"

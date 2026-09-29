@@ -1,17 +1,17 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
+import { Icon, type IconName } from '@/components/ui/icon';
+import { InlineAlert } from '@/components/ui/inline-alert';
+import { PasswordField } from '@/components/ui/password-field';
 import { TextField } from '@/components/ui/text-field';
 import { toAuthErrorMessage } from '@/features/auth/api/auth-error-messages';
 import { useSignin } from '@/features/auth/api/use-signin';
-import { AuthError } from '@/features/auth/components/auth-error';
-import { FieldIcon } from '@/features/auth/components/field-icon';
 import { FormSection } from '@/features/auth/components/form-section';
-import { PasswordField } from '@/features/auth/components/password-field';
-import { AuthIcons, type AuthIconName } from '@/features/auth/constants/icons';
-import { useForm } from '@/features/auth/hooks/use-form';
+import { AuthIcons } from '@/features/auth/constants/icons';
 import type { DemoRole, LoginValues } from '@/features/auth/types';
 import { validateLogin } from '@/features/auth/validation';
+import { useForm } from '@/hooks/use-form';
 import { useTheme } from '@/hooks/use-theme';
 
 type LoginFormProps = {
@@ -24,7 +24,7 @@ type LoginFormProps = {
 const DEMO_ACCOUNTS = [
   { role: 'buyer', label: 'Người mua', icon: AuthIcons.buyer },
   { role: 'seller', label: 'Người bán', icon: AuthIcons.seller },
-] as const satisfies readonly { role: DemoRole; label: string; icon: AuthIconName }[];
+] as const satisfies readonly { role: DemoRole; label: string; icon: IconName }[];
 
 export function LoginForm({ initialEmail = '', onSuccess, onTryDemo }: LoginFormProps) {
   const theme = useTheme();
@@ -56,7 +56,7 @@ export function LoginForm({ initialEmail = '', onSuccess, onTryDemo }: LoginForm
           error={errors.email}
           keyboardType="email-address"
           label="Email"
-          leading={<FieldIcon name={AuthIcons.mail} />}
+          leading={<Icon name={AuthIcons.mail} />}
           onChangeText={(text) => changeField('email', text)}
           placeholder="ban@email.com"
           returnKeyType="next"
@@ -79,7 +79,7 @@ export function LoginForm({ initialEmail = '', onSuccess, onTryDemo }: LoginForm
         </Pressable>
       </FormSection>
 
-      {signin.error ? <AuthError message={toAuthErrorMessage(signin.error)} /> : null}
+      {signin.error ? <InlineAlert message={toAuthErrorMessage(signin.error)} /> : null}
 
       <BrandButton loading={isSubmitting} onPress={() => void submit()}>
         Đăng nhập
@@ -105,7 +105,7 @@ export function LoginForm({ initialEmail = '', onSuccess, onTryDemo }: LoginForm
                 isSubmitting && styles.disabled,
               ]}
             >
-              <FieldIcon name={account.icon} color={theme.primary} size={15} />
+              <Icon name={account.icon} color={theme.primary} size={15} />
               <Text numberOfLines={1} style={[styles.demoLabel, { color: theme.text }]}>
                 {account.label}
               </Text>

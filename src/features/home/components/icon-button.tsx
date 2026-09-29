@@ -1,13 +1,12 @@
 import type { Ref } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { HomeIcon } from '@/features/home/components/home-icon';
+import { Icon, type IconName } from '@/components/ui/icon';
 import { HomeHeaderColors } from '@/features/home/constants/colors';
-import type { HomeIconName } from '@/features/home/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
 
 type IconButtonProps = {
-  icon: HomeIconName;
+  icon: IconName;
   accessibilityLabel: string;
   onPress?: () => void;
   tone?: 'header' | 'surface';
@@ -49,7 +48,7 @@ export function IconButton({
         pressed && styles.pressed,
       ]}
     >
-      <HomeIcon name={icon} color={iconColor} size={onHeader ? 24 : 20} />
+      <Icon name={icon} color={iconColor} size={onHeader ? 24 : 20} />
 
       {badgeCount > 0 ? (
         <View

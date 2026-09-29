@@ -1,10 +1,10 @@
 import { useState } from 'react';
 
-import type { FormErrors } from '@/features/auth/types';
+import type { FormErrors, Validate } from '@/types/form';
 
 type UseFormOptions<T> = {
   initialValues: T;
-  validate: (values: T) => FormErrors<T>;
+  validate: Validate<T>;
   onSubmit: (values: T) => void | Promise<void>;
 };
 

@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { Icon } from '@/components/ui/icon';
 import { AdminIcons } from '@/features/admin/constants/icons';
 import type { DailyDealApproval } from '@/features/admin/types';
-import { HomeIcon } from '@/features/home/components/home-icon';
 import { useTheme } from '@/hooks/use-theme';
 
 const CHART_HEIGHT = 130;
@@ -29,7 +29,7 @@ export function DealApprovalChartCard({ daily, growth }: DealApprovalChartCardPr
           Duyệt deal theo ngày
         </Text>
         <View style={styles.growth}>
-          {isUp ? <HomeIcon name={AdminIcons.trendUp} color={growthColor} size={14} /> : null}
+          {isUp ? <Icon name={AdminIcons.trendUp} color={growthColor} size={14} /> : null}
           <Text style={[styles.growthText, { color: growthColor }]}>
             {`${isUp ? '+' : ''}${growth}%`}
           </Text>
