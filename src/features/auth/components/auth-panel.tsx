@@ -10,7 +10,8 @@ import type { AuthTab, DemoRole, RegisterValues } from '@/features/auth/types';
 import { dismissAuthPrompt, signIn, signInAsAdmin } from '@/lib/auth-session';
 
 type AuthPanelProps = {
-  onAuthenticated: () => void;
+  /** Chạy sau khi phiên đã mở — dùng để điều hướng. Modal không cần vì nó tự đóng. */
+  onAuthenticated?: () => void;
 };
 
 export function AuthPanel({ onAuthenticated }: AuthPanelProps) {
@@ -26,7 +27,8 @@ export function AuthPanel({ onAuthenticated }: AuthPanelProps) {
   // Người bán và quản lý sang hẳn khu vực khác nên bỏ thao tác đang chờ của người mua đi.
   const handleTryDemo = (role: DemoRole) => {
     if (role === 'buyer') {
-      onAuthenticated();
+      signIn();
+      onAuthenticated?.();
       return;
     }
 
@@ -51,8 +53,8 @@ export function AuthPanel({ onAuthenticated }: AuthPanelProps) {
               <AuthNotice message="Tạo tài khoản thành công. Đăng nhập để bắt đầu săn deal nhé!" />
             ) : null}
             <LoginForm
-              initialIdentifier={registeredEmail}
-              onSubmit={onAuthenticated}
+              initialEmail={registeredEmail}
+              onSuccess={() => onAuthenticated?.()}
               onTryDemo={handleTryDemo}
             />
           </>

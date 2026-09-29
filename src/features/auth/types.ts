@@ -4,7 +4,7 @@ export type AuthTab = 'login' | 'register';
 export type DemoRole = 'buyer' | 'seller' | 'admin';
 
 export type LoginValues = {
-  identifier: string;
+  email: string;
   password: string;
 };
 

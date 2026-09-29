@@ -1,13 +1,32 @@
+import { tokenStorage } from '@/lib/storage';
+
 export type SessionStatus = 'guest' | 'authenticated';
+
+export type AuthRole = 'BUYER' | 'MERCHANT' | 'ADMIN';
+
+export type AuthUser = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: AuthRole;
+  roles: AuthRole[];
+};
 
 export type SessionState = {
   status: SessionStatus;
   /** Phiên đăng nhập qua cổng quản trị — chỉ khi này mới được vào khu vực /admin. */
   isAdmin: boolean;
   isAuthPromptOpen: boolean;
+  /** Chỉ có khi đăng nhập bằng API thật; tài khoản demo không có thông tin này. */
+  user: AuthUser | null;
 };
 
-let state: SessionState = { status: 'guest', isAdmin: false, isAuthPromptOpen: false };
+let state: SessionState = {
+  status: 'guest',
+  isAdmin: false,
+  isAuthPromptOpen: false,
+  user: null,
+};
 let pendingAction: (() => void) | null = null;
 const listeners = new Set<() => void>();
 
@@ -44,7 +63,24 @@ export function withAuth(action?: () => void) {
   };
 }
 
-// Chưa có API xác thực nên phiên chỉ nằm trong bộ nhớ: tắt app là quay về trạng thái khách.
+/**
+ * Đăng nhập thật: lưu token rồi mở phiên. Phải await tokenStorage.save trước khi đổi state,
+ * nếu không request đầu tiên sau điều hướng có thể chạy trước lúc token kịp ghi.
+ */
+export async function authenticate(
+  tokens: { accessToken: string; refreshToken: string },
+  user: AuthUser,
+) {
+  await tokenStorage.save(tokens.accessToken, tokens.refreshToken);
+
+  const action = pendingAction;
+  pendingAction = null;
+  setState({ status: 'authenticated', isAuthPromptOpen: false, user });
+
+  if (action) setTimeout(action, 0);
+}
+
+// Tài khoản demo: phiên chỉ nằm trong bộ nhớ, tắt app là quay về trạng thái khách.
 export function signIn() {
   const action = pendingAction;
   pendingAction = null;
@@ -64,7 +100,9 @@ export function signInAsAdmin() {
 
 export function signOut() {
   pendingAction = null;
-  setState({ status: 'guest', isAdmin: false, isAuthPromptOpen: false });
+  setState({ status: 'guest', isAdmin: false, isAuthPromptOpen: false, user: null });
+  // Không await: signOut được gắn thẳng làm onPress, UI phải về trạng thái khách ngay.
+  void tokenStorage.clear();
 }
 
 export function dismissAuthPrompt() {

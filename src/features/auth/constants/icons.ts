@@ -13,6 +13,7 @@ export const AuthIcons = {
   lock: { ios: 'lock', android: 'lock', web: 'lock' },
   show: { ios: 'eye', android: 'visibility', web: 'visibility' },
   hide: { ios: 'eye.slash', android: 'visibility_off', web: 'visibility_off' },
+  warning: { ios: 'exclamationmark.triangle', android: 'warning', web: 'warning' },
   success: { ios: 'checkmark.seal.fill', android: 'check_circle', web: 'check_circle' },
   buyer: { ios: 'bag', android: 'shopping_bag', web: 'shopping_bag' },
   seller: { ios: 'storefront', android: 'storefront', web: 'storefront' },

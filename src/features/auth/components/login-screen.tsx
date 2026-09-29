@@ -14,15 +14,9 @@ import { AuthBackdrop } from '@/features/auth/components/auth-backdrop';
 import { AuthHeader } from '@/features/auth/components/auth-header';
 import { AuthPanel } from '@/features/auth/components/auth-panel';
 import { useTheme } from '@/hooks/use-theme';
-import { signIn } from '@/lib/auth-session';
 
 export function LoginScreen() {
   const theme = useTheme();
-
-  const enterApp = () => {
-    signIn();
-    router.replace('/');
-  };
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]}>
@@ -45,7 +39,7 @@ export function LoginScreen() {
               { backgroundColor: theme.backgroundElement, borderColor: theme.border },
             ]}
           >
-            <AuthPanel onAuthenticated={enterApp} />
+            <AuthPanel onAuthenticated={() => router.replace('/')} />
           </View>
 
           <Pressable

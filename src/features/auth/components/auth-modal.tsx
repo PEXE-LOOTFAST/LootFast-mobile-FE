@@ -17,7 +17,7 @@ import { AuthIcons } from '@/features/auth/constants/icons';
 import { useAuthSession } from '@/hooks/use-auth-session';
 import { useKeyboardHeight } from '@/hooks/use-keyboard-height';
 import { useTheme } from '@/hooks/use-theme';
-import { dismissAuthPrompt, signIn } from '@/lib/auth-session';
+import { dismissAuthPrompt } from '@/lib/auth-session';
 
 const OUTER_PADDING = 16;
 const KEYBOARD_GAP = 8;
@@ -102,7 +102,7 @@ export function AuthModal() {
               showsVerticalScrollIndicator={false}
               style={styles.scroll}
             >
-              <AuthPanel onAuthenticated={signIn} />
+              <AuthPanel />
             </ScrollView>
           </Animated.View>
         </Animated.View>
