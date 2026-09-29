@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BrandButton } from '@/components/ui/brand-button';
 import { Icon } from '@/components/ui/icon';
+import { useBuyerDeal } from '@/demo/use-demo';
 import { MaxContentWidth } from '@/constants/theme';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { DealDetailHero } from '@/features/home/components/deal-detail-hero';
@@ -15,7 +16,7 @@ import { DetailCard } from '@/features/home/components/detail-card';
 import { ReserveBar } from '@/features/home/components/reserve-bar';
 import { RatingColor } from '@/features/home/constants/colors';
 import { HomeIcons } from '@/features/home/constants/icons';
-import { findDealById, getDealReviews } from '@/features/home/data/mock-deals';
+import { getDealReviews } from '@/features/home/data/deal-reviews';
 import { useReservation } from '@/features/home/hooks/use-reservation';
 import type { Deal } from '@/features/home/types';
 import { useTheme } from '@/hooks/use-theme';
@@ -29,7 +30,7 @@ function goBack() {
 
 export function DealDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const deal = typeof id === 'string' ? findDealById(id) : undefined;
+  const deal = useBuyerDeal(typeof id === 'string' ? id : undefined);
 
   // Ảnh món tràn lên dưới status bar nên cần icon sáng, giống Trang chủ.
   useFocusEffect(
@@ -48,13 +49,14 @@ export function DealDetailScreen() {
 
 function DealDetail({ deal }: { deal: Deal }) {
   const theme = useTheme();
-  const reservation = useReservation();
+  const reservation = useReservation(deal.id);
   const [isFavorite, setIsFavorite] = useState(false);
   const [barHeight, setBarHeight] = useState(0);
 
   const reviews = getDealReviews(deal.id);
   const savings = deal.originalPrice - deal.price;
-  const remaining = reservation.status === 'reserved' ? deal.remaining - 1 : deal.remaining;
+  // Đặt giữ đã trừ suất trong kho dữ liệu nên `deal.remaining` tự đúng, không cần trừ tay.
+  const remaining = deal.remaining;
 
   const handleShare = async () => {
     try {

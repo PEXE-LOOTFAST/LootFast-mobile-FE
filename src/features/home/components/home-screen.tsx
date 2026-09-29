@@ -3,6 +3,7 @@ import { setStatusBarStyle } from 'expo-status-bar';
 import { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
+import { useBuyerDeals } from '@/demo/use-demo';
 import { MaxContentWidth } from '@/constants/theme';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { DealCard } from '@/features/home/components/deal-card';
@@ -12,7 +13,7 @@ import { HomeHeader } from '@/features/home/components/home-header';
 import { NotificationSheet } from '@/features/home/components/notification-sheet';
 import { SearchPanel } from '@/features/home/components/search-panel';
 import { SectionHeader } from '@/features/home/components/section-header';
-import { DEAL_CATEGORIES, MOCK_DEALS } from '@/features/home/data/mock-deals';
+import { DEAL_CATEGORIES } from '@/features/home/constants/deal-categories';
 import { MOCK_NOTIFICATIONS } from '@/features/home/data/mock-notifications';
 import { useDealFilters } from '@/features/home/hooks/use-deal-filters';
 import { useNotifications } from '@/features/home/hooks/use-notifications';
@@ -27,7 +28,9 @@ const HORIZONTAL_INSET = 16;
 export function HomeScreen() {
   const theme = useTheme();
   const { isAuthenticated } = useAuthSession();
-  const filters = useDealFilters(MOCK_DEALS);
+  // Sàn deal đọc từ kho dữ liệu demo: quán được admin duyệt hay mở khoá là deal hiện ra ngay.
+  const deals = useBuyerDeals();
+  const filters = useDealFilters(deals);
   const { notifications, unreadCount, markAsRead } = useNotifications(MOCK_NOTIFICATIONS);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 

@@ -1,7 +1,7 @@
 import { router, type Href } from 'expo-router';
-import { Alert } from 'react-native';
 
 import { signOut } from '@/lib/auth-session';
+import { confirmAction } from '@/lib/confirm';
 
 type ConfirmSignOutOptions = {
   message?: string;
@@ -15,15 +15,14 @@ export function confirmSignOut({
   message = 'Bạn muốn đăng xuất khỏi LootFast?',
   redirectTo = '/',
 }: ConfirmSignOutOptions = {}) {
-  Alert.alert('Đăng xuất', message, [
-    { text: 'Huỷ', style: 'cancel' },
-    {
-      text: 'Đăng xuất',
-      style: 'destructive',
-      onPress: () => {
-        signOut();
-        router.replace(redirectTo);
-      },
+  confirmAction({
+    title: 'Đăng xuất',
+    message,
+    confirmLabel: 'Đăng xuất',
+    isDestructive: true,
+    onConfirm: () => {
+      signOut();
+      router.replace(redirectTo);
     },
-  ]);
+  });
 }

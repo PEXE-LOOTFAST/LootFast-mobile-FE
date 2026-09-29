@@ -3,6 +3,8 @@ import { setStatusBarStyle } from 'expo-status-bar';
 import { useCallback, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { cancelOrder } from '@/demo/store';
+import { useBuyerOrders } from '@/demo/use-demo';
 import { MaxContentWidth } from '@/constants/theme';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { OrderCard } from '@/features/order/components/order-card';
@@ -10,17 +12,35 @@ import { OrderHeader } from '@/features/order/components/order-header';
 import { OrderStatusTabs } from '@/features/order/components/order-status-tabs';
 import { SavingsStatsCard } from '@/features/order/components/savings-stats-card';
 import { SavingsSummaryCard } from '@/features/order/components/savings-summary-card';
-import { MOCK_ORDERS } from '@/features/order/data/mock-orders';
 import { useOrderSavings } from '@/features/order/hooks/use-order-savings';
-import type { OrderStatus, SavingsView } from '@/features/order/types';
+import type { Order, OrderStatus, SavingsView } from '@/features/order/types';
 import { useTheme } from '@/hooks/use-theme';
+import { confirmAction } from '@/lib/confirm';
 
 export function OrderListScreen() {
   const theme = useTheme();
   const [status, setStatus] = useState<OrderStatus>('pending');
   const [savingsView, setSavingsView] = useState<SavingsView>('week');
-  const savings = useOrderSavings(MOCK_ORDERS);
-  const orders = MOCK_ORDERS.filter((order) => order.status === status);
+  // Đơn của người mua đọc từ kho dữ liệu demo: vừa đặt giữ ở màn deal là thấy ngay tại đây.
+  const allOrders = useBuyerOrders();
+  const savings = useOrderSavings(allOrders);
+  const orders = allOrders.filter((order) => order.status === status);
+
+  // Huỷ đơn trả suất lại cho deal nên hỏi lại trước, và nói rõ hệ quả cho khách.
+  const askToCancel = (order: Order) =>
+    confirmAction({
+      title: 'Huỷ đơn',
+      message: `Huỷ đơn ${order.code} — ${order.quantity} × ${order.itemName} tại ${order.storeName}? Suất này sẽ được trả lại cho khách khác đặt.`,
+      confirmLabel: 'Huỷ đơn',
+      cancelLabel: 'Giữ đơn',
+      isDestructive: true,
+      onConfirm: () => {
+        cancelOrder(order.id);
+        // Chuyển sang tab Đã hủy để khách thấy ngay đơn vừa huỷ, thay vì nó biến mất khỏi
+        // tab đang xem mà không biết đi đâu.
+        setStatus('cancelled');
+      },
+    });
 
   // Header nền xanh đậm cần icon status bar màu sáng, trả về 'auto' khi rời màn.
   useFocusEffect(
@@ -45,6 +65,7 @@ export function OrderListScreen() {
                 <OrderCard
                   key={order.id}
                   order={order}
+                  onPressCancel={() => askToCancel(order)}
                   onPressCode={() => Alert.alert('Mã nhận món', order.code)}
                 />
               ))}

@@ -2,6 +2,7 @@ import { Alert, StyleSheet, Text, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
 import { Icon } from '@/components/ui/icon';
+import { useSellerDemo } from '@/demo/use-demo';
 import { SellerBadge } from '@/features/seller/components/seller-badge';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import {
@@ -10,7 +11,6 @@ import {
   SELLER_PLAN_FEATURES,
   SELLER_PREMIUM_PRICE,
 } from '@/features/seller/constants/seller-plan';
-import { MOCK_SELLER_PLAN } from '@/features/seller/data/mock-seller-shop';
 import { useTheme } from '@/hooks/use-theme';
 import { formatPrice } from '@/lib/format';
 
@@ -25,7 +25,7 @@ function formatRenewal(iso?: string) {
 
 export function SellerPlanScreen({ onBack }: { onBack: () => void }) {
   const theme = useTheme();
-  const plan = MOCK_SELLER_PLAN;
+  const { plan } = useSellerDemo();
 
   return (
     <SellerPageScaffold

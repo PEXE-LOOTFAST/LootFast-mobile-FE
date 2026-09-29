@@ -25,7 +25,12 @@ export function useSellerOverview(deals: SellerDeal[], orders: SellerOrder[]) {
     );
     const paidToday = ordersToday.filter(countsAsSale);
 
-    const portionsTotal = runningDeals.reduce((sum, deal) => sum + deal.portionsTotal, 0);
+    // Số phần còn lại chỉ tính trên deal đang chạy, còn số phần đã bán cộng cả deal đã kết
+    // thúc: trộn hai phạm vi này vào một phép trừ sẽ ra số âm khi deal cũ đã bán được nhiều.
+    const portionsLeft = runningDeals.reduce(
+      (sum, deal) => sum + Math.max(deal.portionsTotal - deal.portionsSold, 0),
+      0,
+    );
     const portionsSold = deals.reduce((sum, deal) => sum + deal.portionsSold, 0);
     const soldOutCount = runningDeals.filter(isSoldOut).length;
 
@@ -52,7 +57,7 @@ export function useSellerOverview(deals: SellerDeal[], orders: SellerOrder[]) {
       pendingPickupCount: ordersToday.filter((order) => order.status === 'confirmed').length,
       pendingConfirmCount: orders.filter((order) => order.status === 'pending').length,
       runningDealCount: runningDeals.length,
-      portionsLeft: Math.max(portionsTotal - portionsSold, 0),
+      portionsLeft,
       portionsSold,
       soldOutCount,
       soldOutRate: runningDeals.length > 0 ? soldOutCount / runningDeals.length : 0,
