@@ -18,6 +18,7 @@ import { useMerchantImageUpload } from '@/features/seller/hooks/use-merchant-ima
 import type { SellerShop, SellerShopCategory } from '@/features/seller/types';
 import { useLightStatusBar } from '@/features/seller/hooks/use-light-status-bar';
 import { useTheme } from '@/hooks/use-theme';
+import { confirmSignOut } from '@/lib/confirm-sign-out';
 
 function mapErrorCode(code: string): string {
   const messages: Record<string, string> = {
@@ -171,6 +172,20 @@ export function SellerShopScreen() {
             <HomeIcon name={SellerIcons.person} color={theme.text} size={16} />
             <Text style={[styles.switchLabel, { color: theme.text }]}>Chuyển sang người mua</Text>
           </Pressable>
+
+          <Pressable
+            accessibilityLabel="Đăng xuất"
+            accessibilityRole="button"
+            onPress={() => confirmSignOut()}
+            style={({ pressed }) => [
+              styles.signOut,
+              { backgroundColor: theme.backgroundElement, borderColor: theme.danger },
+              pressed && styles.pressed,
+            ]}
+          >
+            <HomeIcon name={SellerIcons.logout} color={theme.danger} size={16} />
+            <Text style={[styles.signOutLabel, { color: theme.danger }]}>Đăng xuất</Text>
+          </Pressable>
         </View>
       </ScrollView>
 
@@ -208,5 +223,15 @@ const styles = StyleSheet.create({
     boxShadow: '0px 4px 10px rgba(23, 33, 27, 0.06)',
   },
   switchLabel: { fontSize: 14, fontWeight: '800' },
+  signOut: {
+    minHeight: 48,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1,
+    borderRadius: 22,
+  },
+  signOutLabel: { fontSize: 14, fontWeight: '800' },
   pressed: { opacity: 0.8 },
 });

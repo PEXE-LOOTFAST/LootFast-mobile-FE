@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 
@@ -10,7 +9,7 @@ import { MOCK_ADMIN_ALERTS } from '@/features/admin/data/mock-admin-overview';
 import { HomeIcon } from '@/features/home/components/home-icon';
 import { useLightStatusBar } from '@/features/seller/hooks/use-light-status-bar';
 import { useTheme } from '@/hooks/use-theme';
-import { signOut } from '@/lib/auth-session';
+import { confirmSignOut } from '@/lib/confirm-sign-out';
 
 // Lấy chữ cái đầu của hai từ đầu tiên, vd. "Nguyễn Quản Trị" → "NQ".
 function getInitials(name: string) {
@@ -73,19 +72,11 @@ export function AdminSettingsScreen() {
   };
 
   // Đăng xuất xong quay lại cổng quản trị để người dùng tiếp theo đăng nhập lại.
-  const handleSignOut = () => {
-    Alert.alert('Đăng xuất', 'Bạn muốn đăng xuất khỏi khu vực quản trị?', [
-      { text: 'Huỷ', style: 'cancel' },
-      {
-        text: 'Đăng xuất',
-        style: 'destructive',
-        onPress: () => {
-          signOut();
-          router.replace('/admin-login');
-        },
-      },
-    ]);
-  };
+  const handleSignOut = () =>
+    confirmSignOut({
+      message: 'Bạn muốn đăng xuất khỏi khu vực quản trị?',
+      redirectTo: '/admin-login',
+    });
 
   const cardStyle = [
     styles.card,

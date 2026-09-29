@@ -1,3 +1,4 @@
+import { apiRequest } from '@/lib/api-client';
 import { tokenStorage } from '@/lib/storage';
 
 export type SessionStatus = 'guest' | 'authenticated';
@@ -102,7 +103,25 @@ export function signOut() {
   pendingAction = null;
   setState({ status: 'guest', isAdmin: false, isAuthPromptOpen: false, user: null });
   // Không await: signOut được gắn thẳng làm onPress, UI phải về trạng thái khách ngay.
-  void tokenStorage.clear();
+  void revokeSession();
+}
+
+/**
+ * Thu hồi refresh session ở server rồi xoá token dưới máy. Lỗi mạng chỉ được bỏ qua chứ không
+ * chặn đăng xuất: phiên local phải đóng bằng mọi giá, và endpoint logout là idempotent nên
+ * lần đăng nhập sau gọi lại cũng không sao. Tài khoản demo không có token nên bỏ qua bước gọi API.
+ */
+async function revokeSession() {
+  try {
+    const refreshToken = await tokenStorage.getRefreshToken();
+    if (refreshToken) {
+      await apiRequest<void>('/auth/logout', { method: 'POST', body: { refreshToken } });
+    }
+  } catch {
+    // Bỏ qua: token dưới máy vẫn bị xoá ở finally.
+  } finally {
+    await tokenStorage.clear();
+  }
 }
 
 export function dismissAuthPrompt() {

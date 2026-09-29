@@ -42,6 +42,9 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
 
+  // 204 không có body: gọi response.json() sẽ ném lỗi parse (vd. POST /auth/logout).
+  if (response.status === 204) return undefined as T;
+
   const payload = (await response.json()) as ApiResponse<T>;
 
   // Backend luôn bọc response trong ApiResponse, kể cả khi lỗi. Ném theo error.code
