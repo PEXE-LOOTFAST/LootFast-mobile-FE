@@ -99,6 +99,34 @@ export function placeOrder(dealId: string, quantity = 1): string {
   return code;
 }
 
+/**
+ * Đơn chỉ huỷ được khi quán chưa soạn xong món: sau khi chuyển sang "Sẵn sàng nhận" thì
+ * phần ăn đã được chuẩn bị, huỷ lúc đó chính là phần thức ăn bị bỏ đi mà app muốn tránh.
+ */
+export function canCancelOrder(status: DemoOrderStatus): boolean {
+  return status === 'pending' || status === 'confirmed';
+}
+
+/**
+ * Người mua huỷ đơn. Suất đã giữ được trả lại cho deal nên khách khác đặt được ngay, và
+ * khu người bán thấy đơn chuyển sang đã huỷ cùng lúc.
+ */
+export function cancelOrder(orderId: string) {
+  const order = state.orders.find((item) => item.id === orderId);
+  if (!order || !canCancelOrder(order.status)) return;
+
+  setState({
+    orders: state.orders.map((item) =>
+      item.id === orderId ? { ...item, status: 'cancelled' } : item,
+    ),
+    deals: state.deals.map((deal) =>
+      deal.id === order.dealId
+        ? { ...deal, portionsSold: Math.max(deal.portionsSold - order.quantity, 0) }
+        : deal,
+    ),
+  });
+}
+
 export function setOrderStatus(orderId: string, status: DemoOrderStatus) {
   setState({
     orders: state.orders.map((order) => (order.id === orderId ? { ...order, status } : order)),

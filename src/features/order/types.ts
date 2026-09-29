@@ -14,6 +14,8 @@ export type Order = {
   pickupLabel: string;
   /** Ngày hoàn thành (ISO), chỉ có ở đơn đã hoàn thành — dùng để cộng tiết kiệm theo ngày. */
   completedAt?: string;
+  /** Khách còn huỷ được đơn này hay không — quán đã soạn xong món thì không huỷ được nữa. */
+  canCancel: boolean;
 };
 
 export type SavingsView = 'week' | 'category';

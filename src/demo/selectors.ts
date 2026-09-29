@@ -1,4 +1,4 @@
-import { hoursAgoToDate } from '@/demo/store';
+import { canCancelOrder, hoursAgoToDate } from '@/demo/store';
 import type { DemoDeal, DemoOrder, DemoState, DemoStore } from '@/demo/types';
 import { DEMO_BUYER_NAME, DEMO_SELLER_STORE_ID } from '@/demo/world';
 import type {
@@ -127,6 +127,7 @@ export function selectBuyerOrders(state: DemoState): Order[] {
           originalPrice: deal.originalPrice * order.quantity,
           pickupLabel: pickupLabelOf(order),
           completedAt: order.status === 'completed' ? placedAt(order).toISOString() : undefined,
+          canCancel: canCancelOrder(order.status),
         },
       ];
     })
