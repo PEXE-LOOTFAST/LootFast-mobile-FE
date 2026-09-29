@@ -20,10 +20,10 @@ type LoginFormProps = {
   onTryDemo: (role: DemoRole) => void;
 };
 
+// Không có demo quản trị ở đây: khu vực quản trị đi qua màn /admin-login riêng.
 const DEMO_ACCOUNTS = [
   { role: 'buyer', label: 'Người mua', icon: AuthIcons.buyer },
   { role: 'seller', label: 'Người bán', icon: AuthIcons.seller },
-  { role: 'admin', label: 'Quản lý', icon: AuthIcons.admin },
 ] as const satisfies readonly { role: DemoRole; label: string; icon: AuthIconName }[];
 
 export function LoginForm({ initialEmail = '', onSuccess, onTryDemo }: LoginFormProps) {

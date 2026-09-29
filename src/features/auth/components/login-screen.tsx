@@ -1,13 +1,5 @@
 import { router } from 'expo-router';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AuthBackdrop } from '@/features/auth/components/auth-backdrop';
@@ -41,17 +33,6 @@ export function LoginScreen() {
           >
             <AuthPanel onAuthenticated={() => router.replace('/')} />
           </View>
-
-          <Pressable
-            accessibilityRole="link"
-            hitSlop={8}
-            onPress={() => router.navigate('/admin-login')}
-            style={({ pressed }) => [styles.adminLink, pressed && styles.pressed]}
-          >
-            <Text style={[styles.adminLinkText, { color: theme.textSecondary }]}>
-              Bạn là quản trị viên? <Text style={{ color: theme.primary }}>Đăng nhập quản trị</Text>
-            </Text>
-          </Pressable>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -70,7 +51,4 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     boxShadow: '0px 18px 40px rgba(23, 33, 27, 0.08)',
   },
-  adminLink: { alignSelf: 'center' },
-  adminLinkText: { fontSize: 13, fontWeight: '600' },
-  pressed: { opacity: 0.7 },
 });
