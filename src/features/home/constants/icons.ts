@@ -4,6 +4,7 @@ import type { IconMap } from '@/components/ui/icon';
 export const HomeIcons = {
   location: { ios: 'mappin.and.ellipse', android: 'location_on', web: 'location_on' },
   bell: { ios: 'bell', android: 'notifications', web: 'notifications' },
+  login: { ios: 'rectangle.portrait.and.arrow.forward', android: 'login', web: 'login' },
   person: { ios: 'person', android: 'person', web: 'person' },
   search: { ios: 'magnifyingglass', android: 'search', web: 'search' },
   clear: { ios: 'xmark.circle.fill', android: 'close', web: 'close' },
