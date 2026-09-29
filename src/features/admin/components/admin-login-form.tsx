@@ -20,6 +20,7 @@ export function AdminLoginForm({ onAuthenticated }: { onAuthenticated: () => voi
   const theme = useTheme();
   // Lỗi sai tài khoản là của cả form, không gắn vào ô nào để không lộ ô nào đúng ô nào sai.
   const [formError, setFormError] = useState<string>();
+  const [isEnteringDemo, setIsEnteringDemo] = useState(false);
   const { values, errors, isSubmitting, setField, submit } = useForm<AdminLoginValues>({
     initialValues: { email: '', password: '' },
     validate: validateAdminLogin,
@@ -40,9 +41,18 @@ export function AdminLoginForm({ onAuthenticated }: { onAuthenticated: () => voi
     setField(field, value);
   };
 
-  const fillDemoAccount = () => {
-    changeField('email', MOCK_ADMIN_ACCOUNT.email);
-    changeField('password', MOCK_ADMIN_ACCOUNT.password);
+  // Điền sẵn tài khoản mẫu rồi vào luôn: người dùng thấy được mình đăng nhập bằng tài khoản nào
+  // mà không phải bấm thêm lần nữa.
+  const enterWithDemoAccount = async () => {
+    if (isSubmitting || isEnteringDemo) return;
+
+    setFormError(undefined);
+    setField('email', MOCK_ADMIN_ACCOUNT.email);
+    setField('password', MOCK_ADMIN_ACCOUNT.password);
+
+    setIsEnteringDemo(true);
+    await wait(400);
+    onAuthenticated();
   };
 
   return (
@@ -84,13 +94,18 @@ export function AdminLoginForm({ onAuthenticated }: { onAuthenticated: () => voi
         </View>
       ) : null}
 
-      <BrandButton loading={isSubmitting} onPress={() => void submit()}>
+      <BrandButton disabled={isEnteringDemo} loading={isSubmitting} onPress={() => void submit()}>
         Đăng nhập quản trị
       </BrandButton>
 
       <View style={styles.demo}>
-        <BrandButton variant="outline" disabled={isSubmitting} onPress={fillDemoAccount}>
-          Điền tài khoản demo
+        <BrandButton
+          variant="outline"
+          disabled={isSubmitting}
+          loading={isEnteringDemo}
+          onPress={() => void enterWithDemoAccount()}
+        >
+          Vào bằng tài khoản demo
         </BrandButton>
         <Text style={[styles.demoNote, { color: theme.textSecondary }]}>
           Chưa có API xác thực — dùng tài khoản mẫu để xem khu vực quản trị.

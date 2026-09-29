@@ -1,20 +1,20 @@
 import type { FormErrors, LoginValues, RegisterValues } from '@/features/auth/types';
 
 export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const USERNAME_PATTERN = /^[a-zA-Z0-9_.]{3,30}$/;
 export const PHONE_PATTERN = /^0\d{9}$/;
 
 export const MIN_PASSWORD_LENGTH = 8;
 
 export function validateLogin(values: LoginValues): FormErrors<LoginValues> {
-  const identifier = values.identifier.trim();
+  const email = values.email.trim();
 
+  // Backend chỉ nhận email (POST /auth/signin), không có đăng nhập bằng username.
   return {
-    identifier: !identifier
-      ? 'Vui lòng nhập email hoặc tên đăng nhập'
-      : EMAIL_PATTERN.test(identifier) || USERNAME_PATTERN.test(identifier)
+    email: !email
+      ? 'Vui lòng nhập email'
+      : EMAIL_PATTERN.test(email)
         ? undefined
-        : 'Email hoặc tên đăng nhập không hợp lệ',
+        : 'Email không hợp lệ',
     // Không kiểm tra độ dài ở màn đăng nhập: tài khoản cũ có thể được tạo trước khi áp quy tắc mới.
     password: values.password ? undefined : 'Vui lòng nhập mật khẩu',
   };

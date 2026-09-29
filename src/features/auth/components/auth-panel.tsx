@@ -1,19 +1,22 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { AuthNotice } from '@/features/auth/components/auth-notice';
 import { AuthTabs } from '@/features/auth/components/auth-tabs';
 import { LoginForm } from '@/features/auth/components/login-form';
 import { RegisterForm } from '@/features/auth/components/register-form';
 import type { AuthTab, DemoRole, RegisterValues } from '@/features/auth/types';
-import { dismissAuthPrompt, signIn, signInAsAdmin } from '@/lib/auth-session';
+import { useTheme } from '@/hooks/use-theme';
+import { dismissAuthPrompt, signIn } from '@/lib/auth-session';
 
 type AuthPanelProps = {
-  onAuthenticated: () => void;
+  /** Chạy sau khi phiên đã mở — dùng để điều hướng. Modal không cần vì nó tự đóng. */
+  onAuthenticated?: () => void;
 };
 
 export function AuthPanel({ onAuthenticated }: AuthPanelProps) {
+  const theme = useTheme();
   const [tab, setTab] = useState<AuthTab>('login');
   const [registeredEmail, setRegisteredEmail] = useState<string>();
 
@@ -23,21 +26,24 @@ export function AuthPanel({ onAuthenticated }: AuthPanelProps) {
   };
 
   // Demo người mua đi như đăng nhập thường (modal còn chạy tiếp thao tác khách vừa bấm).
-  // Người bán và quản lý sang hẳn khu vực khác nên bỏ thao tác đang chờ của người mua đi.
+  // Người bán sang hẳn khu vực khác nên bỏ thao tác đang chờ của người mua đi.
   const handleTryDemo = (role: DemoRole) => {
     if (role === 'buyer') {
-      onAuthenticated();
+      signIn();
+      onAuthenticated?.();
       return;
     }
 
     dismissAuthPrompt();
-    if (role === 'seller') {
-      signIn();
-      router.replace('/seller');
-    } else {
-      signInAsAdmin();
-      router.replace('/admin');
-    }
+    signIn();
+    router.replace('/seller');
+  };
+
+  // Đóng modal trước khi rời đi, nếu không nó vẫn nằm đè lên màn đăng nhập quản trị.
+  // Ở màn /login không có modal nào mở nên lệnh này không đổi gì.
+  const goToAdminLogin = () => {
+    dismissAuthPrompt();
+    router.navigate('/admin-login');
   };
 
   return (
@@ -51,10 +57,22 @@ export function AuthPanel({ onAuthenticated }: AuthPanelProps) {
               <AuthNotice message="Tạo tài khoản thành công. Đăng nhập để bắt đầu săn deal nhé!" />
             ) : null}
             <LoginForm
-              initialIdentifier={registeredEmail}
-              onSubmit={onAuthenticated}
+              initialEmail={registeredEmail}
+              onSuccess={() => onAuthenticated?.()}
               onTryDemo={handleTryDemo}
             />
+
+            <Pressable
+              accessibilityRole="link"
+              hitSlop={8}
+              onPress={goToAdminLogin}
+              style={({ pressed }) => [styles.adminLink, pressed && styles.pressed]}
+            >
+              <Text style={[styles.adminLinkText, { color: theme.textSecondary }]}>
+                Bạn là quản trị viên?{' '}
+                <Text style={{ color: theme.primary }}>Đăng nhập quản trị</Text>
+              </Text>
+            </Pressable>
           </>
         ) : (
           <RegisterForm onSubmit={handleRegistered} />
@@ -66,4 +84,7 @@ export function AuthPanel({ onAuthenticated }: AuthPanelProps) {
 
 const styles = StyleSheet.create({
   body: { gap: 20, padding: 20 },
+  adminLink: { alignSelf: 'center' },
+  adminLinkText: { fontSize: 13, fontWeight: '600', textAlign: 'center' },
+  pressed: { opacity: 0.7 },
 });

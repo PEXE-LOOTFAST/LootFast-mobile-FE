@@ -2,6 +2,9 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
 import { TextField } from '@/components/ui/text-field';
+import { toAuthErrorMessage } from '@/features/auth/api/auth-error-messages';
+import { useSignin } from '@/features/auth/api/use-signin';
+import { AuthError } from '@/features/auth/components/auth-error';
 import { FieldIcon } from '@/features/auth/components/field-icon';
 import { FormSection } from '@/features/auth/components/form-section';
 import { PasswordField } from '@/features/auth/components/password-field';
@@ -12,47 +15,59 @@ import { validateLogin } from '@/features/auth/validation';
 import { useTheme } from '@/hooks/use-theme';
 
 type LoginFormProps = {
-  initialIdentifier?: string;
-  onSubmit: (values: LoginValues) => void | Promise<void>;
+  initialEmail?: string;
+  onSuccess: () => void;
   onTryDemo: (role: DemoRole) => void;
 };
 
+// Không có demo quản trị ở đây: khu vực quản trị đi qua màn /admin-login riêng.
 const DEMO_ACCOUNTS = [
   { role: 'buyer', label: 'Người mua', icon: AuthIcons.buyer },
   { role: 'seller', label: 'Người bán', icon: AuthIcons.seller },
-  { role: 'admin', label: 'Quản lý', icon: AuthIcons.admin },
 ] as const satisfies readonly { role: DemoRole; label: string; icon: AuthIconName }[];
 
-export function LoginForm({ initialIdentifier = '', onSubmit, onTryDemo }: LoginFormProps) {
+export function LoginForm({ initialEmail = '', onSuccess, onTryDemo }: LoginFormProps) {
   const theme = useTheme();
+  const signin = useSignin(onSuccess);
   const { values, errors, isSubmitting, setField, submit } = useForm<LoginValues>({
-    initialValues: { identifier: initialIdentifier, password: '' },
+    initialValues: { email: initialEmail, password: '' },
     validate: validateLogin,
-    onSubmit,
+    onSubmit: async ({ email, password }) => {
+      try {
+        await signin.mutateAsync({ email: email.trim(), password });
+      } catch {
+        // Lỗi đã nằm trong signin.error để hiện banner; ném tiếp sẽ thành unhandled rejection.
+      }
+    },
   });
+
+  const changeField = (field: keyof LoginValues, value: string) => {
+    if (signin.error) signin.reset();
+    setField(field, value);
+  };
 
   return (
     <View style={styles.container}>
       <FormSection title="Thông tin đăng nhập">
         <TextField
           autoCapitalize="none"
-          autoComplete="username"
+          autoComplete="email"
           autoCorrect={false}
-          error={errors.identifier}
+          error={errors.email}
           keyboardType="email-address"
-          label="Email hoặc tên đăng nhập"
+          label="Email"
           leading={<FieldIcon name={AuthIcons.mail} />}
-          onChangeText={(text) => setField('identifier', text)}
-          placeholder="ban@email.com hoặc username"
+          onChangeText={(text) => changeField('email', text)}
+          placeholder="ban@email.com"
           returnKeyType="next"
-          value={values.identifier}
+          value={values.email}
         />
 
         <PasswordField
           autoComplete="current-password"
           error={errors.password}
           label="Mật khẩu"
-          onChangeText={(text) => setField('password', text)}
+          onChangeText={(text) => changeField('password', text)}
           onSubmitEditing={() => void submit()}
           placeholder="••••••••"
           returnKeyType="go"
@@ -63,6 +78,8 @@ export function LoginForm({ initialIdentifier = '', onSubmit, onTryDemo }: Login
           <Text style={[styles.forgotText, { color: theme.primary }]}>Quên mật khẩu?</Text>
         </Pressable>
       </FormSection>
+
+      {signin.error ? <AuthError message={toAuthErrorMessage(signin.error)} /> : null}
 
       <BrandButton loading={isSubmitting} onPress={() => void submit()}>
         Đăng nhập

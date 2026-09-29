@@ -1,12 +1,12 @@
 import { router } from 'expo-router';
-import { Alert, Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet, Text } from 'react-native';
 
 import { HomeIcon } from '@/features/home/components/home-icon';
 import { SellerMenuList, type SellerMenuItem } from '@/features/seller/components/seller-menu-list';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
-import { signOut } from '@/lib/auth-session';
+import { confirmSignOut } from '@/lib/confirm-sign-out';
 
 const SETTINGS_ITEMS: SellerMenuItem[] = [
   {
@@ -38,21 +38,6 @@ const SETTINGS_ITEMS: SellerMenuItem[] = [
 export function SellerSettingsScreen() {
   const theme = useTheme();
 
-  // Đăng xuất xong đưa về Trang chủ người mua, nơi khách chưa đăng nhập vẫn xem được.
-  const handleSignOut = () => {
-    Alert.alert('Đăng xuất', 'Bạn muốn đăng xuất khỏi LootFast?', [
-      { text: 'Huỷ', style: 'cancel' },
-      {
-        text: 'Đăng xuất',
-        style: 'destructive',
-        onPress: () => {
-          signOut();
-          router.replace('/');
-        },
-      },
-    ]);
-  };
-
   return (
     <SellerPageScaffold
       onPressBack={() => router.navigate('/seller/shop')}
@@ -64,7 +49,7 @@ export function SellerSettingsScreen() {
       <Pressable
         accessibilityLabel="Đăng xuất"
         accessibilityRole="button"
-        onPress={handleSignOut}
+        onPress={() => confirmSignOut()}
         style={({ pressed }) => [
           styles.signOut,
           { backgroundColor: theme.backgroundElement, borderColor: theme.danger },

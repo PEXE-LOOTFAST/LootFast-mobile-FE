@@ -1,11 +1,11 @@
 import { router, type Href } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
 
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useTheme } from '@/hooks/use-theme';
-import { signOut } from '@/lib/auth-session';
+import { confirmSignOut } from '@/lib/confirm-sign-out';
 import type { SymbolViewProps } from 'expo-symbols';
 
 type ProfileIconName = Extract<SymbolViewProps['name'], object>;
@@ -102,13 +102,6 @@ function ProfileSection({ items, title }: { items: ProfileItem[]; title: string 
 export function ProfileScreen() {
   const theme = useTheme();
 
-  const handleSignOut = () => {
-    Alert.alert('Đăng xuất', 'Bạn muốn đăng xuất khỏi LootFast?', [
-      { text: 'Huỷ', style: 'cancel' },
-      { text: 'Đăng xuất', style: 'destructive', onPress: signOut },
-    ]);
-  };
-
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]} edges={['top']}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -178,7 +171,11 @@ export function ProfileScreen() {
           <Text style={[styles.sellerText, { color: theme.text }]}>Chuyển sang người bán</Text>
           <SymbolView name={ProfileIcons.chevronRight} size={17} tintColor={theme.textSecondary} />
         </Pressable>
-        <Pressable accessibilityRole="button" onPress={handleSignOut} style={styles.signOut}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => confirmSignOut()}
+          style={styles.signOut}
+        >
           <Text style={[styles.signOutText, { color: theme.danger }]}>Đăng xuất</Text>
         </Pressable>
       </ScrollView>
