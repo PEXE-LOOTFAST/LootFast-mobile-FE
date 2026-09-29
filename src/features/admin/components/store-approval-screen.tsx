@@ -5,7 +5,6 @@ import { MaxContentWidth } from '@/constants/theme';
 import { AdminHeader } from '@/features/admin/components/admin-header';
 import { StoreApplicationCard } from '@/features/admin/components/store-application-card';
 import { STORE_APPROVAL_TABS } from '@/features/admin/constants/store-approval-tabs';
-import { MOCK_STORE_APPLICATIONS } from '@/features/admin/data/mock-store-applications';
 import { useStoreApprovals } from '@/features/admin/hooks/use-store-approvals';
 import type { StoreApplicationStatus } from '@/features/admin/types';
 import { SegmentedTabs } from '@/features/seller/components/segmented-tabs';
@@ -31,7 +30,7 @@ const EMPTY_STATES: Record<StoreApplicationStatus, { title: string; description:
 export function StoreApprovalScreen() {
   const theme = useTheme();
   const [tab, setTab] = useState<StoreApplicationStatus>('pending');
-  const { grouped, approve, reject, undo } = useStoreApprovals(MOCK_STORE_APPLICATIONS);
+  const { grouped, approve, reject, undo } = useStoreApprovals();
   const visible = grouped[tab];
   // Chỉ đếm hàng chờ: đó là việc admin còn phải làm, hai nhóm kia chỉ để tra lại.
   const tabs = STORE_APPROVAL_TABS.map((item) =>

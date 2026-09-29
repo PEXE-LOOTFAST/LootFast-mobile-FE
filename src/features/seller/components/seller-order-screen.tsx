@@ -3,6 +3,7 @@ import { setStatusBarStyle } from 'expo-status-bar';
 import { useCallback, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 
+import { useSellerDemo } from '@/demo/use-demo';
 import { MaxContentWidth } from '@/constants/theme';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { DealQuotaCard } from '@/features/seller/components/deal-quota-card';
@@ -13,11 +14,6 @@ import { SellerDealCard } from '@/features/seller/components/seller-deal-card';
 import { SellerEmptyCard } from '@/features/seller/components/seller-empty-card';
 import { SellerOrderHeader } from '@/features/seller/components/seller-order-header';
 import { SELLER_ORDER_TABS } from '@/features/seller/constants/seller-order-tabs';
-import {
-  MOCK_SELLER_DEALS,
-  MOCK_SELLER_ORDERS,
-  MOCK_SELLER_PLAN,
-} from '@/features/seller/data/mock-seller-shop';
 import { useSellerOrderBoard } from '@/features/seller/hooks/use-seller-order-board';
 import type { SellerOrderTab } from '@/features/seller/types';
 import { useTheme } from '@/hooks/use-theme';
@@ -25,9 +21,10 @@ import { useTheme } from '@/hooks/use-theme';
 export function SellerOrderScreen() {
   const theme = useTheme();
   const [tab, setTab] = useState<SellerOrderTab>('incoming');
-  const board = useSellerOrderBoard(MOCK_SELLER_DEALS, MOCK_SELLER_ORDERS);
-  const runningDeals = MOCK_SELLER_DEALS.filter((deal) => deal.status === 'running');
-  const endedDeals = MOCK_SELLER_DEALS.filter((deal) => deal.status === 'ended');
+  const { deals, orders, plan } = useSellerDemo();
+  const board = useSellerOrderBoard(orders);
+  const runningDeals = deals.filter((deal) => deal.status === 'running');
+  const endedDeals = deals.filter((deal) => deal.status === 'ended');
 
   // Header nền xanh đậm cần icon status bar màu sáng, trả về 'auto' khi rời màn.
   useFocusEffect(
@@ -76,7 +73,7 @@ export function SellerOrderScreen() {
                 onPressPlan={() =>
                   router.navigate({ pathname: '/premium', params: { from: '/seller/orders' } })
                 }
-                plan={MOCK_SELLER_PLAN}
+                plan={plan}
               />
 
               {runningDeals.length > 0 ? (

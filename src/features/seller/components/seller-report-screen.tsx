@@ -1,17 +1,18 @@
 import { router } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { useSellerDemo } from '@/demo/use-demo';
 import { AdvancedReportCard } from '@/features/seller/components/advanced-report-card';
 import { ReportStatCard } from '@/features/seller/components/report-stat-card';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
-import { MOCK_SELLER_DEALS, MOCK_SELLER_ORDERS } from '@/features/seller/data/mock-seller-shop';
 import { useSellerReport } from '@/features/seller/hooks/use-seller-report';
 import { useTheme } from '@/hooks/use-theme';
 import { formatPrice } from '@/lib/format';
 
 export function SellerReportScreen() {
   const theme = useTheme();
-  const report = useSellerReport(MOCK_SELLER_DEALS, MOCK_SELLER_ORDERS);
+  const { deals, orders } = useSellerDemo();
+  const report = useSellerReport(deals, orders);
 
   return (
     <SellerPageScaffold

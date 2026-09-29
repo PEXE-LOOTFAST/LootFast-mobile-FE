@@ -28,8 +28,8 @@ export type AdminStat = {
   tone: AdminStatTone;
 };
 
-/** Số deal được duyệt trong một ngày, dùng cho biểu đồ 7 ngày. */
-export type DailyDealApproval = { key: string; label: string; count: number };
+/** Số suất deal bán ra toàn sàn trong một ngày, dùng cho biểu đồ 7 ngày. */
+export type DailyPlatformSales = { key: string; label: string; count: number };
 
 export type AdminAlertKind = 'warning' | 'info';
 

@@ -1,18 +1,16 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
+import { setStoreApproval } from '@/demo/store';
+import { useAdminDemo } from '@/demo/use-demo';
 import type { StoreApplication, StoreApplicationStatus } from '@/features/admin/types';
 
-// Giữ trạng thái duyệt ngay trên máy cho tới khi có API: phê duyệt / từ chối chỉ đổi status,
-// "Hoàn tác" đưa hồ sơ về lại hàng chờ để admin xét lại.
-export function useStoreApprovals(initial: StoreApplication[]) {
-  const [applications, setApplications] = useState(initial);
-
-  const setStatusOf = (id: string, status: StoreApplicationStatus) =>
-    setApplications((current) =>
-      current.map((application) =>
-        application.id === id ? { ...application, status } : application,
-      ),
-    );
+/**
+ * Hàng chờ duyệt quán. Duyệt hoặc từ chối ghi thẳng vào kho dữ liệu demo dùng chung, nên
+ * quán vừa duyệt xuất hiện luôn ở danh sách Quản lý và deal của quán lên sàn người mua.
+ * "Hoàn tác" đưa hồ sơ về lại hàng chờ để admin xét lại.
+ */
+export function useStoreApprovals() {
+  const { applications } = useAdminDemo();
 
   const grouped = useMemo(() => {
     const groups: Record<StoreApplicationStatus, StoreApplication[]> = {
@@ -29,8 +27,8 @@ export function useStoreApprovals(initial: StoreApplication[]) {
 
   return {
     grouped,
-    approve: (id: string) => setStatusOf(id, 'approved'),
-    reject: (id: string) => setStatusOf(id, 'rejected'),
-    undo: (id: string) => setStatusOf(id, 'pending'),
+    approve: (id: string) => setStoreApproval(id, 'approved'),
+    reject: (id: string) => setStoreApproval(id, 'rejected'),
+    undo: (id: string) => setStoreApproval(id, 'pending'),
   };
 }

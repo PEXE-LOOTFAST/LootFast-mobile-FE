@@ -5,10 +5,11 @@ import { Icon } from '@/components/ui/icon';
 import { MaxContentWidth } from '@/constants/theme';
 import { AdminHeader } from '@/features/admin/components/admin-header';
 import { AdminIcons } from '@/features/admin/constants/icons';
+import { useAdminDemo } from '@/demo/use-demo';
 import { MOCK_ADMIN_PROFILE } from '@/features/admin/data/mock-admin-account';
-import { MOCK_ADMIN_ALERTS } from '@/features/admin/data/mock-admin-overview';
 import { useLightStatusBar } from '@/hooks/use-light-status-bar';
 import { useTheme } from '@/hooks/use-theme';
+import { confirmAction } from '@/lib/confirm';
 import { confirmSignOut } from '@/lib/confirm-sign-out';
 
 // Lấy chữ cái đầu của hai từ đầu tiên, vd. "Nguyễn Quản Trị" → "NQ".
@@ -52,6 +53,7 @@ export function AdminSettingsScreen() {
   // Chỉ giữ trên máy cho tới khi có API cấu hình hệ thống.
   const [notifyNewStores, setNotifyNewStores] = useState(true);
   const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const { alerts } = useAdminDemo();
 
   useLightStatusBar();
 
@@ -61,14 +63,13 @@ export function AdminSettingsScreen() {
       setMaintenanceMode(false);
       return;
     }
-    Alert.alert(
-      'Bật chế độ bảo trì',
-      'Người mua và người bán sẽ tạm thời không dùng được ứng dụng. Tiếp tục?',
-      [
-        { text: 'Huỷ', style: 'cancel' },
-        { text: 'Bật bảo trì', style: 'destructive', onPress: () => setMaintenanceMode(true) },
-      ],
-    );
+    confirmAction({
+      title: 'Bật chế độ bảo trì',
+      message: 'Người mua và người bán sẽ tạm thời không dùng được ứng dụng. Tiếp tục?',
+      confirmLabel: 'Bật bảo trì',
+      isDestructive: true,
+      onConfirm: () => setMaintenanceMode(true),
+    });
   };
 
   // Đăng xuất xong quay lại cổng quản trị để người dùng tiếp theo đăng nhập lại.
@@ -90,7 +91,7 @@ export function AdminSettingsScreen() {
         {/* Trung tâm thông báo của admin sẽ làm ở nhánh riêng, tạm báo trước. */}
         <AdminHeader
           date={today}
-          hasUnread={MOCK_ADMIN_ALERTS.length > 0}
+          hasUnread={alerts.length > 0}
           onPressNotifications={() => Alert.alert('Thông báo', 'Trung tâm thông báo sẽ sớm có.')}
         />
 

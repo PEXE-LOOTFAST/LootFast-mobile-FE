@@ -3,6 +3,7 @@ import { setStatusBarStyle } from 'expo-status-bar';
 import { useCallback, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { useBuyerOrders } from '@/demo/use-demo';
 import { MaxContentWidth } from '@/constants/theme';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { OrderCard } from '@/features/order/components/order-card';
@@ -10,7 +11,6 @@ import { OrderHeader } from '@/features/order/components/order-header';
 import { OrderStatusTabs } from '@/features/order/components/order-status-tabs';
 import { SavingsStatsCard } from '@/features/order/components/savings-stats-card';
 import { SavingsSummaryCard } from '@/features/order/components/savings-summary-card';
-import { MOCK_ORDERS } from '@/features/order/data/mock-orders';
 import { useOrderSavings } from '@/features/order/hooks/use-order-savings';
 import type { OrderStatus, SavingsView } from '@/features/order/types';
 import { useTheme } from '@/hooks/use-theme';
@@ -19,8 +19,10 @@ export function OrderListScreen() {
   const theme = useTheme();
   const [status, setStatus] = useState<OrderStatus>('pending');
   const [savingsView, setSavingsView] = useState<SavingsView>('week');
-  const savings = useOrderSavings(MOCK_ORDERS);
-  const orders = MOCK_ORDERS.filter((order) => order.status === status);
+  // Đơn của người mua đọc từ kho dữ liệu demo: vừa đặt giữ ở màn deal là thấy ngay tại đây.
+  const allOrders = useBuyerOrders();
+  const savings = useOrderSavings(allOrders);
+  const orders = allOrders.filter((order) => order.status === status);
 
   // Header nền xanh đậm cần icon status bar màu sáng, trả về 'auto' khi rời màn.
   useFocusEffect(

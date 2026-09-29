@@ -31,6 +31,41 @@ export type ChangePasswordValues = {
   confirmPassword: string;
 };
 
+export type NewDealValues = {
+  name: string;
+  portions: string;
+  price: string;
+  originalPrice: string;
+  open: string;
+  close: string;
+};
+
+/** Số nguyên dương người bán gõ vào ô số phần hoặc ô giá; chuỗi rỗng và chữ đều không hợp lệ. */
+function toPositiveInt(value: string): number | undefined {
+  const parsed = Number(value.replace(/\D/g, ''));
+
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
+}
+
+export function validateNewDeal(values: NewDealValues): FormErrors<NewDealValues> {
+  const price = toPositiveInt(values.price);
+  const originalPrice = toPositiveInt(values.originalPrice);
+
+  return {
+    name: values.name.trim().length >= MIN_NAME_LENGTH ? undefined : 'Vui lòng nhập tên món',
+    portions: toPositiveInt(values.portions) ? undefined : 'Số phần phải là số lớn hơn 0',
+    price: price ? undefined : 'Giá deal phải là số lớn hơn 0',
+    // Giá gốc phải cao hơn giá deal, nếu không thì không còn là deal giảm giá nữa.
+    originalPrice: !originalPrice
+      ? 'Giá gốc phải là số lớn hơn 0'
+      : price && originalPrice <= price
+        ? 'Giá gốc phải cao hơn giá deal'
+        : undefined,
+    open: checkTime(values.open, 'Giờ bắt đầu nhận dạng HH:mm'),
+    close: checkTime(values.close, 'Giờ kết thúc nhận dạng HH:mm'),
+  };
+}
+
 export function validateShopInfo(values: ShopInfoValues): FormErrors<ShopInfoValues> {
   return {
     name: values.name.trim().length >= MIN_NAME_LENGTH ? undefined : 'Vui lòng nhập tên cửa hàng',
