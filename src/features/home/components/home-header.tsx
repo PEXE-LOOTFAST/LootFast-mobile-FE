@@ -9,10 +9,18 @@ import { HomeIcons } from '@/features/home/constants/icons';
 type HomeHeaderProps = {
   locationLabel: string;
   unreadCount: number;
+  isAuthenticated: boolean;
   onPressNotifications?: () => void;
+  onPressSignIn?: () => void;
 };
 
-export function HomeHeader({ locationLabel, unreadCount, onPressNotifications }: HomeHeaderProps) {
+export function HomeHeader({
+  locationLabel,
+  unreadCount,
+  isAuthenticated,
+  onPressNotifications,
+  onPressSignIn,
+}: HomeHeaderProps) {
   const insets = useSafeAreaInsets();
 
   return (
@@ -36,13 +44,23 @@ export function HomeHeader({ locationLabel, unreadCount, onPressNotifications }:
           </View>
         </View>
 
-        <IconButton
-          accessibilityLabel="Thông báo"
-          badgeCount={unreadCount}
-          icon={HomeIcons.bell}
-          onPress={onPressNotifications}
-          tone="header"
-        />
+        {/* Khách chưa đăng nhập không có thông báo nào để xem, nên chỗ này là lối đăng nhập. */}
+        {isAuthenticated ? (
+          <IconButton
+            accessibilityLabel="Thông báo"
+            badgeCount={unreadCount}
+            icon={HomeIcons.bell}
+            onPress={onPressNotifications}
+            tone="header"
+          />
+        ) : (
+          <IconButton
+            accessibilityLabel="Đăng nhập"
+            icon={HomeIcons.login}
+            onPress={onPressSignIn}
+            tone="header"
+          />
+        )}
       </View>
     </View>
   );

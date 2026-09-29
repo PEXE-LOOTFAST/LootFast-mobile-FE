@@ -52,8 +52,10 @@ export function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <HomeHeader
+          isAuthenticated={isAuthenticated}
           locationLabel={`Gần bạn · ${formatRadius(filters.radiusKm)}`}
-          onPressNotifications={() => requireAuth(() => setIsNotificationsOpen(true))}
+          onPressNotifications={() => setIsNotificationsOpen(true)}
+          onPressSignIn={withAuth()}
           unreadCount={unreadCount}
         />
 
