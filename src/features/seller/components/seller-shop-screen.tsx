@@ -2,21 +2,21 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { Icon } from '@/components/ui/icon';
 import { MaxContentWidth } from '@/constants/theme';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
-import { HomeIcon } from '@/features/home/components/home-icon';
 import { SellerMenuList, type SellerMenuItem } from '@/features/seller/components/seller-menu-list';
 import { SellerShopHeader } from '@/features/seller/components/seller-shop-header';
 import { ShopInfoSheet } from '@/features/seller/components/shop-info-sheet';
 import { SellerIcons } from '@/features/seller/constants/icons';
+import { useMerchantImageUpload } from '@/features/seller/hooks/use-merchant-image-upload';
+import { useLightStatusBar } from '@/hooks/use-light-status-bar';
 import {
   openCloseToSlots,
   slotsToOpenClose,
   useMerchantShop,
 } from '@/features/seller/hooks/use-merchant-shop';
-import { useMerchantImageUpload } from '@/features/seller/hooks/use-merchant-image-upload';
 import type { SellerShop, SellerShopCategory } from '@/features/seller/types';
-import { useLightStatusBar } from '@/features/seller/hooks/use-light-status-bar';
 import { useTheme } from '@/hooks/use-theme';
 import { confirmSignOut } from '@/lib/confirm-sign-out';
 
@@ -169,7 +169,7 @@ export function SellerShopScreen() {
               pressed && styles.pressed,
             ]}
           >
-            <HomeIcon name={SellerIcons.person} color={theme.text} size={16} />
+            <Icon name={SellerIcons.person} color={theme.text} size={16} />
             <Text style={[styles.switchLabel, { color: theme.text }]}>Chuyển sang người mua</Text>
           </Pressable>
 
@@ -183,7 +183,7 @@ export function SellerShopScreen() {
               pressed && styles.pressed,
             ]}
           >
-            <HomeIcon name={SellerIcons.logout} color={theme.danger} size={16} />
+            <Icon name={SellerIcons.logout} color={theme.danger} size={16} />
             <Text style={[styles.signOutLabel, { color: theme.danger }]}>Đăng xuất</Text>
           </Pressable>
         </View>

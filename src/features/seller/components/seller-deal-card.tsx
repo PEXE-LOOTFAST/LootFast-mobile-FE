@@ -1,8 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { Icon, type IconName } from '@/components/ui/icon';
 import { DealImage } from '@/features/home/components/deal-image';
-import { HomeIcon } from '@/features/home/components/home-icon';
-import type { HomeIconName } from '@/features/home/constants/icons';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import type { SellerDeal } from '@/features/seller/types';
 import { useTheme } from '@/hooks/use-theme';
@@ -123,7 +122,7 @@ export function SellerDealCard({
 }
 
 type StepperButtonProps = {
-  icon: HomeIconName;
+  icon: IconName;
   accessibilityLabel: string;
   disabled: boolean;
   onPress: () => void;
@@ -146,7 +145,7 @@ function StepperButton({ icon, accessibilityLabel, disabled, onPress }: StepperB
         pressed && styles.pressed,
       ]}
     >
-      <HomeIcon name={icon} color={theme.text} size={14} />
+      <Icon name={icon} color={theme.text} size={14} />
     </Pressable>
   );
 }

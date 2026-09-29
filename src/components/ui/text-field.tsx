@@ -3,11 +3,18 @@ import { StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-na
 
 import { useTheme } from '@/hooks/use-theme';
 
+/**
+ * `default` cho các màn đăng nhập/đăng ký (ô cao, nhãn in hoa);
+ * `compact` cho form dài của người bán, để nhiều ô vẫn gọn trong một màn.
+ */
+export type TextFieldSize = 'default' | 'compact';
+
 export type TextFieldProps = TextInputProps & {
-  label: string;
+  label?: string;
   leading?: ReactNode;
   trailing?: ReactNode;
   error?: string;
+  size?: TextFieldSize;
 };
 
 export function TextField({
@@ -15,6 +22,7 @@ export function TextField({
   leading,
   trailing,
   error,
+  size = 'default',
   style,
   onFocus,
   onBlur,
@@ -23,15 +31,16 @@ export function TextField({
   const theme = useTheme();
   const [isFocused, setIsFocused] = useState(false);
 
+  const variant = size === 'compact' ? compact : comfortable;
   const borderColor = error ? theme.danger : isFocused ? theme.primary : theme.border;
 
   return (
-    <View style={styles.container}>
-      <Text style={[styles.label, { color: theme.text }]}>{label}</Text>
+    <View style={variant.container}>
+      {label ? <Text style={[variant.label, { color: theme.text }]}>{label}</Text> : null}
 
       <View
         style={[
-          styles.field,
+          variant.field,
           { backgroundColor: theme.backgroundElement, borderColor },
           isFocused && { boxShadow: `0px 0px 0px 3px ${theme.primarySoft}` },
         ]}
@@ -49,7 +58,7 @@ export function TextField({
             setIsFocused(false);
             onBlur?.(event);
           }}
-          style={[styles.input, { color: theme.text }, style]}
+          style={[variant.input, { color: theme.text }, style]}
         />
         {trailing}
       </View>
@@ -60,6 +69,10 @@ export function TextField({
 }
 
 const styles = StyleSheet.create({
+  error: { fontSize: 12, fontWeight: '600' },
+});
+
+const comfortable = StyleSheet.create({
   container: { gap: 8 },
   label: { fontSize: 12, fontWeight: '800', letterSpacing: 1, textTransform: 'uppercase' },
   field: {
@@ -74,5 +87,20 @@ const styles = StyleSheet.create({
   },
   // Trình duyệt tự vẽ viền focus riêng, chồng lên viền focus của field.
   input: { flex: 1, minWidth: 0, minHeight: 54, fontSize: 15, outlineWidth: 0 },
-  error: { fontSize: 12, fontWeight: '600' },
+});
+
+const compact = StyleSheet.create({
+  container: { gap: 7 },
+  label: { fontSize: 12, fontWeight: '800' },
+  field: {
+    minHeight: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    borderWidth: 1,
+    borderRadius: 14,
+    paddingLeft: 14,
+    paddingRight: 8,
+  },
+  input: { flex: 1, minWidth: 0, minHeight: 42, fontSize: 15, outlineWidth: 0 },
 });

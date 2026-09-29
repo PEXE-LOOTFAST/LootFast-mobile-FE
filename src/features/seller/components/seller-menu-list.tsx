@@ -1,14 +1,13 @@
 import { Fragment } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { HomeIcon } from '@/features/home/components/home-icon';
-import type { HomeIconName } from '@/features/home/constants/icons';
+import { Icon, type IconName } from '@/components/ui/icon';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
 
 export type SellerMenuItem = {
   key: string;
-  icon: HomeIconName;
+  icon: IconName;
   title: string;
   subtitle?: string;
   onPress: () => void;
@@ -54,10 +53,10 @@ export function SellerMenuList({ items, title, compact = false }: SellerMenuList
             ]}
           >
             {compact ? (
-              <HomeIcon name={item.icon} color={theme.primary} size={18} />
+              <Icon name={item.icon} color={theme.primary} size={18} />
             ) : (
               <View style={[styles.iconBadge, { backgroundColor: theme.primarySoft }]}>
-                <HomeIcon name={item.icon} color={theme.primary} size={19} />
+                <Icon name={item.icon} color={theme.primary} size={19} />
               </View>
             )}
 
@@ -70,7 +69,7 @@ export function SellerMenuList({ items, title, compact = false }: SellerMenuList
               ) : null}
             </View>
 
-            <HomeIcon name={SellerIcons.chevronRight} color={theme.text} size={16} />
+            <Icon name={SellerIcons.chevronRight} color={theme.text} size={16} />
           </Pressable>
         </Fragment>
       ))}

@@ -1,15 +1,16 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
+import { Icon } from '@/components/ui/icon';
+import { PasswordField } from '@/components/ui/password-field';
 import { TextField } from '@/components/ui/text-field';
-import { FieldIcon } from '@/features/auth/components/field-icon';
 import { FormSection } from '@/features/auth/components/form-section';
-import { PasswordField } from '@/features/auth/components/password-field';
 import { AuthIcons } from '@/features/auth/constants/icons';
-import { useForm } from '@/features/auth/hooks/use-form';
 import type { RegisterValues } from '@/features/auth/types';
-import { MIN_PASSWORD_LENGTH, validateRegister } from '@/features/auth/validation';
+import { validateRegister } from '@/features/auth/validation';
+import { useForm } from '@/hooks/use-form';
 import { useTheme } from '@/hooks/use-theme';
+import { MIN_PASSWORD_LENGTH } from '@/lib/validation';
 
 const INITIAL_VALUES: RegisterValues = {
   fullName: '',
@@ -38,7 +39,7 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
           autoComplete="name"
           error={errors.fullName}
           label="Họ và tên"
-          leading={<FieldIcon name={AuthIcons.person} />}
+          leading={<Icon name={AuthIcons.person} />}
           onChangeText={(text) => setField('fullName', text)}
           placeholder="Nguyễn Văn A"
           returnKeyType="next"
@@ -51,7 +52,7 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
           error={errors.email}
           keyboardType="email-address"
           label="Email"
-          leading={<FieldIcon name={AuthIcons.mail} />}
+          leading={<Icon name={AuthIcons.mail} />}
           onChangeText={(text) => setField('email', text)}
           placeholder="ban@email.com"
           returnKeyType="next"
@@ -62,7 +63,7 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
           error={errors.phone}
           keyboardType="phone-pad"
           label="Số điện thoại"
-          leading={<FieldIcon name={AuthIcons.phone} />}
+          leading={<Icon name={AuthIcons.phone} />}
           maxLength={10}
           onChangeText={(text) => setField('phone', text)}
           placeholder="0901234567"

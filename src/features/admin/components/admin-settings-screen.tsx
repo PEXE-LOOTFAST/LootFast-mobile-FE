@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 
+import { Icon } from '@/components/ui/icon';
 import { MaxContentWidth } from '@/constants/theme';
 import { AdminHeader } from '@/features/admin/components/admin-header';
 import { AdminIcons } from '@/features/admin/constants/icons';
 import { MOCK_ADMIN_PROFILE } from '@/features/admin/data/mock-admin-account';
 import { MOCK_ADMIN_ALERTS } from '@/features/admin/data/mock-admin-overview';
-import { HomeIcon } from '@/features/home/components/home-icon';
-import { useLightStatusBar } from '@/features/seller/hooks/use-light-status-bar';
+import { useLightStatusBar } from '@/hooks/use-light-status-bar';
 import { useTheme } from '@/hooks/use-theme';
 import { confirmSignOut } from '@/lib/confirm-sign-out';
 
@@ -139,7 +139,7 @@ export function AdminSettingsScreen() {
               <Text style={[styles.rowLabel, { color: theme.text }]}>
                 Nhật ký hoạt động quản trị
               </Text>
-              <HomeIcon name={AdminIcons.chevronRight} color={theme.textSecondary} size={18} />
+              <Icon name={AdminIcons.chevronRight} color={theme.textSecondary} size={18} />
             </Pressable>
           </View>
 
@@ -153,7 +153,7 @@ export function AdminSettingsScreen() {
               pressed && styles.pressed,
             ]}
           >
-            <HomeIcon name={AdminIcons.logout} color={theme.danger} size={16} />
+            <Icon name={AdminIcons.logout} color={theme.danger} size={16} />
             <Text style={[styles.signOutLabel, { color: theme.danger }]}>Đăng xuất</Text>
           </Pressable>
         </View>

@@ -1,8 +1,8 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { HomeIcon } from '@/features/home/components/home-icon';
-import { PICKUP_CODE_LENGTH } from '@/features/seller/constants/seller-order-tabs';
+import { Icon } from '@/components/ui/icon';
 import { SellerIcons } from '@/features/seller/constants/icons';
+import { PICKUP_CODE_LENGTH } from '@/features/seller/constants/seller-order-tabs';
 import { useTheme } from '@/hooks/use-theme';
 
 type IncomingOrderFiltersProps = {
@@ -35,7 +35,7 @@ export function IncomingOrderFilters({
     >
       <View style={styles.row}>
         <View style={[styles.iconBadge, { backgroundColor: theme.primarySoft }]}>
-          <HomeIcon name={SellerIcons.calendar} color={theme.primary} size={17} />
+          <Icon name={SellerIcons.calendar} color={theme.primary} size={17} />
         </View>
 
         <View style={styles.field}>
@@ -66,7 +66,7 @@ export function IncomingOrderFilters({
 
       <View style={styles.row}>
         <View style={[styles.iconBadge, { backgroundColor: theme.primarySoft }]}>
-          <HomeIcon name={SellerIcons.code} color={theme.primary} size={17} />
+          <Icon name={SellerIcons.code} color={theme.primary} size={17} />
         </View>
 
         <View style={styles.field}>

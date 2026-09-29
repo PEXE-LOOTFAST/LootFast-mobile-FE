@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
-import { HomeIcon } from '@/features/home/components/home-icon';
+import { Icon } from '@/components/ui/icon';
 import { HomeIcons } from '@/features/home/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -20,7 +20,7 @@ export function EmptyDeals({ onReset }: EmptyDealsProps) {
       ]}
     >
       <View style={[styles.icon, { backgroundColor: theme.primarySoft }]}>
-        <HomeIcon name={HomeIcons.search} color={theme.primary} size={26} />
+        <Icon name={HomeIcons.search} color={theme.primary} size={26} />
       </View>
       <Text style={[styles.title, { color: theme.text }]}>Chưa tìm thấy deal phù hợp</Text>
       <Text style={[styles.description, { color: theme.textSecondary }]}>

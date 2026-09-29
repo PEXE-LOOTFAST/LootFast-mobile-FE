@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { HomeIcon } from '@/features/home/components/home-icon';
+import { Icon } from '@/components/ui/icon';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
@@ -32,7 +32,7 @@ export function SellerLanguageScreen() {
           </Text>
         </View>
         <View style={[styles.check, { backgroundColor: theme.primary }]}>
-          <HomeIcon name={SellerIcons.check} color="#FFFFFF" size={14} />
+          <Icon name={SellerIcons.check} color="#FFFFFF" size={14} />
         </View>
       </View>
     </SellerPageScaffold>

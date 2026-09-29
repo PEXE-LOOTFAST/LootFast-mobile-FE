@@ -2,15 +2,14 @@ import { router } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { HomeIcon } from '@/features/home/components/home-icon';
-import type { HomeIconName } from '@/features/home/constants/icons';
+import { Icon, type IconName } from '@/components/ui/icon';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
 
 type SellerPlaceholderScreenProps = {
   title: string;
   description: string;
-  icon?: HomeIconName;
+  icon?: IconName;
 };
 
 // Các tab người bán còn lại sẽ được thiết kế ở nhánh riêng; màn tạm này giữ cho thanh tab
@@ -26,7 +25,7 @@ export function SellerPlaceholderScreen({
     <SafeAreaView style={[styles.screen, { backgroundColor: theme.background }]} edges={['top']}>
       <View style={styles.body}>
         <View style={[styles.iconBadge, { backgroundColor: theme.primarySoft }]}>
-          <HomeIcon name={icon} color={theme.primary} size={26} />
+          <Icon name={icon} color={theme.primary} size={26} />
         </View>
         <Text accessibilityRole="header" style={[styles.title, { color: theme.text }]}>
           {title}

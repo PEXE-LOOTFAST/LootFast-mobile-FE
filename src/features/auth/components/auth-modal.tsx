@@ -11,8 +11,8 @@ import {
 import Animated, { SlideInDown, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Icon } from '@/components/ui/icon';
 import { AuthPanel } from '@/features/auth/components/auth-panel';
-import { FieldIcon } from '@/features/auth/components/field-icon';
 import { AuthIcons } from '@/features/auth/constants/icons';
 import { useAuthSession } from '@/hooks/use-auth-session';
 import { useKeyboardHeight } from '@/hooks/use-keyboard-height';
@@ -92,7 +92,7 @@ export function AuthModal() {
                 onPress={dismissAuthPrompt}
                 style={[styles.close, { backgroundColor: theme.background }]}
               >
-                <FieldIcon name={AuthIcons.close} color={theme.text} />
+                <Icon name={AuthIcons.close} color={theme.text} />
               </Pressable>
             </View>
 

@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { AuthNotice } from '@/features/auth/components/auth-notice';
+import { InlineAlert } from '@/components/ui/inline-alert';
 import { AuthTabs } from '@/features/auth/components/auth-tabs';
 import { LoginForm } from '@/features/auth/components/login-form';
 import { RegisterForm } from '@/features/auth/components/register-form';
@@ -54,7 +54,10 @@ export function AuthPanel({ onAuthenticated }: AuthPanelProps) {
         {tab === 'login' ? (
           <>
             {registeredEmail ? (
-              <AuthNotice message="Tạo tài khoản thành công. Đăng nhập để bắt đầu săn deal nhé!" />
+              <InlineAlert
+                tone="success"
+                message="Tạo tài khoản thành công. Đăng nhập để bắt đầu săn deal nhé!"
+              />
             ) : null}
             <LoginForm
               initialEmail={registeredEmail}

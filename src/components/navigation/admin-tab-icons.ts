@@ -1,4 +1,4 @@
-import type { TabIconName } from '@/components/navigation/tab-icons';
+import type { IconMap } from '@/components/ui/icon';
 
 // Key trùng với tên file route trong src/app/admin. SF Symbols chỉ có trên iOS,
 // Android và web dùng Material Symbols — mỗi icon phải khai báo đủ cả hai tên.
@@ -7,4 +7,4 @@ export const AdminTabIcons = {
   overview: { ios: 'chart.bar', android: 'bar_chart', web: 'bar_chart' },
   manage: { ios: 'person.2', android: 'group', web: 'group' },
   settings: { ios: 'gearshape', android: 'settings', web: 'settings' },
-} satisfies Record<string, TabIconName>;
+} satisfies IconMap;

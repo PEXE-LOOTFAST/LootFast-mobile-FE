@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { HomeIcon } from '@/features/home/components/home-icon';
+import { Icon } from '@/components/ui/icon';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -11,7 +11,7 @@ export function HistoryInsightCard({ onPressUpgrade }: { onPressUpgrade: () => v
   return (
     <View style={[styles.card, { backgroundColor: theme.primarySoft, borderColor: theme.primary }]}>
       <View style={styles.headline}>
-        <HomeIcon name={SellerIcons.crown} color={theme.primary} size={18} />
+        <Icon name={SellerIcons.crown} color={theme.primary} size={18} />
         <Text accessibilityRole="header" style={[styles.title, { color: theme.text }]}>
           Mở khoá gợi ý dựa trên lịch sử
         </Text>
@@ -31,7 +31,7 @@ export function HistoryInsightCard({ onPressUpgrade }: { onPressUpgrade: () => v
           pressed && styles.pressed,
         ]}
       >
-        <HomeIcon name={SellerIcons.crown} color="#FFFFFF" size={14} />
+        <Icon name={SellerIcons.crown} color="#FFFFFF" size={14} />
         <Text style={styles.buttonLabel}>Nâng cấp gói Cao cấp</Text>
       </Pressable>
     </View>

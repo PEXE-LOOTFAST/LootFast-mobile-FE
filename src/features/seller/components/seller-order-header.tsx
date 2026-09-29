@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { HomeIcon } from '@/features/home/components/home-icon';
+import { Icon } from '@/components/ui/icon';
 import { HomeHeaderColors } from '@/features/home/constants/colors';
 import { SellerIcons } from '@/features/seller/constants/icons';
 
@@ -27,7 +27,7 @@ export function SellerOrderHeader({ onPressScan }: { onPressScan: () => void }) 
         onPress={onPressScan}
         style={({ pressed }) => [styles.scanButton, pressed && styles.pressed]}
       >
-        <HomeIcon name={SellerIcons.qrCode} color={HomeHeaderColors.background} size={18} />
+        <Icon name={SellerIcons.qrCode} color={HomeHeaderColors.background} size={18} />
         <Text style={styles.scanLabel}>Quét QR</Text>
       </Pressable>
     </View>

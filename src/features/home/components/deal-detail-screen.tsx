@@ -5,13 +5,13 @@ import { Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BrandButton } from '@/components/ui/brand-button';
+import { Icon } from '@/components/ui/icon';
 import { MaxContentWidth } from '@/constants/theme';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { DealDetailHero } from '@/features/home/components/deal-detail-hero';
 import { DealMeta } from '@/features/home/components/deal-meta';
 import { DealReviews } from '@/features/home/components/deal-reviews';
 import { DetailCard } from '@/features/home/components/detail-card';
-import { HomeIcon } from '@/features/home/components/home-icon';
 import { ReserveBar } from '@/features/home/components/reserve-bar';
 import { RatingColor } from '@/features/home/constants/colors';
 import { HomeIcons } from '@/features/home/constants/icons';
@@ -85,7 +85,7 @@ function DealDetail({ deal }: { deal: Deal }) {
 
             <View style={styles.storeRow}>
               <View style={[styles.storeIcon, { backgroundColor: theme.primarySoft }]}>
-                <HomeIcon name={HomeIcons.store} color={theme.primary} size={18} />
+                <Icon name={HomeIcons.store} color={theme.primary} size={18} />
               </View>
               <View style={styles.storeCopy}>
                 <View style={styles.storeNameRow}>
@@ -93,12 +93,12 @@ function DealDetail({ deal }: { deal: Deal }) {
                     {deal.store.name}
                   </Text>
                   {deal.store.isVerified ? (
-                    <HomeIcon name={HomeIcons.verified} color={theme.primary} size={15} />
+                    <Icon name={HomeIcons.verified} color={theme.primary} size={15} />
                   ) : null}
                 </View>
                 <View style={styles.metaRow}>
                   <View style={styles.rating}>
-                    <HomeIcon name={HomeIcons.star} color={RatingColor} size={14} />
+                    <Icon name={HomeIcons.star} color={RatingColor} size={14} />
                     <Text style={[styles.ratingText, { color: theme.textSecondary }]}>
                       {deal.store.rating.toFixed(1)} ({reviews.length})
                     </Text>
@@ -139,7 +139,7 @@ function DealDetail({ deal }: { deal: Deal }) {
 
           <DetailCard title="Vị trí cửa hàng">
             <View style={[styles.location, { backgroundColor: theme.primarySoft }]}>
-              <HomeIcon name={HomeIcons.location} color={theme.primary} size={18} />
+              <Icon name={HomeIcons.location} color={theme.primary} size={18} />
               <Text style={[styles.address, { color: theme.text }]}>{deal.store.address}</Text>
               <Pressable
                 accessibilityLabel="Xem cửa hàng trên bản đồ"
@@ -151,7 +151,7 @@ function DealDetail({ deal }: { deal: Deal }) {
                   pressed && styles.pressed,
                 ]}
               >
-                <HomeIcon name={HomeIcons.location} color="#FFFFFF" size={14} />
+                <Icon name={HomeIcons.location} color="#FFFFFF" size={14} />
                 <Text style={styles.mapButtonText}>Bản đồ</Text>
               </Pressable>
             </View>

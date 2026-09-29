@@ -9,7 +9,7 @@ import { MOCK_ADMIN_ALERTS } from '@/features/admin/data/mock-admin-overview';
 import { MOCK_MANAGED_ACCOUNTS } from '@/features/admin/data/mock-managed-accounts';
 import type { ManagedAccount } from '@/features/admin/types';
 import { SellerEmptyCard } from '@/features/seller/components/seller-empty-card';
-import { useLightStatusBar } from '@/features/seller/hooks/use-light-status-bar';
+import { useLightStatusBar } from '@/hooks/use-light-status-bar';
 import { useTheme } from '@/hooks/use-theme';
 
 // So khớp không phân biệt hoa thường và dấu, để gõ "com tam" vẫn ra "Cơm Tấm".

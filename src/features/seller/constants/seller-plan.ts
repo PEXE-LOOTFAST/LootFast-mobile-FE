@@ -1,4 +1,4 @@
-import type { HomeIconName } from '@/features/home/constants/icons';
+import type { IconName } from '@/components/ui/icon';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import type { SellerPlanFeatureStatus } from '@/features/seller/types';
 
@@ -11,7 +11,7 @@ export const PLAN_FEATURE_STATUS_LABEL: Record<SellerPlanFeatureStatus, string> 
 
 export const SELLER_PLAN_FEATURES: {
   key: string;
-  icon: HomeIconName;
+  icon: IconName;
   title: string;
   status: SellerPlanFeatureStatus;
   description: string;

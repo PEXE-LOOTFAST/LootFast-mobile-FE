@@ -2,7 +2,7 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import Animated, { SlideInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { HomeIcon } from '@/features/home/components/home-icon';
+import { Icon } from '@/components/ui/icon';
 import { HomeIcons } from '@/features/home/constants/icons';
 import type { AppNotification } from '@/features/home/types';
 import { useTheme } from '@/hooks/use-theme';
@@ -59,7 +59,7 @@ export function NotificationSheet({
               hitSlop={8}
               onPress={onClose}
             >
-              <HomeIcon name={HomeIcons.close} color={theme.text} size={22} />
+              <Icon name={HomeIcons.close} color={theme.text} size={22} />
             </Pressable>
           </View>
 

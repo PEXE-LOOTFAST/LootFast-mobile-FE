@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
+import { Icon } from '@/components/ui/icon';
 import { AdminIcons } from '@/features/admin/constants/icons';
-import { HomeIcon } from '@/features/home/components/home-icon';
 import { useTheme } from '@/hooks/use-theme';
 
 type AdminSearchBarProps = {
@@ -17,7 +17,7 @@ export function AdminSearchBar({ value, onChange, placeholder }: AdminSearchBarP
     <View
       style={[styles.bar, { backgroundColor: theme.backgroundElement, borderColor: theme.border }]}
     >
-      <HomeIcon name={AdminIcons.search} color={theme.textSecondary} size={17} />
+      <Icon name={AdminIcons.search} color={theme.textSecondary} size={17} />
       <TextInput
         accessibilityLabel={placeholder}
         autoCorrect={false}
@@ -35,7 +35,7 @@ export function AdminSearchBar({ value, onChange, placeholder }: AdminSearchBarP
           hitSlop={8}
           onPress={() => onChange('')}
         >
-          <HomeIcon name={AdminIcons.clear} color={theme.textSecondary} size={17} />
+          <Icon name={AdminIcons.clear} color={theme.textSecondary} size={17} />
         </Pressable>
       ) : null}
     </View>

@@ -15,5 +15,3 @@ export type RegisterValues = {
   password: string;
   confirmPassword: string;
 };
-
-export type FormErrors<T> = Partial<Record<keyof T, string>>;

@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { HomeIcon } from '@/features/home/components/home-icon';
+import { Icon } from '@/components/ui/icon';
 import { HomeHeaderColors } from '@/features/home/constants/colors';
 import { SellerIcons } from '@/features/seller/constants/icons';
 
@@ -28,9 +28,9 @@ export function SellerShopHeader({ shopName, email, onPressAvatar }: SellerShopH
           onPress={onPressAvatar}
           style={({ pressed }) => [styles.avatar, pressed && styles.pressed]}
         >
-          <HomeIcon name={SellerIcons.store} color={HomeHeaderColors.textMuted} size={30} />
+          <Icon name={SellerIcons.store} color={HomeHeaderColors.textMuted} size={30} />
           <View style={styles.cameraBadge}>
-            <HomeIcon name={SellerIcons.camera} color={HomeHeaderColors.background} size={12} />
+            <Icon name={SellerIcons.camera} color={HomeHeaderColors.background} size={12} />
           </View>
         </Pressable>
 

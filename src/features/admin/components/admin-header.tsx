@@ -1,8 +1,8 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Icon } from '@/components/ui/icon';
 import { AdminIcons } from '@/features/admin/constants/icons';
-import { HomeIcon } from '@/features/home/components/home-icon';
 import { HomeHeaderColors } from '@/features/home/constants/colors';
 import { useTheme } from '@/hooks/use-theme';
 import { formatFullDate } from '@/lib/format';
@@ -45,7 +45,7 @@ export function AdminHeader({ date, hasUnread, onPressNotifications }: AdminHead
           onPress={onPressNotifications}
           style={({ pressed }) => [styles.bellButton, pressed && styles.pressed]}
         >
-          <HomeIcon name={AdminIcons.bell} color={HomeHeaderColors.text} size={20} />
+          <Icon name={AdminIcons.bell} color={HomeHeaderColors.text} size={20} />
           {hasUnread ? (
             <View
               style={[

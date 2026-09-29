@@ -4,7 +4,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { MaxContentWidth } from '@/constants/theme';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { SellerPageHeader } from '@/features/seller/components/seller-page-header';
-import { useLightStatusBar } from '@/features/seller/hooks/use-light-status-bar';
+import { useLightStatusBar } from '@/hooks/use-light-status-bar';
 import { useTheme } from '@/hooks/use-theme';
 
 type SellerPageScaffoldProps = {

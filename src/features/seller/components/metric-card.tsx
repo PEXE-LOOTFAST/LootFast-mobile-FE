@@ -1,8 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { Icon, type IconName } from '@/components/ui/icon';
 import { Popover } from '@/components/ui/popover';
-import { HomeIcon } from '@/features/home/components/home-icon';
-import type { HomeIconName } from '@/features/home/constants/icons';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { useAnchor } from '@/hooks/use-anchor';
 import { useTheme } from '@/hooks/use-theme';
@@ -11,7 +10,7 @@ type MetricCardProps = {
   label: string;
   value: string;
   caption?: string;
-  icon: HomeIconName;
+  icon: IconName;
   /** Nội dung popover "?" giải thích con số được tính từ đâu. */
   hint: string;
 };
@@ -44,11 +43,11 @@ export function MetricCard({ label, value, caption, icon, hint }: MetricCardProp
             pressed && styles.pressed,
           ]}
         >
-          <HomeIcon name={SellerIcons.help} color={theme.textSecondary} size={11} />
+          <Icon name={SellerIcons.help} color={theme.textSecondary} size={11} />
         </Pressable>
 
         <View style={[styles.iconBadge, { backgroundColor: theme.primarySoft }]}>
-          <HomeIcon name={icon} color={theme.primary} size={16} />
+          <Icon name={icon} color={theme.primary} size={16} />
         </View>
       </View>
 

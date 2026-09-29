@@ -1,4 +1,4 @@
-import type { HomeIconName } from '@/features/home/constants/icons';
+import type { IconMap } from '@/components/ui/icon';
 
 // SF Symbols chỉ có trên iOS, Android và web dùng Material Symbols — mỗi icon phải khai báo đủ cả hai tên.
 export const SellerIcons = {
@@ -33,12 +33,10 @@ export const SellerIcons = {
     android: 'logout',
     web: 'logout',
   },
-  show: { ios: 'eye', android: 'visibility', web: 'visibility' },
-  hide: { ios: 'eye.slash', android: 'visibility_off', web: 'visibility_off' },
   tag: { ios: 'tag', android: 'sell', web: 'sell' },
   clock: { ios: 'clock', android: 'schedule', web: 'schedule' },
   upload: { ios: 'square.and.arrow.up', android: 'upload', web: 'upload' },
   schedule: { ios: 'calendar.badge.clock', android: 'event_repeat', web: 'event_repeat' },
   smartSuggest: { ios: 'wand.and.stars', android: 'smart_toy', web: 'smart_toy' },
   shield: { ios: 'checkmark.shield', android: 'verified_user', web: 'verified_user' },
-} satisfies Record<string, HomeIconName>;
+} satisfies IconMap;

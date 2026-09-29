@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { HomeIcon } from '@/features/home/components/home-icon';
+import { Icon } from '@/components/ui/icon';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import type { SellerPlan } from '@/features/seller/types';
 import { useTheme } from '@/hooks/use-theme';
@@ -35,7 +35,7 @@ export function DealQuotaCard({ plan, onPressPlan }: DealQuotaCardProps) {
           pressed && styles.pressed,
         ]}
       >
-        <HomeIcon name={SellerIcons.crown} color={theme.primary} size={14} />
+        <Icon name={SellerIcons.crown} color={theme.primary} size={14} />
         <Text style={[styles.buttonLabel, { color: theme.text }]}>Xem gói</Text>
       </Pressable>
     </View>
