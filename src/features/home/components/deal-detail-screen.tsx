@@ -28,6 +28,8 @@ import { RatingColor } from '@/features/home/constants/colors';
 import { HomeIcons } from '@/features/home/constants/icons';
 import { getDealReviews } from '@/features/home/data/mock-deals';
 import { useReservation } from '@/features/home/hooks/use-reservation';
+import { OrderDetailPanel } from '@/features/order/components/order-detail-panel';
+import type { PaymentMethod } from '@/features/order/api/orders';
 import type { Deal } from '@/features/home/types';
 import { useTheme } from '@/hooks/use-theme';
 import { formatDistance, formatPrice } from '@/lib/format';
@@ -70,7 +72,8 @@ export function DealDetailScreen() {
 
 function DealDetail({ deal }: { deal: Deal }) {
   const theme = useTheme();
-  const reservation = useReservation();
+  const reservation = useReservation(deal.id);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('BANK_TRANSFER');
   const [isFavorite, setIsFavorite] = useState(false);
   const [barHeight, setBarHeight] = useState(0);
 
@@ -182,15 +185,19 @@ function DealDetail({ deal }: { deal: Deal }) {
           </DetailCard>
 
           <DealReviews reviews={reviews} />
+          {reservation.order ? <OrderDetailPanel orderId={reservation.order.orderId} /> : null}
         </View>
       </ScrollView>
 
       <ReserveBar
         onLayout={(event) => setBarHeight(event.nativeEvent.layout.height)}
+        onPaymentMethodChange={setPaymentMethod}
         onReserve={reservation.reserve}
         onViewOrder={() => router.navigate('/orders')}
+        paymentMethod={paymentMethod}
         status={reservation.status}
         total={deal.price}
+        errorMessage={reservation.errorMessage}
       />
 
       {/* Đặt nút trợ lý phía trên thanh đặt giữ để không che nút "Đặt giữ ngay". */}
