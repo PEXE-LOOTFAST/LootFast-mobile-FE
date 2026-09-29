@@ -128,6 +128,7 @@ export function selectBuyerOrders(state: DemoState): Order[] {
           pickupLabel: pickupLabelOf(order),
           completedAt: order.status === 'completed' ? placedAt(order).toISOString() : undefined,
           canCancel: canCancelOrder(order.status),
+          paymentMethod: order.paymentMethod,
         },
       ];
     })

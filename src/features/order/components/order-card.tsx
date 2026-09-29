@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
+import { getPaymentOption } from '@/constants/payments';
 import { ORDER_STATUS_LABELS } from '@/features/order/constants/order-status';
 import type { Order } from '@/features/order/types';
 import { useTheme } from '@/hooks/use-theme';
@@ -16,6 +17,7 @@ export function OrderCard({ order, onPressCode, onPressCancel }: OrderCardProps)
   const theme = useTheme();
   const canPickUp = order.status === 'confirmed' || order.status === 'ready';
   const canCancel = order.canCancel && onPressCancel !== undefined;
+  const payment = getPaymentOption(order.paymentMethod);
 
   return (
     <View
@@ -53,8 +55,15 @@ export function OrderCard({ order, onPressCode, onPressCancel }: OrderCardProps)
         <Text style={[styles.summaryText, { color: theme.textSecondary }]}>
           {order.quantity} × {order.itemName}
         </Text>
-        <Text style={[styles.total, { color: theme.primary }]}>
-          {formatPrice(order.price * order.quantity)}
+        <Text style={[styles.total, { color: theme.primary }]}>{formatPrice(order.price)}</Text>
+      </View>
+
+      <View style={styles.paymentRow}>
+        <View style={[styles.brand, { backgroundColor: payment.brandColor }]}>
+          <Text style={styles.brandInitial}>{payment.initial}</Text>
+        </View>
+        <Text style={[styles.paymentLabel, { color: theme.textSecondary }]}>
+          {payment.isPrepaid ? `Đã thanh toán qua ${payment.label}` : 'Trả trực tiếp tại quán'}
         </Text>
       </View>
 
@@ -105,11 +114,22 @@ const styles = StyleSheet.create({
   summary: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginVertical: 16,
+    marginTop: 16,
+    marginBottom: 12,
     borderRadius: 13,
     padding: 12,
   },
   summaryText: { flexShrink: 1, fontSize: 12 },
+  paymentRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 14 },
+  brand: {
+    width: 22,
+    height: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 7,
+  },
+  brandInitial: { color: '#FFFFFF', fontSize: 11, fontWeight: '900' },
+  paymentLabel: { flexShrink: 1, fontSize: 12 },
   total: { fontSize: 13, fontWeight: '900' },
   // Nút phụ, viền nhạt chữ đỏ: huỷ đơn là việc hiếm làm nên không tô nổi như nút chính.
   cancel: {

@@ -1,3 +1,4 @@
+import type { PaymentMethod } from '@/constants/payments';
 import type { DealCategoryId } from '@/features/home/types';
 import type { SellerShopCategory } from '@/features/seller/types';
 
@@ -70,6 +71,8 @@ export type DemoOrder = {
   placedHoursAgo: number;
   /** Giờ khách hẹn đến lấy, dạng "HH:mm". */
   pickupAt: string;
+  /** Cách khách chọn trả tiền lúc đặt giữ. */
+  paymentMethod: PaymentMethod;
 };
 
 export type DemoState = {

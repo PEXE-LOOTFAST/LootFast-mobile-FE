@@ -1,3 +1,5 @@
+import type { PaymentMethod } from '@/constants/payments';
+
 export type OrderStatus = 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled';
 
 export type Order = {
@@ -16,6 +18,7 @@ export type Order = {
   completedAt?: string;
   /** Khách còn huỷ được đơn này hay không — quán đã soạn xong món thì không huỷ được nữa. */
   canCancel: boolean;
+  paymentMethod: PaymentMethod;
 };
 
 export type SavingsView = 'week' | 'category';

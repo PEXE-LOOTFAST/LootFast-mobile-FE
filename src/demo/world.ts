@@ -580,6 +580,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'pending',
     placedHoursAgo: 1,
     pickupAt: '19:30',
+    paymentMethod: 'momo',
   },
   {
     id: 'order-me-2',
@@ -590,6 +591,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'confirmed',
     placedHoursAgo: 3,
     pickupAt: '20:30',
+    paymentMethod: 'cash',
   },
   {
     id: 'order-me-3',
@@ -600,6 +602,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'ready',
     placedHoursAgo: 5,
     pickupAt: '21:00',
+    paymentMethod: 'zalopay',
   },
   {
     id: 'order-me-4',
@@ -610,6 +613,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'completed',
     placedHoursAgo: 26,
     pickupAt: '20:00',
+    paymentMethod: 'vnpay',
   },
   {
     id: 'order-me-5',
@@ -620,6 +624,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'completed',
     placedHoursAgo: 50,
     pickupAt: '19:00',
+    paymentMethod: 'momo',
   },
   {
     id: 'order-me-6',
@@ -630,6 +635,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'completed',
     placedHoursAgo: 74,
     pickupAt: '18:30',
+    paymentMethod: 'cash',
   },
   {
     id: 'order-me-7',
@@ -640,6 +646,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'completed',
     placedHoursAgo: 98,
     pickupAt: '20:30',
+    paymentMethod: 'zalopay',
   },
   {
     id: 'order-me-8',
@@ -650,6 +657,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'completed',
     placedHoursAgo: 122,
     pickupAt: '19:30',
+    paymentMethod: 'vnpay',
   },
   {
     id: 'order-me-9',
@@ -660,6 +668,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'completed',
     placedHoursAgo: 146,
     pickupAt: '21:00',
+    paymentMethod: 'momo',
   },
   {
     id: 'order-me-10',
@@ -670,6 +679,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'cancelled',
     placedHoursAgo: 46,
     pickupAt: '20:30',
+    paymentMethod: 'cash',
   },
 
   // --- Khách khác đặt tại quán demo: nguồn số liệu cho Tổng quan và Báo cáo người bán ---
@@ -682,6 +692,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'confirmed',
     placedHoursAgo: 2,
     pickupAt: '19:45',
+    paymentMethod: 'zalopay',
   },
   {
     id: 'order-shop-2',
@@ -692,6 +703,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'confirmed',
     placedHoursAgo: 2,
     pickupAt: '20:15',
+    paymentMethod: 'vnpay',
   },
   {
     id: 'order-shop-3',
@@ -702,6 +714,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'pending',
     placedHoursAgo: 1,
     pickupAt: '20:45',
+    paymentMethod: 'momo',
   },
   {
     id: 'order-shop-4',
@@ -712,6 +725,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'completed',
     placedHoursAgo: 4,
     pickupAt: '18:30',
+    paymentMethod: 'cash',
   },
   {
     id: 'order-shop-5',
@@ -722,6 +736,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'completed',
     placedHoursAgo: 6,
     pickupAt: '18:15',
+    paymentMethod: 'zalopay',
   },
   {
     id: 'order-shop-6',
@@ -732,6 +747,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'no-show',
     placedHoursAgo: 7,
     pickupAt: '18:00',
+    paymentMethod: 'vnpay',
   },
   {
     id: 'order-shop-7',
@@ -742,6 +758,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'completed',
     placedHoursAgo: 27,
     pickupAt: '19:00',
+    paymentMethod: 'momo',
   },
   {
     id: 'order-shop-8',
@@ -752,6 +769,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'completed',
     placedHoursAgo: 29,
     pickupAt: '20:00',
+    paymentMethod: 'cash',
   },
   {
     id: 'order-shop-9',
@@ -762,6 +780,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'completed',
     placedHoursAgo: 51,
     pickupAt: '19:30',
+    paymentMethod: 'zalopay',
   },
   {
     id: 'order-shop-10',
@@ -772,6 +791,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'completed',
     placedHoursAgo: 53,
     pickupAt: '20:00',
+    paymentMethod: 'vnpay',
   },
   {
     id: 'order-shop-11',
@@ -782,6 +802,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'no-show',
     placedHoursAgo: 75,
     pickupAt: '20:30',
+    paymentMethod: 'momo',
   },
   {
     id: 'order-shop-12',
@@ -792,6 +813,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'completed',
     placedHoursAgo: 77,
     pickupAt: '19:00',
+    paymentMethod: 'cash',
   },
   {
     id: 'order-shop-13',
@@ -802,6 +824,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'cancelled',
     placedHoursAgo: 99,
     pickupAt: '21:00',
+    paymentMethod: 'zalopay',
   },
   {
     id: 'order-shop-14',
@@ -812,6 +835,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'completed',
     placedHoursAgo: 123,
     pickupAt: '18:45',
+    paymentMethod: 'vnpay',
   },
   {
     id: 'order-shop-15',
@@ -822,6 +846,7 @@ export const DEMO_ORDERS: DemoOrder[] = [
     status: 'completed',
     placedHoursAgo: 147,
     pickupAt: '19:15',
+    paymentMethod: 'momo',
   },
 ];
 

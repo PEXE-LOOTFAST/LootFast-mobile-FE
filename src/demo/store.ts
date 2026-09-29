@@ -1,3 +1,4 @@
+import type { PaymentMethod } from '@/constants/payments';
 import type {
   DemoDeal,
   DemoOrderStatus,
@@ -70,7 +71,11 @@ let nextOrderNumber = 7800;
  * Người mua đặt giữ một deal. Đơn mới ở trạng thái chờ quán xác nhận và số phần bán ra
  * tăng ngay, nên trang chủ, tab Đơn hàng và khu người bán cùng cập nhật.
  */
-export function placeOrder(dealId: string, quantity = 1): string {
+export function placeOrder(
+  dealId: string,
+  quantity = 1,
+  paymentMethod: PaymentMethod = 'cash',
+): string {
   const deal = state.deals.find((item) => item.id === dealId);
   if (!deal) throw new Error(`Không tìm thấy deal ${dealId}`);
 
@@ -91,6 +96,7 @@ export function placeOrder(dealId: string, quantity = 1): string {
         status: 'pending',
         placedHoursAgo: 0,
         pickupAt: deal.pickupWindow.end,
+        paymentMethod,
       },
       ...state.orders,
     ],

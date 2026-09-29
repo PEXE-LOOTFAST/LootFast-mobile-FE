@@ -14,6 +14,7 @@ import { DealMeta } from '@/features/home/components/deal-meta';
 import { DealReviews } from '@/features/home/components/deal-reviews';
 import { DetailCard } from '@/features/home/components/detail-card';
 import { ReserveBar } from '@/features/home/components/reserve-bar';
+import { ReserveSheet } from '@/features/home/components/reserve-sheet';
 import { RatingColor } from '@/features/home/constants/colors';
 import { HomeIcons } from '@/features/home/constants/icons';
 import { getDealReviews } from '@/features/home/data/deal-reviews';
@@ -52,6 +53,7 @@ function DealDetail({ deal }: { deal: Deal }) {
   const reservation = useReservation(deal.id);
   const [isFavorite, setIsFavorite] = useState(false);
   const [barHeight, setBarHeight] = useState(0);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   const reviews = getDealReviews(deal.id);
   const savings = deal.originalPrice - deal.price;
@@ -165,10 +167,21 @@ function DealDetail({ deal }: { deal: Deal }) {
 
       <ReserveBar
         onLayout={(event) => setBarHeight(event.nativeEvent.layout.height)}
-        onReserve={reservation.reserve}
+        onReserve={() => setIsCheckoutOpen(true)}
         onViewOrder={() => router.navigate('/orders')}
         status={reservation.status}
-        total={deal.price}
+        total={deal.price * reservation.quantity}
+      />
+
+      <ReserveSheet
+        deal={deal}
+        isSubmitting={reservation.status === 'reserving'}
+        onClose={() => setIsCheckoutOpen(false)}
+        onConfirm={(quantity, paymentMethod) => {
+          reservation.reserve({ quantity, paymentMethod });
+          setIsCheckoutOpen(false);
+        }}
+        visible={isCheckoutOpen}
       />
 
       {/* Đặt nút trợ lý phía trên thanh đặt giữ để không che nút "Đặt giữ ngay". */}
