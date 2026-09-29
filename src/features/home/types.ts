@@ -1,4 +1,5 @@
-export type DealCategoryId = 'all' | 'rice-noodle' | 'banh-mi' | 'bakery' | 'drink' | 'vegetarian';
+export type DealCategoryId =
+  'all' | 'rice-noodle' | 'banh-mi' | 'bakery' | 'drink' | 'vegetarian' | 'other';
 
 export type DealCategory = {
   id: DealCategoryId;

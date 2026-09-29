@@ -1,12 +1,23 @@
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { setStatusBarStyle } from 'expo-status-bar';
 import { useCallback, useState } from 'react';
-import { Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Share,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BrandButton } from '@/components/ui/brand-button';
 import { Icon } from '@/components/ui/icon';
+import { InlineAlert } from '@/components/ui/inline-alert';
 import { MaxContentWidth } from '@/constants/theme';
+import { getDealErrorMessage } from '@/features/home/api/deals';
+import { useDeal } from '@/features/home/api/use-deals';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { DealDetailHero } from '@/features/home/components/deal-detail-hero';
 import { DealMeta } from '@/features/home/components/deal-meta';
@@ -15,7 +26,7 @@ import { DetailCard } from '@/features/home/components/detail-card';
 import { ReserveBar } from '@/features/home/components/reserve-bar';
 import { RatingColor } from '@/features/home/constants/colors';
 import { HomeIcons } from '@/features/home/constants/icons';
-import { findDealById, getDealReviews } from '@/features/home/data/mock-deals';
+import { getDealReviews } from '@/features/home/data/mock-deals';
 import { useReservation } from '@/features/home/hooks/use-reservation';
 import type { Deal } from '@/features/home/types';
 import { useTheme } from '@/hooks/use-theme';
@@ -29,7 +40,7 @@ function goBack() {
 
 export function DealDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const deal = typeof id === 'string' ? findDealById(id) : undefined;
+  const dealQuery = useDeal(typeof id === 'string' ? id : undefined);
 
   // Ảnh món tràn lên dưới status bar nên cần icon sáng, giống Trang chủ.
   useFocusEffect(
@@ -39,11 +50,22 @@ export function DealDetailScreen() {
     }, []),
   );
 
-  if (!deal) return <DealNotFound />;
+  if (typeof id !== 'string') return <DealNotFound />;
+  if (dealQuery.isPending) return <DealDetailLoading />;
+  if (dealQuery.isError) {
+    return (
+      <DealDetailError
+        message={getDealErrorMessage(dealQuery.error)}
+        onRetry={() => void dealQuery.refetch()}
+        retrying={dealQuery.isRefetching}
+      />
+    );
+  }
+  if (!dealQuery.data) return <DealNotFound />;
 
   // Màn nằm trong tab nên không bị unmount khi mở deal khác: đổi key để reset cuộn,
   // trạng thái yêu thích và đặt giữ về mặc định cho deal mới.
-  return <DealDetail key={deal.id} deal={deal} />;
+  return <DealDetail key={dealQuery.data.id} deal={dealQuery.data} />;
 }
 
 function DealDetail({ deal }: { deal: Deal }) {
@@ -52,6 +74,7 @@ function DealDetail({ deal }: { deal: Deal }) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [barHeight, setBarHeight] = useState(0);
 
+  // Review đang dùng mock, chờ BE có API danh sách review; rating tổng vẫn lấy từ BE.
   const reviews = getDealReviews(deal.id);
   const savings = deal.originalPrice - deal.price;
   const remaining = reservation.status === 'reserved' ? deal.remaining - 1 : deal.remaining;
@@ -100,7 +123,8 @@ function DealDetail({ deal }: { deal: Deal }) {
                   <View style={styles.rating}>
                     <Icon name={HomeIcons.star} color={RatingColor} size={14} />
                     <Text style={[styles.ratingText, { color: theme.textSecondary }]}>
-                      {deal.store.rating.toFixed(1)} ({reviews.length})
+                      {deal.store.rating > 0 ? deal.store.rating.toFixed(1) : 'Chưa có đánh giá'} (
+                      {reviews.length})
                     </Text>
                   </View>
                   <DealMeta icon={HomeIcons.distance} label={formatDistance(deal.distanceKm)} />
@@ -191,6 +215,41 @@ function DealNotFound() {
   );
 }
 
+function DealDetailLoading() {
+  const theme = useTheme();
+
+  return (
+    <SafeAreaView style={[styles.feedback, { backgroundColor: theme.background }]}>
+      <ActivityIndicator color={theme.primary} size="large" />
+      <Text style={[styles.feedbackText, { color: theme.textSecondary }]}>Đang tải deal...</Text>
+    </SafeAreaView>
+  );
+}
+
+function DealDetailError({
+  message,
+  onRetry,
+  retrying,
+}: {
+  message: string;
+  onRetry: () => void;
+  retrying: boolean;
+}) {
+  const theme = useTheme();
+
+  return (
+    <SafeAreaView style={[styles.feedback, { backgroundColor: theme.background }]}>
+      <InlineAlert message={message} />
+      <BrandButton loading={retrying} onPress={onRetry}>
+        Thử lại
+      </BrandButton>
+      <BrandButton onPress={goBack} variant="secondary">
+        Quay lại
+      </BrandButton>
+    </SafeAreaView>
+  );
+}
+
 const styles = StyleSheet.create({
   screen: { flex: 1 },
   content: { paddingBottom: 96 },
@@ -252,4 +311,6 @@ const styles = StyleSheet.create({
   notFound: { flex: 1, justifyContent: 'center', gap: 12, padding: 24 },
   notFoundTitle: { fontSize: 22, fontWeight: '900', textAlign: 'center' },
   notFoundText: { fontSize: 14, textAlign: 'center', marginBottom: 8 },
+  feedback: { flex: 1, justifyContent: 'center', gap: 14, padding: 24 },
+  feedbackText: { fontSize: 14, textAlign: 'center' },
 });
