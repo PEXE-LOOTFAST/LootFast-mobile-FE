@@ -1,30 +1,46 @@
 import { router } from 'expo-router';
+import { ActivityIndicator, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
 import { useForm } from '@/features/auth/hooks/use-form';
 import { SellerFormCard } from '@/features/seller/components/seller-form-card';
 import { SellerFormField } from '@/features/seller/components/seller-form-field';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
-import { updateSellerOwner } from '@/features/seller/data/seller-profile-store';
-import { useSellerProfile } from '@/features/seller/hooks/use-seller-profile';
+import { useMerchantCurrentUser } from '@/features/seller/hooks/use-merchant-shop';
 import { validateOwnerInfo, type OwnerInfoValues } from '@/features/seller/validation';
+import { useTheme } from '@/hooks/use-theme';
 
 const goToSettings = () => router.navigate('/seller/settings');
 
 export function SellerOwnerInfoScreen() {
-  const { owner } = useSellerProfile();
+  const theme = useTheme();
+  const { data: currentUser, isLoading } = useMerchantCurrentUser();
+
   const { values, errors, setField, submit } = useForm<OwnerInfoValues>({
-    initialValues: owner,
+    initialValues: {
+      fullName: currentUser?.displayName ?? '',
+      email: currentUser?.email ?? '',
+      phone: currentUser?.phoneNumber ? `0${currentUser.phoneNumber}` : '',
+    },
     validate: validateOwnerInfo,
-    onSubmit: (next) => {
-      updateSellerOwner({
-        fullName: next.fullName.trim(),
-        email: next.email.trim(),
-        phone: next.phone.trim(),
-      });
+    onSubmit: () => {
       goToSettings();
     },
   });
+
+  if (isLoading) {
+    return (
+      <SellerPageScaffold
+        onPressBack={goToSettings}
+        subtitle="Cập nhật thông tin hồ sơ và liên hệ của bạn"
+        title="Thông tin & Liên hệ"
+      >
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 40 }}>
+          <ActivityIndicator color={theme.primary} />
+        </View>
+      </SellerPageScaffold>
+    );
+  }
 
   return (
     <SellerPageScaffold
