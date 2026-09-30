@@ -18,7 +18,7 @@ export type SessionState = {
   /** Phiên đăng nhập qua cổng quản trị — chỉ khi này mới được vào khu vực /admin. */
   isAdmin: boolean;
   isAuthPromptOpen: boolean;
-  /** Chỉ có khi đăng nhập bằng API thật; tài khoản demo không có thông tin này. */
+  /** Thông tin tài khoản backend trả về lúc đăng nhập. */
   user: AuthUser | null;
 };
 
@@ -81,22 +81,19 @@ export async function authenticate(
   if (action) setTimeout(action, 0);
 }
 
-// Tài khoản demo: phiên chỉ nằm trong bộ nhớ, tắt app là quay về trạng thái khách.
-export function signIn() {
-  const action = pendingAction;
-  pendingAction = null;
-  setState({ status: 'authenticated', isAuthPromptOpen: false });
+/**
+ * Đăng nhập thật qua cổng quản trị. Tách khỏi `authenticate` vì chỉ đường này mới được bật
+ * `isAdmin` — người dùng đăng nhập ở cổng người mua dù có role ADMIN cũng không vào khu /admin.
+ * Quyền thật vẫn do backend kiểm tra ở từng endpoint /admin/*.
+ */
+export async function authenticateAsAdmin(
+  tokens: { accessToken: string; refreshToken: string },
+  user: AuthUser,
+) {
+  await tokenStorage.save(tokens.accessToken, tokens.refreshToken);
 
-  // Chạy sau một nhịp để UI kịp render trạng thái đã đăng nhập (tab hết bị khoá, modal đóng)
-  // rồi mới thực hiện thao tác người dùng đã bấm lúc còn là khách.
-  if (action) setTimeout(action, 0);
-}
-
-// Tách khỏi signIn vì signIn được truyền thẳng làm callback của form (nhận giá trị form làm
-// tham số), thêm tham số vai trò vào đó sẽ bị nhận nhầm.
-export function signInAsAdmin() {
   pendingAction = null;
-  setState({ status: 'authenticated', isAdmin: true, isAuthPromptOpen: false });
+  setState({ status: 'authenticated', isAdmin: true, isAuthPromptOpen: false, user });
 }
 
 export function signOut() {
@@ -109,7 +106,7 @@ export function signOut() {
 /**
  * Thu hồi refresh session ở server rồi xoá token dưới máy. Lỗi mạng chỉ được bỏ qua chứ không
  * chặn đăng xuất: phiên local phải đóng bằng mọi giá, và endpoint logout là idempotent nên
- * lần đăng nhập sau gọi lại cũng không sao. Tài khoản demo không có token nên bỏ qua bước gọi API.
+ * lần đăng nhập sau gọi lại cũng không sao.
  */
 async function revokeSession() {
   try {
