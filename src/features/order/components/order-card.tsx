@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
 import { ORDER_STATUS_LABELS } from '@/features/order/constants/order-status';
@@ -9,11 +9,13 @@ import { formatPrice } from '@/lib/format';
 type OrderCardProps = {
   order: Order;
   onPressCode?: () => void;
+  onPressCancel?: () => void;
 };
 
-export function OrderCard({ order, onPressCode }: OrderCardProps) {
+export function OrderCard({ order, onPressCode, onPressCancel }: OrderCardProps) {
   const theme = useTheme();
   const canPickUp = order.status === 'confirmed' || order.status === 'ready';
+  const canCancel = order.canCancel && onPressCancel !== undefined;
 
   return (
     <View
@@ -57,6 +59,22 @@ export function OrderCard({ order, onPressCode }: OrderCardProps) {
       </View>
 
       {canPickUp ? <BrandButton onPress={onPressCode}>Xem mã nhận món</BrandButton> : null}
+
+      {canCancel ? (
+        <Pressable
+          accessibilityLabel={`Huỷ đơn ${order.code}`}
+          accessibilityRole="button"
+          onPress={onPressCancel}
+          style={({ pressed }) => [
+            styles.cancel,
+            { borderColor: theme.border },
+            canPickUp && styles.cancelSpacing,
+            pressed && styles.pressed,
+          ]}
+        >
+          <Text style={[styles.cancelLabel, { color: theme.danger }]}>Huỷ đơn</Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -93,4 +111,15 @@ const styles = StyleSheet.create({
   },
   summaryText: { flexShrink: 1, fontSize: 12 },
   total: { fontSize: 13, fontWeight: '900' },
+  // Nút phụ, viền nhạt chữ đỏ: huỷ đơn là việc hiếm làm nên không tô nổi như nút chính.
+  cancel: {
+    minHeight: 46,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderRadius: 16,
+  },
+  cancelSpacing: { marginTop: 10 },
+  cancelLabel: { fontSize: 14, fontWeight: '800' },
+  pressed: { opacity: 0.8 },
 });

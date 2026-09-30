@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { Alert, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Icon } from '@/components/ui/icon';
+import { updateSellerStore } from '@/demo/store';
+import { useSellerDemo } from '@/demo/use-demo';
 import { MaxContentWidth } from '@/constants/theme';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { SellerMenuList, type SellerMenuItem } from '@/features/seller/components/seller-menu-list';
@@ -44,6 +46,7 @@ export function SellerShopScreen() {
     location,
     openingHours,
     isLoading,
+    isError,
     isSaving,
     refetch,
     updateProfile,
@@ -52,17 +55,37 @@ export function SellerShopScreen() {
   } = useMerchantShop();
 
   const { pickAndUpload } = useMerchantImageUpload();
+  const { shop: demoShop } = useSellerDemo();
 
-  const shopForForm: SellerShop = {
-    name: profile?.storeName ?? '',
-    isVerified: profile !== undefined,
-    email: profile?.contactEmail ?? '',
-    address: location?.addressLine ?? '',
-    categories: profile?.businessCategory ? [profile.businessCategory as SellerShopCategory] : [],
-    openingHours: slotsToOpenClose(openingHours),
-  };
+  // Không gọi được API người bán (thường là chưa bật backend) thì chạy tiếp bằng kho dữ liệu
+  // demo, để buổi demo không dừng ở màn lỗi. Sửa thông tin lúc này ghi vào kho demo.
+  const isOffline = isError;
+
+  const shopForForm: SellerShop = isOffline
+    ? demoShop
+    : {
+        name: profile?.storeName ?? '',
+        isVerified: profile !== undefined,
+        email: profile?.contactEmail ?? '',
+        address: location?.addressLine ?? '',
+        categories: profile?.businessCategory
+          ? [profile.businessCategory as SellerShopCategory]
+          : [],
+        openingHours: slotsToOpenClose(openingHours),
+      };
 
   async function handleSave(partial: Partial<SellerShop>) {
+    if (isOffline) {
+      updateSellerStore({
+        ...(partial.name !== undefined ? { name: partial.name.trim() } : {}),
+        ...(partial.address !== undefined ? { address: partial.address.trim() } : {}),
+        ...(partial.categories !== undefined ? { shopCategories: partial.categories } : {}),
+        ...(partial.openingHours !== undefined ? { openingHours: partial.openingHours } : {}),
+      });
+      setIsInfoOpen(false);
+      return;
+    }
+
     try {
       if (partial.name !== undefined || partial.categories !== undefined) {
         await updateProfile({
@@ -151,9 +174,11 @@ export function SellerShopScreen() {
         }
       >
         <SellerShopHeader
-          email={isLoading ? '' : (profile?.contactEmail ?? '')}
+          email={isOffline ? demoShop.email : isLoading ? '' : (profile?.contactEmail ?? '')}
           onPressAvatar={() => pickAndUpload('logo')}
-          shopName={isLoading ? 'Đang tải...' : (profile?.storeName ?? '—')}
+          shopName={
+            isOffline ? demoShop.name : isLoading ? 'Đang tải...' : (profile?.storeName ?? '—')
+          }
         />
 
         <View style={styles.body}>

@@ -2,6 +2,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import { useColorScheme } from 'react-native';
 
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { AuthModal } from '@/features/auth/components/auth-modal';
 import { queryClient } from '@/lib/query-client';
 
@@ -20,6 +21,7 @@ export default function RootLayout() {
           <Stack.Screen name="admin" />
         </Stack>
         <AuthModal />
+        <ConfirmDialog />
       </ThemeProvider>
     </QueryClientProvider>
   );

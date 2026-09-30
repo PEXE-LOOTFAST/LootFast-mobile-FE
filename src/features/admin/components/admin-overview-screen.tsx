@@ -1,17 +1,12 @@
 import { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 
+import { useAdminDemo } from '@/demo/use-demo';
 import { MaxContentWidth } from '@/constants/theme';
 import { AdminHeader } from '@/features/admin/components/admin-header';
 import { AdminStatCard } from '@/features/admin/components/admin-stat-card';
-import { DealApprovalChartCard } from '@/features/admin/components/deal-approval-chart-card';
+import { PlatformSalesChartCard } from '@/features/admin/components/platform-sales-chart-card';
 import { RecentAlertsCard } from '@/features/admin/components/recent-alerts-card';
-import {
-  MOCK_ADMIN_ALERTS,
-  MOCK_ADMIN_STATS,
-  MOCK_DEAL_APPROVAL_GROWTH,
-  MOCK_DEAL_APPROVALS,
-} from '@/features/admin/data/mock-admin-overview';
 import { useLightStatusBar } from '@/hooks/use-light-status-bar';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -19,6 +14,8 @@ export function AdminOverviewScreen() {
   const theme = useTheme();
   // Chốt ngày lúc mount để dòng ngày trên header không nhảy giữa các lần render.
   const [today] = useState(() => new Date());
+  // Số liệu tính thẳng từ dữ liệu demo: duyệt hay khoá một quán là các ô này đổi ngay.
+  const { stats, dailySales, salesGrowth, alerts } = useAdminDemo();
 
   useLightStatusBar();
 
@@ -28,19 +25,19 @@ export function AdminOverviewScreen() {
         {/* Trung tâm thông báo của admin sẽ làm ở nhánh riêng, tạm báo trước. */}
         <AdminHeader
           date={today}
-          hasUnread={MOCK_ADMIN_ALERTS.length > 0}
+          hasUnread={alerts.length > 0}
           onPressNotifications={() => Alert.alert('Thông báo', 'Trung tâm thông báo sẽ sớm có.')}
         />
 
         <View style={styles.body}>
           <View style={styles.stats}>
-            {MOCK_ADMIN_STATS.map((stat) => (
+            {stats.map((stat) => (
               <AdminStatCard key={stat.id} stat={stat} />
             ))}
           </View>
 
-          <DealApprovalChartCard daily={MOCK_DEAL_APPROVALS} growth={MOCK_DEAL_APPROVAL_GROWTH} />
-          <RecentAlertsCard alerts={MOCK_ADMIN_ALERTS} />
+          <PlatformSalesChartCard daily={dailySales} growth={salesGrowth} />
+          <RecentAlertsCard alerts={alerts} />
         </View>
       </ScrollView>
     </View>

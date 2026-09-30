@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 
+import { setDealPortionsLeft } from '@/demo/store';
 import type {
   SellerDeal,
   SellerOrder,
@@ -27,18 +28,14 @@ const EMPTY_COUNTS: Record<SellerPickupBucket, number> = { waiting: 0, picked: 0
 
 const remainingOf = (deal: SellerDeal) => Math.max(deal.portionsTotal - deal.portionsSold, 0);
 
-// Toàn bộ trạng thái của trang Đơn hàng người bán: bộ lọc ngày/mã, nhóm đơn và số phần
-// còn lại đang sửa tại chỗ. Dữ liệu vẫn là mock, chưa gọi API.
-export function useSellerOrderBoard(deals: SellerDeal[], orders: SellerOrder[]) {
+// Toàn bộ trạng thái của trang Đơn hàng người bán: bộ lọc ngày/mã và nhóm đơn. Số phần còn
+// lại ghi thẳng vào kho dữ liệu demo nên người mua thấy tồn kho đổi theo.
+export function useSellerOrderBoard(orders: SellerOrder[]) {
   // Chốt ngày lúc mount để nút "Hôm nay" không đổi nghĩa giữa các lần render.
   const [today] = useState(() => formatDateInput(new Date()));
   const [date, setDate] = useState(today);
   const [code, setCode] = useState('');
   const [bucket, setBucket] = useState<SellerPickupBucket>('waiting');
-  // Sửa số phần chỉ nằm trên máy cho tới khi có API cập nhật deal.
-  const [portionsLeft, setPortionsLeft] = useState<Record<string, number>>(() =>
-    Object.fromEntries(deals.map((deal) => [deal.id, remainingOf(deal)])),
-  );
 
   const { counts, visibleOrders } = useMemo(() => {
     const matched = orders.filter((order) => {
@@ -74,8 +71,7 @@ export function useSellerOrderBoard(deals: SellerDeal[], orders: SellerOrder[]) 
     setBucket,
     counts,
     visibleOrders,
-    portionsLeftOf: (deal: SellerDeal) => portionsLeft[deal.id] ?? remainingOf(deal),
-    setPortionsLeftOf: (dealId: string, value: number) =>
-      setPortionsLeft((current) => ({ ...current, [dealId]: value })),
+    portionsLeftOf: remainingOf,
+    setPortionsLeftOf: setDealPortionsLeft,
   };
 }

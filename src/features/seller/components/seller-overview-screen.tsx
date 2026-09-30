@@ -3,6 +3,7 @@ import { setStatusBarStyle } from 'expo-status-bar';
 import { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { useSellerDemo } from '@/demo/use-demo';
 import { MaxContentWidth } from '@/constants/theme';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { HistoryInsightCard } from '@/features/seller/components/history-insight-card';
@@ -13,7 +14,6 @@ import { UpcomingPickupCard } from '@/features/seller/components/upcoming-pickup
 import { WeeklyPerformanceCard } from '@/features/seller/components/weekly-performance-card';
 import { WeeklySummaryCard } from '@/features/seller/components/weekly-summary-card';
 import { SellerIcons } from '@/features/seller/constants/icons';
-import { MOCK_SELLER_DEALS, MOCK_SELLER_ORDERS } from '@/features/seller/data/mock-seller-shop';
 import { useMerchantShop } from '@/features/seller/hooks/use-merchant-shop';
 import { useSellerOverview } from '@/features/seller/hooks/use-seller-overview';
 import { useTheme } from '@/hooks/use-theme';
@@ -22,7 +22,9 @@ import { formatPrice } from '@/lib/format';
 export function SellerOverviewScreen() {
   const theme = useTheme();
   const [today] = useState(() => new Date());
-  const overview = useSellerOverview(MOCK_SELLER_DEALS, MOCK_SELLER_ORDERS);
+  // Deal và đơn của quán lấy từ kho dữ liệu demo: khách vừa đặt là các thẻ số liệu đổi ngay.
+  const { shop, deals, orders } = useSellerDemo();
+  const overview = useSellerOverview(deals, orders);
   const { profile } = useMerchantShop();
 
   useFocusEffect(
@@ -37,9 +39,9 @@ export function SellerOverviewScreen() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <SellerOverviewHeader
           date={today}
-          isVerified={profile !== undefined}
+          isVerified={shop.isVerified}
           onPressCreateDeal={() => router.navigate('/seller/new-deal')}
-          shopName={profile?.storeName ?? ''}
+          shopName={profile?.storeName ?? shop.name}
         />
 
         <View style={styles.body}>

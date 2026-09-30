@@ -2,19 +2,19 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Icon } from '@/components/ui/icon';
 import { AdminIcons } from '@/features/admin/constants/icons';
-import type { DailyDealApproval } from '@/features/admin/types';
+import type { DailyPlatformSales } from '@/features/admin/types';
 import { useTheme } from '@/hooks/use-theme';
 
 const CHART_HEIGHT = 130;
 
-type DealApprovalChartCardProps = {
-  daily: DailyDealApproval[];
-  /** Phần trăm tăng/giảm so với tuần trước. */
+type PlatformSalesChartCardProps = {
+  daily: DailyPlatformSales[];
+  /** Phần trăm tăng/giảm của ba ngày gần nhất so với ba ngày trước đó. */
   growth: number;
 };
 
-// Biểu đồ cột số deal được duyệt mỗi ngày trong tuần, kèm mức tăng so với tuần trước.
-export function DealApprovalChartCard({ daily, growth }: DealApprovalChartCardProps) {
+// Biểu đồ cột số suất deal bán ra mỗi ngày trên toàn sàn, kèm mức tăng gần đây.
+export function PlatformSalesChartCard({ daily, growth }: PlatformSalesChartCardProps) {
   const theme = useTheme();
   const max = Math.max(...daily.map((day) => day.count), 0);
   const isUp = growth >= 0;
@@ -26,7 +26,7 @@ export function DealApprovalChartCard({ daily, growth }: DealApprovalChartCardPr
     >
       <View style={styles.header}>
         <Text accessibilityRole="header" style={[styles.title, { color: theme.text }]}>
-          Duyệt deal theo ngày
+          Suất deal bán ra theo ngày
         </Text>
         <View style={styles.growth}>
           {isUp ? <Icon name={AdminIcons.trendUp} color={growthColor} size={14} /> : null}
@@ -42,7 +42,7 @@ export function DealApprovalChartCard({ daily, growth }: DealApprovalChartCardPr
             <View
               key={day.key}
               accessible
-              accessibilityLabel={`${day.label}: ${day.count} deal`}
+              accessibilityLabel={`${day.label}: ${day.count} suất`}
               style={styles.barSlot}
             >
               <View
@@ -60,7 +60,7 @@ export function DealApprovalChartCard({ daily, growth }: DealApprovalChartCardPr
         ) : (
           <View style={styles.empty}>
             <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
-              Chưa có deal nào được duyệt tuần này
+              Chưa có suất nào bán ra trong tuần này
             </Text>
           </View>
         )}
