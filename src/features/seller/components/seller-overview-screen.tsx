@@ -1,30 +1,26 @@
 import { router, useFocusEffect } from 'expo-router';
 import { setStatusBarStyle } from 'expo-status-bar';
 import { useCallback, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { useSellerDemo } from '@/demo/use-demo';
+import { ApiPendingCard } from '@/components/ui/api-pending-card';
 import { MaxContentWidth } from '@/constants/theme';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
-import { HistoryInsightCard } from '@/features/seller/components/history-insight-card';
-import { MetricCard } from '@/features/seller/components/metric-card';
-import { SectionLabel } from '@/features/seller/components/section-label';
 import { SellerOverviewHeader } from '@/features/seller/components/seller-overview-header';
-import { UpcomingPickupCard } from '@/features/seller/components/upcoming-pickup-card';
-import { WeeklyPerformanceCard } from '@/features/seller/components/weekly-performance-card';
-import { WeeklySummaryCard } from '@/features/seller/components/weekly-summary-card';
-import { SellerIcons } from '@/features/seller/constants/icons';
 import { useMerchantShop } from '@/features/seller/hooks/use-merchant-shop';
-import { useSellerOverview } from '@/features/seller/hooks/use-seller-overview';
 import { useTheme } from '@/hooks/use-theme';
-import { formatPrice } from '@/lib/format';
 
+/**
+ * Tổng quan của người bán. Doanh thu, số đơn và biểu đồ 7 ngày đều cần dữ liệu đơn hàng, mà
+ * backend chưa có endpoint đơn cho người bán — chỉ người mua mới đặt và xem đơn của mình.
+ *
+ * Các thành phần hiển thị đã dựng sẵn: `metric-card`, `weekly-performance-card`,
+ * `weekly-summary-card`, `upcoming-pickup-card`, `history-insight-card`, và `use-seller-overview`
+ * lo phần tính toán khi có danh sách deal + đơn.
+ */
 export function SellerOverviewScreen() {
   const theme = useTheme();
   const [today] = useState(() => new Date());
-  // Deal và đơn của quán lấy từ kho dữ liệu demo: khách vừa đặt là các thẻ số liệu đổi ngay.
-  const { shop, deals, orders } = useSellerDemo();
-  const overview = useSellerOverview(deals, orders);
   const { profile } = useMerchantShop();
 
   useFocusEffect(
@@ -39,84 +35,13 @@ export function SellerOverviewScreen() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <SellerOverviewHeader
           date={today}
-          isVerified={shop.isVerified}
+          isVerified={profile !== undefined}
           onPressCreateDeal={() => router.navigate('/seller/new-deal')}
-          shopName={profile?.storeName ?? shop.name}
+          shopName={profile?.storeName ?? '—'}
         />
 
         <View style={styles.body}>
-          <Text style={[styles.storageNote, { color: theme.textSecondary }]}>
-            Dữ liệu được lưu trên thiết bị này
-          </Text>
-
-          <SectionLabel title="HÔM NAY" />
-
-          <View style={styles.metrics}>
-            <MetricCard
-              caption="Hôm nay"
-              hint="Tổng tiền của các đơn deal đã xác nhận hoặc hoàn thành trong ngày hôm nay."
-              icon={SellerIcons.revenue}
-              label="Doanh thu từ deal"
-              value={formatPrice(overview.revenueToday)}
-            />
-            <MetricCard
-              caption={`${overview.pendingPickupCount} đơn chờ lấy`}
-              hint="Số đơn khách đặt trong hôm nay, tính cả đơn chưa xác nhận."
-              icon={SellerIcons.bag}
-              label="Số đơn hôm nay"
-              value={`${overview.orderCountToday}`}
-            />
-            <MetricCard
-              caption="Đang mở bán"
-              hint="Số deal còn hiệu lực và khách vẫn đặt được."
-              icon={SellerIcons.trend}
-              label="Deal đang chạy"
-              value={`${overview.runningDealCount}`}
-            />
-            <MetricCard
-              caption="Trong deal đang chạy"
-              hint="Tổng số phần chưa bán của các deal đang chạy."
-              icon={SellerIcons.bag}
-              label="Số phần còn lại"
-              value={`${overview.portionsLeft}`}
-            />
-            <MetricCard
-              caption="Từ dữ liệu deal hiện có"
-              hint="Tổng số phần đã bán, cộng từ tất cả deal của quán."
-              icon={SellerIcons.bag}
-              label="Số phần đã bán"
-              value={`${overview.portionsSold}`}
-            />
-            <MetricCard
-              caption={`${overview.soldOutCount}/${overview.runningDealCount} deal`}
-              hint="Tỷ lệ deal đang chạy đã bán hết phần."
-              icon={SellerIcons.trend}
-              label="Tỷ lệ bán hết"
-              value={`${Math.round(overview.soldOutRate * 100)}%`}
-            />
-          </View>
-
-          <SectionLabel title="7 NGÀY QUA" />
-          <WeeklyPerformanceCard daily={overview.weekly} />
-          <WeeklySummaryCard
-            orderCount={overview.weekOrderCount}
-            portions={overview.weekPortions}
-            revenue={overview.weekRevenue}
-          />
-
-          <SectionLabel title="GỢI Ý DỰA TRÊN LỊCH SỬ" />
-          <HistoryInsightCard
-            onPressUpgrade={() =>
-              router.navigate({ pathname: '/premium', params: { from: '/seller' } })
-            }
-          />
-
-          <SectionLabel title="ĐƠN SẮP ĐẾN LẤY" />
-          <UpcomingPickupCard
-            onPressSeeAll={() => router.navigate('/seller/orders')}
-            orders={overview.upcomingOrders}
-            pendingConfirmCount={overview.pendingConfirmCount}
-          />
+          <ApiPendingCard feature="Doanh thu, số đơn hôm nay và hiệu quả 7 ngày" />
         </View>
       </ScrollView>
 
@@ -136,6 +61,4 @@ const styles = StyleSheet.create({
     marginTop: 14,
     paddingHorizontal: 16,
   },
-  storageNote: { fontSize: 11, fontWeight: '600', textAlign: 'right' },
-  metrics: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
 });

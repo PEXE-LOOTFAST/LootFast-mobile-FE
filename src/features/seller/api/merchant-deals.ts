@@ -1,0 +1,106 @@
+import { ApiException, apiRequest } from '@/lib/api-client';
+import type { PagedResponse } from '@/types/api';
+
+export type DealStatusDto = 'DRAFT' | 'ACTIVE' | 'HIDDEN' | 'SOLD_OUT' | 'REMOVED';
+
+export type DealImageDto = {
+  imageId: string;
+  imageUrl: string;
+  displayOrder: number;
+  createdAt: string;
+};
+
+/** Khớp MerchantDealResponse của backend. */
+export type MerchantDealDto = {
+  dealId: string;
+  name: string;
+  categoryCode: string;
+  originalPrice: number;
+  discountedPrice: number;
+  discountPercent: number;
+  totalQuantity: number;
+  remainingQuantity: number;
+  committedQuantity: number;
+  primaryImageUrl: string | null;
+  images: DealImageDto[];
+  preparationMinutes: number;
+  saleStartsAt: string;
+  saleEndsAt: string;
+  pickupStartsAt: string;
+  pickupEndsAt: string;
+  status: DealStatusDto;
+  /** Khoá lạc quan: `PATCH .../quantity` bắt gửi kèm đúng version đang giữ. */
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CreateMerchantDealPayload = {
+  name: string;
+  categoryCode: string;
+  originalPrice: number;
+  discountedPrice: number;
+  totalQuantity: number;
+  preparationMinutes: number;
+  /** Bốn mốc thời gian đều là ISO-8601 có múi giờ (Instant của backend). */
+  saleStartsAt: string;
+  saleEndsAt: string;
+  pickupStartsAt: string;
+  pickupEndsAt: string;
+};
+
+const BASE_PATH = '/merchants/me/deals';
+
+export function listMerchantDeals(page = 0, size = 50) {
+  const query = new URLSearchParams({ page: String(page), size: String(size) });
+
+  return apiRequest<PagedResponse<MerchantDealDto>>(`${BASE_PATH}?${query.toString()}`);
+}
+
+/** Tạo bản nháp. Deal chỉ lên sàn sau khi thêm ảnh rồi gọi `publishMerchantDeal`. */
+export function createMerchantDeal(payload: CreateMerchantDealPayload) {
+  return apiRequest<MerchantDealDto>(BASE_PATH, { method: 'POST', body: payload });
+}
+
+export function publishMerchantDeal(dealId: string) {
+  return apiRequest<MerchantDealDto>(`${BASE_PATH}/${dealId}/publish`, { method: 'POST' });
+}
+
+export function updateMerchantDealQuantity(
+  dealId: string,
+  totalQuantity: number,
+  expectedVersion: number,
+) {
+  return apiRequest<MerchantDealDto>(`${BASE_PATH}/${dealId}/quantity`, {
+    method: 'PATCH',
+    body: { totalQuantity, expectedVersion },
+  });
+}
+
+// Backend trả message tiếng Anh, chỉ error.code là enum ổn định — map sang tiếng Việt ở đây.
+const MESSAGES: Record<string, string> = {
+  UNAUTHORIZED: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
+  ACCESS_DENIED: 'Tài khoản chưa được cấp quyền Người bán.',
+  MERCHANT_PROFILE_NOT_FOUND: 'Chưa có hồ sơ quán. Điền thông tin quán trước khi đăng deal.',
+  MERCHANT_NOT_APPROVED: 'Hồ sơ người bán chưa được duyệt.',
+  MERCHANT_PROFILE_INCOMPLETE: 'Hồ sơ quán còn thiếu thông tin bắt buộc.',
+  DEAL_NOT_FOUND: 'Deal không còn tồn tại.',
+  DEAL_NOT_EDITABLE: 'Deal đã đăng nên không sửa được nữa.',
+  DEAL_NOT_PUBLISHABLE: 'Deal chưa đủ điều kiện đăng — kiểm tra ảnh, giá và lịch bán.',
+  DEAL_IMAGE_REQUIRED: 'Deal cần ít nhất một ảnh trước khi đăng.',
+  INVALID_DEAL_PRICE: 'Giá deal phải nhỏ hơn giá gốc.',
+  INVALID_DEAL_SCHEDULE: 'Khung giờ bán hoặc giờ nhận món không hợp lệ.',
+  DEAL_OUTSIDE_OPENING_HOURS: 'Giờ nhận món nằm ngoài giờ mở cửa của quán.',
+  DEAL_QUANTITY_CONFLICT: 'Số lượng mới nhỏ hơn số suất khách đã đặt.',
+  DEAL_VERSION_CONFLICT: 'Deal vừa được cập nhật ở nơi khác. Tải lại rồi thử lại.',
+  VALIDATION_FAILED: 'Thông tin deal không hợp lệ. Kiểm tra lại các ô đã nhập.',
+};
+
+export function toMerchantDealErrorMessage(error: unknown): string {
+  if (error instanceof ApiException) {
+    return MESSAGES[error.code] ?? 'Thao tác không thành công. Vui lòng thử lại.';
+  }
+
+  // Không phải lỗi từ backend: mất mạng, sai EXPO_PUBLIC_API_URL, server chưa chạy...
+  return 'Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.';
+}

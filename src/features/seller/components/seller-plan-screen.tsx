@@ -1,8 +1,8 @@
 import { Alert, StyleSheet, Text, View } from 'react-native';
 
+import { ApiPendingCard } from '@/components/ui/api-pending-card';
 import { BrandButton } from '@/components/ui/brand-button';
 import { Icon } from '@/components/ui/icon';
-import { useSellerDemo } from '@/demo/use-demo';
 import { SellerBadge } from '@/features/seller/components/seller-badge';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import {
@@ -14,18 +14,13 @@ import {
 import { useTheme } from '@/hooks/use-theme';
 import { formatPrice } from '@/lib/format';
 
-const pad = (value: number) => value.toString().padStart(2, '0');
-
-function formatRenewal(iso?: string) {
-  if (!iso) return 'Chưa có dữ liệu';
-  const date = new Date(iso);
-
-  return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
-}
-
+/**
+ * Gói dịch vụ của người bán. Backend chưa có endpoint gói, hạn mức đăng deal hay thanh toán,
+ * nên thẻ "Gói hiện tại" chưa có số liệu thật. Danh sách quyền lợi bên dưới là mô tả sản phẩm
+ * viết sẵn, không phải dữ liệu tài khoản.
+ */
 export function SellerPlanScreen({ onBack }: { onBack: () => void }) {
   const theme = useTheme();
-  const { plan } = useSellerDemo();
 
   return (
     <SellerPageScaffold
@@ -33,35 +28,16 @@ export function SellerPlanScreen({ onBack }: { onBack: () => void }) {
       subtitle="Quyền lợi vận hành và trạng thái khả dụng thực tế"
       title="Gói dành cho người bán"
     >
-      <View
-        style={[
-          styles.currentCard,
-          { backgroundColor: theme.primarySoft, borderColor: theme.primary },
-        ]}
+      <ApiPendingCard feature="Gói hiện tại, hạn mức đăng deal và ngày gia hạn" />
+
+      <BrandButton
+        onPress={() =>
+          Alert.alert('Nâng cấp Premium', 'Tính năng thanh toán đang được phát triển.')
+        }
+        style={styles.upgrade}
       >
-        <View style={styles.currentHeader}>
-          <View style={styles.currentCopy}>
-            <Text style={[styles.caption, { color: theme.textSecondary }]}>Gói hiện tại</Text>
-            <Text style={[styles.planName, { color: theme.text }]}>{plan.name}</Text>
-          </View>
-          <SellerBadge label="Đang dùng" tone="solid" />
-        </View>
-
-        <View style={styles.facts}>
-          <PlanFact label="Ngày gia hạn" value={formatRenewal(plan.renewsAt)} />
-          <PlanFact label="Deal hôm nay" value={`${plan.dealPostsUsed}`} />
-          <PlanFact label="Giới hạn mỗi ngày" value={`${plan.dealPostsLimit} lượt đăng deal`} />
-        </View>
-
-        <BrandButton
-          onPress={() =>
-            Alert.alert('Nâng cấp Premium', 'Tính năng thanh toán đang được phát triển.')
-          }
-          style={styles.upgrade}
-        >
-          {`Nâng cấp Premium · ${formatPrice(SELLER_PREMIUM_PRICE)}`}
-        </BrandButton>
-      </View>
+        {`Nâng cấp Premium · ${formatPrice(SELLER_PREMIUM_PRICE)}`}
+      </BrandButton>
 
       {SELLER_PLAN_FEATURES.map((feature) => (
         <View
@@ -106,26 +82,7 @@ export function SellerPlanScreen({ onBack }: { onBack: () => void }) {
   );
 }
 
-function PlanFact({ label, value }: { label: string; value: string }) {
-  const theme = useTheme();
-
-  return (
-    <View style={styles.fact}>
-      <Text style={[styles.caption, { color: theme.textSecondary }]}>{label}</Text>
-      <Text style={[styles.factValue, { color: theme.text }]}>{value}</Text>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
-  currentCard: { gap: 14, borderWidth: 1, borderRadius: 20, padding: 16 },
-  currentHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
-  currentCopy: { flex: 1, gap: 2 },
-  caption: { fontSize: 12, fontWeight: '600' },
-  planName: { fontSize: 22, fontWeight: '900', letterSpacing: -0.4 },
-  facts: { flexDirection: 'row', flexWrap: 'wrap', rowGap: 12 },
-  fact: { flexBasis: '50%', gap: 4 },
-  factValue: { fontSize: 14, fontWeight: '800' },
   upgrade: { minHeight: 46, borderRadius: 12 },
   featureCard: {
     flexDirection: 'row',
