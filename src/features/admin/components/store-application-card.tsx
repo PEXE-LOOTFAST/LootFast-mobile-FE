@@ -1,52 +1,60 @@
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { Icon, type IconName } from '@/components/ui/icon';
+import { Icon } from '@/components/ui/icon';
 import { AdminIcons } from '@/features/admin/constants/icons';
-import type { StoreApplication } from '@/features/admin/types';
+import type { StoreApplicationCardModel, StoreApplicationInfoRow } from '@/features/admin/types';
 import { useTheme } from '@/hooks/use-theme';
 
 type StoreApplicationCardProps = {
-  application: StoreApplication;
+  application: StoreApplicationCardModel;
   onApprove: () => void;
   onReject: () => void;
-  onUndo: () => void;
+  onViewLicense: () => void;
+  /** Đang gọi API cho chính hồ sơ này: khoá hai nút quyết định để không bấm hai lần. */
+  isBusy?: boolean;
 };
 
-// "2026-09-20" → "20/09/2026". Tách chuỗi thay vì new Date() để không lệch ngày theo múi giờ.
-function formatSubmittedDate(value: string) {
-  const [year, month, day] = value.split('-');
-
-  return `${day}/${month}/${year}`;
-}
-
-function InfoRow({ icon, label }: { icon: IconName; label: string }) {
+function InfoRow({ row }: { row: StoreApplicationInfoRow }) {
   const theme = useTheme();
-
-  return (
+  const tel = row.tel;
+  const content = (
     <View style={styles.infoRow}>
-      <Icon name={icon} color={theme.textSecondary} size={15} />
+      <Icon name={row.icon} color={theme.textSecondary} size={15} />
       <Text numberOfLines={1} style={[styles.infoLabel, { color: theme.textSecondary }]}>
-        {label}
+        {row.label}
       </Text>
     </View>
   );
+
+  if (!tel) return content;
+
+  return (
+    <Pressable
+      accessibilityHint="Gọi cho chủ quán"
+      accessibilityRole="link"
+      onPress={() => Linking.openURL(`tel:${tel.replace(/\s/g, '')}`)}
+      style={({ pressed }) => pressed && styles.pressed}
+    >
+      {content}
+    </Pressable>
+  );
 }
 
-// Một hồ sơ đăng ký quán. Hồ sơ chờ duyệt có hai nút quyết định; hồ sơ đã xử lý chỉ còn
-// nhãn trạng thái và "Hoàn tác" để đưa về hàng chờ nếu admin bấm nhầm.
+// Một hồ sơ đăng ký người bán. Hồ sơ chờ duyệt có hai nút quyết định; hồ sơ đã xử lý chỉ còn
+// nhãn trạng thái và lý do từ chối — API không cho đưa quyết định về lại hàng chờ.
 export function StoreApplicationCard({
   application,
   onApprove,
   onReject,
-  onUndo,
+  onViewLicense,
+  isBusy = false,
 }: StoreApplicationCardProps) {
   const theme = useTheme();
-  const { status, hasFoodSafetyCert } = application;
+  const { status, rejectionReason } = application;
   const isApproved = status === 'approved';
   // Nền nhạt dựng từ màu theme + độ trong suốt để tự khớp cả light lẫn dark mode.
   const dangerSoft = `${theme.danger}1F`;
   const warningSoft = `${theme.accent}33`;
-  const certColor = hasFoodSafetyCert ? theme.primary : theme.text;
 
   return (
     <View
@@ -59,102 +67,114 @@ export function StoreApplicationCard({
 
         <View style={styles.headerCopy}>
           <Text numberOfLines={1} style={[styles.storeName, { color: theme.text }]}>
-            {application.storeName}
+            {application.title}
           </Text>
           <View style={styles.tags}>
-            <View style={[styles.tag, { backgroundColor: theme.primarySoft }]}>
-              <Text style={[styles.tagLabel, { color: theme.primary }]}>
-                {application.category}
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.tag,
-                { backgroundColor: hasFoodSafetyCert ? theme.primarySoft : warningSoft },
-              ]}
-            >
-              <Icon
-                name={hasFoodSafetyCert ? AdminIcons.document : AdminIcons.warning}
-                color={certColor}
-                size={12}
-              />
-              <Text style={[styles.tagLabel, { color: certColor }]}>
-                {hasFoodSafetyCert ? 'Đã nộp giấy ATTP' : 'Thiếu giấy ATTP'}
-              </Text>
-            </View>
+            {application.tags.map((tag) => {
+              const isWarning = tag.tone === 'warning';
+              const tagColor = isWarning ? theme.text : theme.primary;
+
+              return (
+                <View
+                  key={tag.label}
+                  style={[
+                    styles.tag,
+                    { backgroundColor: isWarning ? warningSoft : theme.primarySoft },
+                  ]}
+                >
+                  {tag.icon ? <Icon name={tag.icon} color={tagColor} size={12} /> : null}
+                  <Text numberOfLines={1} style={[styles.tagLabel, { color: tagColor }]}>
+                    {tag.label}
+                  </Text>
+                </View>
+              );
+            })}
           </View>
         </View>
       </View>
 
       <View style={styles.info}>
-        <InfoRow icon={AdminIcons.store} label={`Chủ quán: ${application.ownerName}`} />
-        <Pressable
-          accessibilityHint="Gọi cho chủ quán"
-          accessibilityRole="link"
-          onPress={() => Linking.openURL(`tel:${application.phone.replace(/\s/g, '')}`)}
-          style={({ pressed }) => pressed && styles.pressed}
-        >
-          <InfoRow icon={AdminIcons.phone} label={application.phone} />
-        </Pressable>
-        <InfoRow icon={AdminIcons.location} label={application.address} />
-        <InfoRow
-          icon={AdminIcons.calendar}
-          label={`Gửi ngày ${formatSubmittedDate(application.submittedAt)}`}
-        />
+        {application.rows.map((row) => (
+          <InfoRow key={row.label} row={row} />
+        ))}
       </View>
+
+      <Pressable
+        accessibilityLabel={`Xem giấy phép kinh doanh của ${application.title}`}
+        accessibilityRole="button"
+        onPress={onViewLicense}
+        style={({ pressed }) => [
+          styles.licenseButton,
+          { borderColor: theme.border },
+          pressed && styles.pressed,
+        ]}
+      >
+        <Icon name={AdminIcons.document} color={theme.primary} size={15} />
+        <Text style={[styles.licenseLabel, { color: theme.primary }]}>
+          Xem giấy phép kinh doanh
+        </Text>
+      </Pressable>
 
       {status === 'pending' ? (
         <View style={styles.actions}>
           <Pressable
-            accessibilityLabel={`Từ chối ${application.storeName}`}
+            accessibilityLabel={`Từ chối ${application.title}`}
             accessibilityRole="button"
+            disabled={isBusy}
             onPress={onReject}
             style={({ pressed }) => [
               styles.actionButton,
               { backgroundColor: dangerSoft },
-              pressed && styles.pressed,
+              (pressed || isBusy) && styles.pressed,
             ]}
           >
             <Icon name={AdminIcons.close} color={theme.danger} size={15} />
             <Text style={[styles.actionLabel, { color: theme.danger }]}>Từ chối</Text>
           </Pressable>
           <Pressable
-            accessibilityLabel={`Phê duyệt ${application.storeName}`}
+            accessibilityLabel={`Phê duyệt ${application.title}`}
             accessibilityRole="button"
+            disabled={isBusy}
             onPress={onApprove}
             style={({ pressed }) => [
               styles.actionButton,
               { backgroundColor: theme.primary },
-              pressed && styles.pressed,
+              (pressed || isBusy) && styles.pressed,
             ]}
           >
-            <Icon name={AdminIcons.check} color={theme.backgroundElement} size={15} />
-            <Text style={[styles.actionLabel, { color: theme.backgroundElement }]}>Phê duyệt</Text>
+            {isBusy ? (
+              <ActivityIndicator color={theme.backgroundElement} size="small" />
+            ) : (
+              <>
+                <Icon name={AdminIcons.check} color={theme.backgroundElement} size={15} />
+                <Text style={[styles.actionLabel, { color: theme.backgroundElement }]}>
+                  Phê duyệt
+                </Text>
+              </>
+            )}
           </Pressable>
         </View>
       ) : (
-        <View style={styles.resolvedRow}>
-          <View
-            style={[
-              styles.statusPill,
-              { backgroundColor: isApproved ? theme.primarySoft : dangerSoft },
-            ]}
-          >
-            <Text
-              style={[styles.statusLabel, { color: isApproved ? theme.primary : theme.danger }]}
+        <View style={styles.resolved}>
+          <View style={styles.resolvedRow}>
+            <View
+              style={[
+                styles.statusPill,
+                { backgroundColor: isApproved ? theme.primarySoft : dangerSoft },
+              ]}
             >
-              {isApproved ? 'Đã duyệt' : 'Đã từ chối'}
-            </Text>
+              <Text
+                style={[styles.statusLabel, { color: isApproved ? theme.primary : theme.danger }]}
+              >
+                {isApproved ? 'Đã duyệt' : 'Đã từ chối'}
+              </Text>
+            </View>
           </View>
-          <Pressable
-            accessibilityLabel={`Hoàn tác quyết định cho ${application.storeName}`}
-            accessibilityRole="button"
-            hitSlop={8}
-            onPress={onUndo}
-            style={({ pressed }) => pressed && styles.pressed}
-          >
-            <Text style={[styles.undoLabel, { color: theme.textSecondary }]}>Hoàn tác</Text>
-          </Pressable>
+          {rejectionReason ? (
+            <Text style={[styles.reason, { color: theme.textSecondary }]}>
+              Lý do: {rejectionReason}
+            </Text>
+          ) : null}
         </View>
       )}
     </View>
@@ -188,13 +208,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 9,
     paddingVertical: 3,
   },
-  tagLabel: { fontSize: 11, fontWeight: '800' },
+  tagLabel: { flexShrink: 1, fontSize: 11, fontWeight: '800' },
   info: { gap: 7 },
   infoRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   infoLabel: { flexShrink: 1, fontSize: 13, fontWeight: '500' },
+  licenseButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    borderWidth: 1,
+    borderRadius: 14,
+    paddingVertical: 11,
+  },
+  licenseLabel: { fontSize: 13, fontWeight: '800' },
   actions: { flexDirection: 'row', gap: 10 },
   actionButton: {
     flex: 1,
+    minHeight: 44,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -203,9 +234,10 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   actionLabel: { fontSize: 14, fontWeight: '800' },
+  resolved: { gap: 8 },
   resolvedRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   statusPill: { borderRadius: 999, paddingHorizontal: 12, paddingVertical: 5 },
   statusLabel: { fontSize: 12, fontWeight: '800' },
-  undoLabel: { fontSize: 13, fontWeight: '800' },
+  reason: { fontSize: 13, fontWeight: '500', lineHeight: 19 },
   pressed: { opacity: 0.8 },
 });
