@@ -28,6 +28,8 @@ type AssistantPanelProps = {
   anchor: PopoverAnchor | null;
   messages: ChatMessage[];
   isReplying: boolean;
+  /** false khi backend chưa có API trợ lý: ẩn ô nhập thay vì để người dùng gõ vào hư không. */
+  isAvailable: boolean;
   onSend: (text: string) => void;
   onReset: () => void;
   onClose: () => void;
@@ -37,6 +39,7 @@ export function AssistantPanel({
   anchor,
   messages,
   isReplying,
+  isAvailable,
   onSend,
   onReset,
   onClose,
@@ -47,7 +50,7 @@ export function AssistantPanel({
   const scrollRef = useRef<ScrollView>(null);
   const [draft, setDraft] = useState('');
 
-  const canSend = draft.trim().length > 0 && !isReplying;
+  const canSend = isAvailable && draft.trim().length > 0 && !isReplying;
 
   const handleSend = () => {
     if (!canSend) return;
@@ -154,39 +157,41 @@ export function AssistantPanel({
                 ) : null}
               </ScrollView>
 
-              <View style={[styles.inputRow, { borderTopColor: theme.border }]}>
-                <TextInput
-                  accessibilityLabel="Câu hỏi cho trợ lý"
-                  onChangeText={setDraft}
-                  onSubmitEditing={handleSend}
-                  placeholder="Hỏi về deal hoặc đơn hàng..."
-                  placeholderTextColor={theme.textSecondary}
-                  returnKeyType="send"
-                  style={[
-                    styles.input,
-                    {
-                      color: theme.text,
-                      backgroundColor: theme.background,
-                      borderColor: theme.border,
-                    },
-                  ]}
-                  value={draft}
-                />
-                <Pressable
-                  accessibilityLabel="Gửi câu hỏi"
-                  accessibilityRole="button"
-                  accessibilityState={{ disabled: !canSend }}
-                  disabled={!canSend}
-                  onPress={handleSend}
-                  style={[
-                    styles.send,
-                    { backgroundColor: theme.primary },
-                    !canSend && styles.disabled,
-                  ]}
-                >
-                  <Icon name={HomeIcons.send} color="#FFFFFF" size={18} />
-                </Pressable>
-              </View>
+              {isAvailable ? (
+                <View style={[styles.inputRow, { borderTopColor: theme.border }]}>
+                  <TextInput
+                    accessibilityLabel="Câu hỏi cho trợ lý"
+                    onChangeText={setDraft}
+                    onSubmitEditing={handleSend}
+                    placeholder="Hỏi về deal hoặc đơn hàng..."
+                    placeholderTextColor={theme.textSecondary}
+                    returnKeyType="send"
+                    style={[
+                      styles.input,
+                      {
+                        color: theme.text,
+                        backgroundColor: theme.background,
+                        borderColor: theme.border,
+                      },
+                    ]}
+                    value={draft}
+                  />
+                  <Pressable
+                    accessibilityLabel="Gửi câu hỏi"
+                    accessibilityRole="button"
+                    accessibilityState={{ disabled: !canSend }}
+                    disabled={!canSend}
+                    onPress={handleSend}
+                    style={[
+                      styles.send,
+                      { backgroundColor: theme.primary },
+                      !canSend && styles.disabled,
+                    ]}
+                  >
+                    <Icon name={HomeIcons.send} color="#FFFFFF" size={18} />
+                  </Pressable>
+                </View>
+              ) : null}
             </View>
 
             {/* Nút nổi hoá thành nút đóng, nằm đúng vị trí nút gốc bên dưới lớp Modal. */}

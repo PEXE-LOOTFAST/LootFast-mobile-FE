@@ -17,9 +17,7 @@ import { SearchPanel } from '@/features/home/components/search-panel';
 import { SectionHeader } from '@/features/home/components/section-header';
 import { useDeals } from '@/features/home/api/use-deals';
 import { DEAL_CATEGORIES } from '@/features/home/constants/deal-categories';
-import { MOCK_NOTIFICATIONS } from '@/features/home/data/mock-notifications';
 import { filterDeals, useDealFilters } from '@/features/home/hooks/use-deal-filters';
-import { useNotifications } from '@/features/home/hooks/use-notifications';
 import type { Deal } from '@/features/home/types';
 import { useAuthSession } from '@/hooks/use-auth-session';
 import { useTheme } from '@/hooks/use-theme';
@@ -39,7 +37,6 @@ export function HomeScreen() {
   });
   const deals = dealsQuery.data ?? [];
   const filteredDeals = filterDeals(deals, filters);
-  const { notifications, unreadCount, markAsRead } = useNotifications(MOCK_NOTIFICATIONS);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   // Header nền xanh đậm cần icon status bar màu sáng. Trả về 'auto' khi rời màn,
@@ -75,7 +72,7 @@ export function HomeScreen() {
           locationLabel={`Gần bạn · ${formatRadius(filters.radiusKm)}`}
           onPressNotifications={() => setIsNotificationsOpen(true)}
           onPressSignIn={withAuth()}
-          unreadCount={unreadCount}
+          unreadCount={0}
         />
 
         <View style={styles.body}>
@@ -140,9 +137,7 @@ export function HomeScreen() {
       <AssistantFab />
 
       <NotificationSheet
-        notifications={notifications}
         onClose={() => setIsNotificationsOpen(false)}
-        onPressItem={markAsRead}
         visible={isNotificationsOpen}
       />
     </View>

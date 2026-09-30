@@ -9,14 +9,18 @@ import { useTheme } from '@/hooks/use-theme';
 
 type NotificationSheetProps = {
   visible: boolean;
-  notifications: AppNotification[];
   onClose: () => void;
-  onPressItem: (id: string) => void;
+  /**
+   * Backend chưa có API thông báo nên nơi gọi hiện không truyền gì; sheet tự hiện trạng thái
+   * trống. Có API rồi thì truyền danh sách và hàm đánh dấu đã đọc vào.
+   */
+  notifications?: AppNotification[];
+  onPressItem?: (id: string) => void;
 };
 
 export function NotificationSheet({
   visible,
-  notifications,
+  notifications = [],
   onClose,
   onPressItem,
 }: NotificationSheetProps) {
@@ -64,12 +68,19 @@ export function NotificationSheet({
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false} style={styles.list}>
+            {notifications.length === 0 ? (
+              <Text style={[styles.empty, { color: theme.textSecondary }]}>
+                Backend chưa có API thông báo — mục này sẽ hiện thông báo thật khi endpoint sẵn
+                sàng.
+              </Text>
+            ) : null}
+
             {notifications.map((item, index) => (
               <Pressable
                 key={item.id}
                 accessibilityLabel={`${item.isRead ? '' : 'Chưa đọc. '}${item.title}. ${item.body}`}
                 accessibilityRole="button"
-                onPress={() => onPressItem(item.id)}
+                onPress={() => onPressItem?.(item.id)}
                 style={[
                   styles.item,
                   !item.isRead && { backgroundColor: theme.primarySoft },
@@ -97,6 +108,7 @@ export function NotificationSheet({
 }
 
 const styles = StyleSheet.create({
+  empty: { fontSize: 13, lineHeight: 20, padding: 20, textAlign: 'center' },
   overlay: { flex: 1, justifyContent: 'flex-end' },
   backdrop: { backgroundColor: 'rgba(10, 20, 14, 0.45)' },
   sheet: {

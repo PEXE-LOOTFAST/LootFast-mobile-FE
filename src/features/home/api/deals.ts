@@ -102,6 +102,7 @@ function toDeal(response: DealFeedItemResponse | DealDetailResponse): Deal {
         'rating' in response && response.rating?.averageRating != null
           ? response.rating.averageRating
           : 0,
+      reviewCount: 'rating' in response ? (response.rating?.reviewCount ?? 0) : 0,
       isVerified: response.merchant.verified,
       address: toAddress(response.merchant),
     },

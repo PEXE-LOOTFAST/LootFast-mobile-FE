@@ -26,7 +26,6 @@ import { DetailCard } from '@/features/home/components/detail-card';
 import { ReserveBar } from '@/features/home/components/reserve-bar';
 import { RatingColor } from '@/features/home/constants/colors';
 import { HomeIcons } from '@/features/home/constants/icons';
-import { getDealReviews } from '@/features/home/data/deal-reviews';
 import { useReservation } from '@/features/home/hooks/use-reservation';
 import type { Deal } from '@/features/home/types';
 import { useTheme } from '@/hooks/use-theme';
@@ -74,11 +73,7 @@ function DealDetail({ deal }: { deal: Deal }) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [barHeight, setBarHeight] = useState(0);
 
-  // Review đang dùng mock, chờ BE có API danh sách review; rating tổng vẫn lấy từ BE.
-  const reviews = getDealReviews(deal.id);
   const savings = deal.originalPrice - deal.price;
-  // Deal lấy từ API nên kho demo không trừ suất hộ; trừ tay cho tới khi có API đặt giữ.
-  const remaining = reservation.status === 'reserved' ? deal.remaining - 1 : deal.remaining;
 
   const handleShare = async () => {
     try {
@@ -125,7 +120,7 @@ function DealDetail({ deal }: { deal: Deal }) {
                     <Icon name={HomeIcons.star} color={RatingColor} size={14} />
                     <Text style={[styles.ratingText, { color: theme.textSecondary }]}>
                       {deal.store.rating > 0 ? deal.store.rating.toFixed(1) : 'Chưa có đánh giá'} (
-                      {reviews.length})
+                      {deal.store.reviewCount})
                     </Text>
                   </View>
                   <DealMeta icon={HomeIcons.distance} label={formatDistance(deal.distanceKm)} />
@@ -150,7 +145,7 @@ function DealDetail({ deal }: { deal: Deal }) {
 
             <View style={styles.stockRow}>
               <Text style={[styles.stock, { color: theme.textSecondary }]}>
-                Còn {remaining} phần
+                Còn {deal.remaining} phần
               </Text>
               {savings > 0 ? (
                 <View style={[styles.savings, { backgroundColor: theme.primarySoft }]}>
@@ -182,9 +177,15 @@ function DealDetail({ deal }: { deal: Deal }) {
             </View>
           </DetailCard>
 
-          <DealReviews reviews={reviews} />
+          <DealReviews />
         </View>
       </ScrollView>
+
+      {reservation.error ? (
+        <View style={styles.reserveError}>
+          <InlineAlert message={reservation.error} />
+        </View>
+      ) : null}
 
       <ReserveBar
         onLayout={(event) => setBarHeight(event.nativeEvent.layout.height)}
@@ -252,6 +253,7 @@ function DealDetailError({
 }
 
 const styles = StyleSheet.create({
+  reserveError: { paddingHorizontal: 16, paddingBottom: 8 },
   screen: { flex: 1 },
   content: { paddingBottom: 96 },
   cards: {

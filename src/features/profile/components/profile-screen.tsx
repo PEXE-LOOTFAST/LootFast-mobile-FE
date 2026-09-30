@@ -93,14 +93,14 @@ export function ProfileScreen() {
   const { user } = useAuthSession();
   const profileQuery = useProfile(Boolean(user));
   const profile = profileQuery.data;
-  const isDemo = !user;
-  const displayName = isDemo
-    ? 'test test'
-    : profile?.displayName || [profile?.firstName, profile?.lastName].filter(Boolean).join(' ');
-  const email = isDemo ? 'test@gmail.com' : (profile?.email ?? '');
-  const phoneNumber = isDemo ? '' : (profile?.phoneNumber ?? '');
+  const displayName =
+    profile?.displayName ||
+    [profile?.firstName, profile?.lastName].filter(Boolean).join(' ') ||
+    [user?.firstName, user?.lastName].filter(Boolean).join(' ');
+  const email = profile?.email ?? user?.email ?? '';
+  const phoneNumber = profile?.phoneNumber ?? '';
   const initials = getInitials(displayName || '');
-  const profileImage = isDemo ? null : profile?.avatarUrl;
+  const profileImage = profile?.avatarUrl ?? null;
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]} edges={['top']}>
@@ -130,9 +130,7 @@ export function ProfileScreen() {
             {profileImage ? (
               <Image contentFit="cover" source={{ uri: profileImage }} style={styles.avatarImage} />
             ) : (
-              <Text style={[styles.heroAvatarText, { color: theme.primary }]}>
-                {isDemo ? 'TT' : initials}
-              </Text>
+              <Text style={[styles.heroAvatarText, { color: theme.primary }]}>{initials}</Text>
             )}
             <View style={[styles.heroCamera, { backgroundColor: theme.backgroundElement }]}>
               <Icon name={ProfileIcons.camera} color={theme.primary} size={13} />
@@ -150,9 +148,7 @@ export function ProfileScreen() {
             {profileImage ? (
               <Image contentFit="cover" source={{ uri: profileImage }} style={styles.avatarImage} />
             ) : (
-              <Text style={[styles.avatarText, { color: theme.primary }]}>
-                {isDemo ? 'TT' : initials}
-              </Text>
+              <Text style={[styles.avatarText, { color: theme.primary }]}>{initials}</Text>
             )}
           </View>
           <View style={styles.accountCopy}>
@@ -162,11 +158,9 @@ export function ProfileScreen() {
               <>
                 <Text style={[styles.name, { color: theme.text }]}>{displayName}</Text>
                 <Text style={[styles.email, { color: theme.textSecondary }]}>{email}</Text>
-                {!isDemo ? (
-                  <Text style={[styles.phone, { color: theme.textSecondary }]}>
-                    {phoneNumber || 'Chưa cập nhật số điện thoại'}
-                  </Text>
-                ) : null}
+                <Text style={[styles.phone, { color: theme.textSecondary }]}>
+                  {phoneNumber || 'Chưa cập nhật số điện thoại'}
+                </Text>
               </>
             )}
           </View>

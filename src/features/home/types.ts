@@ -9,6 +9,8 @@ export type DealCategory = {
 export type Store = {
   name: string;
   rating: number;
+  /** Số lượt đánh giá backend đã tổng hợp; chỉ endpoint chi tiết deal trả về, feed thì bằng 0. */
+  reviewCount: number;
   isVerified: boolean;
   address: string;
 };
