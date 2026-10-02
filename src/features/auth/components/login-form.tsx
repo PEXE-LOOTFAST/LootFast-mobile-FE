@@ -5,8 +5,9 @@ import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { PasswordField } from '@/components/ui/password-field';
 import { TextField } from '@/components/ui/text-field';
-import { toAuthErrorMessage } from '@/features/auth/api/auth-error-messages';
+import { toAuthErrorMessage, toSocialErrorMessage } from '@/features/auth/api/auth-error-messages';
 import { useSignin } from '@/features/auth/api/use-signin';
+import { isGoogleLoginConfigured, useSocialLogin } from '@/features/auth/api/use-social-login';
 import { FormSection } from '@/features/auth/components/form-section';
 import { AuthIcons } from '@/features/auth/constants/icons';
 import type { LoginValues } from '@/features/auth/types';
@@ -23,6 +24,7 @@ type LoginFormProps = {
 export function LoginForm({ initialEmail = '', onSuccess, onForgotPassword }: LoginFormProps) {
   const theme = useTheme();
   const signin = useSignin(onSuccess);
+  const socialLogin = useSocialLogin(onSuccess);
   const { values, errors, isSubmitting, setField, submit } = useForm<LoginValues>({
     initialValues: { email: initialEmail, password: '' },
     validate: validateLogin,
@@ -83,6 +85,30 @@ export function LoginForm({ initialEmail = '', onSuccess, onForgotPassword }: Lo
       <BrandButton loading={isSubmitting} onPress={() => void submit()}>
         Đăng nhập
       </BrandButton>
+
+      <View style={styles.divider}>
+        <View style={[styles.dividerLine, { backgroundColor: theme.border }]} />
+        <Text style={[styles.dividerLabel, { color: theme.textSecondary }]}>hoặc</Text>
+        <View style={[styles.dividerLine, { backgroundColor: theme.border }]} />
+      </View>
+
+      {socialLogin.error ? <InlineAlert message={toSocialErrorMessage(socialLogin.error)} /> : null}
+
+      <BrandButton
+        disabled={isSubmitting}
+        loading={socialLogin.isPending}
+        onPress={() => socialLogin.mutate('GOOGLE')}
+        variant="outline"
+      >
+        Đăng nhập bằng Google
+      </BrandButton>
+
+      {/* Nói trước để người dùng không bấm rồi mới gặp lỗi khó hiểu. */}
+      {isGoogleLoginConfigured ? null : (
+        <Text style={[styles.socialNote, { color: theme.textSecondary }]}>
+          Bản dựng này chưa cấu hình OAuth client của Google nên nút trên chưa dùng được.
+        </Text>
+      )}
     </View>
   );
 }
@@ -91,4 +117,8 @@ const styles = StyleSheet.create({
   container: { gap: 20 },
   forgot: { alignSelf: 'flex-end', marginTop: -6 },
   forgotText: { fontSize: 13, fontWeight: '700' },
+  divider: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  dividerLine: { flex: 1, height: StyleSheet.hairlineWidth },
+  dividerLabel: { fontSize: 12, fontWeight: '600' },
+  socialNote: { fontSize: 12, lineHeight: 17, textAlign: 'center' },
 });
