@@ -21,6 +21,7 @@ export const HomeIcons = {
   clock: { ios: 'clock', android: 'schedule', web: 'schedule' },
   distance: { ios: 'location', android: 'near_me', web: 'near_me' },
   flame: { ios: 'flame.fill', android: 'local_fire_department', web: 'local_fire_department' },
+  phone: { ios: 'phone', android: 'call', web: 'call' },
   heart: { ios: 'heart', android: 'favorite', web: 'favorite' },
   share: { ios: 'square.and.arrow.up', android: 'share', web: 'share' },
   chat: { ios: 'bubble.left', android: 'chat_bubble', web: 'chat_bubble' },

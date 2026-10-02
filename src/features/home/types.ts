@@ -7,6 +7,8 @@ export type DealCategory = {
 };
 
 export type Store = {
+  /** publicId của người bán — dùng để mở hồ sơ quán và lưu quán yêu thích. */
+  merchantId: string;
   name: string;
   rating: number;
   /** Số lượt đánh giá backend đã tổng hợp; chỉ endpoint chi tiết deal trả về, feed thì bằng 0. */

@@ -91,12 +91,13 @@ function toCategoryId(categoryCode: string): Exclude<DealCategoryId, 'all'> {
   return aliases[normalized] ?? 'other';
 }
 
-function toDeal(response: DealFeedItemResponse | DealDetailResponse): Deal {
+export function toDeal(response: DealFeedItemResponse | DealDetailResponse): Deal {
   return {
     id: response.dealId,
     name: response.name,
     categoryId: toCategoryId(response.categoryCode),
     store: {
+      merchantId: response.merchant.merchantId,
       name: response.merchant.storeName,
       rating:
         'rating' in response && response.rating?.averageRating != null

@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon, type IconName } from '@/components/ui/icon';
 import { getProfileErrorMessage } from '@/features/profile/api/profile';
+import { useAvatarUpload } from '@/features/profile/api/use-avatar';
 import { useProfile } from '@/features/profile/api/use-profile';
 import { ProfileIcons } from '@/features/profile/constants/icons';
 import { useAuthSession } from '@/hooks/use-auth-session';
@@ -38,7 +39,7 @@ const ACCOUNT_ITEMS: ProfileItem[] = [
     href: '/merchant-application',
   },
   { icon: ProfileIcons.location, title: 'Bản đồ và địa chỉ', subtitle: '' },
-  { icon: ProfileIcons.favorites, title: 'Món yêu thích', subtitle: '' },
+  { icon: ProfileIcons.favorites, title: 'Món yêu thích', subtitle: '', href: '/favorites' },
   { icon: ProfileIcons.payment, title: 'Phương thức thanh toán', subtitle: '' },
   { icon: ProfileIcons.settings, title: 'Cài đặt', subtitle: '' },
   { icon: ProfileIcons.support, title: 'Hỗ trợ', subtitle: '' },
@@ -98,6 +99,7 @@ export function ProfileScreen() {
   const theme = useTheme();
   const { user } = useAuthSession();
   const profileQuery = useProfile(Boolean(user));
+  const avatar = useAvatarUpload();
   const profile = profileQuery.data;
   const displayName =
     profile?.displayName ||
@@ -170,14 +172,23 @@ export function ProfileScreen() {
               </>
             )}
           </View>
-          <View
-            style={[
+          <Pressable
+            accessibilityLabel="Đổi ảnh đại diện"
+            accessibilityRole="button"
+            disabled={!user || avatar.isUploading}
+            onPress={() => void avatar.pickAndUpload()}
+            style={({ pressed }) => [
               styles.camera,
               { backgroundColor: theme.backgroundElement, borderColor: theme.primary },
+              pressed && styles.pressed,
             ]}
           >
-            <Icon name={ProfileIcons.camera} color={theme.primary} size={15} />
-          </View>
+            {avatar.isUploading ? (
+              <ActivityIndicator color={theme.primary} size="small" />
+            ) : (
+              <Icon name={ProfileIcons.camera} color={theme.primary} size={15} />
+            )}
+          </Pressable>
         </View>
         {profileQuery.isError ? (
           <View

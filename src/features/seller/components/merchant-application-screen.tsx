@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
+import { EmptyCard } from '@/components/ui/empty-card';
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { TextField } from '@/components/ui/text-field';
@@ -78,6 +79,14 @@ export function MerchantApplicationScreen() {
       subtitle="Gửi giấy phép kinh doanh để mở khu người bán"
       title="Đăng ký bán hàng"
     >
+      {/* Khách chưa đăng nhập thì không hỏi API, và màn cũng không có gì để hiện. */}
+      {!user ? (
+        <EmptyCard
+          description="Đăng nhập bằng tài khoản người mua rồi quay lại đây để gửi hồ sơ."
+          title="Cần đăng nhập"
+        />
+      ) : null}
+
       {applicationQuery.isLoading ? <ActivityIndicator /> : null}
 
       {applicationQuery.error && !notFound ? (

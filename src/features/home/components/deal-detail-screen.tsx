@@ -18,6 +18,9 @@ import { InlineAlert } from '@/components/ui/inline-alert';
 import { MaxContentWidth } from '@/constants/theme';
 import { getDealErrorMessage } from '@/features/home/api/deals';
 import { useDeal } from '@/features/home/api/use-deals';
+import { useFavorites, useToggleFavoriteDeal } from '@/features/profile/api/use-favorites';
+import { useAuthSession } from '@/hooks/use-auth-session';
+import { requireAuth } from '@/lib/auth-session';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { DealDetailHero } from '@/features/home/components/deal-detail-hero';
 import { DealMeta } from '@/features/home/components/deal-meta';
@@ -70,8 +73,15 @@ export function DealDetailScreen() {
 function DealDetail({ deal }: { deal: Deal }) {
   const theme = useTheme();
   const reservation = useReservation(deal.id);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const { user } = useAuthSession();
   const [barHeight, setBarHeight] = useState(0);
+
+  // Danh sách yêu thích là nguồn sự thật cho nút trái tim: lưu ở màn khác thì vào đây vẫn đúng.
+  const favoritesQuery = useFavorites(Boolean(user));
+  const toggleFavorite = useToggleFavoriteDeal();
+  const isFavorite = (favoritesQuery.data?.items ?? []).some(
+    (item) => item.type === 'DEAL' && item.deal?.dealId === deal.id,
+  );
 
   const savings = deal.originalPrice - deal.price;
 
@@ -93,7 +103,9 @@ function DealDetail({ deal }: { deal: Deal }) {
           isFavorite={isFavorite}
           onBack={goBack}
           onShare={handleShare}
-          onToggleFavorite={() => setIsFavorite((current) => !current)}
+          onToggleFavorite={() =>
+            requireAuth(() => toggleFavorite.mutate({ dealId: deal.id, isSaved: isFavorite }))
+          }
         />
 
         <View style={styles.cards}>
@@ -102,7 +114,17 @@ function DealDetail({ deal }: { deal: Deal }) {
               {deal.name}
             </Text>
 
-            <View style={styles.storeRow}>
+            <Pressable
+              accessibilityHint="Mở hồ sơ cửa hàng"
+              accessibilityRole="button"
+              onPress={() =>
+                router.navigate({
+                  pathname: '/store/[id]',
+                  params: { id: deal.store.merchantId },
+                })
+              }
+              style={styles.storeRow}
+            >
               <View style={[styles.storeIcon, { backgroundColor: theme.primarySoft }]}>
                 <Icon name={HomeIcons.store} color={theme.primary} size={18} />
               </View>
@@ -130,7 +152,7 @@ function DealDetail({ deal }: { deal: Deal }) {
                   />
                 </View>
               </View>
-            </View>
+            </Pressable>
 
             <View style={[styles.divider, { backgroundColor: theme.border }]} />
 
@@ -190,7 +212,14 @@ function DealDetail({ deal }: { deal: Deal }) {
       <ReserveBar
         onLayout={(event) => setBarHeight(event.nativeEvent.layout.height)}
         onReserve={reservation.reserve}
-        onViewOrder={() => router.navigate('/orders')}
+        onViewOrder={() =>
+          reservation.order
+            ? router.navigate({
+                pathname: '/order/[id]',
+                params: { id: reservation.order.orderId },
+              })
+            : router.navigate('/orders')
+        }
         status={reservation.status}
         total={deal.price}
       />
