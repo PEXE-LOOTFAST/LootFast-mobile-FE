@@ -31,6 +31,12 @@ const BENEFITS: ProfileItem[] = [
 
 const ACCOUNT_ITEMS: ProfileItem[] = [
   { icon: ProfileIcons.orders, title: 'Đơn hàng của tôi', subtitle: '', href: '/orders' },
+  {
+    icon: ProfileIcons.seller,
+    title: 'Đăng ký bán hàng',
+    subtitle: 'Gửi giấy phép kinh doanh để mở khu người bán',
+    href: '/merchant-application',
+  },
   { icon: ProfileIcons.location, title: 'Bản đồ và địa chỉ', subtitle: '' },
   { icon: ProfileIcons.favorites, title: 'Món yêu thích', subtitle: '' },
   { icon: ProfileIcons.payment, title: 'Phương thức thanh toán', subtitle: '' },

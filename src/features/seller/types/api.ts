@@ -53,8 +53,10 @@ export type UpdateOpeningHoursPayload = {
   slots: OpeningHourSlotDto[];
 };
 
+/** Khớp MerchantImageResponse của backend. */
 export type MerchantImageDto = {
-  imageUrl: string;
+  imageType: 'LOGO' | 'COVER';
+  url: string;
 };
 
 export type CurrentUserDto = {

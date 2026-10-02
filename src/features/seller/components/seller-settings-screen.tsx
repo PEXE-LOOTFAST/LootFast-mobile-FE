@@ -16,6 +16,12 @@ const SETTINGS_ITEMS: SellerMenuItem[] = [
     onPress: () => router.navigate('/seller/owner-info'),
   },
   {
+    key: 'bank-account',
+    icon: SellerIcons.wallet,
+    title: 'Tài khoản nhận tiền',
+    onPress: () => router.navigate('/seller/bank-account'),
+  },
+  {
     key: 'password',
     icon: SellerIcons.lock,
     title: 'Mật khẩu',

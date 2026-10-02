@@ -86,6 +86,86 @@ async function send(path: string, options: RequestOptions, accessToken: string |
   });
 }
 
+export type UploadFile = {
+  /** URI local do expo-image-picker trả về. */
+  uri: string;
+  /** Tên file gửi lên; để trống thì suy ra từ URI. */
+  name?: string;
+};
+
+type UploadOptions = {
+  method?: 'POST' | 'PUT';
+  /** Các phần dạng chữ đi kèm file (vd. businessLicenseNumber). */
+  fields?: Record<string, string>;
+  files: Record<string, UploadFile>;
+};
+
+function toFilePart(key: string, file: UploadFile) {
+  const name = file.name ?? file.uri.split('/').pop() ?? `${key}.jpg`;
+  const extension = /\.(\w+)$/.exec(name)?.[1]?.toLowerCase();
+
+  return { uri: file.uri, name, type: extension ? `image/${extension}` : 'image/jpeg' };
+}
+
+/**
+ * Gửi multipart/form-data. Tách khỏi `apiRequest` vì FormData phải tự đặt boundary — khai báo
+ * Content-Type bằng tay sẽ làm backend không tách được các phần.
+ *
+ * Dùng chung một đường xử lý lỗi với `apiRequest`, kể cả bước làm mới token khi gặp 401, để
+ * ảnh upload giữa chừng phiên hết hạn vẫn đi tiếp thay vì hỏng im lặng.
+ */
+export async function apiUpload<T>(path: string, options: UploadOptions): Promise<T> {
+  if (!BASE_URL) {
+    throw new Error(
+      'Thiếu EXPO_PUBLIC_API_URL. Copy .env.example thành .env rồi chạy lại: npx expo start --clear',
+    );
+  }
+
+  const { method = 'POST', fields = {}, files } = options;
+
+  const buildBody = () => {
+    const form = new FormData();
+    for (const [key, value] of Object.entries(fields)) form.append(key, value);
+    for (const [key, file] of Object.entries(files)) {
+      // React Native nhận object {uri,name,type} làm phần file; kiểu DOM không mô tả được.
+      form.append(key, toFilePart(key, file) as unknown as Blob);
+    }
+
+    return form;
+  };
+
+  const sendForm = async (accessToken: string | null) =>
+    fetch(`${BASE_URL}${path}`, {
+      method,
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
+      body: buildBody(),
+    });
+
+  const accessToken = await tokenStorage.getAccessToken();
+  let response = await sendForm(accessToken);
+
+  if (response.status === 401 && accessToken) {
+    const refreshed = await refreshSession();
+    if (refreshed) {
+      response = await sendForm(await tokenStorage.getAccessToken());
+    } else {
+      await tokenStorage.clear();
+      onSessionExpired?.();
+    }
+  }
+
+  const payload = (await response.json()) as ApiResponse<T>;
+  if (!payload.success) {
+    throw new ApiException(
+      payload.error?.code ?? 'UNKNOWN_ERROR',
+      payload.error?.message ?? 'Đã có lỗi xảy ra',
+      response.status,
+    );
+  }
+
+  return payload.data as T;
+}
+
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
   if (!BASE_URL) {
     throw new Error(

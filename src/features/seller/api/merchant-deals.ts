@@ -1,4 +1,4 @@
-import { ApiException, apiRequest } from '@/lib/api-client';
+import { ApiException, apiRequest, apiUpload } from '@/lib/api-client';
 import type { PagedResponse } from '@/types/api';
 
 export type DealStatusDto = 'DRAFT' | 'ACTIVE' | 'HIDDEN' | 'SOLD_OUT' | 'REMOVED';
@@ -77,6 +77,29 @@ export function updateMerchantDealQuantity(
   });
 }
 
+/** Backend giới hạn 5 ảnh mỗi deal (ReorderDealImagesRequest @Size(max = 5)). */
+export const MAX_DEAL_IMAGES = 5;
+
+export function uploadDealImage(dealId: string, imageUri: string) {
+  return apiUpload<MerchantDealDto>(`${BASE_PATH}/${dealId}/images`, {
+    files: { file: { uri: imageUri } },
+  });
+}
+
+export function removeDealImage(dealId: string, imageId: string) {
+  return apiRequest<MerchantDealDto>(`${BASE_PATH}/${dealId}/images/${imageId}`, {
+    method: 'DELETE',
+  });
+}
+
+/** Thứ tự truyền vào quyết định ảnh chính: phần tử đầu tiên trở thành ảnh đại diện của deal. */
+export function reorderDealImages(dealId: string, imageIds: string[]) {
+  return apiRequest<MerchantDealDto>(`${BASE_PATH}/${dealId}/images/order`, {
+    method: 'PUT',
+    body: { imageIds },
+  });
+}
+
 // Backend trả message tiếng Anh, chỉ error.code là enum ổn định — map sang tiếng Việt ở đây.
 const MESSAGES: Record<string, string> = {
   UNAUTHORIZED: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
@@ -94,6 +117,11 @@ const MESSAGES: Record<string, string> = {
   DEAL_QUANTITY_CONFLICT: 'Số lượng mới nhỏ hơn số suất khách đã đặt.',
   DEAL_VERSION_CONFLICT: 'Deal vừa được cập nhật ở nơi khác. Tải lại rồi thử lại.',
   VALIDATION_FAILED: 'Thông tin deal không hợp lệ. Kiểm tra lại các ô đã nhập.',
+  DEAL_IMAGE_NOT_FOUND: 'Ảnh không còn tồn tại. Tải lại danh sách ảnh.',
+  DEAL_IMAGE_LIMIT_REACHED: `Mỗi deal chỉ đăng được tối đa ${MAX_DEAL_IMAGES} ảnh.`,
+  INVALID_DEAL_IMAGE: 'Ảnh không hợp lệ. Chỉ nhận JPEG hoặc PNG.',
+  DEAL_IMAGE_TOO_LARGE: 'Ảnh vượt quá dung lượng cho phép. Chọn ảnh nhỏ hơn.',
+  DEAL_IMAGE_UPLOAD_FAILED: 'Không tải được ảnh lên. Vui lòng thử lại.',
 };
 
 export function toMerchantDealErrorMessage(error: unknown): string {

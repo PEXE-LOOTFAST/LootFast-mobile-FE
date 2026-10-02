@@ -4,16 +4,27 @@ import { Alert } from 'react-native';
 
 import { merchantApi } from '@/features/seller/api/merchant-api';
 import { MERCHANT_QUERY_KEYS } from '@/features/seller/hooks/use-merchant-shop';
+import { ApiException } from '@/lib/api-client';
 import { queryClient } from '@/lib/query-client';
 
-function mapUploadError(code: string): string {
+// Tên mã khớp đúng ErrorCode của backend; bảng cũ dùng những mã không tồn tại nên mọi lỗi
+// đều rơi vào câu mặc định.
+function mapUploadError(error: unknown): string {
+  if (!(error instanceof ApiException)) {
+    return 'Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.';
+  }
+
   const messages: Record<string, string> = {
-    FILE_TOO_LARGE: 'Ảnh vượt quá 5 MB. Vui lòng chọn ảnh nhỏ hơn.',
-    UPLOAD_RATE_LIMIT_EXCEEDED: 'Đổi ảnh quá nhiều lần. Thử lại sau 1 giờ.',
-    SERVICE_UNAVAILABLE: 'Dịch vụ tạm thời bảo trì. Thử lại sau.',
-    UPLOAD_FAILED: 'Không thể upload ảnh. Vui lòng thử lại.',
+    INVALID_MERCHANT_IMAGE: 'Ảnh không hợp lệ. Chỉ nhận JPEG hoặc PNG.',
+    MERCHANT_IMAGE_TOO_LARGE: 'Ảnh vượt quá 5 MB. Vui lòng chọn ảnh nhỏ hơn.',
+    MERCHANT_IMAGE_RATE_LIMITED: 'Đổi ảnh quá nhiều lần. Thử lại sau ít phút.',
+    MERCHANT_IMAGE_RATE_LIMIT_UNAVAILABLE: 'Dịch vụ tạm thời bảo trì. Thử lại sau.',
+    MERCHANT_IMAGE_UPLOAD_FAILED: 'Không tải được ảnh lên. Vui lòng thử lại.',
+    MERCHANT_PROFILE_NOT_FOUND: 'Chưa có hồ sơ quán để gắn ảnh.',
+    ACCESS_DENIED: 'Tài khoản chưa được cấp quyền Người bán.',
   };
-  return messages[code] ?? 'Đã có lỗi xảy ra. Vui lòng thử lại.';
+
+  return messages[error.code] ?? 'Đã có lỗi xảy ra. Vui lòng thử lại.';
 }
 
 export function useMerchantImageUpload() {
@@ -42,9 +53,8 @@ export function useMerchantImageUpload() {
     try {
       await merchantApi.uploadImage(type, result.assets[0].uri);
       await queryClient.invalidateQueries({ queryKey: MERCHANT_QUERY_KEYS.profile });
-    } catch (err) {
-      const code = err instanceof Error ? err.message : 'UPLOAD_FAILED';
-      Alert.alert('Upload thất bại', mapUploadError(code));
+    } catch (error) {
+      Alert.alert('Upload thất bại', mapUploadError(error));
     } finally {
       setIsUploading(false);
     }

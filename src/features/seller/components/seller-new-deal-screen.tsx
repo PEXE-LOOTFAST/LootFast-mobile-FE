@@ -1,15 +1,12 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { TextField } from '@/components/ui/text-field';
 import { toMerchantDealErrorMessage } from '@/features/seller/api/merchant-deals';
-import {
-  useCreateMerchantDeal,
-  usePublishMerchantDeal,
-} from '@/features/seller/api/use-merchant-deals';
+import { useCreateMerchantDeal } from '@/features/seller/api/use-merchant-deals';
 import { SellerFormCard } from '@/features/seller/components/seller-form-card';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import { useMerchantShop } from '@/features/seller/hooks/use-merchant-shop';
@@ -48,7 +45,6 @@ export function SellerNewDealScreen() {
   const theme = useTheme();
   const { profile } = useMerchantShop();
   const createDeal = useCreateMerchantDeal();
-  const publishDeal = usePublishMerchantDeal();
   const [formError, setFormError] = useState<string | null>(null);
 
   const { values, errors, isSubmitting, setField, submit } = useForm<NewDealValues>({
@@ -89,20 +85,9 @@ export function SellerNewDealScreen() {
           pickupEndsAt: pickupEnd.toISOString(),
         });
 
-        // Deal tạo ra ở trạng thái nháp; backend chỉ cho đăng khi đã có ít nhất một ảnh, mà
-        // app chưa có bước chọn ảnh cho deal. Vẫn thử đăng để deal nào đủ điều kiện thì lên
-        // sàn luôn, không đủ thì báo rõ là đã lưu nháp.
-        try {
-          await publishDeal.mutateAsync(deal.dealId);
-          router.navigate('/seller/orders');
-          Alert.alert('Đã đăng deal', `"${deal.name}" đã lên sàn, khách đặt giữ được ngay.`);
-        } catch (publishError) {
-          router.navigate('/seller/orders');
-          Alert.alert(
-            'Đã lưu bản nháp',
-            `"${deal.name}" chưa lên sàn: ${toMerchantDealErrorMessage(publishError)}`,
-          );
-        }
+        // Deal tạo ra ở trạng thái nháp và backend chỉ cho đăng khi đã có ít nhất một ảnh,
+        // nên đi thẳng sang màn thêm ảnh — đăng lên sàn là bước cuối ở đó.
+        router.navigate({ pathname: '/seller/deal-images', params: { dealId: deal.dealId } });
       } catch (error) {
         setFormError(toMerchantDealErrorMessage(error));
       }
@@ -205,7 +190,7 @@ export function SellerNewDealScreen() {
       </Text>
 
       <BrandButton loading={isSubmitting} onPress={() => void submit()}>
-        Đăng deal
+        Lưu và thêm ảnh
       </BrandButton>
     </SellerPageScaffold>
   );

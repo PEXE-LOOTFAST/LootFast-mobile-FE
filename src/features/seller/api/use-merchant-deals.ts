@@ -4,7 +4,10 @@ import {
   createMerchantDeal,
   listMerchantDeals,
   publishMerchantDeal,
+  removeDealImage,
+  reorderDealImages,
   updateMerchantDealQuantity,
+  uploadDealImage,
   type CreateMerchantDealPayload,
   type MerchantDealDto,
 } from '@/features/seller/api/merchant-deals';
@@ -76,6 +79,34 @@ export function useCreateMerchantDeal() {
 
 export function usePublishMerchantDeal() {
   return useDealMutation((dealId: string) => publishMerchantDeal(dealId));
+}
+
+export function useUploadDealImage() {
+  return useDealMutation(({ dealId, imageUri }: { dealId: string; imageUri: string }) =>
+    uploadDealImage(dealId, imageUri),
+  );
+}
+
+export function useRemoveDealImage() {
+  return useDealMutation(({ dealId, imageId }: { dealId: string; imageId: string }) =>
+    removeDealImage(dealId, imageId),
+  );
+}
+
+export function useReorderDealImages() {
+  return useDealMutation(({ dealId, imageIds }: { dealId: string; imageIds: string[] }) =>
+    reorderDealImages(dealId, imageIds),
+  );
+}
+
+/** Một deal cụ thể của quán, dùng ở màn quản lý ảnh. */
+export function useMerchantDeal(dealId: string | undefined) {
+  const dealsQuery = useMerchantDeals();
+
+  return {
+    ...dealsQuery,
+    deal: dealsQuery.data?.items.find((item) => item.dealId === dealId),
+  };
 }
 
 export function useUpdateDealQuantity() {
