@@ -20,7 +20,6 @@ export const SellerIcons = {
   check: { ios: 'checkmark', android: 'check', web: 'check' },
   store: { ios: 'storefront', android: 'storefront', web: 'storefront' },
   camera: { ios: 'camera', android: 'photo_camera', web: 'photo_camera' },
-  wallet: { ios: 'wallet.pass', android: 'account_balance_wallet', web: 'account_balance_wallet' },
   report: { ios: 'chart.bar', android: 'bar_chart', web: 'bar_chart' },
   megaphone: { ios: 'megaphone', android: 'campaign', web: 'campaign' },
   settings: { ios: 'slider.horizontal.3', android: 'tune', web: 'tune' },
