@@ -5,6 +5,7 @@ import type { IconMap } from '@/components/ui/icon';
 export const AdminTabIcons = {
   index: { ios: 'checkmark.shield', android: 'verified_user', web: 'verified_user' },
   overview: { ios: 'chart.bar', android: 'bar_chart', web: 'bar_chart' },
+  moderation: { ios: 'flag', android: 'flag', web: 'flag' },
   manage: { ios: 'person.2', android: 'group', web: 'group' },
   settings: { ios: 'gearshape', android: 'settings', web: 'settings' },
 } satisfies IconMap;

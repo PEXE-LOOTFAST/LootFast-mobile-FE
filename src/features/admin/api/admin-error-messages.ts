@@ -13,6 +13,14 @@ const REVIEW_MESSAGES: Record<string, string> = {
   RESOURCE_BUSY: 'Hồ sơ đang được xử lý. Thử lại sau giây lát.',
 };
 
+const DEAL_IMAGE_MESSAGES: Record<string, string> = {
+  UNAUTHORIZED: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
+  ACCESS_DENIED: 'Tài khoản này không có quyền gỡ ảnh deal.',
+  DEAL_IMAGE_NOT_FOUND: 'Không tìm thấy ảnh với mã này. Kiểm tra lại mã ảnh.',
+  DEAL_IMAGE_REQUIRED: 'Không gỡ được ảnh cuối cùng của deal đang hiển thị.',
+  VALIDATION_FAILED: 'Lý do gỡ ảnh không hợp lệ (tối đa 500 ký tự).',
+};
+
 const SIGNIN_MESSAGES: Record<string, string> = {
   VALIDATION_FAILED: 'Email hoặc mật khẩu không đúng định dạng.',
   INVALID_CREDENTIALS: 'Email hoặc mật khẩu không đúng.',
@@ -33,6 +41,11 @@ function toMessage(error: unknown, messages: Record<string, string>, fallback: s
 /** Lỗi khi duyệt / từ chối / xem giấy phép của một hồ sơ. */
 export function toAdminErrorMessage(error: unknown): string {
   return toMessage(error, REVIEW_MESSAGES, 'Thao tác không thành công. Vui lòng thử lại.');
+}
+
+/** Lỗi khi gỡ ảnh deal vi phạm. */
+export function toDealImageErrorMessage(error: unknown): string {
+  return toMessage(error, DEAL_IMAGE_MESSAGES, 'Gỡ ảnh không thành công. Vui lòng thử lại.');
 }
 
 /** Lỗi khi đăng nhập ở cổng quản trị. */

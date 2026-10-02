@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
@@ -5,11 +6,14 @@ import { Alert, StyleSheet, Text, View } from 'react-native';
 import { BrandButton } from '@/components/ui/brand-button';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { TextField } from '@/components/ui/text-field';
-import { toMerchantDealErrorMessage } from '@/features/seller/api/merchant-deals';
 import {
-  useCreateMerchantDeal,
-  usePublishMerchantDeal,
-} from '@/features/seller/api/use-merchant-deals';
+  createMerchantDeal,
+  publishMerchantDeal,
+  toMerchantDealErrorMessage,
+  uploadDealImage,
+} from '@/features/seller/api/merchant-deals';
+import { MERCHANT_DEALS_QUERY_KEY } from '@/features/seller/api/use-merchant-deals';
+import { DealImagePicker } from '@/features/seller/components/deal-image-picker';
 import { SellerFormCard } from '@/features/seller/components/seller-form-card';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import { useMerchantShop } from '@/features/seller/hooks/use-merchant-shop';
@@ -47,9 +51,11 @@ function toTodayAt(value: string) {
 export function SellerNewDealScreen() {
   const theme = useTheme();
   const { profile } = useMerchantShop();
-  const createDeal = useCreateMerchantDeal();
-  const publishDeal = usePublishMerchantDeal();
+  const queryClient = useQueryClient();
   const [formError, setFormError] = useState<string | null>(null);
+  const [imageUris, setImageUris] = useState<string[]>([]);
+  /** Nhãn tiến trình hiện trên nút trong lúc chạy chuỗi ba bước. */
+  const [progress, setProgress] = useState<string | null>(null);
 
   const { values, errors, isSubmitting, setField, submit } = useForm<NewDealValues>({
     initialValues: INITIAL_VALUES,
@@ -74,8 +80,18 @@ export function SellerNewDealScreen() {
         return;
       }
 
+      if (imageUris.length === 0) {
+        setFormError('Deal cần ít nhất một ảnh món mới lên sàn được.');
+        return;
+      }
+
+      // Backend không nhận deal kèm ảnh trong một request: tạo deal phải là JSON, còn endpoint
+      // ảnh cần dealId trong URL. Vì vậy chạy tuần tự ba bước và báo tiến trình cho người bán.
+      let dealId: string | undefined;
+
       try {
-        const deal = await createDeal.mutateAsync({
+        setProgress('Đang tạo deal…');
+        const deal = await createMerchantDeal({
           name: next.name.trim(),
           categoryCode,
           originalPrice: toNumber(next.originalPrice),
@@ -88,23 +104,38 @@ export function SellerNewDealScreen() {
           pickupStartsAt: pickupStart.toISOString(),
           pickupEndsAt: pickupEnd.toISOString(),
         });
+        dealId = deal.dealId;
 
-        // Deal tạo ra ở trạng thái nháp; backend chỉ cho đăng khi đã có ít nhất một ảnh, mà
-        // app chưa có bước chọn ảnh cho deal. Vẫn thử đăng để deal nào đủ điều kiện thì lên
-        // sàn luôn, không đủ thì báo rõ là đã lưu nháp.
-        try {
-          await publishDeal.mutateAsync(deal.dealId);
-          router.navigate('/seller/orders');
-          Alert.alert('Đã đăng deal', `"${deal.name}" đã lên sàn, khách đặt giữ được ngay.`);
-        } catch (publishError) {
-          router.navigate('/seller/orders');
-          Alert.alert(
-            'Đã lưu bản nháp',
-            `"${deal.name}" chưa lên sàn: ${toMerchantDealErrorMessage(publishError)}`,
-          );
+        // Tải lần lượt chứ không song song: backend gán thứ tự ảnh theo thứ tự nhận được, mà
+        // ảnh đầu tiên chính là ảnh đại diện của deal.
+        for (const [index, uri] of imageUris.entries()) {
+          setProgress(`Đang tải ảnh ${index + 1}/${imageUris.length}…`);
+          await uploadDealImage(dealId, uri);
         }
+
+        setProgress('Đang đăng deal…');
+        await publishMerchantDeal(dealId);
+
+        await queryClient.invalidateQueries({ queryKey: MERCHANT_DEALS_QUERY_KEY });
+        await queryClient.invalidateQueries({ queryKey: ['deals'] });
+
+        router.navigate('/seller/orders');
+        Alert.alert('Đã đăng deal', `"${deal.name}" đã lên sàn, khách đặt giữ được ngay.`);
       } catch (error) {
-        setFormError(toMerchantDealErrorMessage(error));
+        const message = toMerchantDealErrorMessage(error);
+
+        // Deal đã tạo mà hỏng ở bước ảnh hoặc bước đăng: bản nháp vẫn nằm trên server, nên đưa
+        // người bán sang màn ảnh của chính bản nháp đó để làm tiếp thay vì nhập lại từ đầu.
+        if (dealId) {
+          await queryClient.invalidateQueries({ queryKey: MERCHANT_DEALS_QUERY_KEY });
+          router.navigate({ pathname: '/seller/deal-images', params: { dealId } });
+          Alert.alert('Deal đã lưu ở dạng nháp', `${message} Thêm ảnh rồi đăng lại tại đây nhé.`);
+          return;
+        }
+
+        setFormError(message);
+      } finally {
+        setProgress(null);
       }
     },
   });
@@ -195,13 +226,15 @@ export function SellerNewDealScreen() {
             />
           </View>
         </View>
+
+        <DealImagePicker disabled={isSubmitting} onChange={setImageUris} uris={imageUris} />
       </SellerFormCard>
 
       {formError ? <InlineAlert message={formError} /> : null}
 
       <Text style={[styles.note, { color: theme.textSecondary }]}>
-        Deal chỉ lên sàn khi đã có ảnh món. App chưa có bước thêm ảnh cho deal, nên deal có thể được
-        lưu ở dạng bản nháp.
+        {progress ??
+          'Quán đăng được tối đa 10 ảnh mỗi giờ, tính chung cả logo và ảnh bìa, nên chọn vừa đủ ảnh cho mỗi deal.'}
       </Text>
 
       <BrandButton loading={isSubmitting} onPress={() => void submit()}>

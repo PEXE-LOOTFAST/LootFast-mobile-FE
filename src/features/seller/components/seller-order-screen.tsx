@@ -1,4 +1,4 @@
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { setStatusBarStyle } from 'expo-status-bar';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, View } from 'react-native';
@@ -79,7 +79,7 @@ export function SellerOrderScreen() {
             deal={deal}
             onChangePortionsLeft={(value) => changePortionsLeft(deal.id, value)}
             onPressDetail={() =>
-              Alert.alert('Chi tiết deal', `Màn chi tiết "${deal.name}" sẽ sớm có.`)
+              router.navigate({ pathname: '/seller/deal-images', params: { dealId: deal.id } })
             }
             onPressPause={() =>
               Alert.alert('Tạm dừng deal', 'Backend chưa có API ẩn hoặc tạm dừng deal.')

@@ -66,3 +66,5 @@ AGENTS.md
 
 expo-env.d.ts
 # @end expo-cli
+# Ảnh mẫu cho scripts/seed-deals.mjs — chỉ dùng ở máy, không đưa vào repo.
+scripts/seed-images/

@@ -27,7 +27,8 @@ export type MerchantApplicationDto = {
 export type MerchantApplicationStatusDto =
   'UPLOADING' | 'PENDING' | 'APPROVED' | 'REJECTED' | 'UPLOAD_FAILED';
 
-export type ReviewableApplicationStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+/** Các trạng thái màn Duyệt quán hỏi tới. UPLOADING chỉ kéo dài vài giây nên không có tab riêng. */
+export type ListedApplicationStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'UPLOAD_FAILED';
 
 export type LicenseDownloadDto = {
   url: string;
@@ -36,7 +37,7 @@ export type LicenseDownloadDto = {
 };
 
 export type MerchantApplicationQuery = {
-  status: ReviewableApplicationStatus;
+  status: ListedApplicationStatus;
   page?: number;
   size?: number;
 };

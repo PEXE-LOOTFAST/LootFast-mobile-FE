@@ -4,9 +4,12 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { AuthTabs } from '@/features/auth/components/auth-tabs';
+import { ForgotPasswordForm } from '@/features/auth/components/forgot-password-form';
 import { LoginForm } from '@/features/auth/components/login-form';
+import { OtpForm } from '@/features/auth/components/otp-form';
 import { RegisterForm } from '@/features/auth/components/register-form';
-import type { AuthTab, RegisterValues } from '@/features/auth/types';
+import { ResetPasswordForm } from '@/features/auth/components/reset-password-form';
+import type { AuthStep, AuthTab } from '@/features/auth/types';
 import { useTheme } from '@/hooks/use-theme';
 import { dismissAuthPrompt } from '@/lib/auth-session';
 
@@ -15,14 +18,26 @@ type AuthPanelProps = {
   onAuthenticated?: () => void;
 };
 
+/**
+ * Khung đăng nhập/đăng ký, gồm bốn bước:
+ *
+ * - `form` — hai tab Đăng nhập và Đăng ký
+ * - `verify-otp` — sau khi đăng ký, bắt buộc vì `signin` chặn tài khoản chưa xác thực
+ * - `forgot-password` → `reset-password` — nhánh quên mật khẩu
+ *
+ * Email đi xuyên các bước nên giữ ở đây thay vì trong từng form con.
+ */
 export function AuthPanel({ onAuthenticated }: AuthPanelProps) {
   const theme = useTheme();
   const [tab, setTab] = useState<AuthTab>('login');
-  const [registeredEmail, setRegisteredEmail] = useState<string>();
+  const [step, setStep] = useState<AuthStep>('form');
+  const [pendingEmail, setPendingEmail] = useState('');
+  const [notice, setNotice] = useState<string>();
 
-  const handleRegistered = ({ email }: RegisterValues) => {
-    setRegisteredEmail(email.trim());
+  const goToLogin = (message?: string) => {
+    setStep('form');
     setTab('login');
+    setNotice(message);
   };
 
   // Đóng modal trước khi rời đi, nếu không nó vẫn nằm đè lên màn đăng nhập quản trị.
@@ -32,6 +47,45 @@ export function AuthPanel({ onAuthenticated }: AuthPanelProps) {
     router.navigate('/admin-login');
   };
 
+  if (step === 'verify-otp') {
+    return (
+      <View style={styles.body}>
+        <OtpForm
+          email={pendingEmail}
+          onBack={() => goToLogin()}
+          onVerified={() => goToLogin('Xác thực thành công. Đăng nhập để bắt đầu săn deal nhé!')}
+        />
+      </View>
+    );
+  }
+
+  if (step === 'forgot-password') {
+    return (
+      <View style={styles.body}>
+        <ForgotPasswordForm
+          initialEmail={pendingEmail}
+          onBack={() => goToLogin()}
+          onSent={(email) => {
+            setPendingEmail(email);
+            setStep('reset-password');
+          }}
+        />
+      </View>
+    );
+  }
+
+  if (step === 'reset-password') {
+    return (
+      <View style={styles.body}>
+        <ResetPasswordForm
+          email={pendingEmail}
+          onBack={() => goToLogin()}
+          onDone={() => goToLogin('Đã đổi mật khẩu. Đăng nhập bằng mật khẩu mới nhé!')}
+        />
+      </View>
+    );
+  }
+
   return (
     <View>
       <AuthTabs value={tab} onChange={setTab} />
@@ -39,13 +93,12 @@ export function AuthPanel({ onAuthenticated }: AuthPanelProps) {
       <View style={styles.body}>
         {tab === 'login' ? (
           <>
-            {registeredEmail ? (
-              <InlineAlert
-                tone="success"
-                message="Tạo tài khoản thành công. Đăng nhập để bắt đầu săn deal nhé!"
-              />
-            ) : null}
-            <LoginForm initialEmail={registeredEmail} onSuccess={() => onAuthenticated?.()} />
+            {notice ? <InlineAlert tone="success" message={notice} /> : null}
+            <LoginForm
+              initialEmail={pendingEmail}
+              onForgotPassword={() => setStep('forgot-password')}
+              onSuccess={() => onAuthenticated?.()}
+            />
 
             <Pressable
               accessibilityRole="link"
@@ -60,7 +113,12 @@ export function AuthPanel({ onAuthenticated }: AuthPanelProps) {
             </Pressable>
           </>
         ) : (
-          <RegisterForm onSubmit={handleRegistered} />
+          <RegisterForm
+            onRegistered={(email) => {
+              setPendingEmail(email);
+              setStep('verify-otp');
+            }}
+          />
         )}
       </View>
     </View>

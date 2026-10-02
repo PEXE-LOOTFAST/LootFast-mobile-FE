@@ -9,7 +9,8 @@ type StoreApplicationCardProps = {
   application: StoreApplicationCardModel;
   onApprove: () => void;
   onReject: () => void;
-  onViewLicense: () => void;
+  /** Bỏ trống khi hồ sơ chưa có giấy phép trên hệ thống (ảnh tải lên hỏng). */
+  onViewLicense?: () => void;
   /** Đang gọi API cho chính hồ sơ này: khoá hai nút quyết định để không bấm hai lần. */
   isBusy?: boolean;
 };
@@ -52,6 +53,12 @@ export function StoreApplicationCard({
   const theme = useTheme();
   const { status, rejectionReason } = application;
   const isApproved = status === 'approved';
+  const isUploadFailed = status === 'upload-failed';
+  const resolvedLabel = isApproved
+    ? 'Đã duyệt'
+    : isUploadFailed
+      ? 'Lỗi tải giấy phép'
+      : 'Đã từ chối';
   // Nền nhạt dựng từ màu theme + độ trong suốt để tự khớp cả light lẫn dark mode.
   const dangerSoft = `${theme.danger}1F`;
   const warningSoft = `${theme.accent}33`;
@@ -99,21 +106,23 @@ export function StoreApplicationCard({
         ))}
       </View>
 
-      <Pressable
-        accessibilityLabel={`Xem giấy phép kinh doanh của ${application.title}`}
-        accessibilityRole="button"
-        onPress={onViewLicense}
-        style={({ pressed }) => [
-          styles.licenseButton,
-          { borderColor: theme.border },
-          pressed && styles.pressed,
-        ]}
-      >
-        <Icon name={AdminIcons.document} color={theme.primary} size={15} />
-        <Text style={[styles.licenseLabel, { color: theme.primary }]}>
-          Xem giấy phép kinh doanh
-        </Text>
-      </Pressable>
+      {onViewLicense ? (
+        <Pressable
+          accessibilityLabel={`Xem giấy phép kinh doanh của ${application.title}`}
+          accessibilityRole="button"
+          onPress={onViewLicense}
+          style={({ pressed }) => [
+            styles.licenseButton,
+            { borderColor: theme.border },
+            pressed && styles.pressed,
+          ]}
+        >
+          <Icon name={AdminIcons.document} color={theme.primary} size={15} />
+          <Text style={[styles.licenseLabel, { color: theme.primary }]}>
+            Xem giấy phép kinh doanh
+          </Text>
+        </Pressable>
+      ) : null}
 
       {status === 'pending' ? (
         <View style={styles.actions}>
@@ -166,7 +175,7 @@ export function StoreApplicationCard({
               <Text
                 style={[styles.statusLabel, { color: isApproved ? theme.primary : theme.danger }]}
               >
-                {isApproved ? 'Đã duyệt' : 'Đã từ chối'}
+                {resolvedLabel}
               </Text>
             </View>
           </View>

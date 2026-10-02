@@ -35,6 +35,10 @@ const EMPTY_STATES: Record<StoreApplicationStatus, { title: string; description:
     title: 'Chưa từ chối quán nào',
     description: 'Hồ sơ bị từ chối sẽ được liệt kê tại đây.',
   },
+  'upload-failed': {
+    title: 'Không có hồ sơ lỗi tải lên',
+    description: 'Hồ sơ mà ảnh giấy phép không lên được hệ thống sẽ xuất hiện tại đây.',
+  },
 };
 
 export function StoreApprovalScreen() {
@@ -98,12 +102,33 @@ export function StoreApprovalScreen() {
                 isBusy={queue.busyId === application.id}
                 onApprove={() => queue.approve(application.id)}
                 onReject={() => setRejecting({ id: application.id, title: application.title })}
-                onViewLicense={() => queue.viewLicense(application.id)}
+                onViewLicense={
+                  queue.canViewLicense(application.status)
+                    ? () => queue.viewLicense(application.id)
+                    : undefined
+                }
               />
             ))
           ) : (
             <EmptyCard {...EMPTY_STATES[tab]} />
           )}
+
+          {queue.hasMore ? (
+            <Pressable
+              accessibilityRole="button"
+              disabled={queue.isLoadingMore}
+              onPress={queue.loadMore}
+              style={({ pressed }) => [
+                styles.retry,
+                { borderColor: theme.border },
+                pressed && styles.pressed,
+              ]}
+            >
+              <Text style={[styles.retryLabel, { color: theme.primary }]}>
+                {queue.isLoadingMore ? 'Đang tải…' : 'Tải thêm hồ sơ'}
+              </Text>
+            </Pressable>
+          ) : null}
         </View>
       </ScrollView>
 
