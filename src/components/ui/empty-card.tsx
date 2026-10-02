@@ -2,13 +2,13 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { useTheme } from '@/hooks/use-theme';
 
-type SellerEmptyCardProps = {
+type EmptyCardProps = {
   title: string;
   description: string;
 };
 
-// Thẻ trống dùng chung cho các mục chưa có dữ liệu của trang Đơn hàng.
-export function SellerEmptyCard({ title, description }: SellerEmptyCardProps) {
+// Thẻ trống dùng chung: mục chưa có dữ liệu, bộ lọc không ra kết quả, hoặc danh sách rỗng.
+export function EmptyCard({ title, description }: EmptyCardProps) {
   const theme = useTheme();
 
   return (

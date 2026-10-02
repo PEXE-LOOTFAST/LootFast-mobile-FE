@@ -1,34 +1,46 @@
-import { useEffect, useState } from 'react';
-
-import { placeOrder } from '@/demo/store';
+import { useCreateOrder } from '@/features/order/api/use-orders';
+import { toOrderErrorMessage } from '@/features/order/api/orders';
+import { getSessionState, requireAuth } from '@/lib/auth-session';
 
 export type ReservationStatus = 'idle' | 'reserving' | 'reserved';
 
-const RESERVE_DELAY_MS = 700;
-
 /**
- * Đặt giữ một deal. Chưa có API nên giả lập độ trễ mạng rồi ghi đơn vào kho dữ liệu demo:
- * đơn hiện ngay ở tab Đơn hàng của người mua và ở khu người bán của quán bán deal đó,
- * đồng thời số phần còn lại giảm trên trang chủ. Khi có API, thay bằng useMutation.
+ * Đặt giữ một deal qua `POST /orders`.
+ *
+ * Mặc định trả tiền mặt khi nhận: backend cũng nhận BANK_TRANSFER nhưng màn chi tiết chưa có
+ * bước chọn phương thức, và đơn đã tạo vẫn đổi được bằng `PUT /orders/{id}/payment-method`.
+ *
+ * Khách chưa đăng nhập thì mở hộp đăng nhập rồi đặt tiếp ngay sau khi có phiên — không gọi API
+ * để khỏi nhận 401.
  */
 export function useReservation(dealId: string) {
-  const [status, setStatus] = useState<ReservationStatus>('idle');
-  const [code, setCode] = useState<string>();
+  const createOrder = useCreateOrder();
 
-  useEffect(() => {
-    if (status !== 'reserving') return;
+  const status: ReservationStatus = createOrder.isPending
+    ? 'reserving'
+    : createOrder.isSuccess
+      ? 'reserved'
+      : 'idle';
 
-    const timeout = setTimeout(() => {
-      setCode(placeOrder(dealId));
-      setStatus('reserved');
-    }, RESERVE_DELAY_MS);
+  const submit = () => {
+    if (createOrder.isPending || createOrder.isSuccess) return;
 
-    return () => clearTimeout(timeout);
-  }, [status, dealId]);
-
-  const reserve = () => {
-    if (status === 'idle') setStatus('reserving');
+    createOrder.mutate({ dealId, quantity: 1, paymentMethod: 'CASH' });
   };
 
-  return { status, code, reserve };
+  const reserve = () => {
+    if (getSessionState().status === 'authenticated') {
+      submit();
+      return;
+    }
+
+    requireAuth(submit);
+  };
+
+  return {
+    status,
+    order: createOrder.data,
+    error: createOrder.error ? toOrderErrorMessage(createOrder.error) : null,
+    reserve,
+  };
 }

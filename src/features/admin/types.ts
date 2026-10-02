@@ -1,19 +1,35 @@
+import type { IconName } from '@/components/ui/icon';
+
 export type StoreApplicationStatus = 'pending' | 'approved' | 'rejected';
 
-/** Hồ sơ đăng ký mở quán mà người bán gửi lên, chờ quản trị duyệt trước khi được đăng deal. */
-export type StoreApplication = {
+export type StoreApplicationTagTone = 'primary' | 'warning';
+
+/** Nhãn nhỏ dưới tên hồ sơ, vd. nhóm món hoặc số giấy phép kinh doanh. */
+export type StoreApplicationTag = {
+  label: string;
+  icon?: IconName;
+  tone: StoreApplicationTagTone;
+};
+
+/** Một dòng thông tin trong thẻ. Có `tel` thì bấm vào dòng đó để gọi. */
+export type StoreApplicationInfoRow = {
+  icon: IconName;
+  label: string;
+  tel?: string;
+};
+
+/**
+ * Dữ liệu hiển thị của một thẻ trên màn Duyệt quán. Thẻ nhận đúng thứ nó vẽ chứ không nhận
+ * nguyên hồ sơ, để đổi cách trình bày không phải sửa theo kiểu dữ liệu của API.
+ */
+export type StoreApplicationCardModel = {
   id: string;
-  storeName: string;
-  /** Nhóm món chính, vd. "Đồ ăn nhanh" — hiển thị nguyên văn trên thẻ. */
-  category: string;
-  ownerName: string;
-  phone: string;
-  address: string;
-  /** Ngày gửi hồ sơ dạng "YYYY-MM-DD". */
-  submittedAt: string;
-  /** Đã nộp giấy chứng nhận an toàn thực phẩm hay chưa. */
-  hasFoodSafetyCert: boolean;
+  title: string;
+  tags: StoreApplicationTag[];
+  rows: StoreApplicationInfoRow[];
   status: StoreApplicationStatus;
+  /** Lý do admin đã ghi khi từ chối; chỉ hồ sơ từ API mới có.  */
+  rejectionReason?: string | null;
 };
 
 export type AdminStatTone = 'primary' | 'accent';

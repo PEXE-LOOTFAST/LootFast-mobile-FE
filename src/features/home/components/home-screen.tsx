@@ -1,10 +1,12 @@
 import { router, useFocusEffect } from 'expo-router';
 import { setStatusBarStyle } from 'expo-status-bar';
 import { useCallback, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 
-import { useBuyerDeals } from '@/demo/use-demo';
+import { BrandButton } from '@/components/ui/brand-button';
+import { InlineAlert } from '@/components/ui/inline-alert';
 import { MaxContentWidth } from '@/constants/theme';
+import { getDealErrorMessage } from '@/features/home/api/deals';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { DealCard } from '@/features/home/components/deal-card';
 import { DealFilterButton } from '@/features/home/components/deal-filter-button';
@@ -13,10 +15,9 @@ import { HomeHeader } from '@/features/home/components/home-header';
 import { NotificationSheet } from '@/features/home/components/notification-sheet';
 import { SearchPanel } from '@/features/home/components/search-panel';
 import { SectionHeader } from '@/features/home/components/section-header';
+import { useDeals } from '@/features/home/api/use-deals';
 import { DEAL_CATEGORIES } from '@/features/home/constants/deal-categories';
-import { MOCK_NOTIFICATIONS } from '@/features/home/data/mock-notifications';
-import { useDealFilters } from '@/features/home/hooks/use-deal-filters';
-import { useNotifications } from '@/features/home/hooks/use-notifications';
+import { filterDeals, useDealFilters } from '@/features/home/hooks/use-deal-filters';
 import type { Deal } from '@/features/home/types';
 import { useAuthSession } from '@/hooks/use-auth-session';
 import { useTheme } from '@/hooks/use-theme';
@@ -28,10 +29,14 @@ const HORIZONTAL_INSET = 16;
 export function HomeScreen() {
   const theme = useTheme();
   const { isAuthenticated } = useAuthSession();
-  // Sàn deal đọc từ kho dữ liệu demo: quán được admin duyệt hay mở khoá là deal hiện ra ngay.
-  const deals = useBuyerDeals();
-  const filters = useDealFilters(deals);
-  const { notifications, unreadCount, markAsRead } = useNotifications(MOCK_NOTIFICATIONS);
+  const filters = useDealFilters([]);
+  const dealsQuery = useDeals({
+    categoryCode: filters.categoryId === 'all' ? undefined : filters.categoryId,
+    keyword: filters.query,
+    radiusKm: filters.radiusKm,
+  });
+  const deals = dealsQuery.data ?? [];
+  const filteredDeals = filterDeals(deals, filters);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   // Header nền xanh đậm cần icon status bar màu sáng. Trả về 'auto' khi rời màn,
@@ -53,13 +58,21 @@ export function HomeScreen() {
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            colors={[theme.primary]}
+            onRefresh={() => void dealsQuery.refetch()}
+            refreshing={dealsQuery.isRefetching}
+            tintColor={theme.primary}
+          />
+        }
       >
         <HomeHeader
           isAuthenticated={isAuthenticated}
           locationLabel={`Gần bạn · ${formatRadius(filters.radiusKm)}`}
           onPressNotifications={() => setIsNotificationsOpen(true)}
           onPressSignIn={withAuth()}
-          unreadCount={unreadCount}
+          unreadCount={0}
         />
 
         <View style={styles.body}>
@@ -80,7 +93,7 @@ export function HomeScreen() {
               title={filters.isFiltering ? 'Kết quả tìm kiếm' : 'Gợi ý gần bạn'}
               subtitle={
                 filters.isFiltering
-                  ? `${filters.filteredDeals.length} deal phù hợp`
+                  ? `${filteredDeals.length} deal phù hợp`
                   : 'Ưu tiên món gần, tiết kiệm và được đánh giá cao'
               }
               action={
@@ -96,8 +109,22 @@ export function HomeScreen() {
               }
             />
 
-            {filters.filteredDeals.length > 0 ? (
-              filters.filteredDeals.map((deal) => (
+            {dealsQuery.isPending ? (
+              <View style={styles.feedback}>
+                <ActivityIndicator color={theme.primary} />
+              </View>
+            ) : dealsQuery.isError ? (
+              <View style={styles.feedback}>
+                <InlineAlert message={getDealErrorMessage(dealsQuery.error)} />
+                <BrandButton
+                  loading={dealsQuery.isRefetching}
+                  onPress={() => void dealsQuery.refetch()}
+                >
+                  Thử lại
+                </BrandButton>
+              </View>
+            ) : filteredDeals.length > 0 ? (
+              filteredDeals.map((deal) => (
                 <DealCard key={deal.id} deal={deal} onPress={() => openDeal(deal)} />
               ))
             ) : (
@@ -110,9 +137,7 @@ export function HomeScreen() {
       <AssistantFab />
 
       <NotificationSheet
-        notifications={notifications}
         onClose={() => setIsNotificationsOpen(false)}
-        onPressItem={markAsRead}
         visible={isNotificationsOpen}
       />
     </View>
@@ -132,4 +157,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: HORIZONTAL_INSET,
   },
   section: { gap: 14 },
+  feedback: { gap: 12 },
 });

@@ -1,12 +1,18 @@
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
+import { InlineAlert } from '@/components/ui/inline-alert';
 import { TextField } from '@/components/ui/text-field';
-import { addSellerDeal } from '@/demo/store';
-import { useSellerDemo } from '@/demo/use-demo';
+import { toMerchantDealErrorMessage } from '@/features/seller/api/merchant-deals';
+import {
+  useCreateMerchantDeal,
+  usePublishMerchantDeal,
+} from '@/features/seller/api/use-merchant-deals';
 import { SellerFormCard } from '@/features/seller/components/seller-form-card';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
+import { useMerchantShop } from '@/features/seller/hooks/use-merchant-shop';
 import { validateNewDeal, type NewDealValues } from '@/features/seller/validation';
 import { useForm } from '@/hooks/use-form';
 import { useTheme } from '@/hooks/use-theme';
@@ -21,30 +27,85 @@ const INITIAL_VALUES: NewDealValues = {
   close: '21:00',
 };
 
+/** Backend bắt buộc chốt đơn trước giờ nhận ít nhất 15 phút (ORDER_CUTOFF). */
+const ORDER_CUTOFF_MS = 15 * 60 * 1000;
+
 const toNumber = (value: string) => Number(value.replace(/\D/g, ''));
+
+/**
+ * "18:00" → mốc thời gian hôm nay. Backend bắt cả bốn mốc (bán và nhận) nằm trong cùng một
+ * ngày theo lịch Việt Nam, nên chỉ đăng được deal trong ngày và máy phải để đúng múi giờ VN.
+ */
+function toTodayAt(value: string) {
+  const [hours, minutes] = value.split(':').map(Number);
+  const date = new Date();
+  date.setHours(hours ?? 0, minutes ?? 0, 0, 0);
+
+  return date;
+}
 
 export function SellerNewDealScreen() {
   const theme = useTheme();
-  const { plan } = useSellerDemo();
-  const hasQuotaLeft = plan.dealPostsUsed < plan.dealPostsLimit;
+  const { profile } = useMerchantShop();
+  const createDeal = useCreateMerchantDeal();
+  const publishDeal = usePublishMerchantDeal();
+  const [formError, setFormError] = useState<string | null>(null);
 
-  const { values, errors, setField, submit } = useForm<NewDealValues>({
+  const { values, errors, isSubmitting, setField, submit } = useForm<NewDealValues>({
     initialValues: INITIAL_VALUES,
     validate: validateNewDeal,
-    onSubmit: (next) => {
-      const deal = addSellerDeal({
-        name: next.name.trim(),
-        emoji: '🍽️',
-        price: toNumber(next.price),
-        originalPrice: toNumber(next.originalPrice),
-        portionsTotal: toNumber(next.portions),
-        pickupWindow: { start: next.open, end: next.close },
-      });
+    onSubmit: async (next) => {
+      setFormError(null);
 
-      // Chuyển màn trước rồi mới báo: trên web, Alert nhiều nút không gọi được onPress nên
-      // nếu đợi người dùng bấm trong hộp thoại thì sẽ kẹt lại ở form.
-      router.navigate('/seller/orders');
-      Alert.alert('Đã đăng deal', `"${deal.name}" đã lên sàn, khách quanh đây đặt giữ được ngay.`);
+      // Nhóm món lấy từ hồ sơ quán — backend bắt buộc categoryCode và form không hỏi lại.
+      const categoryCode = profile?.businessCategory;
+      if (!categoryCode) {
+        setFormError('Chưa có nhóm món trong hồ sơ quán. Cập nhật Thông tin quán trước đã.');
+        return;
+      }
+
+      const pickupStart = toTodayAt(next.open);
+      const pickupEnd = toTodayAt(next.close);
+      const saleEnd = new Date(pickupStart.getTime() - ORDER_CUTOFF_MS);
+      const saleStart = new Date();
+
+      if (saleStart >= saleEnd) {
+        setFormError('Giờ bắt đầu nhận phải cách hiện tại ít nhất 15 phút.');
+        return;
+      }
+
+      try {
+        const deal = await createDeal.mutateAsync({
+          name: next.name.trim(),
+          categoryCode,
+          originalPrice: toNumber(next.originalPrice),
+          discountedPrice: toNumber(next.price),
+          totalQuantity: toNumber(next.portions),
+          // Form chưa hỏi thời gian chuẩn bị; 0 nghĩa là khách đến là lấy được ngay.
+          preparationMinutes: 0,
+          saleStartsAt: saleStart.toISOString(),
+          saleEndsAt: saleEnd.toISOString(),
+          pickupStartsAt: pickupStart.toISOString(),
+          pickupEndsAt: pickupEnd.toISOString(),
+        });
+
+        // Deal tạo ra ở trạng thái nháp; backend chỉ cho đăng khi đã có ít nhất một ảnh, mà
+        // app chưa có bước chọn ảnh cho deal. Vẫn thử đăng để deal nào đủ điều kiện thì lên
+        // sàn luôn, không đủ thì báo rõ là đã lưu nháp.
+        try {
+          await publishDeal.mutateAsync(deal.dealId);
+          router.navigate('/seller/orders');
+          Alert.alert('Đã đăng deal', `"${deal.name}" đã lên sàn, khách đặt giữ được ngay.`);
+        } catch (publishError) {
+          router.navigate('/seller/orders');
+          Alert.alert(
+            'Đã lưu bản nháp',
+            `"${deal.name}" chưa lên sàn: ${toMerchantDealErrorMessage(publishError)}`,
+          );
+        }
+      } catch (error) {
+        setFormError(toMerchantDealErrorMessage(error));
+      }
     },
   });
 
@@ -136,12 +197,15 @@ export function SellerNewDealScreen() {
         </View>
       </SellerFormCard>
 
-      <Text style={[styles.quota, { color: theme.textSecondary }]}>
-        {`Đã dùng ${plan.dealPostsUsed}/${plan.dealPostsLimit} lượt đăng deal của gói ${plan.name}.`}
+      {formError ? <InlineAlert message={formError} /> : null}
+
+      <Text style={[styles.note, { color: theme.textSecondary }]}>
+        Deal chỉ lên sàn khi đã có ảnh món. App chưa có bước thêm ảnh cho deal, nên deal có thể được
+        lưu ở dạng bản nháp.
       </Text>
 
-      <BrandButton disabled={!hasQuotaLeft} onPress={submit}>
-        {hasQuotaLeft ? 'Đăng deal' : 'Đã hết lượt đăng trong ngày'}
+      <BrandButton loading={isSubmitting} onPress={() => void submit()}>
+        Đăng deal
       </BrandButton>
     </SellerPageScaffold>
   );
@@ -151,5 +215,5 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: 12 },
   cell: { flex: 1 },
   hint: { fontSize: 12, fontWeight: '600' },
-  quota: { fontSize: 12, textAlign: 'center' },
+  note: { fontSize: 12, lineHeight: 18, textAlign: 'center' },
 });

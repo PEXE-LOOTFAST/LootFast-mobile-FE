@@ -1,12 +1,21 @@
 import { useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  View,
+} from 'react-native';
 
 import { Icon } from '@/components/ui/icon';
 import { MaxContentWidth } from '@/constants/theme';
 import { AdminHeader } from '@/features/admin/components/admin-header';
 import { AdminIcons } from '@/features/admin/constants/icons';
-import { useAdminDemo } from '@/demo/use-demo';
-import { MOCK_ADMIN_PROFILE } from '@/features/admin/data/mock-admin-account';
+import { useProfile } from '@/features/profile/api/use-profile';
+import { useAuthSession } from '@/hooks/use-auth-session';
 import { useLightStatusBar } from '@/hooks/use-light-status-bar';
 import { useTheme } from '@/hooks/use-theme';
 import { confirmAction } from '@/lib/confirm';
@@ -53,7 +62,19 @@ export function AdminSettingsScreen() {
   // Chỉ giữ trên máy cho tới khi có API cấu hình hệ thống.
   const [notifyNewStores, setNotifyNewStores] = useState(true);
   const [maintenanceMode, setMaintenanceMode] = useState(false);
-  const { alerts } = useAdminDemo();
+  const { user } = useAuthSession();
+  const profileQuery = useProfile(true);
+  const profile = profileQuery.data;
+
+  const accountName =
+    profile?.displayName?.trim() ||
+    [profile?.firstName, profile?.lastName].filter(Boolean).join(' ') ||
+    [user?.firstName, user?.lastName].filter(Boolean).join(' ');
+  const accountEmail = profile?.email ?? user?.email ?? '';
+  // Nhãn vai trò lấy từ role backend trả về thay vì gán cứng.
+  const accountRole = (profile?.roles ?? user?.roles ?? []).includes('ADMIN')
+    ? 'Quản trị viên'
+    : 'Tài khoản';
 
   useLightStatusBar();
 
@@ -91,7 +112,7 @@ export function AdminSettingsScreen() {
         {/* Trung tâm thông báo của admin sẽ làm ở nhánh riêng, tạm báo trước. */}
         <AdminHeader
           date={today}
-          hasUnread={alerts.length > 0}
+          hasUnread={false}
           onPressNotifications={() => Alert.alert('Thông báo', 'Trung tâm thông báo sẽ sớm có.')}
         />
 
@@ -99,19 +120,28 @@ export function AdminSettingsScreen() {
           <View style={[cardStyle, styles.account]}>
             <View style={[styles.avatar, { backgroundColor: theme.primarySoft }]}>
               <Text style={[styles.initials, { color: theme.primary }]}>
-                {getInitials(MOCK_ADMIN_PROFILE.name)}
+                {getInitials(accountName)}
               </Text>
             </View>
             <View style={styles.accountCopy}>
-              <Text numberOfLines={1} style={[styles.accountName, { color: theme.text }]}>
-                {MOCK_ADMIN_PROFILE.name}
-              </Text>
-              <Text numberOfLines={1} style={[styles.accountEmail, { color: theme.textSecondary }]}>
-                {MOCK_ADMIN_PROFILE.email}
-              </Text>
-              <View style={[styles.roleBadge, { backgroundColor: theme.primary }]}>
-                <Text style={styles.roleLabel}>{MOCK_ADMIN_PROFILE.role}</Text>
-              </View>
+              {profileQuery.isLoading ? (
+                <ActivityIndicator color={theme.primary} size="small" />
+              ) : (
+                <>
+                  <Text numberOfLines={1} style={[styles.accountName, { color: theme.text }]}>
+                    {accountName}
+                  </Text>
+                  <Text
+                    numberOfLines={1}
+                    style={[styles.accountEmail, { color: theme.textSecondary }]}
+                  >
+                    {accountEmail}
+                  </Text>
+                  <View style={[styles.roleBadge, { backgroundColor: theme.primary }]}>
+                    <Text style={styles.roleLabel}>{accountRole}</Text>
+                  </View>
+                </>
+              )}
             </View>
           </View>
 

@@ -10,3 +10,12 @@ export type ApiResponse<T> = {
   traceId: string;
   timestamp: string;
 };
+
+/** Khớp PagedResponse của backend — mọi endpoint danh sách đều trả về dạng này. */
+export type PagedResponse<T> = {
+  items: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+};

@@ -67,6 +67,7 @@ export function AssistantFab({ bottomOffset = 16 }: AssistantFabProps) {
 
       <AssistantPanel
         anchor={anchor}
+        isAvailable={chat.isAvailable}
         isReplying={chat.isReplying}
         messages={chat.messages}
         onClose={close}

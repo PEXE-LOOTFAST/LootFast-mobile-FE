@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
-import { Icon, type IconName } from '@/components/ui/icon';
+import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { PasswordField } from '@/components/ui/password-field';
 import { TextField } from '@/components/ui/text-field';
@@ -9,7 +9,7 @@ import { toAuthErrorMessage } from '@/features/auth/api/auth-error-messages';
 import { useSignin } from '@/features/auth/api/use-signin';
 import { FormSection } from '@/features/auth/components/form-section';
 import { AuthIcons } from '@/features/auth/constants/icons';
-import type { DemoRole, LoginValues } from '@/features/auth/types';
+import type { LoginValues } from '@/features/auth/types';
 import { validateLogin } from '@/features/auth/validation';
 import { useForm } from '@/hooks/use-form';
 import { useTheme } from '@/hooks/use-theme';
@@ -17,16 +17,9 @@ import { useTheme } from '@/hooks/use-theme';
 type LoginFormProps = {
   initialEmail?: string;
   onSuccess: () => void;
-  onTryDemo: (role: DemoRole) => void;
 };
 
-// Không có demo quản trị ở đây: khu vực quản trị đi qua màn /admin-login riêng.
-const DEMO_ACCOUNTS = [
-  { role: 'buyer', label: 'Người mua', icon: AuthIcons.buyer },
-  { role: 'seller', label: 'Người bán', icon: AuthIcons.seller },
-] as const satisfies readonly { role: DemoRole; label: string; icon: IconName }[];
-
-export function LoginForm({ initialEmail = '', onSuccess, onTryDemo }: LoginFormProps) {
+export function LoginForm({ initialEmail = '', onSuccess }: LoginFormProps) {
   const theme = useTheme();
   const signin = useSignin(onSuccess);
   const { values, errors, isSubmitting, setField, submit } = useForm<LoginValues>({
@@ -84,38 +77,6 @@ export function LoginForm({ initialEmail = '', onSuccess, onTryDemo }: LoginForm
       <BrandButton loading={isSubmitting} onPress={() => void submit()}>
         Đăng nhập
       </BrandButton>
-
-      <View style={styles.demo}>
-        <Text style={[styles.demoTitle, { color: theme.textSecondary }]}>
-          Dùng thử tài khoản demo
-        </Text>
-        <View style={styles.demoRow}>
-          {DEMO_ACCOUNTS.map((account) => (
-            <Pressable
-              key={account.role}
-              accessibilityLabel={`Dùng thử tài khoản ${account.label}`}
-              accessibilityRole="button"
-              accessibilityState={{ disabled: isSubmitting }}
-              disabled={isSubmitting}
-              onPress={() => onTryDemo(account.role)}
-              style={({ pressed }) => [
-                styles.demoButton,
-                { backgroundColor: theme.backgroundElement, borderColor: theme.border },
-                pressed && styles.pressed,
-                isSubmitting && styles.disabled,
-              ]}
-            >
-              <Icon name={account.icon} color={theme.primary} size={15} />
-              <Text numberOfLines={1} style={[styles.demoLabel, { color: theme.text }]}>
-                {account.label}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-        <Text style={[styles.demoNote, { color: theme.textSecondary }]}>
-          Vào ngay với dữ liệu mẫu, không cần đăng ký.
-        </Text>
-      </View>
     </View>
   );
 }
@@ -124,24 +85,4 @@ const styles = StyleSheet.create({
   container: { gap: 20 },
   forgot: { alignSelf: 'flex-end', marginTop: -6 },
   forgotText: { fontSize: 13, fontWeight: '700' },
-  // Cụm demo là phần tạm, sẽ xoá khi có tài khoản thật: mọi khoảng cách của nó nằm gọn
-  // trong styles.demo nên xoá cả khối <View style={styles.demo}> là đủ, không cần sửa gì thêm.
-  demo: { gap: 8 },
-  demoTitle: { fontSize: 11, fontWeight: '700', letterSpacing: 0.3, textAlign: 'center' },
-  demoRow: { flexDirection: 'row', gap: 8 },
-  demoButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 5,
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: 6,
-    paddingVertical: 8,
-  },
-  demoLabel: { fontSize: 12, fontWeight: '700' },
-  pressed: { opacity: 0.8 },
-  disabled: { opacity: 0.5 },
-  demoNote: { textAlign: 'center', fontSize: 11 },
 });

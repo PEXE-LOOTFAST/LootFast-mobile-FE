@@ -16,10 +16,14 @@ function getInitials(name: string) {
 }
 
 type DealReviewsProps = {
-  reviews: DealReview[];
+  /**
+   * Backend chưa có endpoint danh sách đánh giá nên nơi gọi hiện không truyền gì; thẻ vẫn giữ
+   * chỗ và tự hiện trạng thái trống. Có API rồi thì truyền danh sách vào là đủ.
+   */
+  reviews?: DealReview[];
 };
 
-export function DealReviews({ reviews }: DealReviewsProps) {
+export function DealReviews({ reviews = [] }: DealReviewsProps) {
   const theme = useTheme();
 
   return (
@@ -33,7 +37,7 @@ export function DealReviews({ reviews }: DealReviewsProps) {
     >
       {reviews.length === 0 ? (
         <Text style={[styles.comment, { color: theme.textSecondary }]}>
-          Chưa có đánh giá nào cho deal này.
+          Backend chưa có API đánh giá — phần này sẽ hiện nhận xét thật khi endpoint sẵn sàng.
         </Text>
       ) : (
         reviews.map((review, index) => (

@@ -16,7 +16,6 @@ import { AdminIcons } from '@/features/admin/constants/icons';
 import { AuthBackdrop } from '@/features/auth/components/auth-backdrop';
 import { useAuthSession } from '@/hooks/use-auth-session';
 import { useTheme } from '@/hooks/use-theme';
-import { signInAsAdmin } from '@/lib/auth-session';
 
 // Cổng đăng nhập riêng cho quản trị: không có tab đăng ký vì tài khoản admin do hệ thống cấp.
 export function AdminLoginScreen() {
@@ -26,10 +25,8 @@ export function AdminLoginScreen() {
   // Đã đăng nhập quản trị rồi thì vào thẳng, không bắt nhập lại.
   if (isAdmin) return <Redirect href="/admin" />;
 
-  const enterAdmin = () => {
-    signInAsAdmin();
-    router.replace('/admin');
-  };
+  // Đăng nhập thật: useAdminSignin đã mở phiên quản trị, ở đây chỉ còn việc điều hướng.
+  const enterAdmin = () => router.replace('/admin');
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]}>

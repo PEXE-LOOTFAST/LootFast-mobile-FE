@@ -6,9 +6,9 @@ import { InlineAlert } from '@/components/ui/inline-alert';
 import { AuthTabs } from '@/features/auth/components/auth-tabs';
 import { LoginForm } from '@/features/auth/components/login-form';
 import { RegisterForm } from '@/features/auth/components/register-form';
-import type { AuthTab, DemoRole, RegisterValues } from '@/features/auth/types';
+import type { AuthTab, RegisterValues } from '@/features/auth/types';
 import { useTheme } from '@/hooks/use-theme';
-import { dismissAuthPrompt, signIn } from '@/lib/auth-session';
+import { dismissAuthPrompt } from '@/lib/auth-session';
 
 type AuthPanelProps = {
   /** Chạy sau khi phiên đã mở — dùng để điều hướng. Modal không cần vì nó tự đóng. */
@@ -23,20 +23,6 @@ export function AuthPanel({ onAuthenticated }: AuthPanelProps) {
   const handleRegistered = ({ email }: RegisterValues) => {
     setRegisteredEmail(email.trim());
     setTab('login');
-  };
-
-  // Demo người mua đi như đăng nhập thường (modal còn chạy tiếp thao tác khách vừa bấm).
-  // Người bán sang hẳn khu vực khác nên bỏ thao tác đang chờ của người mua đi.
-  const handleTryDemo = (role: DemoRole) => {
-    if (role === 'buyer') {
-      signIn();
-      onAuthenticated?.();
-      return;
-    }
-
-    dismissAuthPrompt();
-    signIn();
-    router.replace('/seller');
   };
 
   // Đóng modal trước khi rời đi, nếu không nó vẫn nằm đè lên màn đăng nhập quản trị.
@@ -59,11 +45,7 @@ export function AuthPanel({ onAuthenticated }: AuthPanelProps) {
                 message="Tạo tài khoản thành công. Đăng nhập để bắt đầu săn deal nhé!"
               />
             ) : null}
-            <LoginForm
-              initialEmail={registeredEmail}
-              onSuccess={() => onAuthenticated?.()}
-              onTryDemo={handleTryDemo}
-            />
+            <LoginForm initialEmail={registeredEmail} onSuccess={() => onAuthenticated?.()} />
 
             <Pressable
               accessibilityRole="link"

@@ -21,6 +21,28 @@ function matchesPickup(deal: Deal, pickup: PickupFilter) {
   return true;
 }
 
+type DealFilterValues = {
+  categoryId: DealCategoryId;
+  query: string;
+  radiusKm: number;
+  minDiscount: DiscountFilter;
+  pickup: PickupFilter;
+};
+
+export function filterDeals(deals: Deal[], values: DealFilterValues) {
+  const keyword = normalizeText(values.query);
+
+  return deals
+    .filter((deal) => deal.distanceKm <= values.radiusKm)
+    .filter((deal) => values.categoryId === 'all' || deal.categoryId === values.categoryId)
+    .filter(
+      (deal) => !keyword || normalizeText(`${deal.name} ${deal.store.name}`).includes(keyword),
+    )
+    .filter((deal) => getDiscountPercent(deal) >= values.minDiscount)
+    .filter((deal) => matchesPickup(deal, values.pickup))
+    .sort((a, b) => a.distanceKm - b.distanceKm);
+}
+
 export function useDealFilters(deals: Deal[]) {
   const [categoryId, setCategoryId] = useState<DealCategoryId>('all');
   const [query, setQuery] = useState('');
@@ -33,15 +55,13 @@ export function useDealFilters(deals: Deal[]) {
   // Bán kính là bối cảnh "gần bạn" chứ không phải bộ lọc, nên không tính vào đây.
   const isFiltering = categoryId !== 'all' || keyword.length > 0 || hasAdvancedFilters;
 
-  const filteredDeals = deals
-    .filter((deal) => deal.distanceKm <= radiusKm)
-    .filter((deal) => categoryId === 'all' || deal.categoryId === categoryId)
-    .filter(
-      (deal) => !keyword || normalizeText(`${deal.name} ${deal.store.name}`).includes(keyword),
-    )
-    .filter((deal) => getDiscountPercent(deal) >= minDiscount)
-    .filter((deal) => matchesPickup(deal, pickup))
-    .sort((a, b) => a.distanceKm - b.distanceKm);
+  const filteredDeals = filterDeals(deals, {
+    categoryId,
+    query,
+    radiusKm,
+    minDiscount,
+    pickup,
+  });
 
   const resetFilters = () => {
     setCategoryId('all');

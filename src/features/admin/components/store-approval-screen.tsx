@@ -1,14 +1,24 @@
 import { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
+import { InlineAlert } from '@/components/ui/inline-alert';
 import { MaxContentWidth } from '@/constants/theme';
 import { AdminHeader } from '@/features/admin/components/admin-header';
+import { RejectApplicationDialog } from '@/features/admin/components/reject-application-dialog';
 import { StoreApplicationCard } from '@/features/admin/components/store-application-card';
 import { STORE_APPROVAL_TABS } from '@/features/admin/constants/store-approval-tabs';
-import { useStoreApprovals } from '@/features/admin/hooks/use-store-approvals';
+import { useStoreApprovalQueue } from '@/features/admin/hooks/use-store-approval-queue';
 import type { StoreApplicationStatus } from '@/features/admin/types';
 import { SegmentedTabs } from '@/features/seller/components/segmented-tabs';
-import { SellerEmptyCard } from '@/features/seller/components/seller-empty-card';
+import { EmptyCard } from '@/components/ui/empty-card';
 import { useLightStatusBar } from '@/hooks/use-light-status-bar';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -30,14 +40,23 @@ const EMPTY_STATES: Record<StoreApplicationStatus, { title: string; description:
 export function StoreApprovalScreen() {
   const theme = useTheme();
   const [tab, setTab] = useState<StoreApplicationStatus>('pending');
-  const { grouped, approve, reject, undo } = useStoreApprovals();
-  const visible = grouped[tab];
+  const queue = useStoreApprovalQueue(tab);
+  // Hồ sơ đang chờ admin gõ lý do từ chối; null là hộp thoại đang đóng.
+  const [rejecting, setRejecting] = useState<{ id: string; title: string } | null>(null);
+
   // Chỉ đếm hàng chờ: đó là việc admin còn phải làm, hai nhóm kia chỉ để tra lại.
   const tabs = STORE_APPROVAL_TABS.map((item) =>
-    item.id === 'pending' ? { ...item, label: `${item.label} (${grouped.pending.length})` } : item,
+    item.id === 'pending' ? { ...item, label: `${item.label} (${queue.pendingCount})` } : item,
   );
 
   useLightStatusBar();
+
+  const confirmReject = (reason: string) => {
+    if (!rejecting) return;
+
+    queue.reject(rejecting.id, reason);
+    setRejecting(null);
+  };
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
@@ -45,28 +64,57 @@ export function StoreApprovalScreen() {
         {/* Trung tâm thông báo của admin sẽ làm ở nhánh riêng, tạm báo trước. */}
         <AdminHeader
           date={new Date()}
-          hasUnread={grouped.pending.length > 0}
+          hasUnread={queue.pendingCount > 0}
           onPressNotifications={() => Alert.alert('Thông báo', 'Trung tâm thông báo sẽ sớm có.')}
         />
 
         <View style={styles.body}>
           <SegmentedTabs items={tabs} onChange={setTab} value={tab} />
 
-          {visible.length > 0 ? (
-            visible.map((application) => (
+          {queue.actionError ? <InlineAlert message={queue.actionError} /> : null}
+
+          {queue.isLoading ? (
+            <ActivityIndicator color={theme.primary} size="large" style={styles.loader} />
+          ) : queue.loadError ? (
+            <View style={styles.errorBlock}>
+              <InlineAlert message={queue.loadError} />
+              <Pressable
+                accessibilityRole="button"
+                onPress={queue.refetch}
+                style={({ pressed }) => [
+                  styles.retry,
+                  { borderColor: theme.border },
+                  pressed && styles.pressed,
+                ]}
+              >
+                <Text style={[styles.retryLabel, { color: theme.primary }]}>Thử lại</Text>
+              </Pressable>
+            </View>
+          ) : queue.items.length > 0 ? (
+            queue.items.map((application) => (
               <StoreApplicationCard
                 key={application.id}
                 application={application}
-                onApprove={() => approve(application.id)}
-                onReject={() => reject(application.id)}
-                onUndo={() => undo(application.id)}
+                isBusy={queue.busyId === application.id}
+                onApprove={() => queue.approve(application.id)}
+                onReject={() => setRejecting({ id: application.id, title: application.title })}
+                onViewLicense={() => queue.viewLicense(application.id)}
               />
             ))
           ) : (
-            <SellerEmptyCard {...EMPTY_STATES[tab]} />
+            <EmptyCard {...EMPTY_STATES[tab]} />
           )}
         </View>
       </ScrollView>
+
+      {/* key theo hồ sơ: mỗi lần mở là một ô lý do trống. */}
+      <RejectApplicationDialog
+        key={rejecting?.id ?? 'closed'}
+        applicationTitle={rejecting?.title ?? null}
+        isSubmitting={queue.busyId !== null && queue.busyId === rejecting?.id}
+        onCancel={() => setRejecting(null)}
+        onConfirm={confirmReject}
+      />
     </View>
   );
 }
@@ -82,4 +130,15 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingHorizontal: 16,
   },
+  loader: { marginTop: 24 },
+  errorBlock: { gap: 10 },
+  retry: {
+    alignSelf: 'center',
+    borderWidth: 1,
+    borderRadius: 14,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
+  retryLabel: { fontSize: 14, fontWeight: '800' },
+  pressed: { opacity: 0.8 },
 });

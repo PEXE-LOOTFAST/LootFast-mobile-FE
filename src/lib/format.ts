@@ -34,3 +34,8 @@ export function formatFullDate(date: Date): string {
 
   return `${weekday}, ${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
 }
+
+// "20/09/2026" — dạng ngắn cho các dòng thông tin phụ.
+export function formatShortDate(date: Date): string {
+  return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
+}
