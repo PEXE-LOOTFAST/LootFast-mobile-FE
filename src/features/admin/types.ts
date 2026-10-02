@@ -1,6 +1,10 @@
 import type { IconName } from '@/components/ui/icon';
 
-export type StoreApplicationStatus = 'pending' | 'approved' | 'rejected';
+/**
+ * Bốn nhóm hồ sơ admin nhìn thấy. 'upload-failed' là hồ sơ mà ảnh giấy phép không lên được
+ * storage — người gửi vẫn đang chờ, nhưng hồ sơ chưa vào hàng duyệt nên dễ bị bỏ quên.
+ */
+export type StoreApplicationStatus = 'pending' | 'approved' | 'rejected' | 'upload-failed';
 
 export type StoreApplicationTagTone = 'primary' | 'warning';
 

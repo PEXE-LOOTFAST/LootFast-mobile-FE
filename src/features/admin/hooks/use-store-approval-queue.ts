@@ -5,7 +5,7 @@ import { toAdminErrorMessage } from '@/features/admin/api/admin-error-messages';
 import type {
   MerchantApplicationDto,
   MerchantApplicationStatusDto,
-  ReviewableApplicationStatus,
+  ListedApplicationStatus,
 } from '@/features/admin/api/merchant-applications';
 import {
   useApproveApplication,
@@ -17,17 +17,19 @@ import { AdminIcons } from '@/features/admin/constants/icons';
 import type { StoreApplicationCardModel, StoreApplicationStatus } from '@/features/admin/types';
 import { formatShortDate } from '@/lib/format';
 
-const STATUS_TO_DTO: Record<StoreApplicationStatus, ReviewableApplicationStatus> = {
+const STATUS_TO_DTO: Record<StoreApplicationStatus, ListedApplicationStatus> = {
   pending: 'PENDING',
   approved: 'APPROVED',
   rejected: 'REJECTED',
+  'upload-failed': 'UPLOAD_FAILED',
 };
 
-// UPLOADING/UPLOAD_FAILED không bao giờ lọt vào ba tab này, nhưng vẫn phải có nhánh mặc định
-// để kiểu trả về không bị undefined nếu backend thêm trạng thái mới.
+// UPLOADING chỉ kéo dài vài giây và không có tab riêng; xếp nó cùng nhóm chờ xử lý để nhánh
+// mặc định không trả về undefined nếu backend thêm trạng thái mới.
 function toStatus(status: MerchantApplicationStatusDto): StoreApplicationStatus {
   if (status === 'APPROVED') return 'approved';
   if (status === 'REJECTED') return 'rejected';
+  if (status === 'UPLOAD_FAILED') return 'upload-failed';
 
   return 'pending';
 }
@@ -72,6 +74,10 @@ function toCardModel(application: MerchantApplicationDto): StoreApplicationCardM
 
 export type StoreApprovalQueue = {
   isLoading: boolean;
+  /** Còn trang sau để tải; màn hiện nút "Tải thêm" khi true. */
+  hasMore: boolean;
+  isLoadingMore: boolean;
+  loadMore: () => void;
   /** Lỗi tải danh sách; hỏng thì màn hiển thị thông báo kèm nút thử lại. */
   loadError: string | null;
   /** Lỗi của thao tác duyệt / từ chối / xem giấy phép gần nhất. */
@@ -82,6 +88,8 @@ export type StoreApprovalQueue = {
   items: StoreApplicationCardModel[];
   approve: (applicationId: string) => void;
   reject: (applicationId: string, reason: string) => void;
+  /** Hồ sơ lỗi tải lên chưa có file trên storage nên không mở được. */
+  canViewLicense: (status: StoreApplicationStatus) => boolean;
   viewLicense: (applicationId: string) => void;
   refetch: () => void;
 };
@@ -109,13 +117,19 @@ export function useStoreApprovalQueue(tab: StoreApplicationStatus): StoreApprova
       ? (rejectMutation.variables?.applicationId ?? null)
       : null;
 
+  // useInfiniteQuery trả về từng trang; nối lại thành một danh sách phẳng cho màn hình.
+  const items = (activeQuery.data?.pages ?? []).flatMap((page) => page.items).map(toCardModel);
+
   return {
     isLoading: activeQuery.isLoading,
+    hasMore: activeQuery.hasNextPage,
+    isLoadingMore: activeQuery.isFetchingNextPage,
+    loadMore: () => void activeQuery.fetchNextPage(),
     loadError: activeQuery.error ? toAdminErrorMessage(activeQuery.error) : null,
     actionError,
     busyId,
-    pendingCount: pendingQuery.data?.totalElements ?? 0,
-    items: (activeQuery.data?.items ?? []).map(toCardModel),
+    pendingCount: pendingQuery.data?.pages[0]?.totalElements ?? 0,
+    items,
     approve: (applicationId: string) => {
       setActionError(null);
       approveMutation.mutate(applicationId, {
@@ -129,6 +143,7 @@ export function useStoreApprovalQueue(tab: StoreApplicationStatus): StoreApprova
         { onError: (error) => setActionError(toAdminErrorMessage(error)) },
       );
     },
+    canViewLicense: (status: StoreApplicationStatus) => status !== 'upload-failed',
     viewLicense: (applicationId: string) => {
       setActionError(null);
       licenseMutation.mutate(applicationId, {

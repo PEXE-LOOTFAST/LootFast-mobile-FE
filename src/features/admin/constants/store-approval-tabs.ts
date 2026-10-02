@@ -4,4 +4,5 @@ export const STORE_APPROVAL_TABS: { id: StoreApplicationStatus; label: string }[
   { id: 'pending', label: 'Chờ duyệt' },
   { id: 'approved', label: 'Đã duyệt' },
   { id: 'rejected', label: 'Từ chối' },
+  { id: 'upload-failed', label: 'Lỗi tải lên' },
 ];
