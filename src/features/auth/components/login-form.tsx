@@ -17,9 +17,10 @@ import { useTheme } from '@/hooks/use-theme';
 type LoginFormProps = {
   initialEmail?: string;
   onSuccess: () => void;
+  onForgotPassword: () => void;
 };
 
-export function LoginForm({ initialEmail = '', onSuccess }: LoginFormProps) {
+export function LoginForm({ initialEmail = '', onSuccess, onForgotPassword }: LoginFormProps) {
   const theme = useTheme();
   const signin = useSignin(onSuccess);
   const { values, errors, isSubmitting, setField, submit } = useForm<LoginValues>({
@@ -67,7 +68,12 @@ export function LoginForm({ initialEmail = '', onSuccess }: LoginFormProps) {
           value={values.password}
         />
 
-        <Pressable accessibilityRole="link" hitSlop={8} style={styles.forgot}>
+        <Pressable
+          accessibilityRole="link"
+          hitSlop={8}
+          onPress={onForgotPassword}
+          style={styles.forgot}
+        >
           <Text style={[styles.forgotText, { color: theme.primary }]}>Quên mật khẩu?</Text>
         </Pressable>
       </FormSection>

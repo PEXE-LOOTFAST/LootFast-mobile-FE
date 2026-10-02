@@ -1,4 +1,4 @@
-import { apiRequest } from '@/lib/api-client';
+import { apiRequest, registerSessionExpiredHandler } from '@/lib/api-client';
 import { tokenStorage } from '@/lib/storage';
 
 export type SessionStatus = 'guest' | 'authenticated';
@@ -120,6 +120,15 @@ async function revokeSession() {
     await tokenStorage.clear();
   }
 }
+
+/**
+ * Token đã hết hạn và làm mới cũng không được: đưa phiên về trạng thái khách. `api-client` gọi
+ * hàm này ngay khi phát hiện, nên mọi màn đang mở cùng thấy và hiện lại nút đăng nhập.
+ */
+registerSessionExpiredHandler(() => {
+  pendingAction = null;
+  setState({ status: 'guest', isAdmin: false, isAuthPromptOpen: false, user: null });
+});
 
 export function dismissAuthPrompt() {
   pendingAction = null;

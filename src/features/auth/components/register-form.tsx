@@ -2,8 +2,12 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
 import { Icon } from '@/components/ui/icon';
+import { InlineAlert } from '@/components/ui/inline-alert';
 import { PasswordField } from '@/components/ui/password-field';
 import { TextField } from '@/components/ui/text-field';
+import { toSignupErrorMessage } from '@/features/auth/api/auth-error-messages';
+import { splitFullName, toBackendPhone } from '@/features/auth/api/signup';
+import { useSignup } from '@/features/auth/api/use-signup';
 import { FormSection } from '@/features/auth/components/form-section';
 import { AuthIcons } from '@/features/auth/constants/icons';
 import type { RegisterValues } from '@/features/auth/types';
@@ -21,16 +25,38 @@ const INITIAL_VALUES: RegisterValues = {
 };
 
 type RegisterFormProps = {
-  onSubmit: (values: RegisterValues) => void | Promise<void>;
+  /** Chạy sau khi backend đã tạo tài khoản — nhận email đã chuẩn hoá để sang bước nhập OTP. */
+  onRegistered: (email: string) => void;
 };
 
-export function RegisterForm({ onSubmit }: RegisterFormProps) {
+export function RegisterForm({ onRegistered }: RegisterFormProps) {
   const theme = useTheme();
+  const signup = useSignup(onRegistered);
   const { values, errors, isSubmitting, setField, submit } = useForm<RegisterValues>({
     initialValues: INITIAL_VALUES,
     validate: validateRegister,
-    onSubmit,
+    onSubmit: async (next) => {
+      const { firstName, lastName } = splitFullName(next.fullName);
+
+      try {
+        await signup.mutateAsync({
+          firstName,
+          lastName,
+          email: next.email.trim(),
+          phoneNumber: toBackendPhone(next.phone),
+          password: next.password,
+          confirmPassword: next.confirmPassword,
+        });
+      } catch {
+        // Lỗi đã nằm trong signup.error để hiện banner; ném tiếp sẽ thành unhandled rejection.
+      }
+    },
   });
+
+  const changeField = (field: keyof RegisterValues, value: string) => {
+    if (signup.error) signup.reset();
+    setField(field, value);
+  };
 
   return (
     <View style={styles.container}>
@@ -40,7 +66,7 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
           error={errors.fullName}
           label="Họ và tên"
           leading={<Icon name={AuthIcons.person} />}
-          onChangeText={(text) => setField('fullName', text)}
+          onChangeText={(text) => changeField('fullName', text)}
           placeholder="Nguyễn Văn A"
           returnKeyType="next"
           value={values.fullName}
@@ -53,7 +79,7 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
           keyboardType="email-address"
           label="Email"
           leading={<Icon name={AuthIcons.mail} />}
-          onChangeText={(text) => setField('email', text)}
+          onChangeText={(text) => changeField('email', text)}
           placeholder="ban@email.com"
           returnKeyType="next"
           value={values.email}
@@ -65,7 +91,7 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
           label="Số điện thoại"
           leading={<Icon name={AuthIcons.phone} />}
           maxLength={10}
-          onChangeText={(text) => setField('phone', text)}
+          onChangeText={(text) => changeField('phone', text)}
           placeholder="0901234567"
           returnKeyType="next"
           value={values.phone}
@@ -77,7 +103,7 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
           autoComplete="new-password"
           error={errors.password}
           label="Mật khẩu"
-          onChangeText={(text) => setField('password', text)}
+          onChangeText={(text) => changeField('password', text)}
           placeholder={`Tối thiểu ${MIN_PASSWORD_LENGTH} ký tự`}
           returnKeyType="next"
           value={values.password}
@@ -86,13 +112,15 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
           autoComplete="new-password"
           error={errors.confirmPassword}
           label="Nhập lại mật khẩu"
-          onChangeText={(text) => setField('confirmPassword', text)}
+          onChangeText={(text) => changeField('confirmPassword', text)}
           onSubmitEditing={() => void submit()}
           placeholder="Nhập lại mật khẩu"
           returnKeyType="done"
           value={values.confirmPassword}
         />
       </FormSection>
+
+      {signup.error ? <InlineAlert message={toSignupErrorMessage(signup.error)} /> : null}
 
       <BrandButton loading={isSubmitting} onPress={() => void submit()}>
         Tạo tài khoản
