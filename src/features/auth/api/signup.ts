@@ -1,5 +1,7 @@
 import { apiRequest } from '@/lib/api-client';
 
+export { toBackendPhone } from '@/lib/phone';
+
 /**
  * Phiên bản điều khoản gửi kèm lúc đăng ký. Backend chỉ lưu lại chuỗi này cùng thời điểm
  * người dùng đồng ý, không đối chiếu với danh sách nào — đổi nội dung điều khoản thì tăng
@@ -12,7 +14,7 @@ export type SignupPayload = {
   firstName: string;
   lastName: string;
   email: string;
-  /** Đúng 9 chữ số, không có số 0 đứng đầu — backend lưu dạng này. */
+  /** Đúng 9 chữ số, cho phép số 0 đứng đầu — khớp SignupRequest của backend. */
   phoneNumber: string;
   password: string;
   confirmPassword: string;
@@ -38,11 +40,6 @@ export function splitFullName(fullName: string): { firstName: string; lastName: 
     firstName: first ?? '',
     lastName: rest.length > 0 ? rest.join(' ') : (first ?? ''),
   };
-}
-
-/** "0901234567" → "901234567". Backend lưu đúng 9 chữ số, không giữ số 0 đứng đầu. */
-export function toBackendPhone(phone: string): string {
-  return phone.trim().replace(/\D/g, '').replace(/^0+/, '');
 }
 
 export function signupRequest(payload: SignupPayload) {

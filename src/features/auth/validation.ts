@@ -6,12 +6,12 @@ import type {
   ResetPasswordValues,
 } from '@/features/auth/types';
 import type { FormErrors } from '@/types/form';
+import { BACKEND_PHONE_PATTERN, toBackendPhone } from '@/lib/phone';
 import {
   MIN_PASSWORD_LENGTH,
   checkEmail,
   checkFullName,
   checkPasswordMatch,
-  checkPhone,
 } from '@/lib/validation';
 
 /** Backend chỉ nhận địa chỉ Gmail khi đăng ký (SignupRequest), nên chặn sớm ở client. */
@@ -30,6 +30,14 @@ function checkNewPassword(value: string) {
   return value.length >= MIN_PASSWORD_LENGTH
     ? undefined
     : `Mật khẩu tối thiểu ${MIN_PASSWORD_LENGTH} ký tự`;
+}
+
+function checkSignupPhone(value: string) {
+  if (!value.trim()) return 'Vui lòng nhập số điện thoại';
+
+  return BACKEND_PHONE_PATTERN.test(toBackendPhone(value))
+    ? undefined
+    : 'Nhập 9 chữ số hoặc 10 chữ số bắt đầu bằng 0';
 }
 
 function checkOtp(value: string) {
@@ -51,7 +59,7 @@ export function validateRegister(values: RegisterValues): FormErrors<RegisterVal
   return {
     fullName: checkFullName(values.fullName),
     email: checkSignupEmail(values.email),
-    phone: checkPhone(values.phone),
+    phone: checkSignupPhone(values.phone),
     password: checkNewPassword(values.password),
     confirmPassword: checkPasswordMatch(values.confirmPassword, values.password),
   };

@@ -60,7 +60,7 @@ export function RegisterForm({ onRegistered }: RegisterFormProps) {
 
   return (
     <View style={styles.container}>
-      <FormSection title="Thông tin cá nhân">
+      <FormSection title="Thông tin cá nhân" titleSize={16} highlighted>
         <TextField
           autoComplete="name"
           error={errors.fullName}
@@ -98,7 +98,7 @@ export function RegisterForm({ onRegistered }: RegisterFormProps) {
         />
       </FormSection>
 
-      <FormSection title="Bảo mật">
+      <FormSection title="Bảo mật" titleSize={16} highlighted>
         <PasswordField
           autoComplete="new-password"
           error={errors.password}
