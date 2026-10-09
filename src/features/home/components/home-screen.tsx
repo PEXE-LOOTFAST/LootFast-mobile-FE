@@ -1,5 +1,4 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
 import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
@@ -7,16 +6,16 @@ import { InlineAlert } from '@/components/ui/inline-alert';
 import { MaxContentWidth } from '@/constants/theme';
 import { getDealErrorMessage } from '@/features/home/api/deals';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
+import { BuyerHeader } from '@/features/home/components/buyer-header';
 import { DealCard } from '@/features/home/components/deal-card';
 import { DealFilterButton } from '@/features/home/components/deal-filter-button';
 import { EmptyDeals } from '@/features/home/components/empty-deals';
-import { HomeHeader } from '@/features/home/components/home-header';
 import { LocationPrompt } from '@/features/home/components/location-prompt';
-import { NotificationSheet } from '@/features/home/components/notification-sheet';
 import { SearchPanel } from '@/features/home/components/search-panel';
 import { SectionHeader } from '@/features/home/components/section-header';
 import { useDeals } from '@/features/home/api/use-deals';
 import { DEAL_CATEGORIES } from '@/features/home/constants/deal-categories';
+import { HomeIcons } from '@/features/home/constants/icons';
 import { filterDeals, useDealFilters } from '@/features/home/hooks/use-deal-filters';
 import type { Deal } from '@/features/home/types';
 import { useAuthSession } from '@/hooks/use-auth-session';
@@ -40,7 +39,6 @@ export function HomeScreen() {
   });
   const deals = dealsQuery.data ?? [];
   const filteredDeals = filterDeals(deals, filters);
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   // Bộ lọc cần cả đăng nhập lẫn GPS: không có vị trí thì "gần bạn" và bán kính không có nghĩa.
   const canFilter = isAuthenticated && location.isReady;
@@ -65,16 +63,12 @@ export function HomeScreen() {
           />
         }
       >
-        <HomeHeader
-          gpsStatus={location.status}
-          isAuthenticated={isAuthenticated}
-          onPressGps={() => void location.request()}
-          locationLabel={
+        <BuyerHeader
+          subtitle={
             location.isReady ? `Gần bạn · ${formatRadius(filters.radiusKm)}` : 'Chưa bật vị trí'
           }
-          onPressNotifications={() => setIsNotificationsOpen(true)}
-          onPressSignIn={withAuth()}
-          unreadCount={0}
+          subtitleIcon={HomeIcons.location}
+          title="Trang chủ"
         />
 
         <View style={styles.body}>
@@ -147,11 +141,6 @@ export function HomeScreen() {
       </ScrollView>
 
       <AssistantFab />
-
-      <NotificationSheet
-        onClose={() => setIsNotificationsOpen(false)}
-        visible={isNotificationsOpen}
-      />
     </View>
   );
 }

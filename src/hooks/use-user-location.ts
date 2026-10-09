@@ -1,5 +1,5 @@
 import * as Location from 'expo-location';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { AppState, Linking, Platform } from 'react-native';
 
 export type Coordinate = { latitude: number; longitude: number };
@@ -14,7 +14,7 @@ export type LocationStatus = 'checking' | 'granted' | 'denied' | 'gps-off' | 'un
 type Snapshot = { status: LocationStatus; coords: Coordinate | null; canAskAgain: boolean };
 
 type Options = {
-  /** Hiện hộp thoại xin quyền ngay khi mount. Mặc định chỉ đọc quyền đã cấp, không làm phiền. */
+  /** Hiện hộp thoại xin quyền khi màn mount (chỉ một lần mỗi lần mở app). Mặc định chỉ đọc quyền đã cấp. */
   autoRequest?: boolean;
 };
 
@@ -58,94 +58,121 @@ async function observeStatus(): Promise<LocationStatus> {
   return (await Location.hasServicesEnabledAsync()) ? 'granted' : 'gps-off';
 }
 
-export function useUserLocation({ autoRequest = false }: Options = {}) {
-  const [snapshot, setSnapshot] = useState<Snapshot>({
-    status: 'checking',
-    coords: null,
-    canAskAgain: true,
+// Trạng thái vị trí dùng chung cho cả app: header của mọi tab, Trang chủ và Bản đồ đọc cùng một
+// nguồn nên không tranh nhau xin quyền hay đo GPS, và đổi ở đâu thì mọi nơi đều thấy ngay.
+let snapshot: Snapshot = { status: 'checking', coords: null, canAskAgain: true };
+const listeners = new Set<() => void>();
+// Chỉ kết quả của lần đọc mới nhất được ghi nhận, tránh lần đọc chậm ghi đè lần đọc mới hơn.
+let latestRead = 0;
+let hasAutoRequested = false;
+let stopSync: (() => void) | null = null;
+
+function commit(next: Snapshot) {
+  snapshot = next;
+  listeners.forEach((listener) => listener());
+}
+
+async function refresh(ask: boolean) {
+  const id = ++latestRead;
+  const next = await readLocation(ask);
+  if (id === latestRead) commit(next);
+}
+
+// Người dùng có thể bật/tắt GPS hoặc đổi quyền ở Cài đặt / thanh trạng thái khi app vẫn mở, nên
+// đối chiếu định kỳ và mỗi lần app quay lại để bộ lọc khoá/mở đúng theo thực tế.
+async function sync() {
+  if (AppState.currentState !== 'active') return;
+
+  try {
+    const current = snapshot.status;
+    if (current === 'checking') return;
+
+    const observed = await observeStatus();
+    if (observed === current) return;
+    // Đã báo "không đọc được vị trí" thì chỉ thử lại khi người dùng bấm nút, tránh lặp vô hạn.
+    if (current === 'unavailable' && observed === 'granted') return;
+
+    await refresh(false);
+  } catch {
+    // Bỏ qua: lần đối chiếu sau sẽ thử lại.
+  }
+}
+
+function startSync() {
+  void refresh(false);
+
+  const interval = setInterval(() => void sync(), SYNC_INTERVAL_MS);
+  const subscription = AppState.addEventListener('change', (state) => {
+    if (state === 'active') void sync();
   });
-  const statusRef = useRef<LocationStatus>('checking');
 
-  const commit = useCallback((next: Snapshot) => {
-    statusRef.current = next.status;
-    setSnapshot(next);
-  }, []);
+  return () => {
+    clearInterval(interval);
+    subscription.remove();
+  };
+}
 
-  useEffect(() => {
-    let active = true;
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  // Chỉ chạy vòng đối chiếu khi có màn đang cần vị trí.
+  if (listeners.size === 1) stopSync = startSync();
 
-    void readLocation(autoRequest).then((next) => {
-      if (active) commit(next);
-    });
-
-    // Người dùng có thể bật/tắt GPS hoặc đổi quyền ở Cài đặt / thanh trạng thái khi app vẫn mở,
-    // nên đối chiếu định kỳ và mỗi lần app quay lại để bộ lọc khoá/mở đúng theo thực tế.
-    const sync = async () => {
-      if (AppState.currentState !== 'active') return;
-
-      try {
-        const current = statusRef.current;
-        if (current === 'checking') return;
-
-        const observed = await observeStatus();
-        if (observed === current) return;
-        // Đã báo "không đọc được vị trí" thì chỉ thử lại khi người dùng bấm nút, tránh lặp vô hạn.
-        if (current === 'unavailable' && observed === 'granted') return;
-
-        const next = await readLocation(false);
-        if (active) commit(next);
-      } catch {
-        // Bỏ qua: lần đối chiếu sau sẽ thử lại.
-      }
-    };
-
-    const interval = setInterval(() => void sync(), SYNC_INTERVAL_MS);
-    const subscription = AppState.addEventListener('change', (state) => {
-      if (state === 'active') void sync();
-    });
-
-    return () => {
-      active = false;
-      clearInterval(interval);
-      subscription.remove();
-    };
-  }, [autoRequest, commit]);
-
-  /**
-   * Xin quyền / bật GPS / đọc lại vị trí tuỳ tình huống. Khi hệ điều hành không cho hỏi lại
-   * (đã chọn "đừng hỏi lại") hoặc không có hộp thoại bật GPS (iOS) thì đưa vào Cài đặt.
-   */
-  const request = useCallback(async () => {
-    const { status, canAskAgain } = snapshot;
-
-    if (status === 'gps-off') {
-      if (Platform.OS !== 'android') {
-        await Linking.openSettings();
-        return;
-      }
-
-      try {
-        await Location.enableNetworkProviderAsync();
-      } catch {
-        // Người dùng từ chối hộp thoại bật GPS: chỉ báo trạng thái hiện tại, không ép.
-      }
-      commit(await readLocation(false));
-      return;
+  return () => {
+    listeners.delete(listener);
+    if (listeners.size === 0) {
+      stopSync?.();
+      stopSync = null;
     }
+  };
+}
 
-    if (status === 'denied' && !canAskAgain) {
+const getSnapshot = () => snapshot;
+
+/**
+ * Xin quyền / bật GPS / đọc lại vị trí tuỳ tình huống. Khi hệ điều hành không cho hỏi lại
+ * (đã chọn "đừng hỏi lại") hoặc không có hộp thoại bật GPS (iOS) thì đưa vào Cài đặt.
+ */
+async function request() {
+  const { status, canAskAgain } = snapshot;
+
+  if (status === 'gps-off') {
+    if (Platform.OS !== 'android') {
       await Linking.openSettings();
       return;
     }
 
-    commit(await readLocation(true));
-  }, [commit, snapshot]);
+    try {
+      await Location.enableNetworkProviderAsync();
+    } catch {
+      // Người dùng từ chối hộp thoại bật GPS: chỉ báo trạng thái hiện tại, không ép.
+    }
+    await refresh(false);
+    return;
+  }
+
+  if (status === 'denied' && !canAskAgain) {
+    await Linking.openSettings();
+    return;
+  }
+
+  await refresh(true);
+}
+
+export function useUserLocation({ autoRequest = false }: Options = {}) {
+  const current = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+
+  useEffect(() => {
+    if (!autoRequest || hasAutoRequested) return;
+
+    hasAutoRequested = true;
+    void refresh(true);
+  }, [autoRequest]);
 
   return {
-    status: snapshot.status,
-    coords: snapshot.coords,
-    isReady: snapshot.status === 'granted' && snapshot.coords !== null,
-    canAskAgain: snapshot.canAskAgain,
+    status: current.status,
+    coords: current.coords,
+    isReady: current.status === 'granted' && current.coords !== null,
+    canAskAgain: current.canAskAgain,
     request,
   };
 }

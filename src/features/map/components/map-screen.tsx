@@ -7,9 +7,9 @@ import { EmptyCard } from '@/components/ui/empty-card';
 import { ErrorState } from '@/components/ui/error-state';
 import { Icon } from '@/components/ui/icon';
 import { LoadingState } from '@/components/ui/loading-state';
-import { TabHeader } from '@/components/ui/tab-header';
 import { DEFAULT_DEAL_LOCATION, getDeals } from '@/features/home/api/deals';
 import { getStore } from '@/features/home/api/stores';
+import { BuyerHeader } from '@/features/home/components/buyer-header';
 import { LocationPrompt } from '@/features/home/components/location-prompt';
 import { HomeIcons } from '@/features/home/constants/icons';
 import { DealMap } from '@/features/map/components/deal-map';
@@ -87,7 +87,7 @@ export function MapScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
-      <TabHeader subtitle="Tìm deal cuối ngày quanh bạn" title="Bản đồ" />
+      <BuyerHeader subtitle="Tìm deal cuối ngày quanh bạn" title="Bản đồ" />
 
       <View style={styles.mapArea}>
         {isGoongConfigured ? (

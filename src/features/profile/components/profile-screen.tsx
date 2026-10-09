@@ -4,7 +4,7 @@ import { Image } from 'expo-image';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/ui/icon';
-import { TabHeader } from '@/components/ui/tab-header';
+import { BuyerHeader } from '@/features/home/components/buyer-header';
 import { getProfileErrorMessage } from '@/features/profile/api/profile';
 import { useAvatarUpload } from '@/features/profile/api/use-avatar';
 import { useProfile } from '@/features/profile/api/use-profile';
@@ -110,7 +110,7 @@ export function ProfileScreen() {
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <TabHeader subtitle="Quản lý tài khoản, ưu đãi và quyền lợi" title="Hồ sơ người mua" />
+        <BuyerHeader subtitle="Quản lý tài khoản, ưu đãi và quyền lợi" title="Hồ sơ" />
 
         <View
           style={[

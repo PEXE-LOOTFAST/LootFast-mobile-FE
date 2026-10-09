@@ -57,7 +57,13 @@ export function TabHeader({ title, subtitle, subtitleIcon, onBack, trailing }: T
         ) : null}
 
         <View style={styles.copy}>
-          <Text accessibilityRole="header" numberOfLines={1} style={styles.title}>
+          <Text
+            accessibilityRole="header"
+            adjustsFontSizeToFit
+            minimumFontScale={0.8}
+            numberOfLines={1}
+            style={styles.title}
+          >
             {title}
           </Text>
           {subtitle ? (

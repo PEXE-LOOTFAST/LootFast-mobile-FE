@@ -2,7 +2,7 @@ import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 
 import { ErrorState } from '@/components/ui/error-state';
 import { Icon } from '@/components/ui/icon';
-import { TabHeader } from '@/components/ui/tab-header';
+import { BuyerHeader } from '@/features/home/components/buyer-header';
 import { RADIUS_OPTIONS_KM } from '@/features/home/constants/deals';
 import { useBuyerBenefits } from '@/features/profile/api/use-buyer-benefits';
 import { ProfileIcons } from '@/features/profile/constants/icons';
@@ -165,11 +165,10 @@ export function PremiumScreen({ onBack }: PremiumScreenProps) {
   return (
     <View style={[styles.safeArea, { backgroundColor: theme.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <TabHeader
+        <BuyerHeader
           onBack={onBack}
           subtitle="Lưu bộ lọc và nhận thông báo deal phù hợp"
           title="Gói cao cấp"
-          trailing={<Icon name={ProfileIcons.premium} color="#FFFFFF" size={24} />}
         />
 
         <View style={styles.body}>

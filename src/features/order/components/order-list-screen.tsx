@@ -6,9 +6,9 @@ import { BrandButton } from '@/components/ui/brand-button';
 import { EmptyCard } from '@/components/ui/empty-card';
 import { ErrorState } from '@/components/ui/error-state';
 import { LoadingState } from '@/components/ui/loading-state';
-import { TabHeader } from '@/components/ui/tab-header';
 import { MaxContentWidth } from '@/constants/theme';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
+import { BuyerHeader } from '@/features/home/components/buyer-header';
 import { type OrderListStatusDto, toOrderErrorMessage } from '@/features/order/api/orders';
 import { useOrders } from '@/features/order/api/use-orders';
 import { useTheme } from '@/hooks/use-theme';
@@ -34,7 +34,7 @@ export function OrderListScreen() {
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <TabHeader subtitle="Theo dõi đơn và thời gian nhận món" title="Đơn hàng của tôi" />
+        <BuyerHeader subtitle="Theo dõi đơn và thời gian nhận món" title="Đơn hàng" />
 
         <View style={styles.body}>
           <ScrollView
