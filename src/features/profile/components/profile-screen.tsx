@@ -2,9 +2,9 @@ import { router, type Href } from 'expo-router';
 
 import { Image } from 'expo-image';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon, type IconName } from '@/components/ui/icon';
+import { TabHeader } from '@/components/ui/tab-header';
 import { getProfileErrorMessage } from '@/features/profile/api/profile';
 import { useAvatarUpload } from '@/features/profile/api/use-avatar';
 import { useProfile } from '@/features/profile/api/use-profile';
@@ -108,40 +108,9 @@ export function ProfileScreen() {
   const profileImage = profile?.avatarUrl ?? null;
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]} edges={['top']}>
+    <View style={[styles.screen, { backgroundColor: theme.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={[styles.hero, { backgroundColor: theme.primary }]}>
-          <View
-            style={[
-              styles.decoration,
-              styles.decorationLarge,
-              { backgroundColor: theme.primarySoft },
-            ]}
-          />
-          <View
-            style={[
-              styles.decoration,
-              styles.decorationSmall,
-              { backgroundColor: theme.primarySoft },
-            ]}
-          />
-          <View style={styles.heroCopy}>
-            <Text style={styles.heroTitle}>Hồ sơ người mua</Text>
-            <Text style={styles.heroSubtitle}>
-              Quản lý tài khoản, ưu đãi và quyền lợi{`\n`}của bạn
-            </Text>
-          </View>
-          <View style={styles.heroAvatar}>
-            {profileImage ? (
-              <Image contentFit="cover" source={{ uri: profileImage }} style={styles.avatarImage} />
-            ) : (
-              <Text style={[styles.heroAvatarText, { color: theme.primary }]}>{initials}</Text>
-            )}
-            <View style={[styles.heroCamera, { backgroundColor: theme.backgroundElement }]}>
-              <Icon name={ProfileIcons.camera} color={theme.primary} size={13} />
-            </View>
-          </View>
-        </View>
+        <TabHeader subtitle="Quản lý tài khoản, ưu đãi và quyền lợi" title="Hồ sơ người mua" />
 
         <View
           style={[
@@ -235,7 +204,7 @@ export function ProfileScreen() {
           <Text style={[styles.signOutText, { color: theme.danger }]}>Đăng xuất</Text>
         </Pressable>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -250,48 +219,9 @@ function getInitials(name: string) {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1 },
+  screen: { flex: 1 },
   content: { gap: 12, paddingBottom: 110 },
-  hero: {
-    alignItems: 'center',
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    minHeight: 128,
-    overflow: 'hidden',
-    paddingHorizontal: 18,
-  },
-  decoration: { borderRadius: 999, opacity: 0.35, position: 'absolute' },
-  decorationLarge: { height: 220, right: -84, top: -86, width: 220 },
-  decorationSmall: { bottom: -76, height: 132, right: 106, width: 132 },
-  heroCopy: { flex: 1, gap: 6 },
-  heroTitle: { color: '#FFFFFF', fontSize: 21, fontWeight: '900' },
-  heroSubtitle: { color: '#DDF2E5', fontSize: 12, lineHeight: 17 },
-  heroAvatar: {
-    alignItems: 'center',
-    borderColor: '#B7E6C8',
-    borderRadius: 999,
-    borderWidth: 2,
-    height: 70,
-    justifyContent: 'center',
-    marginLeft: 12,
-    width: 70,
-  },
-  heroAvatarText: { fontSize: 16, fontWeight: '900' },
   avatarImage: { borderRadius: 999, height: '100%', width: '100%' },
-  heroCamera: {
-    alignItems: 'center',
-    borderColor: '#16794B',
-    borderRadius: 999,
-    borderWidth: 1,
-    bottom: -4,
-    height: 24,
-    justifyContent: 'center',
-    position: 'absolute',
-    right: -3,
-    width: 24,
-  },
   accountCard: {
     alignItems: 'center',
     flexDirection: 'row',

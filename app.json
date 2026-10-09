@@ -34,7 +34,13 @@
           "imageWidth": 76
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "LootFast dùng vị trí của bạn để tìm deal gần bạn."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

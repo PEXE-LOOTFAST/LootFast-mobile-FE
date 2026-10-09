@@ -1,17 +1,16 @@
-import { router, useFocusEffect } from 'expo-router';
-import { setStatusBarStyle } from 'expo-status-bar';
-import { useCallback, useState } from 'react';
+import { router } from 'expo-router';
+import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
 import { EmptyCard } from '@/components/ui/empty-card';
 import { ErrorState } from '@/components/ui/error-state';
 import { LoadingState } from '@/components/ui/loading-state';
+import { TabHeader } from '@/components/ui/tab-header';
 import { MaxContentWidth } from '@/constants/theme';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { type OrderListStatusDto, toOrderErrorMessage } from '@/features/order/api/orders';
 import { useOrders } from '@/features/order/api/use-orders';
-import { OrderHeader } from '@/features/order/components/order-header';
 import { useTheme } from '@/hooks/use-theme';
 import { formatPrice } from '@/lib/format';
 
@@ -32,18 +31,10 @@ export function OrderListScreen() {
   const [page, setPage] = useState(0);
   const ordersQuery = useOrders(status, page);
 
-  // Header nền xanh đậm cần icon status bar màu sáng, trả về 'auto' khi rời màn.
-  useFocusEffect(
-    useCallback(() => {
-      setStatusBarStyle('light');
-      return () => setStatusBarStyle('auto');
-    }, []),
-  );
-
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <OrderHeader />
+        <TabHeader subtitle="Theo dõi đơn và thời gian nhận món" title="Đơn hàng của tôi" />
 
         <View style={styles.body}>
           <ScrollView
