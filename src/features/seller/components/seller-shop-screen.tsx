@@ -1,5 +1,4 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
 import { Alert, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Icon } from '@/components/ui/icon';
@@ -7,103 +6,37 @@ import { InlineAlert } from '@/components/ui/inline-alert';
 import { MaxContentWidth } from '@/constants/theme';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { SellerMenuList, type SellerMenuItem } from '@/features/seller/components/seller-menu-list';
+import { MerchantRegistrationRequired } from '@/features/seller/components/merchant-registration-required';
+import { ShopSetupCard, getShopSetupSteps } from '@/features/seller/components/shop-setup-card';
 import { SellerShopHeader } from '@/features/seller/components/seller-shop-header';
-import { ShopInfoSheet } from '@/features/seller/components/shop-info-sheet';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { useMerchantImageUpload } from '@/features/seller/hooks/use-merchant-image-upload';
 import { useLightStatusBar } from '@/hooks/use-light-status-bar';
-import {
-  openCloseToSlots,
-  slotsToOpenClose,
-  useMerchantShop,
-} from '@/features/seller/hooks/use-merchant-shop';
-import type { SellerShop, SellerShopCategory } from '@/features/seller/types';
+import { useMerchantShop } from '@/features/seller/hooks/use-merchant-shop';
 import { useTheme } from '@/hooks/use-theme';
 import { confirmSignOut } from '@/lib/confirm-sign-out';
 
-function mapErrorCode(code: string): string {
-  const messages: Record<string, string> = {
-    UNAUTHORIZED: 'Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.',
-    FORBIDDEN: 'Tài khoản chưa được cấp quyền Người bán.',
-    MERCHANT_PROFILE_NOT_FOUND: 'Chưa tìm thấy hồ sơ quán.',
-    VALIDATION_FAILED: 'Thông tin không hợp lệ. Vui lòng kiểm tra lại.',
-    OPENING_HOURS_OVERLAP: 'Khung giờ mở cửa trong ngày không được trùng nhau.',
-    FILE_TOO_LARGE: 'Ảnh vượt quá 5 MB. Vui lòng chọn ảnh nhỏ hơn.',
-    UPLOAD_RATE_LIMIT_EXCEEDED: 'Đổi ảnh quá nhiều lần. Thử lại sau 1 giờ.',
-    SERVICE_UNAVAILABLE: 'Dịch vụ tạm thời bảo trì. Thử lại sau.',
-  };
-  return messages[code] ?? 'Đã có lỗi xảy ra. Vui lòng thử lại.';
-}
-
 export function SellerShopScreen() {
   const theme = useTheme();
-  const [isInfoOpen, setIsInfoOpen] = useState(false);
   useLightStatusBar();
 
-  const {
-    profile,
-    location,
-    openingHours,
-    isLoading,
-    isError,
-    isSaving,
-    refetch,
-    updateProfile,
-    updateLocation,
-    updateOpeningHours,
-  } = useMerchantShop();
+  const { profile, location, openingHours, profileMissing, isLoading, isError, refetch } =
+    useMerchantShop();
+  const setupDone = getShopSetupSteps({ profile, location, openingHours }).every((s) => s.done);
 
   const { pickAndUpload } = useMerchantImageUpload();
-
-  const shopForForm: SellerShop = {
-    name: profile?.storeName ?? '',
-    isVerified: profile !== undefined,
-    email: profile?.contactEmail ?? '',
-    address: location?.addressLine ?? '',
-    categories: profile?.businessCategory ? [profile.businessCategory as SellerShopCategory] : [],
-    openingHours: slotsToOpenClose(openingHours),
-  };
-
-  async function handleSave(partial: Partial<SellerShop>) {
-    try {
-      if (partial.name !== undefined || partial.categories !== undefined) {
-        await updateProfile({
-          storeName: partial.name?.trim() ?? profile?.storeName ?? '',
-          description: profile?.description ?? undefined,
-          businessCategory: partial.categories?.[0] ?? profile?.businessCategory ?? '',
-          contactEmail: profile?.contactEmail ?? '',
-          contactPhone: profile?.contactPhone ?? '',
-        });
-      }
-      if (partial.address !== undefined) {
-        await updateLocation({
-          addressLine: partial.address.trim(),
-          ward: location?.ward ?? '',
-          district: location?.district ?? '',
-          city: location?.city ?? '',
-          latitude: location?.latitude ?? 0,
-          longitude: location?.longitude ?? 0,
-        });
-      }
-      if (partial.openingHours !== undefined) {
-        await updateOpeningHours(
-          openCloseToSlots(partial.openingHours.open, partial.openingHours.close),
-        );
-      }
-      setIsInfoOpen(false);
-    } catch (err) {
-      const code = err instanceof Error ? err.message : 'UNKNOWN_ERROR';
-      Alert.alert('Lỗi lưu thông tin', mapErrorCode(code));
-    }
-  }
 
   const menuItems: SellerMenuItem[] = [
     {
       key: 'info',
       icon: SellerIcons.store,
       title: 'Thông tin quán',
-      subtitle: 'Thông tin cửa hàng và hồ sơ xác minh',
-      onPress: () => setIsInfoOpen(true),
+      subtitle: isLoading
+        ? undefined
+        : setupDone
+          ? 'Hồ sơ, địa chỉ và giờ mở cửa'
+          : 'Chưa hoàn tất — bấm để cập nhật',
+      onPress: () => router.navigate('/seller/shop-info'),
     },
     {
       key: 'plan',
@@ -154,14 +87,22 @@ export function SellerShopScreen() {
       >
         <SellerShopHeader
           email={isLoading ? '' : (profile?.contactEmail ?? '')}
+          logoUrl={profile?.logoUrl}
+          verified={profile?.verified}
           onPressAvatar={() => pickAndUpload('logo')}
-          shopName={isLoading ? 'Đang tải...' : (profile?.storeName ?? '—')}
+          shopName={isLoading ? 'Đang tải...' : profile?.storeName || 'Chưa đặt tên quán'}
         />
 
         <View style={styles.body}>
           {isError ? (
             <InlineAlert message="Không tải được hồ sơ quán. Kéo xuống để thử lại." />
           ) : null}
+
+          {profileMissing ? <MerchantRegistrationRequired /> : null}
+
+          {isLoading || isError || profileMissing ? null : (
+            <ShopSetupCard location={location} openingHours={openingHours} profile={profile} />
+          )}
 
           <SellerMenuList items={menuItems} title="QUẢN LÝ CỬA HÀNG" />
 
@@ -196,13 +137,6 @@ export function SellerShopScreen() {
       </ScrollView>
 
       <AssistantFab bottomOffset={96} />
-
-      <ShopInfoSheet
-        onClose={() => setIsInfoOpen(false)}
-        onSave={handleSave}
-        shop={shopForForm}
-        visible={isInfoOpen && !isSaving}
-      />
     </View>
   );
 }

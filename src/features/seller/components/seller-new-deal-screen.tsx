@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
 import { InlineAlert } from '@/components/ui/inline-alert';
@@ -12,13 +12,26 @@ import {
   toMerchantDealErrorMessage,
   uploadDealImage,
 } from '@/features/seller/api/merchant-deals';
-import { MERCHANT_DEALS_QUERY_KEY } from '@/features/seller/api/use-merchant-deals';
+import {
+  MERCHANT_DEALS_QUERY_KEY,
+  useMerchantDeals,
+} from '@/features/seller/api/use-merchant-deals';
+import { MerchantRegistrationRequired } from '@/features/seller/components/merchant-registration-required';
 import { DealImagePicker } from '@/features/seller/components/deal-image-picker';
 import { SellerFormCard } from '@/features/seller/components/seller-form-card';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
+import { ShopSetupCard, getShopSetupSteps } from '@/features/seller/components/shop-setup-card';
 import { useMerchantShop } from '@/features/seller/hooks/use-merchant-shop';
+import type { MerchantOpeningHoursDto, MerchantProfileDto } from '@/features/seller/types/api';
 import { validateNewDeal, type NewDealValues } from '@/features/seller/validation';
-import { buildDealSchedule, toDealNumber } from '@/features/seller/deal-schedule';
+import {
+  buildDealSchedule,
+  findSharedDaySchedule,
+  toDealNumber,
+  toTimeInput,
+  todayOpeningSlot,
+  type DealSchedule,
+} from '@/features/seller/deal-schedule';
 import { useForm } from '@/hooks/use-form';
 import { useTheme } from '@/hooks/use-theme';
 import { formatPrice } from '@/lib/format';
@@ -34,27 +47,96 @@ const INITIAL_VALUES: NewDealValues = {
 
 export function SellerNewDealScreen() {
   const theme = useTheme();
-  const { profile } = useMerchantShop();
+  const shop = useMerchantShop();
+  const dealsQuery = useMerchantDeals();
+
+  const isLoading = shop.isLoading || dealsQuery.isLoading;
+  // Hồ sơ quán phải đủ tên, địa chỉ, tọa độ thì backend mới cho đăng (MERCHANT_PROFILE_INCOMPLETE);
+  // chặn từ đầu để người bán không nhập cả form rồi mới bị từ chối ở bước đăng.
+  const isSetupDone = getShopSetupSteps(shop).every((step) => step.done);
+  const sharedSchedule = findSharedDaySchedule(dealsQuery.data?.items ?? []);
+
+  return (
+    <SellerPageScaffold
+      onPressBack={() => router.navigate('/seller')}
+      subtitle="Chọn món, số phần, mức giảm và khung giờ khách đến nhận"
+      title="Đăng deal mới"
+    >
+      {isLoading ? <ActivityIndicator color={theme.primary} /> : null}
+
+      {/* Chưa có hồ sơ quán thì danh sách deal cũng trả lỗi 404: đã có thẻ giải thích riêng ở dưới. */}
+      {!shop.profileMissing && (shop.isError || dealsQuery.isError) ? (
+        <InlineAlert message="Không tải được thông tin quán. Kiểm tra mạng rồi thử lại." />
+      ) : null}
+
+      {shop.profileMissing ? <MerchantRegistrationRequired /> : null}
+
+      {!isLoading && !shop.isError && !shop.profileMissing && !isSetupDone ? (
+        <ShopSetupCard
+          location={shop.location}
+          openingHours={shop.openingHours}
+          profile={shop.profile}
+        />
+      ) : null}
+
+      {/* Chờ có đủ dữ liệu quán và deal hôm nay: useForm chốt giá trị ban đầu ở lần render đầu. */}
+      {!isLoading &&
+      !shop.isError &&
+      !dealsQuery.isError &&
+      !shop.profileMissing &&
+      isSetupDone &&
+      shop.profile ? (
+        <NewDealForm
+          openingHours={shop.openingHours}
+          profile={shop.profile}
+          sharedSchedule={sharedSchedule}
+        />
+      ) : null}
+    </SellerPageScaffold>
+  );
+}
+
+function NewDealForm({
+  profile,
+  openingHours,
+  sharedSchedule,
+}: {
+  profile: MerchantProfileDto;
+  openingHours?: MerchantOpeningHoursDto;
+  /** Khung giờ chung hôm nay nếu quán đã có deal đang bán: deal mới phải dùng y nguyên. */
+  sharedSchedule?: DealSchedule;
+}) {
+  const theme = useTheme();
   const queryClient = useQueryClient();
   const [formError, setFormError] = useState<string | null>(null);
   const [imageUris, setImageUris] = useState<string[]>([]);
   /** Nhãn tiến trình hiện trên nút trong lúc chạy chuỗi ba bước. */
   const [progress, setProgress] = useState<string | null>(null);
+  const slot = todayOpeningSlot(openingHours);
 
   const { values, errors, isSubmitting, setField, submit } = useForm<NewDealValues>({
-    initialValues: INITIAL_VALUES,
+    initialValues: sharedSchedule
+      ? {
+          ...INITIAL_VALUES,
+          open: toTimeInput(sharedSchedule.pickupStartsAt),
+          close: toTimeInput(sharedSchedule.pickupEndsAt),
+        }
+      : INITIAL_VALUES,
     validate: validateNewDeal,
     onSubmit: async (next) => {
       setFormError(null);
 
       // Nhóm món lấy từ hồ sơ quán — backend bắt buộc categoryCode và form không hỏi lại.
-      const categoryCode = profile?.businessCategory;
+      const categoryCode = profile.businessCategory;
       if (!categoryCode) {
         setFormError('Chưa có nhóm món trong hồ sơ quán. Cập nhật Thông tin quán trước đã.');
         return;
       }
 
-      const schedule = buildDealSchedule(next.open, next.close);
+      const schedule = buildDealSchedule(next.open, next.close, {
+        shared: sharedSchedule,
+        openingHours,
+      });
       if ('error' in schedule) {
         setFormError(schedule.error);
         return;
@@ -125,11 +207,7 @@ export function SellerNewDealScreen() {
       : 'Nhập giá gốc và giá deal để xem mức giảm.';
 
   return (
-    <SellerPageScaffold
-      onPressBack={() => router.navigate('/seller')}
-      subtitle="Chọn món, số phần, mức giảm và khung giờ khách đến nhận"
-      title="Đăng deal mới"
-    >
+    <>
       <SellerFormCard>
         <TextField
           size="compact"
@@ -183,6 +261,7 @@ export function SellerNewDealScreen() {
           <View style={styles.cell}>
             <TextField
               size="compact"
+              editable={!sharedSchedule}
               error={errors.open}
               label="Bắt đầu nhận"
               maxLength={5}
@@ -194,6 +273,7 @@ export function SellerNewDealScreen() {
           <View style={styles.cell}>
             <TextField
               size="compact"
+              editable={!sharedSchedule}
               error={errors.close}
               label="Kết thúc nhận"
               maxLength={5}
@@ -203,6 +283,14 @@ export function SellerNewDealScreen() {
             />
           </View>
         </View>
+
+        <Text style={[styles.hint, { color: theme.textSecondary }]}>
+          {sharedSchedule
+            ? 'Khung giờ chung của quán hôm nay: mọi deal trong ngày phải dùng cùng giờ bán và giờ nhận, nên không sửa được.'
+            : slot
+              ? `Giờ mở cửa hôm nay: ${slot.opensAt}–${slot.closesAt}. Giờ nhận phải nằm trong khung này, và mọi deal trong ngày sẽ dùng chung khung giờ bạn chọn ở deal đầu tiên.`
+              : 'Hôm nay quán không mở cửa nên chưa đăng deal được.'}
+        </Text>
 
         <DealImagePicker disabled={isSubmitting} onChange={setImageUris} uris={imageUris} />
       </SellerFormCard>
@@ -217,7 +305,7 @@ export function SellerNewDealScreen() {
       <BrandButton loading={isSubmitting} onPress={() => void submit()}>
         Đăng deal
       </BrandButton>
-    </SellerPageScaffold>
+    </>
   );
 }
 

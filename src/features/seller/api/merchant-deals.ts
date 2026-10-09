@@ -126,6 +126,8 @@ const MESSAGES: Record<string, string> = {
   INVALID_DEAL_PRICE: 'Giá deal phải nhỏ hơn giá gốc.',
   INVALID_DEAL_SCHEDULE: 'Khung giờ bán hoặc giờ nhận món không hợp lệ.',
   DEAL_OUTSIDE_OPENING_HOURS: 'Giờ nhận món nằm ngoài giờ mở cửa của quán.',
+  STORE_SCHEDULE_CONFLICT:
+    'Mọi deal trong cùng một ngày phải dùng chung khung giờ bán và nhận với deal đã đăng hôm nay.',
   DEAL_QUANTITY_CONFLICT: 'Số lượng mới nhỏ hơn số suất khách đã đặt.',
   DEAL_VERSION_CONFLICT: 'Deal vừa được cập nhật ở nơi khác. Tải lại rồi thử lại.',
   VALIDATION_FAILED: 'Thông tin deal không hợp lệ. Kiểm tra lại các ô đã nhập.',
@@ -138,7 +140,7 @@ const MESSAGES: Record<string, string> = {
 
 export function toMerchantDealErrorMessage(error: unknown): string {
   if (error instanceof ApiException) {
-    return MESSAGES[error.code] ?? 'Thao tác không thành công. Vui lòng thử lại.';
+    return MESSAGES[error.code] ?? `Thao tác không thành công (${error.code}). Vui lòng thử lại.`;
   }
 
   // Không phải lỗi từ backend: mất mạng, sai EXPO_PUBLIC_API_URL, server chưa chạy...

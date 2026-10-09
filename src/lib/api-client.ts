@@ -1,3 +1,6 @@
+import { File } from 'expo-file-system';
+import { Platform } from 'react-native';
+
 import { tokenStorage } from '@/lib/storage';
 import type { ApiResponse } from '@/types/api';
 
@@ -63,7 +66,7 @@ async function runRefresh(): Promise<boolean> {
   }
 }
 
-function refreshSession(): Promise<boolean> {
+export function refreshSession(): Promise<boolean> {
   refreshInFlight ??= runRefresh().finally(() => {
     refreshInFlight = null;
   });
@@ -91,6 +94,8 @@ export type UploadFile = {
   uri: string;
   /** Tên file gửi lên; để trống thì suy ra từ URI. */
   name?: string;
+  /** MIME do expo-image-picker báo (asset.mimeType); chính xác hơn việc đoán theo đuôi file. */
+  mimeType?: string;
 };
 
 type UploadOptions = {
@@ -100,11 +105,26 @@ type UploadOptions = {
   files: Record<string, UploadFile>;
 };
 
-function toFilePart(key: string, file: UploadFile) {
+/**
+ * Đóng gói một file để gửi multipart. `fetch` toàn cục của Expo (SDK 52+) tự dựng body từ FormData
+ * và không hiểu kiểu `{ uri, name, type }` của React Native cũ — gặp là ném "Unsupported
+ * FormDataPart implementation". Trên máy dùng `File` của expo-file-system (một Blob đọc từ URI);
+ * trên web URI là blob: nên đọc bằng fetch.
+ */
+async function toFilePart(key: string, file: UploadFile): Promise<Blob> {
   const name = file.name ?? file.uri.split('/').pop() ?? `${key}.jpg`;
   const extension = /\.(\w+)$/.exec(name)?.[1]?.toLowerCase();
+  // "image/jpg" không phải MIME hợp lệ; đuôi .jpg/.jpeg đều phải gửi là image/jpeg.
+  const guessed = !extension || extension === 'jpg' ? 'jpeg' : extension;
+  const type = file.mimeType ?? `image/${guessed}`;
 
-  return { uri: file.uri, name, type: extension ? `image/${extension}` : 'image/jpeg' };
+  if (Platform.OS === 'web') {
+    const blob = await (await fetch(file.uri)).blob();
+
+    return Object.assign(new Blob([blob], { type }), { name });
+  }
+
+  return new File(file.uri);
 }
 
 /**
@@ -123,23 +143,33 @@ export async function apiUpload<T>(path: string, options: UploadOptions): Promis
 
   const { method = 'POST', fields = {}, files } = options;
 
-  const buildBody = () => {
+  const buildBody = async () => {
     const form = new FormData();
     for (const [key, value] of Object.entries(fields)) form.append(key, value);
     for (const [key, file] of Object.entries(files)) {
-      // React Native nhận object {uri,name,type} làm phần file; kiểu DOM không mô tả được.
-      form.append(key, toFilePart(key, file) as unknown as Blob);
+      form.append(key, await toFilePart(key, file));
     }
 
     return form;
   };
 
-  const sendForm = async (accessToken: string | null) =>
-    fetch(`${BASE_URL}${path}`, {
-      method,
-      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
-      body: buildBody(),
-    });
+  // Gói lỗi mạng thành ApiException để màn hình phân biệt được "không tới được máy chủ" với
+  // lỗi do chính file (không đọc được URI, quá lớn...) thay vì cùng một câu chung chung.
+  const sendForm = async (accessToken: string | null) => {
+    try {
+      return await fetch(`${BASE_URL}${path}`, {
+        method,
+        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
+        body: await buildBody(),
+      });
+    } catch (error) {
+      throw new ApiException(
+        'NETWORK_ERROR',
+        error instanceof Error ? error.message : 'Network request failed',
+        0,
+      );
+    }
+  };
 
   const accessToken = await tokenStorage.getAccessToken();
   let response = await sendForm(accessToken);
@@ -154,7 +184,14 @@ export async function apiUpload<T>(path: string, options: UploadOptions): Promis
     }
   }
 
-  const payload = (await response.json()) as ApiResponse<T>;
+  // Proxy/gateway lỗi (502, 413...) trả HTML chứ không phải ApiResponse nên json() sẽ ném.
+  let payload: ApiResponse<T>;
+  try {
+    payload = (await response.json()) as ApiResponse<T>;
+  } catch {
+    throw new ApiException('INVALID_RESPONSE', 'Response was not valid JSON', response.status);
+  }
+
   if (!payload.success) {
     throw new ApiException(
       payload.error?.code ?? 'UNKNOWN_ERROR',

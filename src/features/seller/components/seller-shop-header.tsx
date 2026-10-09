@@ -1,3 +1,4 @@
+import { Image } from 'expo-image';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -8,11 +9,20 @@ import { SellerIcons } from '@/features/seller/constants/icons';
 type SellerShopHeaderProps = {
   shopName: string;
   email: string;
+  logoUrl?: string | null;
+  /** Admin đã duyệt hồ sơ đăng ký bán hàng. */
+  verified?: boolean;
   onPressAvatar: () => void;
 };
 
 // Header tab Hồ sơ quán: ảnh đại diện quán to bên trái, tên quán và email đăng nhập.
-export function SellerShopHeader({ shopName, email, onPressAvatar }: SellerShopHeaderProps) {
+export function SellerShopHeader({
+  shopName,
+  email,
+  logoUrl,
+  verified,
+  onPressAvatar,
+}: SellerShopHeaderProps) {
   const insets = useSafeAreaInsets();
 
   return (
@@ -28,14 +38,26 @@ export function SellerShopHeader({ shopName, email, onPressAvatar }: SellerShopH
           onPress={onPressAvatar}
           style={({ pressed }) => [styles.avatar, pressed && styles.pressed]}
         >
-          <Icon name={SellerIcons.store} color={HomeHeaderColors.textMuted} size={30} />
+          {logoUrl ? (
+            <Image contentFit="cover" source={{ uri: logoUrl }} style={styles.logo} />
+          ) : (
+            <Icon name={SellerIcons.store} color={HomeHeaderColors.textMuted} size={30} />
+          )}
           <View style={styles.cameraBadge}>
             <Icon name={SellerIcons.camera} color={HomeHeaderColors.background} size={12} />
           </View>
         </Pressable>
 
         <View style={styles.copy}>
-          <Text style={styles.eyebrow}>Hồ sơ quán</Text>
+          <View style={styles.eyebrowRow}>
+            <Text style={styles.eyebrow}>Hồ sơ quán</Text>
+            {verified ? (
+              <View style={styles.verified}>
+                <Icon name={SellerIcons.verified} color={HomeHeaderColors.text} size={12} />
+                <Text style={styles.verifiedLabel}>Đã xác minh</Text>
+              </View>
+            ) : null}
+          </View>
           <Text accessibilityRole="header" numberOfLines={2} style={styles.title}>
             {shopName}
           </Text>
@@ -102,6 +124,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: '#FFFFFF',
   },
+  logo: { width: 60, height: 60, borderRadius: 30 },
+  eyebrowRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  verified: { flexDirection: 'row', alignItems: 'center', gap: 3 },
+  verifiedLabel: { color: HomeHeaderColors.text, fontSize: 11, fontWeight: '800' },
   copy: { flex: 1, gap: 2 },
   eyebrow: { color: HomeHeaderColors.textMuted, fontSize: 11, fontWeight: '700' },
   title: { color: HomeHeaderColors.text, fontSize: 20, fontWeight: '900', letterSpacing: -0.4 },

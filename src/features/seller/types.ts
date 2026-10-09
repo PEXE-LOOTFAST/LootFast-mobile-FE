@@ -34,27 +34,6 @@ export type SellerOrder = {
   createdAt: string;
 };
 
-export type SellerShop = {
-  name: string;
-  isVerified: boolean;
-  email: string;
-  address: string;
-  categories: SellerShopCategory[];
-  /** Giờ mở và đóng cửa dạng "HH:mm". */
-  openingHours: { open: string; close: string };
-};
-
-/** Nhóm món quán bán, dùng để khách lọc deal theo loại đồ ăn. */
-export type SellerShopCategory =
-  | 'rice-noodle'
-  | 'banh-mi'
-  | 'bakery'
-  | 'fast-food'
-  | 'drinks'
-  | 'fruit'
-  | 'dessert'
-  | 'international';
-
 /** Người đứng tên tài khoản quán, tách khỏi thông tin hiển thị của cửa hàng. */
 export type SellerOwner = {
   fullName: string;
