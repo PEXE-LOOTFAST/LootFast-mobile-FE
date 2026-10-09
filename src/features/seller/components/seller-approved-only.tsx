@@ -34,7 +34,7 @@ export function SellerApprovedOnly({ title, children }: SellerApprovedOnlyProps)
 
   return (
     <SellerPageScaffold
-      onPressBack={() => router.navigate('/seller/shop')}
+      onPressBack={() => (router.canGoBack() ? router.back() : router.navigate('/seller/reports'))}
       subtitle="Cần được duyệt đăng ký bán hàng để dùng chức năng này"
       title={title}
     >
