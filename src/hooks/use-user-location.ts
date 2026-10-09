@@ -128,6 +128,9 @@ function subscribe(listener: () => void) {
 
 const getSnapshot = () => snapshot;
 
+/** Đọc trạng thái mới nhất ngoài React, dùng sau một `await request()` khi closure đã cũ. */
+export const peekUserLocation = () => snapshot;
+
 /**
  * Xin quyền / bật GPS / đọc lại vị trí tuỳ tình huống. Khi hệ điều hành không cho hỏi lại
  * (đã chọn "đừng hỏi lại") hoặc không có hộp thoại bật GPS (iOS) thì đưa vào Cài đặt.
