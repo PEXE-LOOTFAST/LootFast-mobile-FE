@@ -5,7 +5,7 @@ export const LOW_STOCK_THRESHOLD = 3;
 // BE cho mọi buyer chọn bán kính 0,1–50 km, không gắn với gói Premium; danh sách này chỉ là các
 // mức gợi ý trên giao diện.
 export const RADIUS_OPTIONS_KM = [0.5, 1, 2, 3, 5, 10, 20];
-export const DEFAULT_RADIUS_KM = 1;
+export const DEFAULT_RADIUS_KM = 3;
 
 export const DISCOUNT_OPTIONS: { value: DiscountFilter; label: string }[] = [
   { value: 30, label: 'Giảm ≥30%' },
