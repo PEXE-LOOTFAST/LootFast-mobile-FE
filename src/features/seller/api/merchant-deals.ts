@@ -57,6 +57,18 @@ export function listMerchantDeals(page = 0, size = 50) {
   return apiRequest<PagedResponse<MerchantDealDto>>(`${BASE_PATH}?${query.toString()}`);
 }
 
+export function getMerchantDeal(dealId: string) {
+  return apiRequest<MerchantDealDto>(`${BASE_PATH}/${dealId}`);
+}
+
+/**
+ * Sửa bản nháp. Backend chỉ cho sửa deal còn ở trạng thái DRAFT — deal đã đăng sẽ trả
+ * DEAL_NOT_EDITABLE, lúc đó chỉ đổi được số lượng qua `updateMerchantDealQuantity`.
+ */
+export function updateMerchantDeal(dealId: string, payload: CreateMerchantDealPayload) {
+  return apiRequest<MerchantDealDto>(`${BASE_PATH}/${dealId}`, { method: 'PUT', body: payload });
+}
+
 /** Tạo bản nháp. Deal chỉ lên sàn sau khi thêm ảnh rồi gọi `publishMerchantDeal`. */
 export function createMerchantDeal(payload: CreateMerchantDealPayload) {
   return apiRequest<MerchantDealDto>(BASE_PATH, { method: 'POST', body: payload });

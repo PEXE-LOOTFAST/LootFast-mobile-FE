@@ -2,10 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
   createMerchantDeal,
+  getMerchantDeal,
   listMerchantDeals,
   publishMerchantDeal,
   removeDealImage,
   reorderDealImages,
+  updateMerchantDeal,
   updateMerchantDealQuantity,
   uploadDealImage,
   type CreateMerchantDealPayload,
@@ -99,14 +101,25 @@ export function useReorderDealImages() {
   );
 }
 
-/** Một deal cụ thể của quán, dùng ở màn quản lý ảnh. */
+/**
+ * Một deal cụ thể của quán. Hỏi thẳng backend chứ không lọc trong danh sách đã nạp, vì danh
+ * sách chỉ lấy 50 deal đầu — deal cũ hơn sẽ không tìm thấy, và mở thẳng bằng URL cũng hỏng.
+ */
 export function useMerchantDeal(dealId: string | undefined) {
-  const dealsQuery = useMerchantDeals();
+  const query = useQuery({
+    enabled: Boolean(dealId),
+    queryKey: [...MERCHANT_DEALS_QUERY_KEY, dealId],
+    queryFn: () => getMerchantDeal(dealId as string),
+  });
 
-  return {
-    ...dealsQuery,
-    deal: dealsQuery.data?.items.find((item) => item.dealId === dealId),
-  };
+  return { ...query, deal: query.data };
+}
+
+export function useUpdateMerchantDeal() {
+  return useDealMutation(
+    ({ dealId, payload }: { dealId: string; payload: CreateMerchantDealPayload }) =>
+      updateMerchantDeal(dealId, payload),
+  );
 }
 
 export function useUpdateDealQuantity() {

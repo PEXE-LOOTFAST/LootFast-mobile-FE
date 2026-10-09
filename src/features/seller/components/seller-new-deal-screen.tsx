@@ -18,6 +18,7 @@ import { SellerFormCard } from '@/features/seller/components/seller-form-card';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import { useMerchantShop } from '@/features/seller/hooks/use-merchant-shop';
 import { validateNewDeal, type NewDealValues } from '@/features/seller/validation';
+import { buildDealSchedule, toDealNumber } from '@/features/seller/deal-schedule';
 import { useForm } from '@/hooks/use-form';
 import { useTheme } from '@/hooks/use-theme';
 import { formatPrice } from '@/lib/format';
@@ -30,23 +31,6 @@ const INITIAL_VALUES: NewDealValues = {
   open: '18:00',
   close: '21:00',
 };
-
-/** Backend bắt buộc chốt đơn trước giờ nhận ít nhất 15 phút (ORDER_CUTOFF). */
-const ORDER_CUTOFF_MS = 15 * 60 * 1000;
-
-const toNumber = (value: string) => Number(value.replace(/\D/g, ''));
-
-/**
- * "18:00" → mốc thời gian hôm nay. Backend bắt cả bốn mốc (bán và nhận) nằm trong cùng một
- * ngày theo lịch Việt Nam, nên chỉ đăng được deal trong ngày và máy phải để đúng múi giờ VN.
- */
-function toTodayAt(value: string) {
-  const [hours, minutes] = value.split(':').map(Number);
-  const date = new Date();
-  date.setHours(hours ?? 0, minutes ?? 0, 0, 0);
-
-  return date;
-}
 
 export function SellerNewDealScreen() {
   const theme = useTheme();
@@ -70,13 +54,9 @@ export function SellerNewDealScreen() {
         return;
       }
 
-      const pickupStart = toTodayAt(next.open);
-      const pickupEnd = toTodayAt(next.close);
-      const saleEnd = new Date(pickupStart.getTime() - ORDER_CUTOFF_MS);
-      const saleStart = new Date();
-
-      if (saleStart >= saleEnd) {
-        setFormError('Giờ bắt đầu nhận phải cách hiện tại ít nhất 15 phút.');
+      const schedule = buildDealSchedule(next.open, next.close);
+      if ('error' in schedule) {
+        setFormError(schedule.error);
         return;
       }
 
@@ -94,15 +74,12 @@ export function SellerNewDealScreen() {
         const deal = await createMerchantDeal({
           name: next.name.trim(),
           categoryCode,
-          originalPrice: toNumber(next.originalPrice),
-          discountedPrice: toNumber(next.price),
-          totalQuantity: toNumber(next.portions),
+          originalPrice: toDealNumber(next.originalPrice),
+          discountedPrice: toDealNumber(next.price),
+          totalQuantity: toDealNumber(next.portions),
           // Form chưa hỏi thời gian chuẩn bị; 0 nghĩa là khách đến là lấy được ngay.
           preparationMinutes: 0,
-          saleStartsAt: saleStart.toISOString(),
-          saleEndsAt: saleEnd.toISOString(),
-          pickupStartsAt: pickupStart.toISOString(),
-          pickupEndsAt: pickupEnd.toISOString(),
+          ...schedule.schedule,
         });
         dealId = deal.dealId;
 
@@ -140,8 +117,8 @@ export function SellerNewDealScreen() {
     },
   });
 
-  const price = toNumber(values.price);
-  const originalPrice = toNumber(values.originalPrice);
+  const price = toDealNumber(values.price);
+  const originalPrice = toDealNumber(values.originalPrice);
   const discount =
     price > 0 && originalPrice > price
       ? `Giảm ${Math.round((1 - price / originalPrice) * 100)}% so với ${formatPrice(originalPrice)}`

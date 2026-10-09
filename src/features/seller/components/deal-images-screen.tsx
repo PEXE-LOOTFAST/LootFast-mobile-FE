@@ -164,6 +164,20 @@ export function DealImagesScreen() {
 
           {deal.status === 'DRAFT' ? (
             <BrandButton
+              onPress={() =>
+                router.navigate({
+                  pathname: '/seller/edit-deal',
+                  params: { dealId: deal.dealId },
+                })
+              }
+              variant="outline"
+            >
+              Sửa thông tin deal
+            </BrandButton>
+          ) : null}
+
+          {deal.status === 'DRAFT' ? (
+            <BrandButton
               disabled={images.length === 0}
               loading={publish.isPending}
               onPress={() =>
