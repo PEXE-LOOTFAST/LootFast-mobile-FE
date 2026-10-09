@@ -19,7 +19,7 @@ import { useAuthSession } from '@/hooks/use-auth-session';
 import { useTheme } from '@/hooks/use-theme';
 import type { FormErrors } from '@/types/form';
 
-const goToShop = () => router.navigate('/seller/shop');
+const goBack = () => (router.canGoBack() ? router.back() : router.navigate('/seller/reports'));
 
 type MerchantShop = ReturnType<typeof useMerchantShop>;
 
@@ -37,7 +37,7 @@ export function SellerShopInfoScreen() {
 
   return (
     <SellerPageScaffold
-      onPressBack={goToShop}
+      onPressBack={goBack}
       subtitle="Đăng ký bán hàng, hồ sơ, địa chỉ và giờ mở cửa của quán"
       title="Thông tin quán"
     >

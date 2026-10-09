@@ -1,31 +1,39 @@
-import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
-import { ActivityIndicator, StyleSheet } from 'react-native';
+import { router, useFocusEffect } from 'expo-router';
+import { setStatusBarStyle } from 'expo-status-bar';
+import { useCallback, useMemo, useState } from 'react';
+import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 
 import { InlineAlert } from '@/components/ui/inline-alert';
+import { MaxContentWidth } from '@/constants/theme';
+import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { useMerchantPerformance } from '@/features/seller/api/merchant-performance';
 import { AdvancedReportCard } from '@/features/seller/components/advanced-report-card';
+import { MetricCard } from '@/features/seller/components/metric-card';
 import { PerformanceChartCard } from '@/features/seller/components/performance-chart-card';
 import { PerformanceSummaryCard } from '@/features/seller/components/performance-summary-card';
 import { SegmentedTabs } from '@/features/seller/components/segmented-tabs';
-import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
+import { SellerOverviewHeader } from '@/features/seller/components/seller-overview-header';
 import { TopDealsCard } from '@/features/seller/components/top-deals-card';
+import { SellerIcons } from '@/features/seller/constants/icons';
+import { useMerchantShop } from '@/features/seller/hooks/use-merchant-shop';
 import { useTheme } from '@/hooks/use-theme';
+import { formatPrice } from '@/lib/format';
 
-type RangeId = '7d' | '30d' | '90d';
+type RangeId = 'today' | '7d' | '30d';
 
 const RANGE_TABS: { id: RangeId; label: string }[] = [
+  { id: 'today', label: 'Hôm nay' },
   { id: '7d', label: '7 ngày' },
   { id: '30d', label: '30 ngày' },
-  { id: '90d', label: '90 ngày' },
 ];
 
-const RANGE_DAYS: Record<RangeId, number> = { '7d': 6, '30d': 29, '90d': 89 };
+const RANGE_DAYS: Record<RangeId, number> = { today: 0, '7d': 6, '30d': 29 };
 
 export function SellerReportScreen() {
   const theme = useTheme();
-  const [range, setRange] = useState<RangeId>('7d');
+  const [range, setRange] = useState<RangeId>('today');
   const [today] = useState(() => new Date());
+  const { profile } = useMerchantShop();
 
   const from = useMemo(() => {
     const d = new Date(today);
@@ -36,39 +44,96 @@ export function SellerReportScreen() {
   const query = useMerchantPerformance(from, today);
   const data = query.data;
 
+  useFocusEffect(
+    useCallback(() => {
+      setStatusBarStyle('light');
+      return () => setStatusBarStyle('auto');
+    }, []),
+  );
+
   return (
-    <SellerPageScaffold
-      onPressBack={() => (router.canGoBack() ? router.back() : router.navigate('/seller'))}
-      subtitle="Phân tích doanh thu và hiệu suất deal"
-      title="Báo cáo"
-    >
-      <SegmentedTabs items={RANGE_TABS} onChange={setRange} value={range} />
+    <View style={[styles.screen, { backgroundColor: theme.background }]}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <SellerOverviewHeader
+          date={today}
+          isVerified={profile !== undefined}
+          onPressCreateDeal={() => router.navigate('/seller/new-deal')}
+          shopName={profile?.storeName ?? '—'}
+        />
 
-      {query.isLoading ? (
-        <ActivityIndicator color={theme.primary} size="large" style={styles.loader} />
-      ) : null}
+        <View style={styles.body}>
+          <SegmentedTabs items={RANGE_TABS} onChange={setRange} value={range} />
 
-      {query.isError ? <InlineAlert message="Không tải được dữ liệu báo cáo." /> : null}
+          {query.isLoading ? (
+            <ActivityIndicator color={theme.primary} size="large" style={styles.loader} />
+          ) : null}
 
-      {data ? (
-        <>
-          <PerformanceSummaryCard data={data} />
+          {query.isError ? <InlineAlert message="Không tải được dữ liệu báo cáo." /> : null}
 
-          {data.daily.length > 1 ? <PerformanceChartCard daily={data.daily} /> : null}
+          {data ? (
+            <>
+              <View style={styles.metricsRow}>
+                <MetricCard
+                  icon={SellerIcons.revenue}
+                  label="Doanh thu"
+                  value={formatPrice(data.completedRevenue)}
+                  hint="Doanh thu từ đơn hoàn tất."
+                />
+                <MetricCard
+                  icon={SellerIcons.bag}
+                  label="Tổng đơn"
+                  value={`${data.placedOrders}`}
+                  hint="Số đơn đặt trong khoảng thời gian."
+                />
+              </View>
 
-          <TopDealsCard deals={data.topDeals} />
-        </>
-      ) : null}
+              <View style={styles.metricsRow}>
+                <MetricCard
+                  icon={SellerIcons.tag}
+                  label="Phần đã bán"
+                  value={`${data.discountedPortions}`}
+                  hint="Số phần ăn bán qua deal giảm giá."
+                />
+                <MetricCard
+                  icon={SellerIcons.trend}
+                  label="Tiết kiệm cho khách"
+                  value={formatPrice(data.customerSavings)}
+                  hint="Tiền khách tiết kiệm so với giá gốc."
+                />
+              </View>
 
-      <AdvancedReportCard
-        onPressPlan={() =>
-          router.navigate({ pathname: '/seller/plan', params: { from: '/seller/reports' } })
-        }
-      />
-    </SellerPageScaffold>
+              {data.daily.length > 1 ? <PerformanceChartCard daily={data.daily} /> : null}
+
+              <PerformanceSummaryCard data={data} />
+
+              <TopDealsCard deals={data.topDeals} />
+            </>
+          ) : null}
+
+          <AdvancedReportCard
+            onPressPlan={() =>
+              router.navigate({ pathname: '/seller/plan', params: { from: '/seller/reports' } })
+            }
+          />
+        </View>
+      </ScrollView>
+
+      <AssistantFab bottomOffset={96} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: { flex: 1 },
+  content: { paddingBottom: 120 },
+  body: {
+    width: '100%',
+    maxWidth: MaxContentWidth,
+    alignSelf: 'center',
+    gap: 14,
+    marginTop: 14,
+    paddingHorizontal: 16,
+  },
+  metricsRow: { flexDirection: 'row', gap: 12 },
   loader: { marginTop: 24 },
 });
