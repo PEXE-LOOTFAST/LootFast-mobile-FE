@@ -1,8 +1,12 @@
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ErrorState } from '@/components/ui/error-state';
 import { Icon } from '@/components/ui/icon';
+import { TabHeader } from '@/components/ui/tab-header';
+import { RADIUS_OPTIONS_KM } from '@/features/home/constants/deals';
+import { useBuyerBenefits } from '@/features/profile/api/use-buyer-benefits';
 import { ProfileIcons } from '@/features/profile/constants/icons';
+import { useAuthSession } from '@/hooks/use-auth-session';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -12,28 +16,29 @@ type PremiumScreenProps = {
 
 type Benefit = {
   label: string;
-  premiumLabel?: string;
+  badge?: string;
 };
 
+// Quyền lợi chỉ gồm những gì backend thật sự cấp: tìm/lọc deal, đặt giữ, yêu thích và thông báo
+// cơ bản là miễn phí; Premium của người mua hiện là bộ lọc đã lưu (BUYER_SAVED_FILTERS).
 const FREE_BENEFITS: Benefit[] = [
-  { label: 'Gợi ý món cơ bản', premiumLabel: '5 gợi ý/ngày' },
-  { label: 'Chat với quán', premiumLabel: '5 lượt/ngày' },
-  { label: 'Gợi ý deal hồi sắp hết', premiumLabel: '3 deal/ngày' },
-  { label: 'Xem deal cuối ngày gần bạn' },
+  { label: 'Tìm và lọc deal quanh bạn', badge: `Tới ${Math.max(...RADIUS_OPTIONS_KM)}km` },
+  { label: 'Đặt giữ deal và theo dõi đơn hàng' },
   { label: 'Lưu món và quán yêu thích' },
-  { label: 'Theo dõi đơn hàng' },
+  { label: 'Thông báo deal cơ bản' },
 ];
 
-const PREMIUM_BENEFITS: Benefit[] = [
-  { label: 'Gợi ý món cá nhân hoá', premiumLabel: 'Không giới hạn' },
-  { label: 'Chat với quán', premiumLabel: 'Không giới hạn' },
-  { label: 'Cảnh báo deal hồi sắp hết theo thời gian thực', premiumLabel: 'Không giới hạn' },
-  { label: 'Nhận thông báo deal sớm' },
-  { label: 'Theo dõi nhiều quán yêu thích hơn' },
-  { label: 'Bộ lọc tìm deal nâng cao' },
-  { label: 'Thông báo hành trình mua deal' },
-  { label: 'Hỗ trợ ưu tiên' },
-];
+function buildPremiumBenefits(filterLimit: number): Benefit[] {
+  return [
+    { label: 'Toàn bộ quyền lợi gói miễn phí' },
+    { label: 'Lưu bộ lọc deal để dùng lại', badge: `Tối đa ${filterLimit} bộ lọc` },
+    { label: 'Tìm nhanh deal theo bộ lọc đã lưu' },
+    { label: 'Thông báo khi có deal mới khớp bộ lọc đã lưu' },
+  ];
+}
+
+// Số bộ lọc tối đa BE trả kèm quyền; dùng giá trị này khi chưa tải xong.
+const DEFAULT_FILTER_LIMIT = 10;
 
 function BenefitRow({
   benefit,
@@ -50,9 +55,9 @@ function BenefitRow({
     <View style={styles.benefitRow}>
       <Icon name={ProfileIcons.check} color={accent} size={16} />
       <Text style={[styles.benefitLabel, { color: theme.text }]}>{benefit.label}</Text>
-      {benefit.premiumLabel ? (
+      {benefit.badge ? (
         <View style={[styles.badge, { backgroundColor: badgeBg ?? theme.backgroundElement }]}>
-          <Text style={[styles.badgeText, { color: accent }]}>{benefit.premiumLabel}</Text>
+          <Text style={[styles.badgeText, { color: accent }]}>{benefit.badge}</Text>
         </View>
       ) : null}
     </View>
@@ -76,21 +81,25 @@ const PREMIUM_COLORS = {
   },
 } as const;
 
+// current: gói người dùng đang có; available: có thể mua; included: đã nằm trong gói cao hơn
+// người dùng đang có nên không cần nút.
+type PlanStatus = 'current' | 'available' | 'included';
+
 function PlanCard({
   benefits,
   color,
-  current,
   onPress,
   premium = false,
   price,
+  status,
   title,
 }: {
   benefits: Benefit[];
   color: string;
-  current?: boolean;
   onPress?: () => void;
   premium?: boolean;
   price: string;
+  status: PlanStatus;
   title: string;
 }) {
   const theme = useTheme();
@@ -131,94 +140,80 @@ function PlanCard({
           />
         ))}
       </View>
-      {current ? (
+      {status === 'current' ? (
         <View style={[styles.currentButton, { borderColor: theme.border }]}>
           <Text style={[styles.currentButtonText, { color: theme.text }]}>Đang dùng</Text>
         </View>
-      ) : (
+      ) : null}
+      {status === 'available' ? (
         <Pressable onPress={onPress} style={styles.buyButton}>
           <Text style={styles.buyButtonText}>Mua Premium</Text>
         </Pressable>
-      )}
+      ) : null}
     </View>
   );
 }
 
 export function PremiumScreen({ onBack }: PremiumScreenProps) {
   const theme = useTheme();
+  const { user } = useAuthSession();
+  const benefitsQuery = useBuyerBenefits(Boolean(user));
+  const isPremium = benefitsQuery.data?.savedFilters === true;
+  const isChecking = Boolean(user) && benefitsQuery.isPending;
+  const currentPlan = isChecking ? 'Đang kiểm tra…' : isPremium ? 'Cao cấp' : 'Miễn phí';
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]} edges={['top']}>
+    <View style={[styles.safeArea, { backgroundColor: theme.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={[styles.header, { backgroundColor: theme.primary }]}>
-          <Pressable
-            accessibilityLabel="Quay lại"
-            accessibilityRole="button"
-            onPress={onBack}
-            style={styles.backButton}
-          >
-            <Icon name={ProfileIcons.back} color="#FFFFFF" size={20} />
-          </Pressable>
-          <View style={styles.headerCopy}>
-            <Text style={styles.headerTitle}>Gói cao cấp</Text>
-            <Text style={styles.headerSubtitle}>
-              Quyền lợi thông minh cho trải nghiệm mua deal thuận tiện hơn
-            </Text>
-          </View>
-          <Icon name={ProfileIcons.premium} color="#FFFFFF" size={28} />
-        </View>
+        <TabHeader
+          onBack={onBack}
+          subtitle="Lưu bộ lọc và nhận thông báo deal phù hợp"
+          title="Gói cao cấp"
+          trailing={<Icon name={ProfileIcons.premium} color="#FFFFFF" size={24} />}
+        />
 
         <View style={styles.body}>
           <Text style={[styles.eyebrow, { color: theme.textSecondary }]}>GÓI DỊCH VỤ</Text>
           <Text style={[styles.status, { color: theme.textSecondary }]}>
-            Gói hạn mức AI hiện tại:{' '}
-            <Text style={{ color: theme.text, fontWeight: '800' }}>Miễn phí</Text>
+            Gói hiện tại:{' '}
+            <Text style={{ color: theme.text, fontWeight: '800' }}>{currentPlan}</Text>
           </Text>
+
+          {benefitsQuery.isError ? (
+            <ErrorState
+              message="Không kiểm tra được gói hiện tại. Vui lòng thử lại."
+              onRetry={() => void benefitsQuery.refetch()}
+              retrying={benefitsQuery.isRefetching}
+            />
+          ) : null}
 
           <PlanCard
             benefits={FREE_BENEFITS}
             color={theme.backgroundElement}
-            current
             price="Miễn phí"
+            status={isPremium ? 'included' : 'current'}
             title="Miễn phí"
           />
           <PlanCard
-            benefits={PREMIUM_BENEFITS}
+            benefits={buildPremiumBenefits(
+              benefitsQuery.data?.savedFilterLimit ?? DEFAULT_FILTER_LIMIT,
+            )}
             color="#DDF2FC"
             onPress={() => Alert.alert('Mua Premium', 'Tính năng thanh toán đang được phát triển.')}
             premium
             price="29.000 VND"
+            status={isPremium ? 'current' : 'available'}
             title="Cao cấp"
           />
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   content: { paddingBottom: 110 },
-  header: {
-    alignItems: 'center',
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    flexDirection: 'row',
-    gap: 12,
-    minHeight: 104,
-    paddingHorizontal: 16,
-  },
-  backButton: {
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.16)',
-    borderRadius: 12,
-    height: 40,
-    justifyContent: 'center',
-    width: 40,
-  },
-  headerCopy: { flex: 1, gap: 4 },
-  headerTitle: { color: '#FFFFFF', fontSize: 21, fontWeight: '900' },
-  headerSubtitle: { color: '#DDF2E5', fontSize: 12, lineHeight: 17 },
   body: { gap: 8, padding: 16 },
   eyebrow: { fontSize: 11, fontWeight: '900', letterSpacing: 0.4, marginTop: 8 },
   status: { fontSize: 12, marginBottom: 2 },

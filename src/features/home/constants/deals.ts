@@ -2,7 +2,9 @@ import type { DiscountFilter, PickupFilter } from '@/features/home/types';
 
 export const LOW_STOCK_THRESHOLD = 3;
 
-export const RADIUS_OPTIONS_KM = [0.2, 0.4, 0.6, 0.8, 1, 1.5, 2];
+// BE cho mọi buyer chọn bán kính 0,1–50 km, không gắn với gói Premium; danh sách này chỉ là các
+// mức gợi ý trên giao diện.
+export const RADIUS_OPTIONS_KM = [0.5, 1, 2, 3, 5, 10, 20];
 export const DEFAULT_RADIUS_KM = 1;
 
 export const DISCOUNT_OPTIONS: { value: DiscountFilter; label: string }[] = [
