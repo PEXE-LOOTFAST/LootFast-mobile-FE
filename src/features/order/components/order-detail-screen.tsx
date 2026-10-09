@@ -1,13 +1,15 @@
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import QRCode from 'react-native-qrcode-svg';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BrandButton } from '@/components/ui/brand-button';
 import { EmptyCard } from '@/components/ui/empty-card';
+import { ErrorState } from '@/components/ui/error-state';
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
+import { LoadingState } from '@/components/ui/loading-state';
 import { MaxContentWidth } from '@/constants/theme';
 import { HomeIcons } from '@/features/home/constants/icons';
 import {
@@ -88,9 +90,15 @@ export function OrderDetailScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {orderQuery.isLoading ? <ActivityIndicator color={theme.primary} size="large" /> : null}
+        {orderQuery.isLoading ? <LoadingState /> : null}
 
-        {orderQuery.error ? <InlineAlert message={toOrderErrorMessage(orderQuery.error)} /> : null}
+        {orderQuery.error ? (
+          <ErrorState
+            message={toOrderErrorMessage(orderQuery.error)}
+            onRetry={() => void orderQuery.refetch()}
+            retrying={orderQuery.isRefetching}
+          />
+        ) : null}
         {cancelOrder.error ? (
           <InlineAlert message={toOrderErrorMessage(cancelOrder.error)} />
         ) : null}
@@ -159,18 +167,13 @@ export function OrderDetailScreen() {
                 Thanh toán
               </Text>
 
-              {instructionsQuery.isLoading ? <ActivityIndicator color={theme.primary} /> : null}
+              {instructionsQuery.isLoading ? <LoadingState size="small" /> : null}
               {instructionsQuery.error ? (
-                <>
-                  <InlineAlert message={toPaymentErrorMessage(instructionsQuery.error)} />
-                  <BrandButton
-                    loading={instructionsQuery.isRefetching}
-                    onPress={() => void instructionsQuery.refetch()}
-                    variant="outline"
-                  >
-                    Thử lại hướng dẫn thanh toán
-                  </BrandButton>
-                </>
+                <ErrorState
+                  message={toPaymentErrorMessage(instructionsQuery.error)}
+                  onRetry={() => void instructionsQuery.refetch()}
+                  retrying={instructionsQuery.isRefetching}
+                />
               ) : null}
 
               {instructions ? (

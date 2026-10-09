@@ -1,10 +1,12 @@
 import { router } from 'expo-router';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmptyCard } from '@/components/ui/empty-card';
+import { ErrorState } from '@/components/ui/error-state';
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
+import { LoadingState } from '@/components/ui/loading-state';
 import { MaxContentWidth } from '@/constants/theme';
 import { toDeal } from '@/features/home/api/deals';
 import { DealCard } from '@/features/home/components/deal-card';
@@ -58,10 +60,14 @@ export function FavoritesScreen() {
           />
         ) : null}
 
-        {favoritesQuery.isLoading ? <ActivityIndicator color={theme.primary} size="large" /> : null}
+        {favoritesQuery.isLoading ? <LoadingState /> : null}
 
         {favoritesQuery.error ? (
-          <InlineAlert message={toFavoriteErrorMessage(favoritesQuery.error)} />
+          <ErrorState
+            message={toFavoriteErrorMessage(favoritesQuery.error)}
+            onRetry={() => void favoritesQuery.refetch()}
+            retrying={favoritesQuery.isRefetching}
+          />
         ) : null}
         {actionError ? <InlineAlert message={toFavoriteErrorMessage(actionError)} /> : null}
 
