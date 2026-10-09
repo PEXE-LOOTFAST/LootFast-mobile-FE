@@ -3,6 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/ui/icon';
 import { ProfileIcons } from '@/features/profile/constants/icons';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTheme } from '@/hooks/use-theme';
 
 type PremiumScreenProps = {
@@ -34,7 +35,15 @@ const PREMIUM_BENEFITS: Benefit[] = [
   { label: 'Hỗ trợ ưu tiên' },
 ];
 
-function BenefitRow({ benefit, accent }: { benefit: Benefit; accent: string }) {
+function BenefitRow({
+  benefit,
+  accent,
+  badgeBg,
+}: {
+  benefit: Benefit;
+  accent: string;
+  badgeBg?: string;
+}) {
   const theme = useTheme();
 
   return (
@@ -42,13 +51,30 @@ function BenefitRow({ benefit, accent }: { benefit: Benefit; accent: string }) {
       <Icon name={ProfileIcons.check} color={accent} size={16} />
       <Text style={[styles.benefitLabel, { color: theme.text }]}>{benefit.label}</Text>
       {benefit.premiumLabel ? (
-        <View style={[styles.badge, { backgroundColor: theme.backgroundElement }]}>
+        <View style={[styles.badge, { backgroundColor: badgeBg ?? theme.backgroundElement }]}>
           <Text style={[styles.badgeText, { color: accent }]}>{benefit.premiumLabel}</Text>
         </View>
       ) : null}
     </View>
   );
 }
+
+const PREMIUM_COLORS = {
+  light: {
+    cardBg: '#DDF2FC',
+    cardBorder: '#8BC8E8',
+    accent: '#12659A',
+    accentSoft: '#247EA9',
+    badgeBg: '#C4E4F5',
+  },
+  dark: {
+    cardBg: '#132A3A',
+    cardBorder: '#2A5A7A',
+    accent: '#6DC0E8',
+    accentSoft: '#5AACDA',
+    badgeBg: '#1A3A50',
+  },
+} as const;
 
 function PlanCard({
   benefits,
@@ -68,38 +94,45 @@ function PlanCard({
   title: string;
 }) {
   const theme = useTheme();
+  const scheme = useColorScheme();
+  const mode = scheme === 'dark' ? 'dark' : 'light';
+  const pc = PREMIUM_COLORS[mode];
 
   return (
     <View
       style={[
         styles.planCard,
-        { backgroundColor: color, borderColor: premium ? '#8BC8E8' : theme.textSecondary },
+        {
+          backgroundColor: premium ? pc.cardBg : color,
+          borderColor: premium ? pc.cardBorder : theme.textSecondary,
+        },
       ]}
     >
       <View style={styles.planHeader}>
         <View>
           <Text style={[styles.planTitle, { color: theme.text }]}>{title}</Text>
-          <Text style={[styles.planPrice, { color: premium ? '#12659A' : theme.text }]}>
+          <Text style={[styles.planPrice, { color: premium ? pc.accent : theme.text }]}>
             {price}
           </Text>
         </View>
         <Icon
           name={ProfileIcons.check}
-          color={premium ? '#12659A' : theme.textSecondary}
+          color={premium ? pc.accent : theme.textSecondary}
           size={22}
         />
       </View>
       <View style={styles.benefits}>
         {benefits.map((benefit) => (
           <BenefitRow
-            accent={premium ? '#247EA9' : theme.textSecondary}
+            accent={premium ? pc.accentSoft : theme.textSecondary}
+            badgeBg={premium ? pc.badgeBg : undefined}
             benefit={benefit}
             key={benefit.label}
           />
         ))}
       </View>
       {current ? (
-        <View style={[styles.currentButton, { borderColor: '#D4E2DC' }]}>
+        <View style={[styles.currentButton, { borderColor: theme.border }]}>
           <Text style={[styles.currentButtonText, { color: theme.text }]}>Đang dùng</Text>
         </View>
       ) : (
