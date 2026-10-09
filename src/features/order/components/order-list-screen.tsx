@@ -1,25 +1,35 @@
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { setStatusBarStyle } from 'expo-status-bar';
-import { useCallback } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { useCallback, useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { ApiPendingCard } from '@/components/ui/api-pending-card';
+import { BrandButton } from '@/components/ui/brand-button';
+import { EmptyCard } from '@/components/ui/empty-card';
+import { InlineAlert } from '@/components/ui/inline-alert';
 import { MaxContentWidth } from '@/constants/theme';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
+import { type OrderListStatusDto, toOrderErrorMessage } from '@/features/order/api/orders';
+import { useOrders } from '@/features/order/api/use-orders';
 import { OrderHeader } from '@/features/order/components/order-header';
 import { useTheme } from '@/hooks/use-theme';
+import { formatPrice } from '@/lib/format';
 
-/**
- * Đơn của người mua. Backend mới có `POST /orders`, `GET /orders/{id}` và huỷ đơn — chưa có
- * endpoint liệt kê đơn theo người dùng, nên màn chưa dựng được danh sách.
- *
- * Phần giao diện đã sẵn sàng cho lúc có API: `order-card` (một đơn, kèm nút huỷ và mã nhận
- * món), `order-status-tabs` (lọc theo trạng thái), `savings-summary-card` / `savings-stats-card`
- * cùng `use-order-savings` (thống kê tiền tiết kiệm). Huỷ đơn đã có sẵn `useCancelOrder`
- * trong `@/features/order/api/use-orders`.
- */
+const STATUS_TABS: { value: OrderListStatusDto; label: string }[] = [
+  { value: 'RESERVED', label: 'Đang giữ' },
+  { value: 'COMPLETED', label: 'Hoàn tất' },
+  { value: 'CANCELLED', label: 'Đã huỷ' },
+  { value: 'NO_SHOW', label: 'Không đến lấy' },
+];
+
+const STATUS_LABELS: Record<OrderListStatusDto, string> = Object.fromEntries(
+  STATUS_TABS.map((tab) => [tab.value, tab.label]),
+) as Record<OrderListStatusDto, string>;
+
 export function OrderListScreen() {
   const theme = useTheme();
+  const [status, setStatus] = useState<OrderListStatusDto>('RESERVED');
+  const [page, setPage] = useState(0);
+  const ordersQuery = useOrders(status, page);
 
   // Header nền xanh đậm cần icon status bar màu sáng, trả về 'auto' khi rời màn.
   useFocusEffect(
@@ -35,7 +45,125 @@ export function OrderListScreen() {
         <OrderHeader />
 
         <View style={styles.body}>
-          <ApiPendingCard feature="Danh sách đơn đã đặt và thống kê tiết kiệm" />
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.tabs}
+          >
+            {STATUS_TABS.map((tab) => {
+              const active = tab.value === status;
+              return (
+                <Pressable
+                  key={tab.value}
+                  accessibilityRole="tab"
+                  accessibilityState={{ selected: active }}
+                  onPress={() => {
+                    setStatus(tab.value);
+                    setPage(0);
+                  }}
+                  style={[
+                    styles.tab,
+                    {
+                      backgroundColor: active ? theme.primary : theme.backgroundElement,
+                      borderColor: active ? theme.primary : theme.border,
+                    },
+                  ]}
+                >
+                  <Text style={{ color: active ? '#FFFFFF' : theme.text }}>{tab.label}</Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+
+          {ordersQuery.isPending ? (
+            <View style={styles.feedback}>
+              <ActivityIndicator color={theme.primary} size="large" />
+              <Text style={[styles.feedbackText, { color: theme.textSecondary }]}>
+                Đang tải danh sách đơn...
+              </Text>
+            </View>
+          ) : ordersQuery.isError ? (
+            <View style={styles.feedback}>
+              <InlineAlert message={toOrderErrorMessage(ordersQuery.error)} />
+              <BrandButton
+                loading={ordersQuery.isRefetching}
+                onPress={() => void ordersQuery.refetch()}
+              >
+                Thử lại
+              </BrandButton>
+            </View>
+          ) : ordersQuery.data.items.length === 0 ? (
+            <EmptyCard
+              description={`Bạn chưa có đơn nào ở trạng thái “${STATUS_LABELS[status]}”.`}
+              title="Chưa có đơn hàng"
+            />
+          ) : (
+            <>
+              {ordersQuery.data.items.map((order) => (
+                <Pressable
+                  key={order.orderId}
+                  accessibilityLabel={`Mở đơn ${order.orderId}`}
+                  accessibilityRole="button"
+                  onPress={() => router.push(`/order/${order.orderId}`)}
+                  style={({ pressed }) => [
+                    styles.card,
+                    {
+                      backgroundColor: theme.backgroundElement,
+                      borderColor: theme.border,
+                    },
+                    pressed && styles.pressed,
+                  ]}
+                >
+                  <View style={styles.cardHeader}>
+                    <Text numberOfLines={1} style={[styles.dealName, { color: theme.text }]}>
+                      {order.dealName}
+                    </Text>
+                    <Text style={[styles.status, { color: theme.primary }]}>
+                      {STATUS_LABELS[status]}
+                    </Text>
+                  </View>
+                  <Text style={[styles.orderId, { color: theme.textSecondary }]}>
+                    Mã đơn: {order.orderId}
+                  </Text>
+                  <Text style={[styles.pickup, { color: theme.textSecondary }]}>
+                    Nhận món: {toTimeLabel(order.pickupStart)}–{toTimeLabel(order.pickupEnd)}
+                  </Text>
+                  <View style={styles.totalRow}>
+                    <Text style={[styles.quantity, { color: theme.textSecondary }]}>
+                      {order.quantity} phần
+                    </Text>
+                    <Text style={[styles.total, { color: theme.primary }]}>
+                      {formatPrice(order.totalAmount)}
+                    </Text>
+                  </View>
+                </Pressable>
+              ))}
+
+              {ordersQuery.data.totalPages > 1 ? (
+                <View style={styles.pagination}>
+                  <BrandButton
+                    disabled={page === 0}
+                    onPress={() => setPage((current) => Math.max(current - 1, 0))}
+                    variant="outline"
+                  >
+                    Trang trước
+                  </BrandButton>
+                  <Text style={[styles.pageLabel, { color: theme.textSecondary }]}>
+                    Trang {ordersQuery.data.page + 1}/{ordersQuery.data.totalPages}
+                  </Text>
+                  <BrandButton
+                    disabled={page >= ordersQuery.data.totalPages - 1}
+                    onPress={() =>
+                      setPage((current) => Math.min(current + 1, ordersQuery.data.totalPages - 1))
+                    }
+                    variant="outline"
+                  >
+                    Trang sau
+                  </BrandButton>
+                </View>
+              ) : null}
+            </>
+          )}
         </View>
       </ScrollView>
 
@@ -56,4 +184,29 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingHorizontal: 16,
   },
+  tabs: { gap: 8, paddingRight: 16 },
+  tab: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 10 },
+  feedback: { alignItems: 'center', gap: 12, paddingVertical: 24 },
+  feedbackText: { fontSize: 13 },
+  card: { gap: 8, borderWidth: 1, borderRadius: 18, padding: 16 },
+  pressed: { opacity: 0.8 },
+  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  dealName: { flex: 1, fontSize: 16, fontWeight: '800' },
+  status: { fontSize: 12, fontWeight: '800' },
+  orderId: { fontSize: 11 },
+  pickup: { fontSize: 13 },
+  totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  quantity: { fontSize: 13 },
+  total: { fontSize: 15, fontWeight: '900' },
+  pagination: { alignItems: 'center', gap: 10 },
+  pageLabel: { fontSize: 13, fontWeight: '700' },
 });
+
+function toTimeLabel(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '--:--';
+  return `${date.getHours().toString().padStart(2, '0')}:${date
+    .getMinutes()
+    .toString()
+    .padStart(2, '0')}`;
+}

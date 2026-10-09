@@ -32,11 +32,14 @@ export type PublicStoreResponse = {
   activeDeals: PagedResponse<DealFeedItemResponse>;
 };
 
-export function getStore(merchantId: string) {
+export function getStore(
+  merchantId: string,
+  location: { latitude: number; longitude: number } = DEFAULT_DEAL_LOCATION,
+) {
   // Gửi kèm vị trí để backend tính khoảng cách cho từng deal, giống feed trang chủ.
   const query = new URLSearchParams({
-    latitude: String(DEFAULT_DEAL_LOCATION.latitude),
-    longitude: String(DEFAULT_DEAL_LOCATION.longitude),
+    latitude: String(location.latitude),
+    longitude: String(location.longitude),
     dealPage: '0',
     dealSize: '50',
   });
