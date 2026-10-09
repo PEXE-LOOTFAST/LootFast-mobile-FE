@@ -46,7 +46,7 @@ export function SellerSettingsScreen() {
 
   return (
     <SellerPageScaffold
-      onPressBack={() => router.navigate('/seller/shop')}
+      onPressBack={() => (router.canGoBack() ? router.back() : router.navigate('/seller/reports'))}
       subtitle="Quản lý tài khoản và vận hành cửa hàng"
       title="Cài đặt"
     >
