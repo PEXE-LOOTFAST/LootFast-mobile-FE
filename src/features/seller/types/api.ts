@@ -9,6 +9,8 @@ export type MerchantProfileDto = {
   contactPhone: string;
   logoUrl: string | null;
   coverUrl: string | null;
+  /** Admin đã duyệt hồ sơ đăng ký bán hàng. */
+  verified: boolean;
   createdAt: string;
   updatedAt: string;
 };

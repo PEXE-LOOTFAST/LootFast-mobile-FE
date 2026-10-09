@@ -42,3 +42,15 @@ export const tokenStorage = {
     await Promise.all([removeItem(ACCESS_TOKEN_KEY), removeItem(REFRESH_TOKEN_KEY)]);
   },
 };
+
+/**
+ * Lưu một chuỗi nhỏ theo khoá tự đặt (vd. bản nháp form). SecureStore chỉ nhận khoá gồm chữ, số
+ * và ". - _" nên mọi ký tự khác (vd. "@" trong email) được đổi thành "_".
+ */
+const toSafeKey = (key: string) => `lootfast.${key.replace(/[^A-Za-z0-9._-]/g, '_')}`;
+
+export const draftStorage = {
+  get: (key: string) => getItem(toSafeKey(key)),
+  set: (key: string, value: string) => setItem(toSafeKey(key), value),
+  clear: (key: string) => removeItem(toSafeKey(key)),
+};

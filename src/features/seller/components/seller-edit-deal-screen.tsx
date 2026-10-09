@@ -10,10 +10,22 @@ import {
   toMerchantDealErrorMessage,
   type MerchantDealDto,
 } from '@/features/seller/api/merchant-deals';
-import { useMerchantDeal, useUpdateMerchantDeal } from '@/features/seller/api/use-merchant-deals';
+import {
+  useMerchantDeal,
+  useMerchantDeals,
+  useUpdateMerchantDeal,
+} from '@/features/seller/api/use-merchant-deals';
 import { SellerFormCard } from '@/features/seller/components/seller-form-card';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
-import { buildDealSchedule, toDealNumber, toTimeInput } from '@/features/seller/deal-schedule';
+import {
+  buildDealSchedule,
+  findSharedDaySchedule,
+  toDealNumber,
+  toTimeInput,
+  type DealSchedule,
+} from '@/features/seller/deal-schedule';
+import { useMerchantShop } from '@/features/seller/hooks/use-merchant-shop';
+import type { MerchantOpeningHoursDto } from '@/features/seller/types/api';
 import { validateNewDeal, type NewDealValues } from '@/features/seller/validation';
 import { useForm } from '@/hooks/use-form';
 import { useTheme } from '@/hooks/use-theme';
@@ -26,7 +38,10 @@ import { formatPrice } from '@/lib/format';
 export function SellerEditDealScreen() {
   const theme = useTheme();
   const { dealId } = useLocalSearchParams<{ dealId?: string }>();
-  const { deal, isLoading, error } = useMerchantDeal(dealId);
+  const { deal, isLoading: isDealLoading, error } = useMerchantDeal(dealId);
+  const dealsQuery = useMerchantDeals();
+  const shop = useMerchantShop();
+  const isLoading = isDealLoading || dealsQuery.isLoading || shop.isLoading;
 
   const backToImages = () =>
     dealId
@@ -57,12 +72,29 @@ export function SellerEditDealScreen() {
       ) : null}
 
       {/* Chờ tải xong mới dựng form: useForm chốt giá trị ban đầu ngay lần render đầu tiên. */}
-      {deal && deal.status === 'DRAFT' ? <EditDealForm deal={deal} onSaved={backToImages} /> : null}
+      {deal && deal.status === 'DRAFT' && !isLoading ? (
+        <EditDealForm
+          deal={deal}
+          onSaved={backToImages}
+          openingHours={shop.openingHours}
+          sharedSchedule={findSharedDaySchedule(dealsQuery.data?.items ?? [], deal.dealId)}
+        />
+      ) : null}
     </SellerPageScaffold>
   );
 }
 
-function EditDealForm({ deal, onSaved }: { deal: MerchantDealDto; onSaved: () => void }) {
+function EditDealForm({
+  deal,
+  onSaved,
+  openingHours,
+  sharedSchedule,
+}: {
+  deal: MerchantDealDto;
+  onSaved: () => void;
+  openingHours?: MerchantOpeningHoursDto;
+  sharedSchedule?: DealSchedule;
+}) {
   const theme = useTheme();
   const updateDeal = useUpdateMerchantDeal();
   const [formError, setFormError] = useState<string | null>(null);
@@ -73,14 +105,17 @@ function EditDealForm({ deal, onSaved }: { deal: MerchantDealDto; onSaved: () =>
       portions: String(deal.totalQuantity),
       price: String(deal.discountedPrice),
       originalPrice: String(deal.originalPrice),
-      open: toTimeInput(deal.pickupStartsAt),
-      close: toTimeInput(deal.pickupEndsAt),
+      open: toTimeInput((sharedSchedule ?? deal).pickupStartsAt),
+      close: toTimeInput((sharedSchedule ?? deal).pickupEndsAt),
     },
     validate: validateNewDeal,
     onSubmit: async (next) => {
       setFormError(null);
 
-      const result = buildDealSchedule(next.open, next.close);
+      const result = buildDealSchedule(next.open, next.close, {
+        shared: sharedSchedule,
+        openingHours,
+      });
       if ('error' in result) {
         setFormError(result.error);
         return;
@@ -169,6 +204,7 @@ function EditDealForm({ deal, onSaved }: { deal: MerchantDealDto; onSaved: () =>
           <View style={styles.cell}>
             <TextField
               size="compact"
+              editable={!sharedSchedule}
               error={errors.open}
               label="Bắt đầu nhận"
               maxLength={5}
@@ -180,6 +216,7 @@ function EditDealForm({ deal, onSaved }: { deal: MerchantDealDto; onSaved: () =>
           <View style={styles.cell}>
             <TextField
               size="compact"
+              editable={!sharedSchedule}
               error={errors.close}
               label="Kết thúc nhận"
               maxLength={5}

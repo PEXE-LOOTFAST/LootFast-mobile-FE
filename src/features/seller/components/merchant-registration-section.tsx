@@ -1,7 +1,6 @@
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
-import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
@@ -18,13 +17,16 @@ import {
   useMyMerchantApplication,
   useSubmitMerchantApplication,
 } from '@/features/seller/api/use-merchant-application';
+import { MerchantProfileNotCreated } from '@/features/seller/components/merchant-registration-required';
 import { SellerFormCard } from '@/features/seller/components/seller-form-card';
-import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { useAuthSession } from '@/hooks/use-auth-session';
 import { useTheme } from '@/hooks/use-theme';
 import { ApiException } from '@/lib/api-client';
+import { syncSessionRoles } from '@/lib/auth-session';
 import { formatShortDate } from '@/lib/format';
+
+const LICENSE_NUMBER_PATTERN = /^\d{10,14}$/;
 
 const STATUS_COPY: Record<MerchantApplicationStatusDto, { title: string; description: string }> = {
   UPLOADING: {
@@ -42,8 +44,7 @@ const STATUS_COPY: Record<MerchantApplicationStatusDto, { title: string; descrip
   },
   APPROVED: {
     title: 'Hồ sơ đã được duyệt',
-    description:
-      'Bạn đã có quyền người bán. Đăng nhập lại để quyền mới có hiệu lực, rồi mở khu người bán.',
+    description: 'Bạn đã có quyền người bán. Đang cập nhật quyền — vui lòng chờ trong giây lát.',
   },
   REJECTED: {
     title: 'Hồ sơ bị từ chối',
@@ -57,14 +58,7 @@ function toDateLabel(value: string) {
   return Number.isNaN(date.getTime()) ? '--/--/----' : formatShortDate(date);
 }
 
-/**
- * Người mua gửi giấy phép kinh doanh để xin quyền bán hàng. Đây chính là nguồn dữ liệu cho
- * hàng chờ ở màn Duyệt quán của quản trị.
- *
- * Backend chỉ cho mỗi tài khoản có một hồ sơ đang mở, nên màn này tự chuyển giữa hai dạng:
- * form gửi mới khi chưa có hồ sơ hoặc hồ sơ cũ đã bị từ chối, và thẻ trạng thái khi đã gửi.
- */
-export function MerchantApplicationScreen() {
+export function MerchantRegistrationSection() {
   const { user } = useAuthSession();
   const applicationQuery = useMyMerchantApplication(Boolean(user));
 
@@ -73,13 +67,16 @@ export function MerchantApplicationScreen() {
     applicationQuery.error.code === 'MERCHANT_APPLICATION_NOT_FOUND';
   const application = applicationQuery.data;
 
+  // Được duyệt thì làm mới token để route tự redirect sang /seller khi thấy MERCHANT role.
+  const isApproved = application?.status === 'APPROVED';
+  useEffect(() => {
+    if (isApproved) void syncSessionRoles();
+  }, [isApproved]);
+
+  if (user?.roles.includes('MERCHANT') && !isApproved) return <MerchantProfileNotCreated />;
+
   return (
-    <SellerPageScaffold
-      onPressBack={() => router.navigate('/profile')}
-      subtitle="Gửi giấy phép kinh doanh để mở khu người bán"
-      title="Đăng ký bán hàng"
-    >
-      {/* Khách chưa đăng nhập thì không hỏi API, và màn cũng không có gì để hiện. */}
+    <>
       {!user ? (
         <EmptyCard
           description="Đăng nhập bằng tài khoản người mua rồi quay lại đây để gửi hồ sơ."
@@ -105,7 +102,7 @@ export function MerchantApplicationScreen() {
       ) : null}
 
       {notFound ? <SubmitApplicationForm /> : null}
-    </SellerPageScaffold>
+    </>
   );
 }
 
@@ -147,9 +144,7 @@ function ApplicationStatusCard({ application }: { application: MyMerchantApplica
         <InlineAlert message={`Lý do từ chối: ${application.rejectionReason}`} />
       ) : null}
 
-      {isApproved ? (
-        <BrandButton onPress={() => router.navigate('/seller')}>Mở khu người bán</BrandButton>
-      ) : null}
+      {isApproved ? <ActivityIndicator /> : null}
     </View>
   );
 }
@@ -158,7 +153,7 @@ function SubmitApplicationForm() {
   const theme = useTheme();
   const submit = useSubmitMerchantApplication();
   const [licenseNumber, setLicenseNumber] = useState('');
-  const [licenseUri, setLicenseUri] = useState<string>();
+  const [license, setLicense] = useState<{ uri: string; mimeType?: string; name?: string }>();
   const [formError, setFormError] = useState<string>();
 
   const pickLicense = async () => {
@@ -178,34 +173,47 @@ function SubmitApplicationForm() {
     if (result.canceled || !result.assets[0]) return;
 
     setFormError(undefined);
-    setLicenseUri(result.assets[0].uri);
+    const asset = result.assets[0];
+    setLicense({ uri: asset.uri, mimeType: asset.mimeType, name: asset.fileName ?? undefined });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setFormError(undefined);
 
-    if (!licenseNumber.trim()) {
-      setFormError('Vui lòng nhập số giấy phép kinh doanh.');
+    if (!LICENSE_NUMBER_PATTERN.test(licenseNumber.trim())) {
+      setFormError('Số giấy phép kinh doanh gồm 10 đến 14 chữ số.');
       return;
     }
-    if (!licenseUri) {
+    if (!license) {
       setFormError('Vui lòng chọn ảnh giấy phép kinh doanh.');
       return;
     }
 
     submit.mutate(
-      { licenseNumber, licenseUri },
+      { licenseNumber, license },
       { onError: (error) => setFormError(toMerchantApplicationErrorMessage(error)) },
     );
   };
 
   return (
     <>
+      <Text style={[styles.intro, { color: theme.textSecondary }]}>
+        Gửi giấy phép kinh doanh để đăng ký bán hàng. Quản trị viên sẽ xem xét và duyệt hồ sơ của
+        bạn.
+      </Text>
+
+      <View style={styles.sectionTitle}>
+        <Icon name={SellerIcons.verified} color={theme.text} size={14} />
+        <Text accessibilityRole="header" style={[styles.sectionLabel, { color: theme.text }]}>
+          Giấy phép kinh doanh
+        </Text>
+      </View>
       <SellerFormCard>
         <TextField
           size="compact"
-          autoCapitalize="characters"
+          keyboardType="number-pad"
           label="Số giấy phép kinh doanh"
+          maxLength={14}
           onChangeText={(text) => {
             setFormError(undefined);
             setLicenseNumber(text);
@@ -224,8 +232,8 @@ function SubmitApplicationForm() {
             pressed && styles.pressed,
           ]}
         >
-          {licenseUri ? (
-            <Image contentFit="cover" source={{ uri: licenseUri }} style={styles.preview} />
+          {license ? (
+            <Image contentFit="cover" source={{ uri: license.uri }} style={styles.preview} />
           ) : (
             <View style={styles.pickerEmpty}>
               <Icon name={SellerIcons.camera} color={theme.primary} size={22} />
@@ -242,14 +250,17 @@ function SubmitApplicationForm() {
 
       {formError ? <InlineAlert message={formError} /> : null}
 
-      <BrandButton loading={submit.isPending} onPress={handleSubmit}>
-        Gửi hồ sơ
+      <BrandButton loading={submit.isPending} onPress={() => void handleSubmit()}>
+        Gửi hồ sơ đăng ký
       </BrandButton>
     </>
   );
 }
 
 const styles = StyleSheet.create({
+  intro: { fontSize: 13, lineHeight: 20 },
+  sectionTitle: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
+  sectionLabel: { fontSize: 13, fontWeight: '900' },
   card: { gap: 12, borderWidth: 1, borderRadius: 20, padding: 16 },
   cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   cardTitle: { flex: 1, fontSize: 16, fontWeight: '900', letterSpacing: -0.2 },

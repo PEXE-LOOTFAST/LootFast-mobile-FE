@@ -1,5 +1,6 @@
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 
+import { SellerApprovedOnly } from '@/features/seller/components/seller-approved-only';
 import { SellerPlanScreen } from '@/features/seller/components/seller-plan-screen';
 
 // Mở từ Hồ sơ quán và từ khối Báo cáo nâng cao: router.back() trong tab navigator về tab
@@ -7,5 +8,9 @@ import { SellerPlanScreen } from '@/features/seller/components/seller-plan-scree
 export default function SellerPlanRoute() {
   const { from } = useLocalSearchParams<{ from?: string }>();
 
-  return <SellerPlanScreen onBack={() => router.navigate((from ?? '/seller/shop') as Href)} />;
+  return (
+    <SellerApprovedOnly title="Gói Người bán Cao cấp">
+      <SellerPlanScreen onBack={() => router.navigate((from ?? '/seller/shop') as Href)} />
+    </SellerApprovedOnly>
+  );
 }

@@ -1,4 +1,4 @@
-import { apiRequest, registerSessionExpiredHandler } from '@/lib/api-client';
+import { apiRequest, refreshSession, registerSessionExpiredHandler } from '@/lib/api-client';
 import { tokenStorage } from '@/lib/storage';
 
 export type SessionStatus = 'guest' | 'authenticated';
@@ -129,6 +129,32 @@ registerSessionExpiredHandler(() => {
   pendingAction = null;
   setState({ status: 'guest', isAdmin: false, isAuthPromptOpen: false, user: null });
 });
+
+/**
+ * Quyền (roles) nằm trong access token nên đổi quyền ở server — vd. admin vừa duyệt đơn đăng ký
+ * bán hàng — không có hiệu lực cho tới khi token được cấp lại. Làm mới token rồi đọc lại quyền
+ * để người dùng vào được khu người bán ngay mà không phải đăng nhập lại.
+ * Trả về true nếu quyền trong phiên đã thay đổi.
+ */
+export async function syncSessionRoles(): Promise<boolean> {
+  if (state.status !== 'authenticated' || !state.user) return false;
+
+  try {
+    if (!(await refreshSession())) return false;
+
+    const me = await apiRequest<{ role: AuthRole; roles: AuthRole[] }>('/users/me');
+    const current = state.user;
+    const changed =
+      me.roles.length !== current.roles.length || me.roles.some((r) => !current.roles.includes(r));
+    if (!changed) return false;
+
+    setState({ user: { ...current, role: me.role, roles: me.roles } });
+    return true;
+  } catch {
+    // Lỗi mạng: giữ nguyên phiên, lần mở màn sau sẽ thử lại.
+    return false;
+  }
+}
 
 export function dismissAuthPrompt() {
   pendingAction = null;

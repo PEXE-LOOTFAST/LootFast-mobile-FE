@@ -1,29 +1,44 @@
+import type { MerchantDealDto } from '@/features/seller/api/merchant-deals';
+import type { DayOfWeek, MerchantOpeningHoursDto } from '@/features/seller/types/api';
+
 /** Backend bắt buộc chốt đơn trước giờ nhận ít nhất 15 phút (ORDER_CUTOFF). */
 const ORDER_CUTOFF_MS = 15 * 60 * 1000;
 
+// Backend tính "ngày" theo giờ Việt Nam (UTC+7, không có giờ mùa hè) bất kể múi giờ của máy, nên
+// mọi phép so sánh ngày và giờ ở đây cũng phải theo giờ VN chứ không theo giờ máy.
+const VN_OFFSET_MS = 7 * 60 * 60 * 1000;
+
+/** Dời mốc sang giờ VN: đọc bằng getUTC* hoặc toISOString sẽ ra giờ trên đồng hồ ở VN. */
+const toVietnamClock = (value: Date | string | number) =>
+  new Date(new Date(value).getTime() + VN_OFFSET_MS);
+
+/** Ngày theo lịch VN, dạng "2026-10-09". */
+export const vietnamDateKey = (value: Date | string | number) =>
+  toVietnamClock(value).toISOString().slice(0, 10);
+
+const DAYS: DayOfWeek[] = [
+  'SUNDAY',
+  'MONDAY',
+  'TUESDAY',
+  'WEDNESDAY',
+  'THURSDAY',
+  'FRIDAY',
+  'SATURDAY',
+];
+
 export const toDealNumber = (value: string) => Number(value.replace(/\D/g, ''));
 
-/** Mốc thời gian ISO → "18:00" theo giờ máy, để đổ ngược vào ô nhập. */
+/** Mốc thời gian ISO → "18:00" theo giờ VN, để đổ ngược vào ô nhập. */
 export function toTimeInput(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '';
 
-  return `${date.getHours().toString().padStart(2, '0')}:${date
-    .getMinutes()
-    .toString()
-    .padStart(2, '0')}`;
+  return toVietnamClock(date).toISOString().slice(11, 16);
 }
 
-/**
- * "18:00" → mốc thời gian hôm nay. Backend bắt cả bốn mốc (bán và nhận) nằm trong cùng một
- * ngày theo lịch Việt Nam, nên chỉ đăng được deal trong ngày và máy phải để đúng múi giờ VN.
- */
+/** "18:00" → mốc thời gian hôm nay (theo ngày VN). */
 function toTodayAt(value: string) {
-  const [hours, minutes] = value.split(':').map(Number);
-  const date = new Date();
-  date.setHours(hours ?? 0, minutes ?? 0, 0, 0);
-
-  return date;
+  return new Date(`${vietnamDateKey(Date.now())}T${value}:00+07:00`);
 }
 
 export type DealSchedule = {
@@ -33,26 +48,89 @@ export type DealSchedule = {
   pickupEndsAt: string;
 };
 
+/** Cùng tập trạng thái mà backend tính là "đã đăng" khi kiểm tra lịch chung của quán. */
+const PUBLISHED_STATUSES: MerchantDealDto['status'][] = ['ACTIVE', 'HIDDEN', 'SOLD_OUT'];
+
+/**
+ * Backend bắt mọi deal đã đăng của quán trong cùng một ngày dùng chung đúng bốn mốc thời gian
+ * (STORE_SCHEDULE_CONFLICT). Nếu hôm nay quán đã có deal như vậy thì trả về khung giờ của nó để
+ * deal mới dùng lại y nguyên; chưa có thì người bán tự chọn.
+ */
+export function findSharedDaySchedule(
+  deals: MerchantDealDto[],
+  excludeDealId?: string,
+): DealSchedule | undefined {
+  const today = vietnamDateKey(Date.now());
+  const shared = deals.find(
+    (deal) =>
+      deal.dealId !== excludeDealId &&
+      PUBLISHED_STATUSES.includes(deal.status) &&
+      vietnamDateKey(deal.saleStartsAt) === today,
+  );
+
+  if (!shared) return undefined;
+
+  return {
+    saleStartsAt: shared.saleStartsAt,
+    saleEndsAt: shared.saleEndsAt,
+    pickupStartsAt: shared.pickupStartsAt,
+    pickupEndsAt: shared.pickupEndsAt,
+  };
+}
+
+/** Khung giờ mở cửa của quán hôm nay ("08:00"–"22:00"), undefined nếu hôm nay quán không mở. */
+export function todayOpeningSlot(openingHours: MerchantOpeningHoursDto | undefined) {
+  const today = DAYS[toVietnamClock(Date.now()).getUTCDay()];
+
+  return openingHours?.slots.find((slot) => slot.dayOfWeek === today);
+}
+
 /**
  * Dựng bốn mốc thời gian backend cần từ khung giờ nhận người bán nhập. Trả về chuỗi lỗi khi
  * khung giờ không hợp lệ, để màn hình hiện ngay thay vì để backend từ chối.
+ *
+ * `shared`: khung giờ chung của hôm nay (xem findSharedDaySchedule) — có thì dùng nguyên, bỏ
+ * qua giờ nhập vì bốn mốc phải trùng khít từng mili giây với các deal đã đăng.
+ * `openingHours`: giờ mở cửa của quán; giờ nhận món phải nằm gọn trong khung hôm nay.
  *
  * Dùng chung giữa màn đăng deal mới và màn sửa bản nháp, vì cả hai gửi cùng một payload.
  */
 export function buildDealSchedule(
   open: string,
   close: string,
+  options: { shared?: DealSchedule; openingHours?: MerchantOpeningHoursDto } = {},
 ): { schedule: DealSchedule } | { error: string } {
+  if (options.shared) {
+    if (Date.now() >= new Date(options.shared.saleEndsAt).getTime()) {
+      return {
+        error: 'Khung giờ chung của quán hôm nay đã hết hạn bán. Hãy đăng deal vào ngày mai.',
+      };
+    }
+
+    return { schedule: options.shared };
+  }
+
   const pickupStart = toTodayAt(open);
   const pickupEnd = toTodayAt(close);
   const saleEnd = new Date(pickupStart.getTime() - ORDER_CUTOFF_MS);
-  const saleStart = new Date();
+  // Làm tròn xuống phút để mốc bắt đầu bán gọn gàng, vẫn không vượt quá hiện tại.
+  const saleStart = new Date(Math.floor(Date.now() / 60_000) * 60_000);
 
   if (pickupStart >= pickupEnd) {
     return { error: 'Giờ kết thúc nhận phải sau giờ bắt đầu nhận.' };
   }
   if (saleStart >= saleEnd) {
     return { error: 'Giờ bắt đầu nhận phải cách hiện tại ít nhất 15 phút.' };
+  }
+
+  if (options.openingHours) {
+    const slot = todayOpeningSlot(options.openingHours);
+    if (!slot) return { error: 'Hôm nay quán không mở cửa nên chưa đăng deal được.' };
+    if (open < slot.opensAt || close > slot.closesAt) {
+      return {
+        error: `Giờ nhận món phải nằm trong giờ mở cửa hôm nay (${slot.opensAt}–${slot.closesAt}).`,
+      };
+    }
   }
 
   return {

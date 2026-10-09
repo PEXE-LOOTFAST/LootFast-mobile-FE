@@ -4,7 +4,7 @@ import {
   getMyMerchantApplication,
   submitMerchantApplication,
 } from '@/features/seller/api/merchant-application';
-import { ApiException } from '@/lib/api-client';
+import { ApiException, type UploadFile } from '@/lib/api-client';
 
 const MY_APPLICATION_KEY = ['merchant-application', 'me'];
 
@@ -32,8 +32,8 @@ export function useSubmitMerchantApplication() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ licenseNumber, licenseUri }: { licenseNumber: string; licenseUri: string }) =>
-      submitMerchantApplication(licenseNumber, licenseUri),
+    mutationFn: ({ licenseNumber, license }: { licenseNumber: string; license: UploadFile }) =>
+      submitMerchantApplication(licenseNumber, license),
     onSuccess: (application) => queryClient.setQueryData(MY_APPLICATION_KEY, application),
   });
 }

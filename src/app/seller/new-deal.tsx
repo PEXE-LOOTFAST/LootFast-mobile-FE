@@ -1,5 +1,4 @@
 import { SellerNewDealScreen } from '@/features/seller/components/seller-new-deal-screen';
+import { withSellerApproval } from '@/features/seller/components/seller-approved-only';
 
-export default function SellerNewDealRoute() {
-  return <SellerNewDealScreen />;
-}
+export default withSellerApproval(SellerNewDealScreen, 'Đăng deal mới');

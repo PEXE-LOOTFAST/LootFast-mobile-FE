@@ -32,12 +32,6 @@ const BENEFITS: ProfileItem[] = [
 
 const ACCOUNT_ITEMS: ProfileItem[] = [
   { icon: ProfileIcons.orders, title: 'Đơn hàng của tôi', subtitle: '', href: '/orders' },
-  {
-    icon: ProfileIcons.seller,
-    title: 'Đăng ký bán hàng',
-    subtitle: 'Gửi giấy phép kinh doanh để mở khu người bán',
-    href: '/merchant-application',
-  },
   { icon: ProfileIcons.location, title: 'Bản đồ và địa chỉ', subtitle: '' },
   { icon: ProfileIcons.favorites, title: 'Món yêu thích', subtitle: '', href: '/favorites' },
   { icon: ProfileIcons.payment, title: 'Phương thức thanh toán', subtitle: '' },
@@ -98,6 +92,9 @@ function ProfileSection({ items, title }: { items: ProfileItem[]; title: string 
 export function ProfileScreen() {
   const theme = useTheme();
   const { user } = useAuthSession();
+  // Đăng ký bán hàng thuộc về phía người bán nên gộp chung nút chuyển sang người bán: chưa được
+  // duyệt thì nút dẫn sang màn đăng ký, được duyệt rồi mới vào khu người bán.
+  const isMerchant = Boolean(user?.roles.includes('MERCHANT'));
   const profileQuery = useProfile(Boolean(user));
   const avatar = useAvatarUpload();
   const profile = profileQuery.data;
@@ -213,16 +210,21 @@ export function ProfileScreen() {
         <ProfileSection items={BENEFITS} title="QUYỀN LỢI CỦA BẠN" />
         <ProfileSection items={ACCOUNT_ITEMS} title="TÀI KHOẢN NGƯỜI MUA" />
         <Pressable
-          accessibilityLabel="Chuyển sang người bán"
+          accessibilityLabel={isMerchant ? 'Chuyển sang người bán' : 'Đăng ký bán hàng'}
           accessibilityRole="button"
-          onPress={() => router.navigate('/seller')}
+          onPress={() =>
+            // Chưa được duyệt làm người bán thì khu /seller chỉ trả lỗi quyền, nên dẫn sang đăng ký.
+            router.navigate(isMerchant ? '/seller' : '/merchant-application')
+          }
           style={[
             styles.sellerButton,
             { backgroundColor: theme.backgroundElement, borderColor: theme.border },
           ]}
         >
           <Icon name={ProfileIcons.seller} color={theme.text} size={18} />
-          <Text style={[styles.sellerText, { color: theme.text }]}>Chuyển sang người bán</Text>
+          <Text style={[styles.sellerText, { color: theme.text }]}>
+            {isMerchant ? 'Chuyển sang người bán' : 'Đăng ký bán hàng'}
+          </Text>
           <Icon name={ProfileIcons.chevronRight} color={theme.textSecondary} size={17} />
         </Pressable>
         <Pressable
