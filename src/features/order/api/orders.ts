@@ -4,6 +4,8 @@ import { createIdempotencyKey } from '@/lib/idempotency';
 export type OrderStatusDto =
   'RESERVED' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW' | 'MERCHANT_CANCELLED';
 
+export type OrderListStatusDto = 'RESERVED' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
+
 export type PaymentMethodDto = 'BANK_TRANSFER' | 'CASH';
 
 export type PaymentStatusDto = 'UNPAID' | 'CONFIRMED' | 'REVIEW_REQUIRED';
@@ -23,6 +25,8 @@ export type OrderDto = {
   paymentMethod: PaymentMethodDto;
   paymentStatus: PaymentStatusDto;
   paymentReference: string | null;
+  pickupCode: string | null;
+  pickupQrPayload: string | null;
   createdAt: string;
   finalizedAt: string | null;
 };
@@ -32,6 +36,14 @@ export type CreateOrderPayload = {
   /** Backend giới hạn 1–5 suất mỗi đơn. */
   quantity: number;
   paymentMethod: PaymentMethodDto;
+};
+
+export type PagedOrdersDto = {
+  items: OrderDto[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
 };
 
 export function createOrder(payload: CreateOrderPayload) {
@@ -44,6 +56,16 @@ export function createOrder(payload: CreateOrderPayload) {
 
 export function getOrder(orderId: string) {
   return apiRequest<OrderDto>(`/orders/${orderId}`);
+}
+
+export function getOrders(status: OrderListStatusDto, page: number, size = 10) {
+  const query = new URLSearchParams({
+    status,
+    page: String(page),
+    size: String(size),
+  });
+
+  return apiRequest<PagedOrdersDto>(`/orders?${query.toString()}`);
 }
 
 export function cancelOrder(orderId: string) {

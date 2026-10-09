@@ -1,5 +1,6 @@
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
+import QRCode from 'react-native-qrcode-svg';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -125,6 +126,24 @@ export function OrderDetailScreen() {
                 label="Giờ nhận"
                 value={`${toTimeLabel(order.pickupStart)}–${toTimeLabel(order.pickupEnd)}`}
               />
+              {order.pickupCode ? (
+                <View style={styles.pickupCodeSection}>
+                  <Text accessibilityRole="header" style={[styles.section, { color: theme.text }]}>
+                    Mã nhận món
+                  </Text>
+                  <Text style={[styles.pickupCode, { color: theme.primary }]}>
+                    {order.pickupCode}
+                  </Text>
+                  {order.pickupQrPayload ? (
+                    <View style={styles.pickupQr}>
+                      <QRCode size={180} value={order.pickupQrPayload} />
+                    </View>
+                  ) : null}
+                  <Text style={[styles.note, { color: theme.textSecondary }]}>
+                    Đưa mã này cho cửa hàng khi nhận món.
+                  </Text>
+                </View>
+              ) : null}
               {order.paymentReference ? (
                 <Row label="Mã tham chiếu" value={order.paymentReference} />
               ) : null}
@@ -142,7 +161,16 @@ export function OrderDetailScreen() {
 
               {instructionsQuery.isLoading ? <ActivityIndicator color={theme.primary} /> : null}
               {instructionsQuery.error ? (
-                <InlineAlert message={toPaymentErrorMessage(instructionsQuery.error)} />
+                <>
+                  <InlineAlert message={toPaymentErrorMessage(instructionsQuery.error)} />
+                  <BrandButton
+                    loading={instructionsQuery.isRefetching}
+                    onPress={() => void instructionsQuery.refetch()}
+                    variant="outline"
+                  >
+                    Thử lại hướng dẫn thanh toán
+                  </BrandButton>
+                </>
               ) : null}
 
               {instructions ? (
@@ -175,6 +203,11 @@ export function OrderDetailScreen() {
                     </View>
                   ) : null}
                 </>
+              ) : !instructionsQuery.isLoading && !instructionsQuery.error ? (
+                <EmptyCard
+                  description="Chưa có hướng dẫn thanh toán cho đơn này."
+                  title="Chưa có mã VietQR"
+                />
               ) : null}
 
               {canCancel ? (
@@ -249,4 +282,7 @@ const styles = StyleSheet.create({
   note: { fontSize: 13, lineHeight: 19 },
   qr: { width: '100%', height: 220 },
   bank: { gap: 8 },
+  pickupCodeSection: { gap: 10, alignItems: 'center', marginTop: 4 },
+  pickupCode: { fontSize: 28, fontWeight: '900', letterSpacing: 2 },
+  pickupQr: { alignItems: 'center', backgroundColor: '#FFFFFF', borderRadius: 12, padding: 12 },
 });

@@ -4,10 +4,19 @@ import {
   cancelOrder,
   createOrder,
   getOrder,
+  getOrders,
   type CreateOrderPayload,
+  type OrderListStatusDto,
 } from '@/features/order/api/orders';
 
 export const ORDER_QUERY_KEY = ['orders'];
+
+export function useOrders(status: OrderListStatusDto, page: number) {
+  return useQuery({
+    queryKey: [...ORDER_QUERY_KEY, status, page],
+    queryFn: () => getOrders(status, page),
+  });
+}
 
 /**
  * Đặt giữ deal. Đặt xong phải làm mới feed deal: số suất còn lại vừa giảm ở server, để nguyên
