@@ -43,6 +43,7 @@ export function SellerHeader({ title, subtitle, subtitleIcon, onBack }: SellerHe
 
       <NotificationSheet
         onClose={() => setIsNotificationsOpen(false)}
+        role="seller"
         visible={isNotificationsOpen}
       />
     </>

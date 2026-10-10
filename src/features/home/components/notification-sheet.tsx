@@ -1,6 +1,8 @@
+import { router } from 'expo-router';
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   Modal,
   Pressable,
   StyleSheet,
@@ -11,6 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/ui/icon';
 import {
+  filterByRole,
   useMarkAllRead,
   useMarkRead,
   useNotifications,
@@ -29,20 +32,33 @@ function formatDate(iso: string): string {
 type NotificationSheetProps = {
   visible: boolean;
   onClose: () => void;
+  role?: 'buyer' | 'seller';
 };
 
-export function NotificationSheet({ visible, onClose }: NotificationSheetProps) {
+export function NotificationSheet({ visible, onClose, role = 'buyer' }: NotificationSheetProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const { data, isLoading } = useNotifications();
   const markRead = useMarkRead();
   const markAllRead = useMarkAllRead();
 
-  const items = data?.items ?? [];
+  const items = filterByRole(data?.items ?? [], role);
   const hasUnread = items.some((n) => !n.read);
 
   const handlePress = (item: NotificationDto) => {
     if (!item.read) markRead.mutate(item.notificationId);
+
+    onClose();
+
+    if (item.type === 'MATCHING_DEAL' && item.dealId) {
+      router.push(`/deal/${item.dealId}`);
+    } else if (item.orderId) {
+      if (role === 'seller') {
+        router.navigate('/seller/orders');
+      } else {
+        router.push(`/order/${item.orderId}`);
+      }
+    }
   };
 
   const renderItem = ({ item, index }: { item: NotificationDto; index: number }) => (
@@ -57,21 +73,29 @@ export function NotificationSheet({ visible, onClose }: NotificationSheetProps) 
         pressed && styles.itemPressed,
       ]}
     >
-      <View style={styles.itemContent}>
-        <View style={styles.itemTitleRow}>
-          <View style={styles.itemTitleLeft}>
-            {item.read ? null : <View style={[styles.dot, { backgroundColor: theme.primary }]} />}
-            <Text numberOfLines={1} style={[styles.itemTitle, { color: theme.text }]}>
-              {item.title}
+      <View style={styles.itemRow}>
+        {item.imageUrl ? (
+          <Image
+            source={{ uri: item.imageUrl }}
+            style={[styles.thumb, { backgroundColor: theme.border }]}
+          />
+        ) : null}
+        <View style={styles.itemContent}>
+          <View style={styles.itemTitleRow}>
+            <View style={styles.itemTitleLeft}>
+              {item.read ? null : <View style={[styles.dot, { backgroundColor: theme.primary }]} />}
+              <Text numberOfLines={1} style={[styles.itemTitle, { color: theme.text }]}>
+                {item.title}
+              </Text>
+            </View>
+            <Text style={[styles.itemDate, { color: theme.textSecondary }]}>
+              {formatDate(item.createdAt)}
             </Text>
           </View>
-          <Text style={[styles.itemDate, { color: theme.textSecondary }]}>
-            {formatDate(item.createdAt)}
+          <Text numberOfLines={2} style={[styles.itemBody, { color: theme.textSecondary }]}>
+            {item.message}
           </Text>
         </View>
-        <Text numberOfLines={2} style={[styles.itemBody, { color: theme.textSecondary }]}>
-          {item.message}
-        </Text>
       </View>
     </Pressable>
   );
@@ -153,7 +177,9 @@ const styles = StyleSheet.create({
   empty: { fontSize: 14, lineHeight: 20, padding: 32, textAlign: 'center' },
   item: { paddingHorizontal: 16, paddingVertical: 14 },
   itemPressed: { opacity: 0.7 },
-  itemContent: { gap: 4 },
+  itemRow: { flexDirection: 'row', gap: 12 },
+  thumb: { width: 56, height: 56, borderRadius: 10 },
+  itemContent: { flex: 1, gap: 4 },
   itemTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
