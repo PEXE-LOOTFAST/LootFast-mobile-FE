@@ -3,7 +3,6 @@ import { setStatusBarStyle } from 'expo-status-bar';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, View } from 'react-native';
 
-import { ApiPendingCard } from '@/components/ui/api-pending-card';
 import { EmptyCard } from '@/components/ui/empty-card';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { MaxContentWidth } from '@/constants/theme';
@@ -14,6 +13,7 @@ import {
   useMerchantDeals,
   useUpdateDealQuantity,
 } from '@/features/seller/api/use-merchant-deals';
+import { IncomingOrdersSection } from '@/features/seller/components/incoming-orders-section';
 import { SegmentedTabs } from '@/features/seller/components/segmented-tabs';
 import { SellerDealCard } from '@/features/seller/components/seller-deal-card';
 import { SellerOrderHeader } from '@/features/seller/components/seller-order-header';
@@ -25,9 +25,7 @@ import { useTheme } from '@/hooks/use-theme';
  * Deal của quán đọc từ `GET /merchants/me/deals`, sửa số suất qua
  * `PATCH /merchants/me/deals/{id}/quantity`.
  *
- * Mục "Đơn hàng đến" chưa có dữ liệu: backend chưa có endpoint đơn cho người bán — không có
- * danh sách đơn, cũng chưa có thao tác xác nhận / hoàn tất đơn. Giao diện đã dựng sẵn ở
- * `incoming-order-filters` và `incoming-orders-panel`.
+ * Mục "Đơn hàng đến" đọc từ `GET /merchants/me/orders` — xem `incoming-orders-section`.
  */
 export function SellerOrderScreen() {
   const theme = useTheme();
@@ -94,7 +92,7 @@ export function SellerOrderScreen() {
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Máy quét QR sẽ được nối ở nhánh riêng, tạm báo cho người bán biết. */}
+        {/* Máy quét QR cần quyền camera nên chưa nối; hiện giao đơn bằng cách nhập mã ở mục Đơn hàng đến. */}
         <SellerOrderHeader
           onPressScan={() => Alert.alert('Quét QR', 'Tính năng quét mã sẽ sớm có.')}
         />
@@ -106,9 +104,7 @@ export function SellerOrderScreen() {
             <InlineAlert message={toMerchantDealErrorMessage(updateQuantity.error)} />
           ) : null}
 
-          {tab === 'incoming' ? (
-            <ApiPendingCard feature="Đơn khách đặt và thao tác xác nhận, hoàn tất đơn" />
-          ) : null}
+          {tab === 'incoming' ? <IncomingOrdersSection /> : null}
 
           {tab === 'running'
             ? renderDeals(runningDeals, {

@@ -2,8 +2,20 @@ import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Icon } from '@/components/ui/icon';
 import { SellerIcons } from '@/features/seller/constants/icons';
+import { PICKUP_CODE_PREFIX } from '@/features/seller/api/merchant-orders';
 import { PICKUP_CODE_LENGTH } from '@/features/seller/constants/seller-order-tabs';
 import { useTheme } from '@/hooks/use-theme';
+
+/** Bỏ tiền tố `LF-` nếu người bán dán cả mã, chỉ giữ chữ và số viết hoa, cắt đủ 6 ký tự. */
+function normalizePickupCode(value: string): string {
+  // Ô nhập luôn hiện sẵn `LF-` nên chỉ cắt tiền tố khi có đủ cả dấu gạch; mã thật có thể bắt đầu bằng "LF".
+  const withoutPrefix = value.replace(/^\s*LF-/i, '');
+
+  return withoutPrefix
+    .toUpperCase()
+    .replace(/[^0-9A-Z]/g, '')
+    .slice(0, PICKUP_CODE_LENGTH);
+}
 
 type IncomingOrderFiltersProps = {
   /** Ngày đang xem, dạng dd/mm/yyyy để người bán gõ tay được. */
@@ -14,9 +26,10 @@ type IncomingOrderFiltersProps = {
   code: string;
   onChangeCode: (code: string) => void;
   onSubmitCode: () => void;
+  isSubmittingCode?: boolean;
 };
 
-// Hai bộ lọc của mục "Đơn hàng đến": xem đơn theo ngày và tra nhanh một mã lấy hàng.
+// Hai bộ lọc của mục "Đơn hàng đến": xem đơn theo ngày và nhập tay mã lấy hàng của khách để giao.
 export function IncomingOrderFilters({
   date,
   onChangeDate,
@@ -25,9 +38,10 @@ export function IncomingOrderFilters({
   code,
   onChangeCode,
   onSubmitCode,
+  isSubmittingCode = false,
 }: IncomingOrderFiltersProps) {
   const theme = useTheme();
-  const canSearch = code.length === PICKUP_CODE_LENGTH;
+  const canSearch = code.length === PICKUP_CODE_LENGTH && !isSubmittingCode;
 
   return (
     <View
@@ -70,28 +84,31 @@ export function IncomingOrderFilters({
         </View>
 
         <View style={styles.field}>
-          <Text style={[styles.label, { color: theme.textSecondary }]}>Mã lấy hàng</Text>
+          <Text style={[styles.label, { color: theme.textSecondary }]}>
+            Mã lấy hàng (LF-xxxxxx)
+          </Text>
           <TextInput
             accessibilityLabel="Mã lấy hàng"
-            inputMode="numeric"
-            maxLength={PICKUP_CODE_LENGTH}
-            onChangeText={(value) => onChangeCode(value.replace(/\D/g, ''))}
+            autoCapitalize="characters"
+            autoCorrect={false}
+            maxLength={PICKUP_CODE_LENGTH + PICKUP_CODE_PREFIX.length}
+            onChangeText={(value) => onChangeCode(normalizePickupCode(value))}
             onSubmitEditing={() => canSearch && onSubmitCode()}
-            placeholder="6 số, VD: 482917"
+            placeholder="VD: LF-7K2M9Q"
             placeholderTextColor={theme.textSecondary}
-            returnKeyType="search"
+            returnKeyType="done"
             style={[
               styles.input,
               { backgroundColor: theme.background, borderColor: theme.border, color: theme.text },
             ]}
-            value={code}
+            value={code ? `${PICKUP_CODE_PREFIX}${code}` : ''}
           />
         </View>
 
         <FilterAction
           disabled={!canSearch}
-          label="Tìm"
-          accessibilityLabel="Tìm đơn theo mã lấy hàng"
+          label="Giao"
+          accessibilityLabel="Xác nhận giao đơn theo mã lấy hàng"
           onPress={onSubmitCode}
         />
       </View>

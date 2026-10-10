@@ -6,14 +6,18 @@ import {
   PICKUP_EMPTY_MESSAGES,
   SELLER_PICKUP_BUCKETS,
 } from '@/features/seller/constants/seller-order-tabs';
-import type { SellerOrder, SellerPickupBucket } from '@/features/seller/types';
+import type { MerchantOrderDto } from '@/features/seller/api/merchant-orders';
+import type { SellerPickupBucket } from '@/features/seller/types';
 import { useTheme } from '@/hooks/use-theme';
 
 type IncomingOrdersPanelProps = {
   bucket: SellerPickupBucket;
   onChangeBucket: (bucket: SellerPickupBucket) => void;
   counts: Record<SellerPickupBucket, number>;
-  orders: SellerOrder[];
+  orders: MerchantOrderDto[];
+  busyOrderId: string | null;
+  onConfirmPayment: (order: MerchantOrderDto) => void;
+  onRejectPayment: (order: MerchantOrderDto) => void;
 };
 
 export function IncomingOrdersPanel({
@@ -21,6 +25,9 @@ export function IncomingOrdersPanel({
   onChangeBucket,
   counts,
   orders,
+  busyOrderId,
+  onConfirmPayment,
+  onRejectPayment,
 }: IncomingOrdersPanelProps) {
   const theme = useTheme();
   // Số đơn nằm ngay trên nhãn để người bán thấy còn bao nhiêu khách chưa tới lấy.
@@ -38,7 +45,13 @@ export function IncomingOrdersPanel({
       {orders.length > 0 ? (
         <View style={styles.list}>
           {orders.map((order) => (
-            <SellerOrderRow key={order.id} order={order} />
+            <SellerOrderRow
+              key={order.orderId}
+              isBusy={busyOrderId === order.orderId}
+              onConfirmPayment={() => onConfirmPayment(order)}
+              onRejectPayment={() => onRejectPayment(order)}
+              order={order}
+            />
           ))}
         </View>
       ) : (
