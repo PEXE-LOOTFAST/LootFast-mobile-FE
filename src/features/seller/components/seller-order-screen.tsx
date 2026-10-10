@@ -7,12 +7,15 @@ import { InlineAlert } from '@/components/ui/inline-alert';
 import { MaxContentWidth } from '@/constants/theme';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { toMerchantDealErrorMessage } from '@/features/seller/api/merchant-deals';
+import { toMerchantOrderErrorMessage } from '@/features/seller/api/merchant-orders';
+import { useConfirmPickup } from '@/features/seller/api/use-merchant-orders';
 import {
   toSellerDeal,
   useMerchantDeals,
   useUpdateDealQuantity,
 } from '@/features/seller/api/use-merchant-deals';
 import { IncomingOrdersSection } from '@/features/seller/components/incoming-orders-section';
+import { QrScannerModal } from '@/features/seller/components/qr-scanner-modal';
 import { SegmentedTabs } from '@/features/seller/components/segmented-tabs';
 import { SellerDealCard } from '@/features/seller/components/seller-deal-card';
 import { SellerHeaderWithAction } from '@/features/seller/components/seller-header';
@@ -30,8 +33,10 @@ import { useTheme } from '@/hooks/use-theme';
 export function SellerOrderScreen() {
   const theme = useTheme();
   const [tab, setTab] = useState<SellerOrderTab>('incoming');
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
   const dealsQuery = useMerchantDeals();
   const updateQuantity = useUpdateDealQuantity();
+  const confirmPickup = useConfirmPickup();
 
   const dealDtos = dealsQuery.data?.items ?? [];
   const deals = dealDtos.map(toSellerDeal);
@@ -87,7 +92,7 @@ export function SellerOrderScreen() {
         <SellerHeaderWithAction
           actionIcon={SellerIcons.qrCode}
           actionLabel="Quét QR"
-          onPressAction={() => Alert.alert('Quét QR', 'Tính năng quét mã sẽ sớm có.')}
+          onPressAction={() => setIsScannerOpen(true)}
           subtitle="Deal đang chạy và đơn đến"
           title="Đơn hàng"
         />
@@ -117,8 +122,22 @@ export function SellerOrderScreen() {
         </View>
       </ScrollView>
 
-      {/* Nâng lên trên thanh tab người bán để nút trợ lý không đè lên nút Đăng deal. */}
       <AssistantFab bottomOffset={96} />
+
+      <QrScannerModal
+        visible={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+        onScan={(code) => {
+          confirmPickup.mutate(code, {
+            onSuccess: (order) => {
+              Alert.alert('Giao hàng thành công', `Đã xác nhận giao đơn "${order.dealName}".`);
+            },
+            onError: (error) => {
+              Alert.alert('Không xác nhận được', toMerchantOrderErrorMessage(error));
+            },
+          });
+        }}
+      />
     </View>
   );
 }

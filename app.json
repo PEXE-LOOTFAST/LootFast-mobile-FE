@@ -37,6 +37,12 @@
         {
           "locationWhenInUsePermission": "LootFast dùng vị trí của bạn để tìm deal gần bạn."
         }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "LootFast cần camera để quét mã QR xác nhận giao hàng."
+        }
       ]
     ],
     "experiments": {
