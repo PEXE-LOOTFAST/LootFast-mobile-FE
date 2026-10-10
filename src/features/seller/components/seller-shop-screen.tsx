@@ -70,6 +70,12 @@ export function SellerShopScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
+      <SellerHeader
+        onBack={() => (router.canGoBack() ? router.back() : router.navigate('/seller/reports'))}
+        subtitle={isLoading ? '' : (profile?.contactEmail ?? '')}
+        title="Hồ sơ quán"
+      />
+
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -82,12 +88,6 @@ export function SellerShopScreen() {
           />
         }
       >
-        <SellerHeader
-          onBack={() => (router.canGoBack() ? router.back() : router.navigate('/seller/reports'))}
-          subtitle={isLoading ? '' : (profile?.contactEmail ?? '')}
-          title="Hồ sơ quán"
-        />
-
         <View style={styles.body}>
           {isError ? (
             <InlineAlert message="Không tải được hồ sơ quán. Kéo xuống để thử lại." />

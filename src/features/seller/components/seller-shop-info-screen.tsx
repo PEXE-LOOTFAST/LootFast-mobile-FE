@@ -28,13 +28,13 @@ export function SellerShopInfoScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
+      <SellerHeader subtitle="Hồ sơ, địa chỉ và giờ mở cửa" title="Thông tin quán" />
+
       <ScrollView
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <SellerHeader subtitle="Hồ sơ, địa chỉ và giờ mở cửa" title="Thông tin quán" />
-
         <View style={styles.body}>
           {shop.isLoading ? <ActivityIndicator color={theme.primary} /> : null}
 

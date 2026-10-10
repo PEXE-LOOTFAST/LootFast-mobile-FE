@@ -48,9 +48,9 @@ export function SellerSettingsScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <SellerHeader subtitle="Tài khoản và vận hành cửa hàng" title="Cài đặt" />
+      <SellerHeader subtitle="Tài khoản và vận hành cửa hàng" title="Cài đặt" />
 
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.body}>
           <SellerMenuList compact items={SETTINGS_ITEMS} />
 

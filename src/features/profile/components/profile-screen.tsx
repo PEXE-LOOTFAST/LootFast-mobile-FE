@@ -109,9 +109,9 @@ export function ProfileScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <BuyerHeader subtitle="Quản lý tài khoản, ưu đãi và quyền lợi" title="Hồ sơ" />
+      <BuyerHeader subtitle="Quản lý tài khoản, ưu đãi và quyền lợi" title="Hồ sơ" />
 
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View
           style={[
             styles.accountCard,

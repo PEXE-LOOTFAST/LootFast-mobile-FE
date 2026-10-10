@@ -3,7 +3,6 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { InlineAlert } from '@/components/ui/inline-alert';
 import {
-  parseDayRange,
   PICKUP_CODE_PREFIX,
   toMerchantOrderErrorMessage,
   type MerchantOrderDto,
@@ -21,7 +20,6 @@ import { PICKUP_CODE_LENGTH } from '@/features/seller/constants/seller-order-tab
 import type { SellerPickupBucket } from '@/features/seller/types';
 import { useTheme } from '@/hooks/use-theme';
 import { confirmAction } from '@/lib/confirm';
-import { formatShortDate } from '@/lib/format';
 
 const BUCKET_STATUS: Record<SellerPickupBucket, MerchantOrderDto['orderStatus']> = {
   waiting: 'RESERVED',
@@ -29,19 +27,34 @@ const BUCKET_STATUS: Record<SellerPickupBucket, MerchantOrderDto['orderStatus']>
   'no-show': 'NO_SHOW',
 };
 
-/**
- * Mục "Đơn hàng đến": đơn của quán trong một ngày (theo giờ nhận), nhập tay mã lấy hàng để giao,
- * và xác nhận hoặc từ chối khoản chuyển khoản khách vừa báo. Đơn bị huỷ không nằm ở nhóm nào.
- */
+function startOfDay(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function isSameDay(a: Date, b: Date): boolean {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
 export function IncomingOrdersSection() {
   const theme = useTheme();
-  const [date, setDate] = useState(() => formatShortDate(new Date()));
+  const [date, setDate] = useState(() => startOfDay(new Date()));
   const [bucket, setBucket] = useState<SellerPickupBucket>('waiting');
   const [code, setCode] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [deliveredMessage, setDeliveredMessage] = useState<string | null>(null);
   const [rejecting, setRejecting] = useState<MerchantOrderDto | null>(null);
 
-  const range = useMemo(() => parseDayRange(date), [date]);
+  const range = useMemo(() => {
+    const from = startOfDay(date);
+    const to = new Date(from);
+    to.setDate(to.getDate() + 1);
+    return { from, to };
+  }, [date]);
+
   const ordersQuery = useMerchantOrders(range);
   const confirmPickup = useConfirmPickup();
   const confirmPayment = useConfirmPayment();
@@ -53,7 +66,14 @@ export function IncomingOrdersSection() {
     picked: orders.filter((order) => order.orderStatus === BUCKET_STATUS.picked).length,
     'no-show': orders.filter((order) => order.orderStatus === BUCKET_STATUS['no-show']).length,
   };
-  const visible = orders.filter((order) => order.orderStatus === BUCKET_STATUS[bucket]);
+
+  const keyword = searchQuery.trim().toLowerCase();
+  const visible = orders.filter(
+    (order) =>
+      order.orderStatus === BUCKET_STATUS[bucket] &&
+      (!keyword || order.dealName.toLowerCase().includes(keyword)),
+  );
+
   const busyOrderId =
     (confirmPayment.isPending ? confirmPayment.variables : null) ??
     (rejectPayment.isPending ? rejectPayment.variables.orderId : null);
@@ -64,7 +84,6 @@ export function IncomingOrdersSection() {
   const submitCode = () => {
     if (code.length !== PICKUP_CODE_LENGTH) return;
 
-    // Giao đơn là thao tác một lần, không hoàn tác được nên hỏi lại để tránh gõ nhầm mã.
     confirmAction({
       title: 'Xác nhận giao đơn',
       message: `Giao đơn có mã ${PICKUP_CODE_PREFIX}${code} cho khách? Không hoàn tác được.`,
@@ -95,23 +114,22 @@ export function IncomingOrdersSection() {
         code={code}
         date={date}
         isSubmittingCode={confirmPickup.isPending}
-        isToday={date === formatShortDate(new Date())}
+        isToday={isSameDay(date, new Date())}
         onChangeCode={(value) => {
           setCode(value);
           setDeliveredMessage(null);
         }}
         onChangeDate={setDate}
-        onPressToday={() => setDate(formatShortDate(new Date()))}
+        onChangeSearch={setSearchQuery}
+        onPressToday={() => setDate(startOfDay(new Date()))}
         onSubmitCode={submitCode}
+        searchQuery={searchQuery}
       />
 
       {deliveredMessage ? (
         <Text style={[styles.success, { color: theme.primary }]}>{deliveredMessage}</Text>
       ) : null}
       {error ? <InlineAlert message={toMerchantOrderErrorMessage(error)} /> : null}
-      {range === null ? (
-        <InlineAlert message="Nhập ngày theo dạng dd/mm/yyyy, VD: 20/09/2026." />
-      ) : null}
 
       {ordersQuery.isLoading ? (
         <ActivityIndicator color={theme.primary} size="large" style={styles.loader} />

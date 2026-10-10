@@ -164,13 +164,13 @@ export function PremiumScreen({ onBack }: PremiumScreenProps) {
 
   return (
     <View style={[styles.safeArea, { backgroundColor: theme.background }]}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <BuyerHeader
-          onBack={onBack}
-          subtitle="Lưu bộ lọc và nhận thông báo deal phù hợp"
-          title="Gói cao cấp"
-        />
+      <BuyerHeader
+        onBack={onBack}
+        subtitle="Lưu bộ lọc và nhận thông báo deal phù hợp"
+        title="Gói cao cấp"
+      />
 
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.body}>
           <Text style={[styles.eyebrow, { color: theme.textSecondary }]}>GÓI DỊCH VỤ</Text>
           <Text style={[styles.status, { color: theme.textSecondary }]}>

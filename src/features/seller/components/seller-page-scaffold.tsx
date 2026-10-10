@@ -23,12 +23,13 @@ export function SellerPageScaffold({
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
+      <TabHeader onBack={onPressBack} subtitle={subtitle} title={title} variant="seller" />
+
       <ScrollView
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <TabHeader onBack={onPressBack} subtitle={subtitle} title={title} />
         <View style={styles.body}>{children}</View>
       </ScrollView>
 

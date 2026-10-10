@@ -33,9 +33,9 @@ export function OrderListScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <BuyerHeader subtitle="Theo dõi đơn và thời gian nhận món" title="Đơn hàng" />
+      <BuyerHeader subtitle="Theo dõi đơn và thời gian nhận món" title="Đơn hàng" />
 
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.body}>
           <ScrollView
             horizontal

@@ -43,9 +43,9 @@ export function SellerReportScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <SellerHeader subtitle="Doanh thu và hiệu suất deal" title="Báo cáo" />
+      <SellerHeader subtitle="Doanh thu và hiệu suất deal" title="Báo cáo" />
 
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.body}>
           <SegmentedTabs items={RANGE_TABS} onChange={setRange} value={range} />
 

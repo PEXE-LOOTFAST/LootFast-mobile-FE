@@ -43,7 +43,8 @@
         {
           "cameraPermission": "LootFast cần camera để quét mã QR xác nhận giao hàng."
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,

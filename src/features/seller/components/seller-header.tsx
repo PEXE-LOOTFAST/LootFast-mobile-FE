@@ -6,7 +6,7 @@ import { Icon, type IconName } from '@/components/ui/icon';
 import { TabHeader } from '@/components/ui/tab-header';
 import { IconButton } from '@/features/home/components/icon-button';
 import { NotificationSheet } from '@/features/home/components/notification-sheet';
-import { HomeHeaderColors } from '@/features/home/constants/colors';
+import { SellerHeaderColors } from '@/features/home/constants/colors';
 import { HomeIcons } from '@/features/home/constants/icons';
 
 const BRAND_NAME = 'LootFast';
@@ -30,6 +30,7 @@ export function SellerHeader({ title, subtitle, subtitleIcon, onBack }: SellerHe
         subtitle={subtitle}
         subtitleIcon={subtitleIcon}
         title={`${BRAND_NAME} · ${title}`}
+        variant="seller"
         trailing={
           <IconButton
             accessibilityLabel="Thông báo"
@@ -43,7 +44,6 @@ export function SellerHeader({ title, subtitle, subtitleIcon, onBack }: SellerHe
 
       <NotificationSheet
         onClose={() => setIsNotificationsOpen(false)}
-        role="seller"
         visible={isNotificationsOpen}
       />
     </>
@@ -71,6 +71,7 @@ export function SellerHeaderWithAction({
       subtitle={subtitle}
       subtitleIcon={subtitleIcon}
       title={`${BRAND_NAME} · ${title}`}
+      variant="seller"
       trailing={
         <Pressable
           accessibilityLabel={actionLabel}
@@ -78,8 +79,10 @@ export function SellerHeaderWithAction({
           onPress={onPressAction}
           style={({ pressed }) => [styles.actionButton, pressed && styles.pressed]}
         >
-          <Icon name={actionIcon} color={HomeHeaderColors.text} size={16} />
-          <Text style={styles.actionLabel}>{actionLabel}</Text>
+          <Icon name={actionIcon} color={SellerHeaderColors.text} size={16} />
+          <Text style={[styles.actionLabel, { color: SellerHeaderColors.text }]}>
+            {actionLabel}
+          </Text>
         </Pressable>
       }
     />
@@ -98,6 +101,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
-  actionLabel: { color: HomeHeaderColors.text, fontSize: 13, fontWeight: '800' },
+  actionLabel: { fontSize: 13, fontWeight: '800' },
   pressed: { opacity: 0.8 },
 });

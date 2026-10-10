@@ -44,14 +44,14 @@ export function SellerOverviewScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <SellerOverviewHeader
-          date={today}
-          isVerified={profile !== undefined}
-          onPressCreateDeal={() => router.navigate('/seller/new-deal')}
-          shopName={profile?.storeName ?? '—'}
-        />
+      <SellerOverviewHeader
+        date={today}
+        isVerified={profile !== undefined}
+        onPressCreateDeal={() => router.navigate('/seller/new-deal')}
+        shopName={profile?.storeName ?? '—'}
+      />
 
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.body}>
           {todayPerf.isLoading ? <ActivityIndicator color={theme.primary} /> : null}
 

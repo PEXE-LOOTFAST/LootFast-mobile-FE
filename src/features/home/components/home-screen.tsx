@@ -50,6 +50,14 @@ export function HomeScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
+      <BuyerHeader
+        subtitle={
+          location.isReady ? `Gần bạn · ${formatRadius(filters.radiusKm)}` : 'Chưa bật vị trí'
+        }
+        subtitleIcon={HomeIcons.location}
+        title="Trang chủ"
+      />
+
       <ScrollView
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
@@ -63,14 +71,6 @@ export function HomeScreen() {
           />
         }
       >
-        <BuyerHeader
-          subtitle={
-            location.isReady ? `Gần bạn · ${formatRadius(filters.radiusKm)}` : 'Chưa bật vị trí'
-          }
-          subtitleIcon={HomeIcons.location}
-          title="Trang chủ"
-        />
-
         <View style={styles.body}>
           <LocationPrompt
             canAskAgain={location.canAskAgain}

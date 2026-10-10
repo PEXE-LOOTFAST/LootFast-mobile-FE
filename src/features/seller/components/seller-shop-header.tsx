@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/ui/icon';
-import { HomeHeaderColors } from '@/features/home/constants/colors';
+import { SellerHeaderColors } from '@/features/home/constants/colors';
 import { SellerIcons } from '@/features/seller/constants/icons';
 
 type SellerShopHeaderProps = {
@@ -41,10 +41,10 @@ export function SellerShopHeader({
           {logoUrl ? (
             <Image contentFit="cover" source={{ uri: logoUrl }} style={styles.logo} />
           ) : (
-            <Icon name={SellerIcons.store} color={HomeHeaderColors.textMuted} size={30} />
+            <Icon name={SellerIcons.store} color={SellerHeaderColors.textMuted} size={30} />
           )}
           <View style={styles.cameraBadge}>
-            <Icon name={SellerIcons.camera} color={HomeHeaderColors.background} size={12} />
+            <Icon name={SellerIcons.camera} color={SellerHeaderColors.background} size={12} />
           </View>
         </Pressable>
 
@@ -53,7 +53,7 @@ export function SellerShopHeader({
             <Text style={styles.eyebrow}>Hồ sơ quán</Text>
             {verified ? (
               <View style={styles.verified}>
-                <Icon name={SellerIcons.verified} color={HomeHeaderColors.text} size={12} />
+                <Icon name={SellerIcons.verified} color={SellerHeaderColors.text} size={12} />
                 <Text style={styles.verifiedLabel}>Đã xác minh</Text>
               </View>
             ) : null}
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
     gap: 6,
-    backgroundColor: HomeHeaderColors.background,
+    backgroundColor: SellerHeaderColors.background,
     borderBottomLeftRadius: 28,
     borderBottomRightRadius: 28,
     paddingHorizontal: 20,
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     right: -50,
     bottom: -90,
     borderRadius: 90,
-    backgroundColor: HomeHeaderColors.decoration,
+    backgroundColor: SellerHeaderColors.decoration,
     opacity: 0.5,
   },
   identity: { flexDirection: 'row', alignItems: 'center', gap: 14 },
@@ -120,17 +120,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: HomeHeaderColors.background,
+    borderColor: SellerHeaderColors.background,
     borderRadius: 12,
     backgroundColor: '#FFFFFF',
   },
   logo: { width: 60, height: 60, borderRadius: 30 },
   eyebrowRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   verified: { flexDirection: 'row', alignItems: 'center', gap: 3 },
-  verifiedLabel: { color: HomeHeaderColors.text, fontSize: 11, fontWeight: '800' },
+  verifiedLabel: { color: SellerHeaderColors.text, fontSize: 11, fontWeight: '800' },
   copy: { flex: 1, gap: 2 },
-  eyebrow: { color: HomeHeaderColors.textMuted, fontSize: 11, fontWeight: '700' },
-  title: { color: HomeHeaderColors.text, fontSize: 20, fontWeight: '900', letterSpacing: -0.4 },
-  email: { color: HomeHeaderColors.textMuted, fontSize: 13, fontWeight: '600' },
+  eyebrow: { color: SellerHeaderColors.textMuted, fontSize: 11, fontWeight: '700' },
+  title: { color: SellerHeaderColors.text, fontSize: 20, fontWeight: '900', letterSpacing: -0.4 },
+  email: { color: SellerHeaderColors.textMuted, fontSize: 13, fontWeight: '600' },
   pressed: { opacity: 0.8 },
 });

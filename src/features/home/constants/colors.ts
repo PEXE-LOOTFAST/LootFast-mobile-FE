@@ -1,11 +1,25 @@
 // Header giữ màu xanh đậm ở cả light lẫn dark mode: theme.primary bản dark là xanh nhạt,
 // đặt chữ trắng lên sẽ không đủ tương phản.
-export const HomeHeaderColors = {
+export type HeaderColors = {
+  background: string;
+  decoration: string;
+  text: string;
+  textMuted: string;
+};
+
+export const HomeHeaderColors: HeaderColors = {
   background: '#12703F',
   decoration: '#1D8A52',
   text: '#FFFFFF',
   textMuted: '#CFEBDA',
-} as const;
+};
+
+export const SellerHeaderColors: HeaderColors = {
+  background: '#1A5C3A',
+  decoration: '#D4943A',
+  text: '#FFFFFF',
+  textMuted: '#C8DDD0',
+};
 
 // Chấm trạng thái trên nút (vd. GPS): đủ sáng để nổi trên cả nền header xanh đậm lẫn nền thẻ.
 export const IndicatorColor = {

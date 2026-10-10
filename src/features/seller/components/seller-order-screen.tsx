@@ -88,15 +88,15 @@ export function SellerOrderScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <SellerHeaderWithAction
-          actionIcon={SellerIcons.qrCode}
-          actionLabel="Quét QR"
-          onPressAction={() => setIsScannerOpen(true)}
-          subtitle="Deal đang chạy và đơn đến"
-          title="Đơn hàng"
-        />
+      <SellerHeaderWithAction
+        actionIcon={SellerIcons.qrCode}
+        actionLabel="Quét QR"
+        onPressAction={() => setIsScannerOpen(true)}
+        subtitle="Deal đang chạy và đơn đến"
+        title="Đơn hàng"
+      />
 
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.body}>
           <SegmentedTabs items={SELLER_ORDER_TABS} onChange={setTab} value={tab} />
 

@@ -6,7 +6,18 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon, type IconName } from '@/components/ui/icon';
 import { UiIcons } from '@/constants/icons';
-import { HomeHeaderColors } from '@/features/home/constants/colors';
+import {
+  HomeHeaderColors,
+  SellerHeaderColors,
+  type HeaderColors,
+} from '@/features/home/constants/colors';
+
+export type HeaderVariant = 'buyer' | 'seller';
+
+const VARIANT_COLORS: Record<HeaderVariant, HeaderColors> = {
+  buyer: HomeHeaderColors,
+  seller: SellerHeaderColors,
+};
 
 type TabHeaderProps = {
   title: string;
@@ -17,14 +28,23 @@ type TabHeaderProps = {
   onBack?: () => void;
   /** Cụm nút hành động bên phải (vd. GPS, thông báo). */
   trailing?: ReactNode;
+  variant?: HeaderVariant;
 };
 
 /**
  * Header xanh đậm dùng chung cho các tab của người mua: cùng chiều cao, cùng cấu trúc
  * (tiêu đề + dòng phụ bên trái, hành động bên phải) để chuyển tab không thấy khung nhảy.
  */
-export function TabHeader({ title, subtitle, subtitleIcon, onBack, trailing }: TabHeaderProps) {
+export function TabHeader({
+  title,
+  subtitle,
+  subtitleIcon,
+  onBack,
+  trailing,
+  variant = 'buyer',
+}: TabHeaderProps) {
   const insets = useSafeAreaInsets();
+  const colors = VARIANT_COLORS[variant];
 
   // Nền xanh đậm cần icon status bar màu sáng. Trả về 'auto' khi rời màn,
   // nếu không các màn nền sáng khác sẽ bị icon trắng chìm mất.
@@ -36,11 +56,11 @@ export function TabHeader({ title, subtitle, subtitleIcon, onBack, trailing }: T
   );
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + 8 }]}>
-      {/* Vòng trang trí nằm trong lớp cắt riêng: nếu tràn trực tiếp trong container, trình duyệt
-          coi container cuộn ngang được và dịch cả chữ sang trái khi focus vào nút bên phải. */}
+    <View
+      style={[styles.container, { paddingTop: insets.top + 8, backgroundColor: colors.background }]}
+    >
       <View style={styles.decorationLayer}>
-        <View style={styles.decoration} />
+        <View style={[styles.decoration, { backgroundColor: colors.decoration }]} />
       </View>
 
       <View style={styles.row}>
@@ -52,7 +72,7 @@ export function TabHeader({ title, subtitle, subtitleIcon, onBack, trailing }: T
             onPress={onBack}
             style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
           >
-            <Icon name={UiIcons.back} color={HomeHeaderColors.text} size={18} />
+            <Icon name={UiIcons.back} color={colors.text} size={18} />
           </Pressable>
         ) : null}
 
@@ -62,16 +82,16 @@ export function TabHeader({ title, subtitle, subtitleIcon, onBack, trailing }: T
             adjustsFontSizeToFit
             minimumFontScale={0.8}
             numberOfLines={1}
-            style={styles.title}
+            style={[styles.title, { color: colors.text }]}
           >
             {title}
           </Text>
           {subtitle ? (
             <View style={styles.subtitleRow}>
               {subtitleIcon ? (
-                <Icon name={subtitleIcon} color={HomeHeaderColors.textMuted} size={13} />
+                <Icon name={subtitleIcon} color={colors.textMuted} size={13} />
               ) : null}
-              <Text numberOfLines={1} style={styles.subtitle}>
+              <Text numberOfLines={1} style={[styles.subtitle, { color: colors.textMuted }]}>
                 {subtitle}
               </Text>
             </View>
@@ -87,7 +107,6 @@ export function TabHeader({ title, subtitle, subtitleIcon, onBack, trailing }: T
 const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
-    backgroundColor: HomeHeaderColors.background,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     paddingHorizontal: 16,
@@ -109,7 +128,6 @@ const styles = StyleSheet.create({
     top: -50,
     right: -50,
     borderRadius: 75,
-    backgroundColor: HomeHeaderColors.decoration,
     opacity: 0.5,
   },
   row: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 10 },
@@ -124,7 +142,7 @@ const styles = StyleSheet.create({
   pressed: { opacity: 0.8 },
   trailing: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   copy: { flex: 1, minWidth: 0, gap: 1 },
-  title: { color: HomeHeaderColors.text, fontSize: 20, fontWeight: '900', letterSpacing: -0.3 },
+  title: { fontSize: 20, fontWeight: '900', letterSpacing: -0.3 },
   subtitleRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  subtitle: { flexShrink: 1, color: HomeHeaderColors.textMuted, fontSize: 12, fontWeight: '600' },
+  subtitle: { flexShrink: 1, fontSize: 12, fontWeight: '600' },
 });
