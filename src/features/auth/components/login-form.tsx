@@ -106,7 +106,8 @@ export function LoginForm({ initialEmail = '', onSuccess, onForgotPassword }: Lo
       {/* Nói trước để người dùng không bấm rồi mới gặp lỗi khó hiểu. */}
       {isGoogleLoginConfigured ? null : (
         <Text style={[styles.socialNote, { color: theme.textSecondary }]}>
-          Bản dựng này chưa cấu hình OAuth client của Google nên nút trên chưa dùng được.
+          Đăng nhập Google chỉ dùng được trên bản dựng Android (không chạy trong Expo Go) và cần cấu
+          hình OAuth client.
         </Text>
       )}
     </View>

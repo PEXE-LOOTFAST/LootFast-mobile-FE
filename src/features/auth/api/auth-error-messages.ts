@@ -19,7 +19,9 @@ const SIGNUP_MESSAGES: Record<string, string> = {
 
 const SOCIAL_MESSAGES: Record<string, string> = {
   GOOGLE_NOT_CONFIGURED:
-    'Chưa cấu hình đăng nhập Google. Điền EXPO_PUBLIC_GOOGLE_CLIENT_ID_* và EXPO_PUBLIC_GOOGLE_REDIRECT_URI trong .env.',
+    'Chưa cấu hình đăng nhập Google. Điền EXPO_PUBLIC_GOOGLE_CLIENT_ID_WEB trong .env và chạy trên Android.',
+  GOOGLE_SIGNIN_FAILED:
+    'Không đăng nhập được bằng Google. Kiểm tra máy có Google Play Services và đã thêm tài khoản Google.',
   APPLE_NOT_CONFIGURED: 'Đăng nhập Apple chưa sẵn sàng trên bản dựng này.',
   SOCIAL_CANCELLED: 'Bạn đã đóng cửa sổ đăng nhập.',
   INVALID_SOCIAL_TOKEN: 'Phiên đăng nhập mạng xã hội không hợp lệ. Thử lại nhé.',

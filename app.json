@@ -7,9 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "lootfastmobilefe",
     "userInterfaceStyle": "automatic",
-    "ios": {
-      "icon": "./assets/expo.icon"
-    },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
@@ -18,7 +15,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.lootfastmobilefe"
+      "package": "vn.lootfast.app"
     },
     "web": {
       "output": "static",
