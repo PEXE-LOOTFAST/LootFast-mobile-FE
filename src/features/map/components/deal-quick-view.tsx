@@ -1,0 +1,97 @@
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+
+import { Icon } from '@/components/ui/icon';
+import { DealImage } from '@/features/home/components/deal-image';
+import { DealMeta } from '@/features/home/components/deal-meta';
+import { HomeIcons } from '@/features/home/constants/icons';
+import type { Deal } from '@/features/home/types';
+import { useTheme } from '@/hooks/use-theme';
+import { formatDiscount, formatDistance, formatPrice } from '@/lib/format';
+
+type DealQuickViewProps = {
+  deal: Deal;
+  onOpen: () => void;
+  onClose: () => void;
+};
+
+// Thẻ xem nhanh nổi trên bản đồ khi chạm vào một ghim: đủ thông tin để quyết định có mở chi tiết.
+export function DealQuickView({ deal, onOpen, onClose }: DealQuickViewProps) {
+  const theme = useTheme();
+  const discount = formatDiscount(deal.price, deal.originalPrice);
+
+  return (
+    <View
+      style={[styles.card, { backgroundColor: theme.backgroundElement, borderColor: theme.border }]}
+    >
+      <Pressable
+        accessibilityHint="Mở chi tiết deal"
+        accessibilityLabel={`${deal.name}, ${deal.store.name}, giá ${formatPrice(deal.price)}`}
+        accessibilityRole="button"
+        onPress={onOpen}
+        style={({ pressed }) => [styles.content, pressed && styles.pressed]}
+      >
+        <DealImage emoji={deal.emoji} emojiSize={34} style={styles.image} uri={deal.imageUrl} />
+
+        <View style={styles.copy}>
+          <Text numberOfLines={1} style={[styles.store, { color: theme.textSecondary }]}>
+            {deal.store.name}
+          </Text>
+          <Text numberOfLines={2} style={[styles.name, { color: theme.text }]}>
+            {deal.name}
+          </Text>
+
+          <View style={styles.priceRow}>
+            <Text style={[styles.price, { color: theme.primary }]}>{formatPrice(deal.price)}</Text>
+            <Text style={[styles.originalPrice, { color: theme.textSecondary }]}>
+              {formatPrice(deal.originalPrice)}
+            </Text>
+            {discount ? (
+              <View style={[styles.discount, { backgroundColor: theme.danger }]}>
+                <Text style={styles.discountText}>{discount}</Text>
+              </View>
+            ) : null}
+          </View>
+
+          <View style={styles.meta}>
+            <DealMeta
+              icon={HomeIcons.clock}
+              label={`${deal.pickupWindow.start}–${deal.pickupWindow.end}`}
+            />
+            <DealMeta icon={HomeIcons.distance} label={formatDistance(deal.distanceKm)} />
+          </View>
+        </View>
+      </Pressable>
+
+      <Pressable
+        accessibilityLabel="Đóng xem nhanh"
+        accessibilityRole="button"
+        hitSlop={8}
+        onPress={onClose}
+        style={styles.close}
+      >
+        <Icon name={HomeIcons.close} color={theme.textSecondary} size={14} />
+      </Pressable>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  card: {
+    borderWidth: 1,
+    borderRadius: 20,
+    boxShadow: '0px 10px 24px rgba(23, 33, 27, 0.18)',
+  },
+  content: { flexDirection: 'row', gap: 12, padding: 12 },
+  pressed: { opacity: 0.85 },
+  image: { width: 92, height: 92, borderRadius: 14 },
+  copy: { flex: 1, minWidth: 0, gap: 3, paddingRight: 18 },
+  store: { fontSize: 12, fontWeight: '600' },
+  name: { fontSize: 15, fontWeight: '800', lineHeight: 20 },
+  priceRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6 },
+  price: { fontSize: 16, fontWeight: '900' },
+  originalPrice: { fontSize: 12, textDecorationLine: 'line-through' },
+  discount: { borderRadius: 999, paddingHorizontal: 7, paddingVertical: 2 },
+  discountText: { color: '#FFFFFF', fontSize: 11, fontWeight: '900' },
+  meta: { flexDirection: 'row', gap: 12 },
+  close: { position: 'absolute', top: 10, right: 10, padding: 4 },
+});

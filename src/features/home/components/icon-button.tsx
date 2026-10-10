@@ -2,7 +2,7 @@ import type { Ref } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/ui/icon';
-import { HomeHeaderColors } from '@/features/home/constants/colors';
+import { HomeHeaderColors, IndicatorColor } from '@/features/home/constants/colors';
 import { useTheme } from '@/hooks/use-theme';
 
 type IconButtonProps = {
@@ -13,6 +13,8 @@ type IconButtonProps = {
   badgeCount?: number;
   /** Tô nổi nút khi tính năng nó điều khiển đang bật (vd. bộ lọc đang áp dụng). */
   isActive?: boolean;
+  /** Chấm trạng thái ở góc nút (vd. GPS bật/tắt): on là xanh, off là cam. */
+  indicator?: 'on' | 'off';
   ref?: Ref<View>;
 };
 
@@ -23,6 +25,7 @@ export function IconButton({
   tone = 'surface',
   badgeCount = 0,
   isActive = false,
+  indicator,
   ref,
 }: IconButtonProps) {
   const theme = useTheme();
@@ -49,6 +52,18 @@ export function IconButton({
       ]}
     >
       <Icon name={icon} color={iconColor} size={onHeader ? 24 : 20} />
+
+      {indicator ? (
+        <View
+          style={[
+            styles.dot,
+            {
+              backgroundColor: indicator === 'on' ? IndicatorColor.on : IndicatorColor.off,
+              borderColor: onHeader ? HomeHeaderColors.background : theme.backgroundElement,
+            },
+          ]}
+        />
+      ) : null}
 
       {badgeCount > 0 ? (
         <View
@@ -78,6 +93,15 @@ const styles = StyleSheet.create({
   },
   headerButton: { backgroundColor: 'transparent', borderColor: 'transparent' },
   pressed: { opacity: 0.8 },
+  dot: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    width: 12,
+    height: 12,
+    borderWidth: 2,
+    borderRadius: 6,
+  },
   badge: {
     position: 'absolute',
     top: 2,

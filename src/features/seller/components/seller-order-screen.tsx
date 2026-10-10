@@ -1,22 +1,25 @@
-import { router, useFocusEffect } from 'expo-router';
-import { setStatusBarStyle } from 'expo-status-bar';
-import { useCallback, useState } from 'react';
+import { router } from 'expo-router';
+import { useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, View } from 'react-native';
 
-import { ApiPendingCard } from '@/components/ui/api-pending-card';
 import { EmptyCard } from '@/components/ui/empty-card';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { MaxContentWidth } from '@/constants/theme';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { toMerchantDealErrorMessage } from '@/features/seller/api/merchant-deals';
+import { toMerchantOrderErrorMessage } from '@/features/seller/api/merchant-orders';
+import { useConfirmPickup } from '@/features/seller/api/use-merchant-orders';
 import {
   toSellerDeal,
   useMerchantDeals,
   useUpdateDealQuantity,
 } from '@/features/seller/api/use-merchant-deals';
+import { IncomingOrdersSection } from '@/features/seller/components/incoming-orders-section';
+import { QrScannerModal } from '@/features/seller/components/qr-scanner-modal';
 import { SegmentedTabs } from '@/features/seller/components/segmented-tabs';
 import { SellerDealCard } from '@/features/seller/components/seller-deal-card';
-import { SellerOrderHeader } from '@/features/seller/components/seller-order-header';
+import { SellerHeaderWithAction } from '@/features/seller/components/seller-header';
+import { SellerIcons } from '@/features/seller/constants/icons';
 import { SELLER_ORDER_TABS } from '@/features/seller/constants/seller-order-tabs';
 import type { SellerOrderTab } from '@/features/seller/types';
 import { useTheme } from '@/hooks/use-theme';
@@ -25,28 +28,20 @@ import { useTheme } from '@/hooks/use-theme';
  * Deal của quán đọc từ `GET /merchants/me/deals`, sửa số suất qua
  * `PATCH /merchants/me/deals/{id}/quantity`.
  *
- * Mục "Đơn hàng đến" chưa có dữ liệu: backend chưa có endpoint đơn cho người bán — không có
- * danh sách đơn, cũng chưa có thao tác xác nhận / hoàn tất đơn. Giao diện đã dựng sẵn ở
- * `incoming-order-filters` và `incoming-orders-panel`.
+ * Mục "Đơn hàng đến" đọc từ `GET /merchants/me/orders` — xem `incoming-orders-section`.
  */
 export function SellerOrderScreen() {
   const theme = useTheme();
   const [tab, setTab] = useState<SellerOrderTab>('incoming');
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
   const dealsQuery = useMerchantDeals();
   const updateQuantity = useUpdateDealQuantity();
+  const confirmPickup = useConfirmPickup();
 
   const dealDtos = dealsQuery.data?.items ?? [];
   const deals = dealDtos.map(toSellerDeal);
   const runningDeals = deals.filter((deal) => deal.status === 'running');
   const endedDeals = deals.filter((deal) => deal.status === 'ended');
-
-  // Header nền xanh đậm cần icon status bar màu sáng, trả về 'auto' khi rời màn.
-  useFocusEffect(
-    useCallback(() => {
-      setStatusBarStyle('light');
-      return () => setStatusBarStyle('auto');
-    }, []),
-  );
 
   // Backend nhận tổng số suất chứ không nhận số còn lại, và bắt gửi kèm version đang giữ để
   // không ghi đè thay đổi của phiên khác.
@@ -93,12 +88,15 @@ export function SellerOrderScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Máy quét QR sẽ được nối ở nhánh riêng, tạm báo cho người bán biết. */}
-        <SellerOrderHeader
-          onPressScan={() => Alert.alert('Quét QR', 'Tính năng quét mã sẽ sớm có.')}
-        />
+      <SellerHeaderWithAction
+        actionIcon={SellerIcons.qrCode}
+        actionLabel="Quét QR"
+        onPressAction={() => setIsScannerOpen(true)}
+        subtitle="Deal đang chạy và đơn đến"
+        title="Đơn hàng"
+      />
 
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.body}>
           <SegmentedTabs items={SELLER_ORDER_TABS} onChange={setTab} value={tab} />
 
@@ -106,9 +104,7 @@ export function SellerOrderScreen() {
             <InlineAlert message={toMerchantDealErrorMessage(updateQuantity.error)} />
           ) : null}
 
-          {tab === 'incoming' ? (
-            <ApiPendingCard feature="Đơn khách đặt và thao tác xác nhận, hoàn tất đơn" />
-          ) : null}
+          {tab === 'incoming' ? <IncomingOrdersSection /> : null}
 
           {tab === 'running'
             ? renderDeals(runningDeals, {
@@ -126,8 +122,22 @@ export function SellerOrderScreen() {
         </View>
       </ScrollView>
 
-      {/* Nâng lên trên thanh tab người bán để nút trợ lý không đè lên nút Đăng deal. */}
       <AssistantFab bottomOffset={96} />
+
+      <QrScannerModal
+        visible={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+        onScan={(code) => {
+          confirmPickup.mutate(code, {
+            onSuccess: (order) => {
+              Alert.alert('Giao hàng thành công', `Đã xác nhận giao đơn "${order.dealName}".`);
+            },
+            onError: (error) => {
+              Alert.alert('Không xác nhận được', toMerchantOrderErrorMessage(error));
+            },
+          });
+        }}
+      />
     </View>
   );
 }

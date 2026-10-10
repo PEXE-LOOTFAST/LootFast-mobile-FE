@@ -64,14 +64,14 @@ export function StoreApprovalScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Trung tâm thông báo của admin sẽ làm ở nhánh riêng, tạm báo trước. */}
-        <AdminHeader
-          date={new Date()}
-          hasUnread={queue.pendingCount > 0}
-          onPressNotifications={() => Alert.alert('Thông báo', 'Trung tâm thông báo sẽ sớm có.')}
-        />
+      {/* Trung tâm thông báo của admin sẽ làm ở nhánh riêng, tạm báo trước. */}
+      <AdminHeader
+        date={new Date()}
+        hasUnread={queue.pendingCount > 0}
+        onPressNotifications={() => Alert.alert('Thông báo', 'Trung tâm thông báo sẽ sớm có.')}
+      />
 
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.body}>
           <SegmentedTabs items={tabs} onChange={setTab} value={tab} />
 

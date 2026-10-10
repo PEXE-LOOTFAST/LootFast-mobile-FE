@@ -1,4 +1,5 @@
-import { SellerOverviewScreen } from '@/features/seller/components/seller-overview-screen';
-import { withSellerApproval } from '@/features/seller/components/seller-approved-only';
+import { Redirect } from 'expo-router';
 
-export default withSellerApproval(SellerOverviewScreen, 'Tổng quan');
+export default function SellerIndexRoute() {
+  return <Redirect href="/seller/reports" />;
+}

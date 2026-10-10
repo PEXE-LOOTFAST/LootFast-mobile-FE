@@ -3,6 +3,8 @@ import type { IconMap } from '@/components/ui/icon';
 // SF Symbols chỉ có trên iOS, Android và web dùng Material Symbols — mỗi icon phải khai báo đủ cả hai tên.
 export const HomeIcons = {
   location: { ios: 'mappin.and.ellipse', android: 'location_on', web: 'location_on' },
+  gpsOn: { ios: 'location.fill', android: 'my_location', web: 'my_location' },
+  gpsOff: { ios: 'location.slash', android: 'location_disabled', web: 'location_disabled' },
   bell: { ios: 'bell', android: 'notifications', web: 'notifications' },
   login: { ios: 'rectangle.portrait.and.arrow.forward', android: 'login', web: 'login' },
   person: { ios: 'person', android: 'person', web: 'person' },
@@ -28,4 +30,5 @@ export const HomeIcons = {
   sparkles: { ios: 'sparkles', android: 'auto_awesome', web: 'auto_awesome' },
   refresh: { ios: 'arrow.clockwise', android: 'refresh', web: 'refresh' },
   send: { ios: 'paperplane.fill', android: 'send', web: 'send' },
+  doneAll: { ios: 'checkmark.circle', android: 'done_all', web: 'done_all' },
 } satisfies IconMap;

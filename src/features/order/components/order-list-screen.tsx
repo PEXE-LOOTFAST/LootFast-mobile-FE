@@ -1,16 +1,16 @@
-import { router, useFocusEffect } from 'expo-router';
-import { setStatusBarStyle } from 'expo-status-bar';
-import { useCallback, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { router } from 'expo-router';
+import { useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
 import { EmptyCard } from '@/components/ui/empty-card';
-import { InlineAlert } from '@/components/ui/inline-alert';
+import { ErrorState } from '@/components/ui/error-state';
+import { LoadingState } from '@/components/ui/loading-state';
 import { MaxContentWidth } from '@/constants/theme';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
+import { BuyerHeader } from '@/features/home/components/buyer-header';
 import { type OrderListStatusDto, toOrderErrorMessage } from '@/features/order/api/orders';
 import { useOrders } from '@/features/order/api/use-orders';
-import { OrderHeader } from '@/features/order/components/order-header';
 import { useTheme } from '@/hooks/use-theme';
 import { formatPrice } from '@/lib/format';
 
@@ -31,19 +31,11 @@ export function OrderListScreen() {
   const [page, setPage] = useState(0);
   const ordersQuery = useOrders(status, page);
 
-  // Header nền xanh đậm cần icon status bar màu sáng, trả về 'auto' khi rời màn.
-  useFocusEffect(
-    useCallback(() => {
-      setStatusBarStyle('light');
-      return () => setStatusBarStyle('auto');
-    }, []),
-  );
-
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <OrderHeader />
+      <BuyerHeader subtitle="Theo dõi đơn và thời gian nhận món" title="Đơn hàng" />
 
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.body}>
           <ScrollView
             horizontal
@@ -76,22 +68,13 @@ export function OrderListScreen() {
           </ScrollView>
 
           {ordersQuery.isPending ? (
-            <View style={styles.feedback}>
-              <ActivityIndicator color={theme.primary} size="large" />
-              <Text style={[styles.feedbackText, { color: theme.textSecondary }]}>
-                Đang tải danh sách đơn...
-              </Text>
-            </View>
+            <LoadingState label="Đang tải danh sách đơn..." />
           ) : ordersQuery.isError ? (
-            <View style={styles.feedback}>
-              <InlineAlert message={toOrderErrorMessage(ordersQuery.error)} />
-              <BrandButton
-                loading={ordersQuery.isRefetching}
-                onPress={() => void ordersQuery.refetch()}
-              >
-                Thử lại
-              </BrandButton>
-            </View>
+            <ErrorState
+              message={toOrderErrorMessage(ordersQuery.error)}
+              onRetry={() => void ordersQuery.refetch()}
+              retrying={ordersQuery.isRefetching}
+            />
           ) : ordersQuery.data.items.length === 0 ? (
             <EmptyCard
               description={`Bạn chưa có đơn nào ở trạng thái “${STATUS_LABELS[status]}”.`}
@@ -186,8 +169,6 @@ const styles = StyleSheet.create({
   },
   tabs: { gap: 8, paddingRight: 16 },
   tab: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 10 },
-  feedback: { alignItems: 'center', gap: 12, paddingVertical: 24 },
-  feedbackText: { fontSize: 13 },
   card: { gap: 8, borderWidth: 1, borderRadius: 18, padding: 16 },
   pressed: { opacity: 0.8 },
   cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 12 },

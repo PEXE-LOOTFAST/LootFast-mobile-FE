@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/ui/icon';
-import { HomeHeaderColors } from '@/features/home/constants/colors';
+import { SellerHeaderColors } from '@/features/home/constants/colors';
 import { SellerIcons } from '@/features/seller/constants/icons';
 
 type SellerPageHeaderProps = {
@@ -29,7 +29,7 @@ export function SellerPageHeader({ title, subtitle, onPressBack }: SellerPageHea
         onPress={onPressBack}
         style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
       >
-        <Icon name={SellerIcons.back} color={HomeHeaderColors.text} size={18} />
+        <Icon name={SellerIcons.back} color={SellerHeaderColors.text} size={18} />
       </Pressable>
 
       <View style={styles.copy}>
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
-    backgroundColor: HomeHeaderColors.background,
+    backgroundColor: SellerHeaderColors.background,
     borderBottomLeftRadius: 28,
     borderBottomRightRadius: 28,
     paddingHorizontal: 20,
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     top: -40,
     right: -60,
     borderRadius: 100,
-    backgroundColor: HomeHeaderColors.decoration,
+    backgroundColor: SellerHeaderColors.decoration,
     opacity: 0.5,
   },
   backButton: {
@@ -82,9 +82,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.16)',
   },
   copy: { flex: 1, gap: 4 },
-  title: { color: HomeHeaderColors.text, fontSize: 22, fontWeight: '900', letterSpacing: -0.4 },
+  title: { color: SellerHeaderColors.text, fontSize: 22, fontWeight: '900', letterSpacing: -0.4 },
   subtitle: {
-    color: HomeHeaderColors.textMuted,
+    color: SellerHeaderColors.textMuted,
     fontSize: 13,
     fontWeight: '600',
     lineHeight: 18,

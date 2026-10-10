@@ -38,8 +38,8 @@ export type DealReview = {
   comment: string;
 };
 
-/** Mức giảm giá tối thiểu (%) của bộ lọc nâng cao. */
-export type DiscountFilter = 30 | 40 | 50;
+/** Mức giảm giá tối thiểu (%) của bộ lọc nâng cao; 0 là không lọc. */
+export type DiscountFilter = 0 | 30 | 40 | 50;
 
 export type PickupFilter = 'any' | 'before-20' | 'after-20';
 

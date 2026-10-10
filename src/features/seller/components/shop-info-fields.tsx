@@ -1,12 +1,16 @@
+import { useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { BrandButton } from '@/components/ui/brand-button';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { TextField } from '@/components/ui/text-field';
+import { LocationPickerModal } from '@/features/map/components/location-picker-modal';
 import { useShopCategories } from '@/features/seller/api/shop-categories';
 import { SellerFormCard } from '@/features/seller/components/seller-form-card';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import type { ShopInfoValues } from '@/features/seller/validation';
 import { useTheme } from '@/hooks/use-theme';
+import type { Coordinate } from '@/hooks/use-user-location';
 import type { FormErrors } from '@/types/form';
 
 type ShopInfoFieldsProps = {
@@ -29,6 +33,7 @@ export function ShopInfoFields({
 }: ShopInfoFieldsProps) {
   const theme = useTheme();
   const categories = useShopCategories();
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
 
   return (
     <>
@@ -162,6 +167,9 @@ export function ShopInfoFields({
           onChangeText={(text) => onChange('city', text)}
           value={values.city}
         />
+        <BrandButton onPress={() => setIsPickerOpen(true)} variant="secondary">
+          Chọn vị trí trên bản đồ
+        </BrandButton>
         <View style={styles.row}>
           <View style={styles.rowItem}>
             <TextField
@@ -187,7 +195,8 @@ export function ShopInfoFields({
           </View>
         </View>
         <Text style={[styles.hint, { color: theme.textSecondary }]}>
-          Tọa độ dùng để hiện quán trên bản đồ và tính khoảng cách cho khách.
+          Chọn vị trí trên bản đồ hoặc nhập tay. Khách sẽ thấy quán đúng chỗ này trên tab Bản đồ và
+          dùng nó để tính khoảng cách.
         </Text>
       </SellerFormCard>
 
@@ -216,8 +225,48 @@ export function ShopInfoFields({
           Áp dụng cho cả tuần. Giờ đóng phải sau giờ mở trong cùng một ngày.
         </Text>
       </SellerFormCard>
+
+      <LocationPickerModal
+        addressHint={
+          values.addressLine.trim()
+            ? [values.addressLine, values.ward, values.district, values.city]
+                .map((part) => part.trim())
+                .filter(Boolean)
+                .join(', ')
+            : ''
+        }
+        initial={toCoordinate(values.latitude, values.longitude)}
+        onClose={() => setIsPickerOpen(false)}
+        onConfirm={({ latitude, longitude }, address) => {
+          // Backend nhận tối đa 6 chữ số thập phân.
+          onChange('latitude', latitude.toFixed(6));
+          onChange('longitude', longitude.toFixed(6));
+
+          // Địa chỉ chỉ là gợi ý từ vị trí; các ô vẫn sửa tay được sau khi điền.
+          if (address) {
+            onChange('addressLine', address.addressLine);
+            onChange('ward', address.ward);
+            onChange('district', address.district);
+            onChange('city', address.city);
+          }
+          setIsPickerOpen(false);
+        }}
+        visible={isPickerOpen}
+      />
     </>
   );
+}
+
+// Chỉ trả toạ độ khi cả hai ô đều hợp lệ; ngược lại bản đồ mở ở vị trí hiện tại, không đặt sẵn ghim.
+function toCoordinate(latitude: string, longitude: string): Coordinate | null {
+  const lat = Number(latitude.trim().replace(',', '.'));
+  const lng = Number(longitude.trim().replace(',', '.'));
+
+  if (!latitude.trim() || !longitude.trim()) return null;
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+
+  return { latitude: lat, longitude: lng };
 }
 
 function SectionTitle({ icon, label }: { icon: IconName; label: string }) {

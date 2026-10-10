@@ -1,20 +1,14 @@
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { setStatusBarStyle } from 'expo-status-bar';
 import { useCallback, useState } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  Share,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BrandButton } from '@/components/ui/brand-button';
+import { ErrorState } from '@/components/ui/error-state';
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
+import { LoadingState } from '@/components/ui/loading-state';
 import { MaxContentWidth } from '@/constants/theme';
 import { getDealErrorMessage } from '@/features/home/api/deals';
 import { useDeal } from '@/features/home/api/use-deals';
@@ -251,8 +245,7 @@ function DealDetailLoading() {
 
   return (
     <SafeAreaView style={[styles.feedback, { backgroundColor: theme.background }]}>
-      <ActivityIndicator color={theme.primary} size="large" />
-      <Text style={[styles.feedbackText, { color: theme.textSecondary }]}>Đang tải deal...</Text>
+      <LoadingState fill label="Đang tải deal..." />
     </SafeAreaView>
   );
 }
@@ -270,10 +263,7 @@ function DealDetailError({
 
   return (
     <SafeAreaView style={[styles.feedback, { backgroundColor: theme.background }]}>
-      <InlineAlert message={message} />
-      <BrandButton loading={retrying} onPress={onRetry}>
-        Thử lại
-      </BrandButton>
+      <ErrorState message={message} onRetry={onRetry} retrying={retrying} />
       <BrandButton onPress={goBack} variant="secondary">
         Quay lại
       </BrandButton>
@@ -344,5 +334,4 @@ const styles = StyleSheet.create({
   notFoundTitle: { fontSize: 22, fontWeight: '900', textAlign: 'center' },
   notFoundText: { fontSize: 14, textAlign: 'center', marginBottom: 8 },
   feedback: { flex: 1, justifyContent: 'center', gap: 14, padding: 24 },
-  feedbackText: { fontSize: 14, textAlign: 'center' },
 });

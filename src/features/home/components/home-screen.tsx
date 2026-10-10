@@ -1,6 +1,4 @@
-import { router, useFocusEffect } from 'expo-router';
-import { setStatusBarStyle } from 'expo-status-bar';
-import { useCallback, useState } from 'react';
+import { router } from 'expo-router';
 import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
@@ -8,19 +6,21 @@ import { InlineAlert } from '@/components/ui/inline-alert';
 import { MaxContentWidth } from '@/constants/theme';
 import { getDealErrorMessage } from '@/features/home/api/deals';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
+import { BuyerHeader } from '@/features/home/components/buyer-header';
 import { DealCard } from '@/features/home/components/deal-card';
 import { DealFilterButton } from '@/features/home/components/deal-filter-button';
 import { EmptyDeals } from '@/features/home/components/empty-deals';
-import { HomeHeader } from '@/features/home/components/home-header';
-import { NotificationSheet } from '@/features/home/components/notification-sheet';
+import { LocationPrompt } from '@/features/home/components/location-prompt';
 import { SearchPanel } from '@/features/home/components/search-panel';
 import { SectionHeader } from '@/features/home/components/section-header';
 import { useDeals } from '@/features/home/api/use-deals';
 import { DEAL_CATEGORIES } from '@/features/home/constants/deal-categories';
+import { HomeIcons } from '@/features/home/constants/icons';
 import { filterDeals, useDealFilters } from '@/features/home/hooks/use-deal-filters';
 import type { Deal } from '@/features/home/types';
 import { useAuthSession } from '@/hooks/use-auth-session';
 import { useTheme } from '@/hooks/use-theme';
+import { useUserLocation } from '@/hooks/use-user-location';
 import { requireAuth, withAuth } from '@/lib/auth-session';
 import { formatRadius } from '@/lib/format';
 
@@ -30,23 +30,19 @@ export function HomeScreen() {
   const theme = useTheme();
   const { isAuthenticated } = useAuthSession();
   const filters = useDealFilters([]);
+  const location = useUserLocation();
   const dealsQuery = useDeals({
+    ...(location.coords ?? {}),
     categoryCode: filters.categoryId === 'all' ? undefined : filters.categoryId,
     keyword: filters.query,
     radiusKm: filters.radiusKm,
   });
   const deals = dealsQuery.data ?? [];
   const filteredDeals = filterDeals(deals, filters);
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
-  // Header nền xanh đậm cần icon status bar màu sáng. Trả về 'auto' khi rời màn,
-  // nếu không các màn nền sáng khác sẽ bị icon trắng chìm mất.
-  useFocusEffect(
-    useCallback(() => {
-      setStatusBarStyle('light');
-      return () => setStatusBarStyle('auto');
-    }, []),
-  );
+  // Bộ lọc cần cả đăng nhập lẫn GPS: không có vị trí thì "gần bạn" và bán kính không có nghĩa.
+  const canFilter = isAuthenticated && location.isReady;
+  const unlockFilters = () => requireAuth(() => void location.request());
 
   const openDeal = (deal: Deal) => {
     requireAuth(() => router.navigate({ pathname: '/deal/[id]', params: { id: deal.id } }));
@@ -54,6 +50,14 @@ export function HomeScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
+      <BuyerHeader
+        subtitle={
+          location.isReady ? `Gần bạn · ${formatRadius(filters.radiusKm)}` : 'Chưa bật vị trí'
+        }
+        subtitleIcon={HomeIcons.location}
+        title="Trang chủ"
+      />
+
       <ScrollView
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
@@ -67,22 +71,20 @@ export function HomeScreen() {
           />
         }
       >
-        <HomeHeader
-          isAuthenticated={isAuthenticated}
-          locationLabel={`Gần bạn · ${formatRadius(filters.radiusKm)}`}
-          onPressNotifications={() => setIsNotificationsOpen(true)}
-          onPressSignIn={withAuth()}
-          unreadCount={0}
-        />
-
         <View style={styles.body}>
+          <LocationPrompt
+            canAskAgain={location.canAskAgain}
+            onRequest={unlockFilters}
+            status={location.status}
+          />
+
           <SearchPanel
             categories={DEAL_CATEGORIES}
-            isLocked={!isAuthenticated}
+            isLocked={!canFilter}
             onChangeQuery={filters.setQuery}
             onChangeRadius={filters.setRadiusKm}
-            onPressLocked={withAuth()}
-            onSelectCategory={(id) => requireAuth(() => filters.setCategoryId(id))}
+            onPressLocked={unlockFilters}
+            onSelectCategory={(id) => (canFilter ? filters.setCategoryId(id) : unlockFilters())}
             query={filters.query}
             radiusKm={filters.radiusKm}
             selectedCategoryId={filters.categoryId}
@@ -99,11 +101,11 @@ export function HomeScreen() {
               action={
                 <DealFilterButton
                   isActive={filters.hasAdvancedFilters}
-                  isLocked={!isAuthenticated}
+                  isLocked={!canFilter}
                   minDiscount={filters.minDiscount}
                   onChangeDiscount={filters.setMinDiscount}
                   onChangePickup={filters.setPickup}
-                  onPressLocked={withAuth()}
+                  onPressLocked={unlockFilters}
                   pickup={filters.pickup}
                 />
               }
@@ -128,18 +130,17 @@ export function HomeScreen() {
                 <DealCard key={deal.id} deal={deal} onPress={() => openDeal(deal)} />
               ))
             ) : (
-              <EmptyDeals onReset={withAuth(filters.resetFilters)} />
+              <EmptyDeals
+                isFiltering={filters.isFiltering}
+                onReset={withAuth(filters.resetFilters)}
+                radiusLabel={formatRadius(filters.radiusKm)}
+              />
             )}
           </View>
         </View>
       </ScrollView>
 
       <AssistantFab />
-
-      <NotificationSheet
-        onClose={() => setIsNotificationsOpen(false)}
-        visible={isNotificationsOpen}
-      />
     </View>
   );
 }

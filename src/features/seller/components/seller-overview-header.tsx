@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/ui/icon';
-import { HomeHeaderColors } from '@/features/home/constants/colors';
+import { SellerHeaderColors } from '@/features/home/constants/colors';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { formatFullDate } from '@/lib/format';
 
@@ -37,7 +37,7 @@ export function SellerOverviewHeader({
           {shopName}
         </Text>
         {isVerified ? (
-          <Icon name={SellerIcons.verified} color={HomeHeaderColors.textMuted} size={14} />
+          <Icon name={SellerIcons.verified} color={SellerHeaderColors.textMuted} size={14} />
         ) : null}
         <Text style={styles.dot}>·</Text>
         <Text style={styles.date}>{formatFullDate(date)}</Text>
@@ -49,7 +49,7 @@ export function SellerOverviewHeader({
         onPress={onPressCreateDeal}
         style={({ pressed }) => [styles.createButton, pressed && styles.pressed]}
       >
-        <Icon name={SellerIcons.plus} color={HomeHeaderColors.text} size={15} />
+        <Icon name={SellerIcons.plus} color={SellerHeaderColors.text} size={15} />
         <Text style={styles.createLabel}>Đăng deal mới</Text>
       </Pressable>
     </View>
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
     gap: 6,
-    backgroundColor: HomeHeaderColors.background,
+    backgroundColor: SellerHeaderColors.background,
     borderBottomLeftRadius: 28,
     borderBottomRightRadius: 28,
     paddingHorizontal: 20,
@@ -82,14 +82,14 @@ const styles = StyleSheet.create({
     top: -30,
     right: -70,
     borderRadius: 110,
-    backgroundColor: HomeHeaderColors.decoration,
+    backgroundColor: SellerHeaderColors.decoration,
     opacity: 0.5,
   },
-  title: { color: HomeHeaderColors.text, fontSize: 22, fontWeight: '900', letterSpacing: -0.4 },
+  title: { color: SellerHeaderColors.text, fontSize: 22, fontWeight: '900', letterSpacing: -0.4 },
   metaRow: { flexDirection: 'row', alignItems: 'center', gap: 5, flexWrap: 'wrap' },
-  shopName: { flexShrink: 1, color: HomeHeaderColors.textMuted, fontSize: 13, fontWeight: '700' },
-  dot: { color: HomeHeaderColors.textMuted, fontSize: 13, fontWeight: '700' },
-  date: { color: HomeHeaderColors.textMuted, fontSize: 13, fontWeight: '600' },
+  shopName: { flexShrink: 1, color: SellerHeaderColors.textMuted, fontSize: 13, fontWeight: '700' },
+  dot: { color: SellerHeaderColors.textMuted, fontSize: 13, fontWeight: '700' },
+  date: { color: SellerHeaderColors.textMuted, fontSize: 13, fontWeight: '600' },
   createButton: {
     alignSelf: 'flex-start',
     flexDirection: 'row',
@@ -103,6 +103,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
   },
-  createLabel: { color: HomeHeaderColors.text, fontSize: 14, fontWeight: '800' },
+  createLabel: { color: SellerHeaderColors.text, fontSize: 14, fontWeight: '800' },
   pressed: { opacity: 0.85 },
 });
