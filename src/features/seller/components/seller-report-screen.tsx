@@ -1,6 +1,5 @@
-import { router, useFocusEffect } from 'expo-router';
-import { setStatusBarStyle } from 'expo-status-bar';
-import { useCallback, useMemo, useState } from 'react';
+import { router } from 'expo-router';
+import { useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 
 import { InlineAlert } from '@/components/ui/inline-alert';
@@ -12,10 +11,9 @@ import { MetricCard } from '@/features/seller/components/metric-card';
 import { PerformanceChartCard } from '@/features/seller/components/performance-chart-card';
 import { PerformanceSummaryCard } from '@/features/seller/components/performance-summary-card';
 import { SegmentedTabs } from '@/features/seller/components/segmented-tabs';
-import { SellerOverviewHeader } from '@/features/seller/components/seller-overview-header';
+import { SellerHeader } from '@/features/seller/components/seller-header';
 import { TopDealsCard } from '@/features/seller/components/top-deals-card';
 import { SellerIcons } from '@/features/seller/constants/icons';
-import { useMerchantShop } from '@/features/seller/hooks/use-merchant-shop';
 import { useTheme } from '@/hooks/use-theme';
 import { formatPrice } from '@/lib/format';
 
@@ -33,7 +31,6 @@ export function SellerReportScreen() {
   const theme = useTheme();
   const [range, setRange] = useState<RangeId>('today');
   const [today] = useState(() => new Date());
-  const { profile } = useMerchantShop();
 
   const from = useMemo(() => {
     const d = new Date(today);
@@ -44,22 +41,10 @@ export function SellerReportScreen() {
   const query = useMerchantPerformance(from, today);
   const data = query.data;
 
-  useFocusEffect(
-    useCallback(() => {
-      setStatusBarStyle('light');
-      return () => setStatusBarStyle('auto');
-    }, []),
-  );
-
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <SellerOverviewHeader
-          date={today}
-          isVerified={profile !== undefined}
-          onPressCreateDeal={() => router.navigate('/seller/new-deal')}
-          shopName={profile?.storeName ?? '—'}
-        />
+        <SellerHeader subtitle="Doanh thu và hiệu suất deal" title="Báo cáo" />
 
         <View style={styles.body}>
           <SegmentedTabs items={RANGE_TABS} onChange={setRange} value={range} />

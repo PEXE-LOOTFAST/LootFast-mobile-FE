@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { useUnreadCount } from '@/api/notifications';
 import { Popover } from '@/components/ui/popover';
 import { TabHeader } from '@/components/ui/tab-header';
 import { IconButton } from '@/features/home/components/icon-button';
@@ -47,27 +48,17 @@ const GPS_NOTES: Record<LocationStatus, { title: string; body: string }> = {
 };
 
 type BuyerHeaderProps = {
-  /** Tên trang, không kèm tên thương hiệu: header tự thêm "LootFast ·" phía trước. */
   title: string;
   subtitle?: string;
   subtitleIcon?: IconName;
   onBack?: () => void;
-  unreadCount?: number;
 };
 
-/**
- * Header chung của mọi trang người mua: cùng cách đặt tên ("LootFast · <trang>") và cùng cụm nút
- * bên phải (GPS + thông báo, hoặc GPS + đăng nhập với khách) để các tab trông thống nhất.
- */
-export function BuyerHeader({
-  title,
-  subtitle,
-  subtitleIcon,
-  onBack,
-  unreadCount = 0,
-}: BuyerHeaderProps) {
+export function BuyerHeader({ title, subtitle, subtitleIcon, onBack }: BuyerHeaderProps) {
   const theme = useTheme();
   const { isAuthenticated } = useAuthSession();
+  const { data: unreadData } = useUnreadCount(isAuthenticated);
+  const unreadCount = unreadData?.unreadCount ?? 0;
   const location = useUserLocation();
   const { ref: gpsRef, anchor: gpsAnchor, open: openGpsNote, close: closeGpsNote } = useAnchor();
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);

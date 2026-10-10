@@ -30,4 +30,5 @@ export const HomeIcons = {
   sparkles: { ios: 'sparkles', android: 'auto_awesome', web: 'auto_awesome' },
   refresh: { ios: 'arrow.clockwise', android: 'refresh', web: 'refresh' },
   send: { ios: 'paperplane.fill', android: 'send', web: 'send' },
+  doneAll: { ios: 'checkmark.circle', android: 'done_all', web: 'done_all' },
 } satisfies IconMap;

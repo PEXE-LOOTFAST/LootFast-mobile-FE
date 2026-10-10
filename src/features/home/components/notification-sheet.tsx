@@ -1,142 +1,168 @@
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import Animated, { SlideInDown } from 'react-native-reanimated';
+import {
+  ActivityIndicator,
+  FlatList,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/ui/icon';
+import {
+  useMarkAllRead,
+  useMarkRead,
+  useNotifications,
+  type NotificationDto,
+} from '@/api/notifications';
 import { HomeIcons } from '@/features/home/constants/icons';
-import type { AppNotification } from '@/features/home/types';
 import { useTheme } from '@/hooks/use-theme';
+
+function formatDate(iso: string): string {
+  const d = new Date(iso);
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  return `${day}/${month}`;
+}
 
 type NotificationSheetProps = {
   visible: boolean;
   onClose: () => void;
-  /**
-   * Backend chưa có API thông báo nên nơi gọi hiện không truyền gì; sheet tự hiện trạng thái
-   * trống. Có API rồi thì truyền danh sách và hàm đánh dấu đã đọc vào.
-   */
-  notifications?: AppNotification[];
-  onPressItem?: (id: string) => void;
 };
 
-export function NotificationSheet({
-  visible,
-  notifications = [],
-  onClose,
-  onPressItem,
-}: NotificationSheetProps) {
+export function NotificationSheet({ visible, onClose }: NotificationSheetProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const { data, isLoading } = useNotifications();
+  const markRead = useMarkRead();
+  const markAllRead = useMarkAllRead();
+
+  const items = data?.items ?? [];
+  const hasUnread = items.some((n) => !n.read);
+
+  const handlePress = (item: NotificationDto) => {
+    if (!item.read) markRead.mutate(item.notificationId);
+  };
+
+  const renderItem = ({ item, index }: { item: NotificationDto; index: number }) => (
+    <Pressable
+      accessibilityLabel={`${item.read ? '' : 'Chưa đọc. '}${item.title}. ${item.message}`}
+      accessibilityRole="button"
+      onPress={() => handlePress(item)}
+      style={({ pressed }) => [
+        styles.item,
+        !item.read && { backgroundColor: theme.primarySoft },
+        index > 0 && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.border },
+        pressed && styles.itemPressed,
+      ]}
+    >
+      <View style={styles.itemContent}>
+        <View style={styles.itemTitleRow}>
+          <View style={styles.itemTitleLeft}>
+            {item.read ? null : <View style={[styles.dot, { backgroundColor: theme.primary }]} />}
+            <Text numberOfLines={1} style={[styles.itemTitle, { color: theme.text }]}>
+              {item.title}
+            </Text>
+          </View>
+          <Text style={[styles.itemDate, { color: theme.textSecondary }]}>
+            {formatDate(item.createdAt)}
+          </Text>
+        </View>
+        <Text numberOfLines={2} style={[styles.itemBody, { color: theme.textSecondary }]}>
+          {item.message}
+        </Text>
+      </View>
+    </Pressable>
+  );
 
   return (
     <Modal
-      animationType="fade"
+      animationType="slide"
       navigationBarTranslucent
       onRequestClose={onClose}
       statusBarTranslucent
-      transparent
       visible={visible}
     >
-      <View style={styles.overlay}>
-        <Pressable
-          accessibilityLabel="Đóng thông báo"
-          accessibilityRole="button"
-          onPress={onClose}
-          style={[StyleSheet.absoluteFill, styles.backdrop]}
-        />
-
-        <Animated.View
-          entering={SlideInDown.duration(260)}
-          style={[
-            styles.sheet,
-            { backgroundColor: theme.backgroundElement, paddingBottom: insets.bottom + 8 },
-          ]}
+      <View style={[styles.screen, { backgroundColor: theme.background }]}>
+        <View
+          style={[styles.header, { paddingTop: insets.top + 8, borderBottomColor: theme.border }]}
         >
-          <View style={[styles.handle, { backgroundColor: theme.border }]} />
+          <Pressable
+            accessibilityLabel="Quay lại"
+            accessibilityRole="button"
+            hitSlop={8}
+            onPress={onClose}
+            style={styles.headerButton}
+          >
+            <Icon name={HomeIcons.back} color={theme.text} size={22} />
+          </Pressable>
 
-          <View style={[styles.header, { borderBottomColor: theme.border }]}>
-            <Text accessibilityRole="header" style={[styles.title, { color: theme.text }]}>
-              Thông báo
-            </Text>
+          <Text accessibilityRole="header" style={[styles.title, { color: theme.text }]}>
+            Thông báo
+          </Text>
+
+          {hasUnread ? (
             <Pressable
-              accessibilityLabel="Đóng thông báo"
+              accessibilityLabel="Đánh dấu tất cả đã đọc"
               accessibilityRole="button"
               hitSlop={8}
-              onPress={onClose}
+              onPress={() => markAllRead.mutate()}
+              style={styles.headerButton}
             >
-              <Icon name={HomeIcons.close} color={theme.text} size={22} />
+              <Icon name={HomeIcons.doneAll} color={theme.text} size={22} />
             </Pressable>
-          </View>
+          ) : (
+            <View style={styles.headerButton} />
+          )}
+        </View>
 
-          <ScrollView showsVerticalScrollIndicator={false} style={styles.list}>
-            {notifications.length === 0 ? (
+        {isLoading ? (
+          <ActivityIndicator color={theme.primary} style={styles.loader} />
+        ) : (
+          <FlatList
+            data={items}
+            keyExtractor={(item) => item.notificationId}
+            renderItem={renderItem}
+            contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}
+            ListEmptyComponent={
               <Text style={[styles.empty, { color: theme.textSecondary }]}>
-                Backend chưa có API thông báo — mục này sẽ hiện thông báo thật khi endpoint sẵn
-                sàng.
+                Chưa có thông báo nào.
               </Text>
-            ) : null}
-
-            {notifications.map((item, index) => (
-              <Pressable
-                key={item.id}
-                accessibilityLabel={`${item.isRead ? '' : 'Chưa đọc. '}${item.title}. ${item.body}`}
-                accessibilityRole="button"
-                onPress={() => onPressItem?.(item.id)}
-                style={[
-                  styles.item,
-                  !item.isRead && { backgroundColor: theme.primarySoft },
-                  index > 0 && { borderTopWidth: StyleSheet.hairlineWidth },
-                  { borderTopColor: theme.border },
-                ]}
-              >
-                <View style={styles.itemTitleRow}>
-                  {item.isRead ? null : (
-                    <View style={[styles.dot, { backgroundColor: theme.primary }]} />
-                  )}
-                  <Text style={[styles.itemTitle, { color: theme.text }]}>{item.title}</Text>
-                </View>
-                <Text style={[styles.itemBody, { color: theme.textSecondary }]}>{item.body}</Text>
-                <Text style={[styles.itemTime, { color: theme.textSecondary }]}>
-                  {item.timeLabel}
-                </Text>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </Animated.View>
+            }
+          />
+        )}
       </View>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  empty: { fontSize: 13, lineHeight: 20, padding: 20, textAlign: 'center' },
-  overlay: { flex: 1, justifyContent: 'flex-end' },
-  backdrop: { backgroundColor: 'rgba(10, 20, 14, 0.45)' },
-  sheet: {
-    flexShrink: 1,
-    width: '100%',
-    maxWidth: 520,
-    maxHeight: '82%',
-    alignSelf: 'center',
-    overflow: 'hidden',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-  },
-  handle: { alignSelf: 'center', width: 44, height: 5, marginTop: 10, borderRadius: 3 },
+  screen: { flex: 1 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     borderBottomWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 14,
+    paddingHorizontal: 12,
+    paddingBottom: 12,
   },
-  title: { fontSize: 18, fontWeight: '800' },
-  list: { flexGrow: 0 },
-  item: { gap: 3, paddingHorizontal: 20, paddingVertical: 14 },
-  itemTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  headerButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+  title: { fontSize: 17, fontWeight: '800' },
+  loader: { marginTop: 40 },
+  empty: { fontSize: 14, lineHeight: 20, padding: 32, textAlign: 'center' },
+  item: { paddingHorizontal: 16, paddingVertical: 14 },
+  itemPressed: { opacity: 0.7 },
+  itemContent: { gap: 4 },
+  itemTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  itemTitleLeft: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
   dot: { width: 8, height: 8, borderRadius: 4 },
-  itemTitle: { flexShrink: 1, fontSize: 15, fontWeight: '700' },
+  itemTitle: { flex: 1, fontSize: 15, fontWeight: '700' },
+  itemDate: { fontSize: 13 },
   itemBody: { fontSize: 13, lineHeight: 19 },
-  itemTime: { marginTop: 2, fontSize: 11 },
 });

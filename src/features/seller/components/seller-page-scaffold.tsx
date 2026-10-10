@@ -1,10 +1,9 @@
 import type { ReactNode } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
+import { TabHeader } from '@/components/ui/tab-header';
 import { MaxContentWidth } from '@/constants/theme';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
-import { SellerPageHeader } from '@/features/seller/components/seller-page-header';
-import { useLightStatusBar } from '@/hooks/use-light-status-bar';
 import { useTheme } from '@/hooks/use-theme';
 
 type SellerPageScaffoldProps = {
@@ -14,8 +13,6 @@ type SellerPageScaffoldProps = {
   children: ReactNode;
 };
 
-// Khung chung của các trang con người bán: header xanh có nút quay lại, nội dung cuộn và
-// nút trợ lý nổi trên thanh tab.
 export function SellerPageScaffold({
   title,
   subtitle,
@@ -23,7 +20,6 @@ export function SellerPageScaffold({
   children,
 }: SellerPageScaffoldProps) {
   const theme = useTheme();
-  useLightStatusBar();
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
@@ -32,11 +28,10 @@ export function SellerPageScaffold({
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <SellerPageHeader onPressBack={onPressBack} subtitle={subtitle} title={title} />
+        <TabHeader onBack={onPressBack} subtitle={subtitle} title={title} />
         <View style={styles.body}>{children}</View>
       </ScrollView>
 
-      {/* Nâng lên trên thanh tab người bán để nút trợ lý không đè lên nút Đăng deal. */}
       <AssistantFab bottomOffset={96} />
     </View>
   );

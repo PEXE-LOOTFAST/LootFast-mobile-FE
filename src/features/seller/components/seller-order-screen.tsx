@@ -1,6 +1,5 @@
-import { router, useFocusEffect } from 'expo-router';
-import { setStatusBarStyle } from 'expo-status-bar';
-import { useCallback, useState } from 'react';
+import { router } from 'expo-router';
+import { useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, View } from 'react-native';
 
 import { EmptyCard } from '@/components/ui/empty-card';
@@ -16,7 +15,8 @@ import {
 import { IncomingOrdersSection } from '@/features/seller/components/incoming-orders-section';
 import { SegmentedTabs } from '@/features/seller/components/segmented-tabs';
 import { SellerDealCard } from '@/features/seller/components/seller-deal-card';
-import { SellerOrderHeader } from '@/features/seller/components/seller-order-header';
+import { SellerHeaderWithAction } from '@/features/seller/components/seller-header';
+import { SellerIcons } from '@/features/seller/constants/icons';
 import { SELLER_ORDER_TABS } from '@/features/seller/constants/seller-order-tabs';
 import type { SellerOrderTab } from '@/features/seller/types';
 import { useTheme } from '@/hooks/use-theme';
@@ -37,14 +37,6 @@ export function SellerOrderScreen() {
   const deals = dealDtos.map(toSellerDeal);
   const runningDeals = deals.filter((deal) => deal.status === 'running');
   const endedDeals = deals.filter((deal) => deal.status === 'ended');
-
-  // Header nền xanh đậm cần icon status bar màu sáng, trả về 'auto' khi rời màn.
-  useFocusEffect(
-    useCallback(() => {
-      setStatusBarStyle('light');
-      return () => setStatusBarStyle('auto');
-    }, []),
-  );
 
   // Backend nhận tổng số suất chứ không nhận số còn lại, và bắt gửi kèm version đang giữ để
   // không ghi đè thay đổi của phiên khác.
@@ -92,9 +84,12 @@ export function SellerOrderScreen() {
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Máy quét QR cần quyền camera nên chưa nối; hiện giao đơn bằng cách nhập mã ở mục Đơn hàng đến. */}
-        <SellerOrderHeader
-          onPressScan={() => Alert.alert('Quét QR', 'Tính năng quét mã sẽ sớm có.')}
+        <SellerHeaderWithAction
+          actionIcon={SellerIcons.qrCode}
+          actionLabel="Quét QR"
+          onPressAction={() => Alert.alert('Quét QR', 'Tính năng quét mã sẽ sớm có.')}
+          subtitle="Deal đang chạy và đơn đến"
+          title="Đơn hàng"
         />
 
         <View style={styles.body}>

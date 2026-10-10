@@ -1,9 +1,11 @@
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Icon } from '@/components/ui/icon';
+import { MaxContentWidth } from '@/constants/theme';
+import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { SellerMenuList, type SellerMenuItem } from '@/features/seller/components/seller-menu-list';
-import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
+import { SellerHeader } from '@/features/seller/components/seller-header';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
 import { confirmSignOut } from '@/lib/confirm-sign-out';
@@ -45,39 +47,78 @@ export function SellerSettingsScreen() {
   const theme = useTheme();
 
   return (
-    <SellerPageScaffold
-      onPressBack={() => (router.canGoBack() ? router.back() : router.navigate('/seller/reports'))}
-      subtitle="Quản lý tài khoản và vận hành cửa hàng"
-      title="Cài đặt"
-    >
-      <SellerMenuList compact items={SETTINGS_ITEMS} />
+    <View style={[styles.screen, { backgroundColor: theme.background }]}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <SellerHeader subtitle="Tài khoản và vận hành cửa hàng" title="Cài đặt" />
 
-      <Pressable
-        accessibilityLabel="Đăng xuất"
-        accessibilityRole="button"
-        onPress={() => confirmSignOut()}
-        style={({ pressed }) => [
-          styles.signOut,
-          { backgroundColor: theme.backgroundElement, borderColor: theme.danger },
-          pressed && styles.pressed,
-        ]}
-      >
-        <Icon name={SellerIcons.logout} color={theme.danger} size={16} />
-        <Text style={[styles.signOutLabel, { color: theme.danger }]}>Đăng xuất</Text>
-      </Pressable>
-    </SellerPageScaffold>
+        <View style={styles.body}>
+          <SellerMenuList compact items={SETTINGS_ITEMS} />
+
+          <Pressable
+            accessibilityLabel="Chuyển sang người mua"
+            accessibilityRole="button"
+            onPress={() => router.navigate('/profile')}
+            style={({ pressed }) => [
+              styles.switchButton,
+              { backgroundColor: theme.backgroundElement, borderColor: theme.border },
+              pressed && styles.pressed,
+            ]}
+          >
+            <Icon name={SellerIcons.person} color={theme.text} size={16} />
+            <Text style={[styles.switchLabel, { color: theme.text }]}>Chuyển sang người mua</Text>
+          </Pressable>
+
+          <Pressable
+            accessibilityLabel="Đăng xuất"
+            accessibilityRole="button"
+            onPress={() => confirmSignOut()}
+            style={({ pressed }) => [
+              styles.signOut,
+              { backgroundColor: theme.backgroundElement, borderColor: theme.danger },
+              pressed && styles.pressed,
+            ]}
+          >
+            <Icon name={SellerIcons.logout} color={theme.danger} size={16} />
+            <Text style={[styles.signOutLabel, { color: theme.danger }]}>Đăng xuất</Text>
+          </Pressable>
+        </View>
+      </ScrollView>
+
+      <AssistantFab bottomOffset={96} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  signOut: {
-    minHeight: 46,
+  screen: { flex: 1 },
+  content: { paddingBottom: 120 },
+  body: {
+    width: '100%',
+    maxWidth: MaxContentWidth,
+    alignSelf: 'center',
+    gap: 14,
+    marginTop: 14,
+    paddingHorizontal: 16,
+  },
+  switchButton: {
+    minHeight: 48,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: 22,
+    boxShadow: '0px 4px 10px rgba(23, 33, 27, 0.06)',
+  },
+  switchLabel: { fontSize: 14, fontWeight: '800' },
+  signOut: {
+    minHeight: 48,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1,
+    borderRadius: 22,
   },
   signOutLabel: { fontSize: 14, fontWeight: '800' },
   pressed: { opacity: 0.8 },

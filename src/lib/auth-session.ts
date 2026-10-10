@@ -1,4 +1,5 @@
 import { apiRequest, refreshSession, registerSessionExpiredHandler } from '@/lib/api-client';
+import { queryClient } from '@/lib/query-client';
 import { tokenStorage } from '@/lib/storage';
 
 export type SessionStatus = 'guest' | 'authenticated';
@@ -99,7 +100,7 @@ export async function authenticateAsAdmin(
 export function signOut() {
   pendingAction = null;
   setState({ status: 'guest', isAdmin: false, isAuthPromptOpen: false, user: null });
-  // Không await: signOut được gắn thẳng làm onPress, UI phải về trạng thái khách ngay.
+  queryClient.clear();
   void revokeSession();
 }
 
@@ -128,6 +129,7 @@ async function revokeSession() {
 registerSessionExpiredHandler(() => {
   pendingAction = null;
   setState({ status: 'guest', isAdmin: false, isAuthPromptOpen: false, user: null });
+  queryClient.clear();
 });
 
 /**
