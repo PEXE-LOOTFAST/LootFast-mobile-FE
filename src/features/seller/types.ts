@@ -14,8 +14,11 @@ export type SellerDeal = {
   originalPrice: number;
   /** Khung giờ khách đến lấy, hiển thị dạng "18:00–23:59". */
   pickupWindow: { start: string; end: string };
+  /** Mốc khách còn đặt được, dạng "19:35 · 11/10" (giờ VN); sau mốc này deal ẩn khỏi người mua. */
+  saleEndsLabel: string;
   /** Vì sao deal dừng bán — chỉ có ở deal đã kết thúc. */
-  endedReason?: 'sold-out' | 'expired';
+  /** 'sale-closed': hết giờ nhận đặt (trước giờ nhận 15 phút) nhưng khách vẫn còn đến lấy được. */
+  endedReason?: 'sold-out' | 'expired' | 'sale-closed';
 };
 
 /** 'no-show': khách đã đặt nhưng hết khung nhận vẫn không tới lấy, khác với đơn bị huỷ. */

@@ -75,6 +75,9 @@ export async function authenticate(
 ) {
   await tokenStorage.save(tokens.accessToken, tokens.refreshToken);
 
+  // Bỏ dữ liệu của phiên trước (thông báo, đơn, hồ sơ…) để tài khoản mới không thấy nhầm.
+  queryClient.clear();
+
   const action = pendingAction;
   pendingAction = null;
   setState({ status: 'authenticated', isAuthPromptOpen: false, user });
@@ -92,6 +95,8 @@ export async function authenticateAsAdmin(
   user: AuthUser,
 ) {
   await tokenStorage.save(tokens.accessToken, tokens.refreshToken);
+
+  queryClient.clear();
 
   pendingAction = null;
   setState({ status: 'authenticated', isAdmin: true, isAuthPromptOpen: false, user });

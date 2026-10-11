@@ -29,6 +29,7 @@ import type { MerchantOpeningHoursDto, MerchantProfileDto } from '@/features/sel
 import { validateNewDeal, type NewDealValues } from '@/features/seller/validation';
 import {
   buildDealSchedule,
+  describeSaleCutoff,
   findSharedDaySchedule,
   toDealNumber,
   toTimeInput,
@@ -304,6 +305,12 @@ function NewDealForm({
               ? `Giờ mở cửa hôm nay: ${slot.opensAt}–${slot.closesAt}. Giờ nhận phải nằm trong khung này, và mọi deal trong ngày sẽ dùng chung khung giờ bạn chọn ở deal đầu tiên.`
               : 'Hôm nay quán không mở cửa nên chưa đăng deal được.'}
         </Text>
+
+        {slot || sharedSchedule ? (
+          <Text style={[styles.hint, { color: theme.primary, fontWeight: '700' }]}>
+            {describeSaleCutoff(values.open, sharedSchedule)}
+          </Text>
+        ) : null}
 
         <DealImagePicker
           disabled={isSubmitting}
