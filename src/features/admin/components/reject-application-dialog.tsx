@@ -15,6 +15,10 @@ type RejectApplicationDialogProps = {
   isSubmitting: boolean;
   onCancel: () => void;
   onConfirm: (reason: string) => void;
+  /** Mặc định là nội dung từ chối hồ sơ; màn khác (vd. khoá tài khoản) ghi đè cho đúng ngữ cảnh. */
+  title?: string;
+  message?: string;
+  confirmLabel?: string;
 };
 
 /**
@@ -29,6 +33,9 @@ export function RejectApplicationDialog({
   isSubmitting,
   onCancel,
   onConfirm,
+  title = 'Từ chối hồ sơ',
+  message = 'Người đăng ký sẽ nhận được lý do này, hãy ghi rõ để họ biết cần bổ sung gì.',
+  confirmLabel = 'Từ chối',
 }: RejectApplicationDialogProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
@@ -57,11 +64,9 @@ export function RejectApplicationDialog({
 
         <View style={[styles.card, { backgroundColor: theme.backgroundElement }]}>
           <Text accessibilityRole="header" style={[styles.title, { color: theme.text }]}>
-            Từ chối hồ sơ
+            {title}
           </Text>
-          <Text style={[styles.message, { color: theme.textSecondary }]}>
-            Người đăng ký sẽ nhận được lý do này, hãy ghi rõ để họ biết cần bổ sung gì.
-          </Text>
+          <Text style={[styles.message, { color: theme.textSecondary }]}>{message}</Text>
 
           <TextField
             autoFocus
@@ -98,7 +103,7 @@ export function RejectApplicationDialog({
                 loading={isSubmitting}
                 onPress={() => onConfirm(trimmed)}
               >
-                Từ chối
+                {confirmLabel}
               </BrandButton>
             </View>
           </View>
