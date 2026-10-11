@@ -1,11 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import * as ImagePicker from 'expo-image-picker';
 import { Alert } from 'react-native';
 
 import { toAvatarErrorMessage, uploadAvatar } from '@/features/profile/api/avatar';
+import { pickImages, useRecoveredPick } from '@/lib/pick-image';
+
+const PROFILE_ROUTE = '/profile';
 
 /**
- * Chọn ảnh từ thư viện rồi đổi ảnh đại diện. Cắt vuông sẵn vì mọi chỗ hiển thị avatar đều
+ * Chụp ảnh hoặc chọn từ thư viện rồi đổi ảnh đại diện. Cắt vuông sẵn vì mọi chỗ hiển thị avatar đều
  * bo tròn, để người dùng thấy đúng phần ảnh sẽ được dùng.
  */
 export function useAvatarUpload() {
@@ -18,25 +20,21 @@ export function useAvatarUpload() {
   });
 
   const pickAndUpload = async () => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      Alert.alert(
-        'Cần quyền truy cập',
-        'Vui lòng cấp quyền truy cập thư viện ảnh trong Cài đặt hệ thống.',
-      );
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
+    const [asset] = await pickImages({
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 0.8,
+      resume: { route: PROFILE_ROUTE },
     });
-    if (result.canceled || !result.assets[0]) return;
+    if (!asset) return;
 
-    mutation.mutate(result.assets[0].uri);
+    mutation.mutate(asset.uri);
   };
+
+  // Android có thể tắt app khi camera đang mở: đổi tiếp ảnh đại diện bằng ảnh vừa chụp.
+  useRecoveredPick(PROFILE_ROUTE, ({ assets }) => {
+    const [asset] = assets;
+    if (asset) mutation.mutate(asset.uri);
+  });
 
   return { pickAndUpload, isUploading: mutation.isPending };
 }

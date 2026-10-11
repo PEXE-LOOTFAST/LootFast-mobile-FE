@@ -1,7 +1,6 @@
 import { Image } from 'expo-image';
-import * as ImagePicker from 'expo-image-picker';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
 import { EmptyCard } from '@/components/ui/empty-card';
@@ -25,6 +24,9 @@ import { useTheme } from '@/hooks/use-theme';
 import { ApiException } from '@/lib/api-client';
 import { syncSessionRoles } from '@/lib/auth-session';
 import { formatShortDate } from '@/lib/format';
+import { pickImages, useRecoveredPick } from '@/lib/pick-image';
+
+const REGISTRATION_ROUTE = '/merchant-application';
 
 const LICENSE_NUMBER_PATTERN = /^\d{10,14}$/;
 
@@ -157,25 +159,24 @@ function SubmitApplicationForm() {
   const [formError, setFormError] = useState<string>();
 
   const pickLicense = async () => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      Alert.alert(
-        'Cần quyền truy cập',
-        'Vui lòng cấp quyền truy cập thư viện ảnh trong Cài đặt hệ thống.',
-      );
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      quality: 0.8,
+    const [asset] = await pickImages({
+      resume: { route: REGISTRATION_ROUTE, draft: { licenseNumber } },
     });
-    if (result.canceled || !result.assets[0]) return;
+    if (!asset) return;
 
     setFormError(undefined);
-    const asset = result.assets[0];
     setLicense({ uri: asset.uri, mimeType: asset.mimeType, name: asset.fileName ?? undefined });
   };
+
+  // Android có thể tắt app khi camera đang mở: lấy lại số giấy phép đã nhập và ảnh vừa chụp.
+  useRecoveredPick<{ licenseNumber: string }>(REGISTRATION_ROUTE, ({ assets, draft }) => {
+    if (draft) setLicenseNumber(draft.licenseNumber);
+
+    const [asset] = assets;
+    if (asset) {
+      setLicense({ uri: asset.uri, mimeType: asset.mimeType, name: asset.fileName ?? undefined });
+    }
+  });
 
   const handleSubmit = async () => {
     setFormError(undefined);

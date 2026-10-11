@@ -54,6 +54,13 @@ export function normalizeTime(text: string): string {
   return TIME_PATTERN.test(padded) ? padded : text;
 }
 
+/** Đang gõ: chỉ giữ chữ số và tự chèn ":" sau hai số đầu ("183" → "18:3"). */
+export function formatTimeTyping(text: string): string {
+  const digits = text.replace(/\D/g, '').slice(0, 4);
+
+  return digits.length > 2 ? `${digits.slice(0, 2)}:${digits.slice(2)}` : digits;
+}
+
 export function toMinutes(time: string): number | null {
   if (!TIME_PATTERN.test(time)) return null;
   const [hours, minutes] = time.split(':').map(Number);

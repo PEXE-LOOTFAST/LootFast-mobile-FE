@@ -6,6 +6,7 @@ import { useColorScheme } from 'react-native';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { AuthModal } from '@/features/auth/components/auth-modal';
 import { restoreSession } from '@/lib/auth-session';
+import { resumeInterruptedPick } from '@/lib/pick-image';
 import { queryClient } from '@/lib/query-client';
 
 // Không gọi SplashScreen.preventAutoHideAsync() ở đây: lệnh hideAsync() tương ứng
@@ -14,7 +15,10 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   useEffect(() => {
-    void restoreSession();
+    void (async () => {
+      await restoreSession();
+      await resumeInterruptedPick();
+    })();
   }, []);
 
   return (
