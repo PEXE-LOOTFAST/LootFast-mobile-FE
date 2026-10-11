@@ -40,6 +40,25 @@ export function formatFullDate(date: Date): string {
   return `${weekday}, ${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
 }
 
+// "19:58" theo giờ máy.
+export function formatTimeOfDay(date: Date): string {
+  return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+const startOfDayMs = (date: Date) =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+
+// "Hôm nay · Chủ Nhật, 11/10/2026", "Hôm qua · …", các ngày trước chỉ có phần ngày đầy đủ.
+export function formatDayLabel(date: Date, now: Date = new Date()): string {
+  const full = formatFullDate(date);
+  const daysAgo = Math.round((startOfDayMs(now) - startOfDayMs(date)) / 86_400_000);
+
+  if (daysAgo === 0) return `Hôm nay · ${full}`;
+  if (daysAgo === 1) return `Hôm qua · ${full}`;
+
+  return full;
+}
+
 // "20/09/2026" — dạng ngắn cho các dòng thông tin phụ.
 export function formatShortDate(date: Date): string {
   return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;

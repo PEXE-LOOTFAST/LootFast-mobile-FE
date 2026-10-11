@@ -1,5 +1,6 @@
 import type { MerchantDealDto } from '@/features/seller/api/merchant-deals';
 import type { DayOfWeek, MerchantOpeningHoursDto } from '@/features/seller/types/api';
+import { TIME_PATTERN } from '@/lib/validation';
 
 /** Backend bắt buộc chốt đơn trước giờ nhận ít nhất 15 phút (ORDER_CUTOFF). */
 const ORDER_CUTOFF_MS = 15 * 60 * 1000;
@@ -76,6 +77,28 @@ export function findSharedDaySchedule(
     pickupStartsAt: shared.pickupStartsAt,
     pickupEndsAt: shared.pickupEndsAt,
   };
+}
+
+/**
+ * Giải thích giờ khách còn đặt được. Backend chốt đơn 15 phút trước giờ bắt đầu nhận và chỉ hiện
+ * deal cho người mua khi còn trong khung bán, nên deal sẽ biến mất khỏi trang người mua đúng giờ
+ * này dù còn suất; người bán cần biết trước điều đó.
+ */
+export function describeSaleCutoff(open: string, shared?: DealSchedule): string | null {
+  const saleEnd = shared
+    ? new Date(shared.saleEndsAt)
+    : TIME_PATTERN.test(open)
+      ? new Date(toTodayAt(open).getTime() - ORDER_CUTOFF_MS)
+      : null;
+  if (!saleEnd) return null;
+
+  const time = toTimeInput(saleEnd.toISOString());
+  const minutesLeft = Math.floor((saleEnd.getTime() - Date.now()) / 60_000);
+  if (minutesLeft <= 0) return `Khung bán đã đóng lúc ${time}, khách không đặt được nữa.`;
+
+  const remaining = minutesLeft <= 60 ? ` (còn ${minutesLeft} phút)` : '';
+
+  return `Khách đặt giữ chỗ được đến ${time}${remaining}, sau đó deal ẩn khỏi trang người mua dù còn suất. Muốn bán lâu hơn, hãy chọn giờ nhận muộn hơn.`;
 }
 
 /** Khung giờ mở cửa của quán hôm nay ("08:00"–"22:00"), undefined nếu hôm nay quán không mở. */

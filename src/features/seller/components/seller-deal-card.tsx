@@ -16,7 +16,11 @@ type SellerDealCardProps = {
   onPressPause: () => void;
 };
 
-const ENDED_REASON_LABELS = { 'sold-out': 'Hết hàng', expired: 'Hết hạn' } as const;
+const ENDED_REASON_LABELS = {
+  'sold-out': 'Hết hàng',
+  expired: 'Hết hạn',
+  'sale-closed': 'Ngừng nhận đặt',
+} as const;
 
 // Thẻ deal nửa chiều ngang: ảnh món, giá deal, số suất còn lại chỉnh nhanh bằng nút +/-.
 export function SellerDealCard({
@@ -69,6 +73,18 @@ export function SellerDealCard({
           Còn {portionsLeft}/{deal.portionsTotal} suất · {deal.pickupWindow.start}–
           {deal.pickupWindow.end}
         </Text>
+        {deal.endedReason === 'sold-out' ? null : (
+          <Text
+            style={[
+              styles.meta,
+              { color: isRunning ? theme.primary : theme.textSecondary, fontWeight: '700' },
+            ]}
+          >
+            {isRunning
+              ? `Hiện với khách đến ${deal.saleEndsLabel}`
+              : `Đã ẩn khỏi khách từ ${deal.saleEndsLabel}`}
+          </Text>
+        )}
 
         {isRunning ? (
           <View style={[styles.stepper, { backgroundColor: theme.primarySoft }]}>

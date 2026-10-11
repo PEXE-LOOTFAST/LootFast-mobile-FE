@@ -13,6 +13,7 @@ import {
   type CreateMerchantDealPayload,
   type MerchantDealDto,
 } from '@/features/seller/api/merchant-deals';
+import { toTimeInput, vietnamDateKey } from '@/features/seller/deal-schedule';
 import type { SellerDeal } from '@/features/seller/types';
 
 export const MERCHANT_DEALS_QUERY_KEY = ['merchant', 'deals'];
@@ -30,9 +31,18 @@ function toTimeLabel(value: string) {
 /**
  * Backend có 5 trạng thái, màn Đơn hàng chỉ chia hai nhóm: còn bán được hay không. DRAFT cũng
  * xếp vào "đang chạy" để người bán thấy bản nháp mình vừa tạo mà bấm vào đăng tiếp.
+ *
+ * ACTIVE chỉ là "đang bán" khi còn trong khung bán: backend không tự đổi trạng thái khi hết giờ
+ * mà chỉ ẩn deal khỏi trang người mua, nên phải tự xét giờ ở đây để màn người bán khớp với những
+ * gì khách thấy.
  */
 export function toSellerDeal(deal: MerchantDealDto): SellerDeal {
-  const isRunning = deal.status === 'ACTIVE' || deal.status === 'DRAFT';
+  const now = Date.now();
+  const isSaleOpen = now < new Date(deal.saleEndsAt).getTime();
+  const isPickupOver = now >= new Date(deal.pickupEndsAt).getTime();
+  const isRunning = deal.status === 'DRAFT' || (deal.status === 'ACTIVE' && isSaleOpen);
+  const endedReason: SellerDeal['endedReason'] =
+    deal.status === 'SOLD_OUT' ? 'sold-out' : isPickupOver ? 'expired' : 'sale-closed';
 
   return {
     id: deal.dealId,
@@ -49,9 +59,12 @@ export function toSellerDeal(deal: MerchantDealDto): SellerDeal {
       start: toTimeLabel(deal.pickupStartsAt),
       end: toTimeLabel(deal.pickupEndsAt),
     },
-    ...(isRunning
-      ? {}
-      : { endedReason: deal.status === 'SOLD_OUT' ? ('sold-out' as const) : ('expired' as const) }),
+    saleEndsLabel: `${toTimeInput(deal.saleEndsAt)} · ${vietnamDateKey(deal.saleEndsAt)
+      .slice(5)
+      .split('-')
+      .reverse()
+      .join('/')}`,
+    ...(isRunning ? {} : { endedReason }),
   };
 }
 
@@ -59,6 +72,8 @@ export function useMerchantDeals() {
   return useQuery({
     queryKey: MERCHANT_DEALS_QUERY_KEY,
     queryFn: () => listMerchantDeals(),
+    // Deal tự chuyển sang "đã kết thúc" theo giờ mà không có thay đổi nào từ server.
+    refetchInterval: 60 * 1000,
   });
 }
 
