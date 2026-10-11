@@ -178,8 +178,8 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: MaxContentWidth,
     alignSelf: 'center',
-    gap: 14,
-    marginTop: 14,
+    gap: 10,
+    marginTop: 12,
     paddingHorizontal: 16,
   },
 });

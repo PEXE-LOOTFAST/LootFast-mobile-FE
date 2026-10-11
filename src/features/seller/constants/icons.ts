@@ -42,4 +42,5 @@ export const SellerIcons = {
   shield: { ios: 'checkmark.shield', android: 'verified_user', web: 'verified_user' },
   photoLibrary: { ios: 'photo.on.rectangle', android: 'photo_library', web: 'photo_library' },
   search: { ios: 'magnifyingglass', android: 'search', web: 'search' },
+  location: { ios: 'mappin.and.ellipse', android: 'location_on', web: 'location_on' },
 } satisfies IconMap;

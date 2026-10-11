@@ -1,3 +1,4 @@
+import { ALL_OPEN_DAYS } from '@/features/seller/opening-hours';
 import type { ShopInfoValues } from '@/features/seller/validation';
 import { draftStorage } from '@/lib/storage';
 
@@ -15,6 +16,7 @@ export const EMPTY_SHOP_INFO: ShopInfoValues = {
   longitude: '',
   open: '',
   close: '',
+  openDays: ALL_OPEN_DAYS,
 };
 
 /**

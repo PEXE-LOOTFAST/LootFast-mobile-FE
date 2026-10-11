@@ -1,4 +1,5 @@
 import { openCloseToSlots, slotsToOpenClose } from '@/features/seller/hooks/use-merchant-shop';
+import { parseOpenDays } from '@/features/seller/opening-hours';
 import type {
   MerchantLocationDto,
   MerchantOpeningHoursDto,
@@ -33,6 +34,7 @@ export function toShopInfoValues(shop: {
     longitude: location?.longitude != null ? String(location.longitude) : '',
     open: hours.open,
     close: hours.close,
+    openDays: hours.openDays,
   };
 }
 
@@ -57,7 +59,7 @@ const LOCATION_FIELDS: (keyof ShopInfoValues)[] = [
   'latitude',
   'longitude',
 ];
-const HOURS_FIELDS: (keyof ShopInfoValues)[] = ['open', 'close'];
+const HOURS_FIELDS: (keyof ShopInfoValues)[] = ['open', 'close', 'openDays'];
 
 const toCoordinate = (value: string) => Number(value.trim().replace(',', '.'));
 
@@ -96,7 +98,9 @@ export async function saveShopInfo(
   }
 
   if (changed(HOURS_FIELDS)) {
-    await api.updateOpeningHours(openCloseToSlots(values.open, values.close));
+    await api.updateOpeningHours(
+      openCloseToSlots(values.open, values.close, parseOpenDays(values.openDays)),
+    );
   }
 }
 
