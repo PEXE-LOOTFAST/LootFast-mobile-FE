@@ -1,4 +1,5 @@
 import { apiRequest, refreshSession, registerSessionExpiredHandler } from '@/lib/api-client';
+import { queryClient } from '@/lib/query-client';
 import { tokenStorage } from '@/lib/storage';
 
 export type SessionStatus = 'guest' | 'authenticated';
@@ -99,7 +100,7 @@ export async function authenticateAsAdmin(
 export function signOut() {
   pendingAction = null;
   setState({ status: 'guest', isAdmin: false, isAuthPromptOpen: false, user: null });
-  // Không await: signOut được gắn thẳng làm onPress, UI phải về trạng thái khách ngay.
+  queryClient.clear();
   void revokeSession();
 }
 
@@ -128,6 +129,7 @@ async function revokeSession() {
 registerSessionExpiredHandler(() => {
   pendingAction = null;
   setState({ status: 'guest', isAdmin: false, isAuthPromptOpen: false, user: null });
+  queryClient.clear();
 });
 
 /**
@@ -153,6 +155,45 @@ export async function syncSessionRoles(): Promise<boolean> {
   } catch {
     // Lỗi mạng: giữ nguyên phiên, lần mở màn sau sẽ thử lại.
     return false;
+  }
+}
+
+/**
+ * Khôi phục phiên từ token đã lưu khi mở app. Access token thường đã hết hạn sau một thời gian
+ * tắt app nên luôn làm mới trước rồi mới đọc `/users/me`. Lỗi mạng thì giữ nguyên trạng thái
+ * khách mà không xoá token, lần mở sau sẽ thử lại. Phiên admin không được khôi phục: `isAdmin`
+ * chỉ bật qua cổng quản trị nên admin phải đăng nhập lại ở đó.
+ */
+export async function restoreSession(): Promise<void> {
+  if (state.status === 'authenticated') return;
+
+  try {
+    if (!(await tokenStorage.getRefreshToken())) return;
+    if (!(await refreshSession())) return;
+
+    const me = await apiRequest<{
+      firstName: string;
+      lastName: string;
+      email: string;
+      role: AuthRole;
+      roles: AuthRole[];
+    }>('/users/me');
+
+    // Người dùng có thể đã tự đăng nhập trong lúc chờ; không ghi đè phiên mới đó.
+    if (getSessionState().status === 'authenticated') return;
+
+    setState({
+      status: 'authenticated',
+      user: {
+        firstName: me.firstName,
+        lastName: me.lastName,
+        email: me.email,
+        role: me.role,
+        roles: me.roles,
+      },
+    });
+  } catch {
+    // Giữ trạng thái khách.
   }
 }
 

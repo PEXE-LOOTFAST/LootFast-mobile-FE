@@ -8,9 +8,8 @@ import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { SellerMenuList, type SellerMenuItem } from '@/features/seller/components/seller-menu-list';
 import { MerchantRegistrationRequired } from '@/features/seller/components/merchant-registration-required';
 import { ShopSetupCard, getShopSetupSteps } from '@/features/seller/components/shop-setup-card';
-import { SellerShopHeader } from '@/features/seller/components/seller-shop-header';
+import { SellerHeader } from '@/features/seller/components/seller-header';
 import { SellerIcons } from '@/features/seller/constants/icons';
-import { useMerchantImageUpload } from '@/features/seller/hooks/use-merchant-image-upload';
 import { useLightStatusBar } from '@/hooks/use-light-status-bar';
 import { useMerchantShop } from '@/features/seller/hooks/use-merchant-shop';
 import { useTheme } from '@/hooks/use-theme';
@@ -23,8 +22,6 @@ export function SellerShopScreen() {
   const { profile, location, openingHours, profileMissing, isLoading, isError, refetch } =
     useMerchantShop();
   const setupDone = getShopSetupSteps({ profile, location, openingHours }).every((s) => s.done);
-
-  const { pickAndUpload } = useMerchantImageUpload();
 
   const menuItems: SellerMenuItem[] = [
     {
@@ -73,6 +70,12 @@ export function SellerShopScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
+      <SellerHeader
+        onBack={() => (router.canGoBack() ? router.back() : router.navigate('/seller/reports'))}
+        subtitle={isLoading ? '' : (profile?.contactEmail ?? '')}
+        title="Hồ sơ quán"
+      />
+
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -85,14 +88,6 @@ export function SellerShopScreen() {
           />
         }
       >
-        <SellerShopHeader
-          email={isLoading ? '' : (profile?.contactEmail ?? '')}
-          logoUrl={profile?.logoUrl}
-          verified={profile?.verified}
-          onPressAvatar={() => pickAndUpload('logo')}
-          shopName={isLoading ? 'Đang tải...' : profile?.storeName || 'Chưa đặt tên quán'}
-        />
-
         <View style={styles.body}>
           {isError ? (
             <InlineAlert message="Không tải được hồ sơ quán. Kéo xuống để thử lại." />

@@ -1,19 +1,13 @@
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
-import {
-  ActivityIndicator,
-  Linking,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmptyCard } from '@/components/ui/empty-card';
+import { ErrorState } from '@/components/ui/error-state';
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
+import { LoadingState } from '@/components/ui/loading-state';
 import { MaxContentWidth } from '@/constants/theme';
 import { toDeal } from '@/features/home/api/deals';
 import { toStoreErrorMessage, type OpeningHourSlot } from '@/features/home/api/stores';
@@ -89,8 +83,14 @@ export function StoreScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {storeQuery.isLoading ? <ActivityIndicator color={theme.primary} size="large" /> : null}
-        {storeQuery.error ? <InlineAlert message={toStoreErrorMessage(storeQuery.error)} /> : null}
+        {storeQuery.isLoading ? <LoadingState /> : null}
+        {storeQuery.error ? (
+          <ErrorState
+            message={toStoreErrorMessage(storeQuery.error)}
+            onRetry={() => void storeQuery.refetch()}
+            retrying={storeQuery.isRefetching}
+          />
+        ) : null}
         {toggleStore.error ? (
           <InlineAlert message="Không lưu được cửa hàng. Vui lòng thử lại." />
         ) : null}

@@ -1,22 +1,37 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useState } from 'react';
+import { Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { Icon } from '@/components/ui/icon';
 import { SellerIcons } from '@/features/seller/constants/icons';
+import { PICKUP_CODE_PREFIX } from '@/features/seller/api/merchant-orders';
 import { PICKUP_CODE_LENGTH } from '@/features/seller/constants/seller-order-tabs';
 import { useTheme } from '@/hooks/use-theme';
+import { formatFullDate } from '@/lib/format';
+
+/** Bỏ tiền tố `LF-` nếu người bán dán cả mã, chỉ giữ chữ và số viết hoa, cắt đủ 6 ký tự. */
+function normalizePickupCode(value: string): string {
+  const withoutPrefix = value.replace(/^\s*LF-/i, '');
+
+  return withoutPrefix
+    .toUpperCase()
+    .replace(/[^0-9A-Z]/g, '')
+    .slice(0, PICKUP_CODE_LENGTH);
+}
 
 type IncomingOrderFiltersProps = {
-  /** Ngày đang xem, dạng dd/mm/yyyy để người bán gõ tay được. */
-  date: string;
-  onChangeDate: (date: string) => void;
+  date: Date;
+  onChangeDate: (date: Date) => void;
   onPressToday: () => void;
   isToday: boolean;
   code: string;
   onChangeCode: (code: string) => void;
   onSubmitCode: () => void;
+  isSubmittingCode?: boolean;
+  searchQuery: string;
+  onChangeSearch: (query: string) => void;
 };
 
-// Hai bộ lọc của mục "Đơn hàng đến": xem đơn theo ngày và tra nhanh một mã lấy hàng.
 export function IncomingOrderFilters({
   date,
   onChangeDate,
@@ -25,141 +40,176 @@ export function IncomingOrderFilters({
   code,
   onChangeCode,
   onSubmitCode,
+  isSubmittingCode = false,
+  searchQuery,
+  onChangeSearch,
 }: IncomingOrderFiltersProps) {
   const theme = useTheme();
-  const canSearch = code.length === PICKUP_CODE_LENGTH;
+  const [showPicker, setShowPicker] = useState(false);
+  const canDeliver = code.length === PICKUP_CODE_LENGTH && !isSubmittingCode;
 
   return (
-    <View
-      style={[styles.card, { backgroundColor: theme.backgroundElement, borderColor: theme.border }]}
-    >
-      <View style={styles.row}>
-        <View style={[styles.iconBadge, { backgroundColor: theme.primarySoft }]}>
-          <Icon name={SellerIcons.calendar} color={theme.primary} size={17} />
-        </View>
+    <View style={styles.container}>
+      {/* Date row */}
+      <View style={styles.dateRow}>
+        <Pressable
+          accessibilityLabel="Chọn ngày xem đơn"
+          accessibilityRole="button"
+          onPress={() => setShowPicker(true)}
+          style={({ pressed }) => [
+            styles.dateButton,
+            { backgroundColor: theme.backgroundElement, borderColor: theme.border },
+            pressed && styles.pressed,
+          ]}
+        >
+          <Icon name={SellerIcons.calendar} color={theme.primary} size={18} />
+          <Text numberOfLines={1} style={[styles.dateText, { color: theme.text }]}>
+            {formatFullDate(date)}
+          </Text>
+        </Pressable>
 
-        <View style={styles.field}>
-          <Text style={[styles.label, { color: theme.textSecondary }]}>Ngày xem đơn</Text>
-          <TextInput
-            accessibilityLabel="Ngày xem đơn"
-            inputMode="numeric"
-            onChangeText={onChangeDate}
-            placeholder="dd/mm/yyyy"
-            placeholderTextColor={theme.textSecondary}
-            style={[
-              styles.input,
-              { backgroundColor: theme.background, borderColor: theme.border, color: theme.text },
-            ]}
-            value={date}
-          />
-        </View>
-
-        <FilterAction
-          disabled={isToday}
-          label="Hôm nay"
+        <Pressable
           accessibilityLabel="Xem đơn của hôm nay"
+          accessibilityRole="button"
+          accessibilityState={{ disabled: isToday }}
+          disabled={isToday}
           onPress={onPressToday}
-        />
+          style={({ pressed }) => [
+            styles.todayButton,
+            { backgroundColor: isToday ? theme.backgroundSelected : theme.primary },
+            pressed && styles.pressed,
+          ]}
+        >
+          <Text style={[styles.todayLabel, { color: isToday ? theme.textSecondary : '#FFFFFF' }]}>
+            Hôm nay
+          </Text>
+        </Pressable>
       </View>
 
-      <View style={[styles.divider, { backgroundColor: theme.border }]} />
+      {showPicker && (
+        <DateTimePicker
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          mode="date"
+          onChange={(_event, selected) => {
+            setShowPicker(Platform.OS === 'ios');
+            if (selected) onChangeDate(selected);
+          }}
+          value={date}
+        />
+      )}
 
-      <View style={styles.row}>
-        <View style={[styles.iconBadge, { backgroundColor: theme.primarySoft }]}>
-          <Icon name={SellerIcons.code} color={theme.primary} size={17} />
-        </View>
-
-        <View style={styles.field}>
-          <Text style={[styles.label, { color: theme.textSecondary }]}>Mã lấy hàng</Text>
+      {/* Search + pickup code row */}
+      <View style={styles.inputRow}>
+        <View
+          style={[
+            styles.searchInput,
+            { backgroundColor: theme.backgroundElement, borderColor: theme.border },
+          ]}
+        >
+          <Icon name={SellerIcons.search} color={theme.textSecondary} size={18} />
           <TextInput
-            accessibilityLabel="Mã lấy hàng"
-            inputMode="numeric"
-            maxLength={PICKUP_CODE_LENGTH}
-            onChangeText={(value) => onChangeCode(value.replace(/\D/g, ''))}
-            onSubmitEditing={() => canSearch && onSubmitCode()}
-            placeholder="6 số, VD: 482917"
+            accessibilityLabel="Tìm đơn theo tên món"
+            autoCorrect={false}
+            onChangeText={onChangeSearch}
+            placeholder="Tìm đơn..."
             placeholderTextColor={theme.textSecondary}
-            returnKeyType="search"
-            style={[
-              styles.input,
-              { backgroundColor: theme.background, borderColor: theme.border, color: theme.text },
-            ]}
-            value={code}
+            style={[styles.input, { color: theme.text }]}
+            value={searchQuery}
           />
         </View>
 
-        <FilterAction
-          disabled={!canSearch}
-          label="Tìm"
-          accessibilityLabel="Tìm đơn theo mã lấy hàng"
-          onPress={onSubmitCode}
-        />
+        <View
+          style={[
+            styles.codeInput,
+            { backgroundColor: theme.backgroundElement, borderColor: theme.border },
+          ]}
+        >
+          <Icon name={SellerIcons.code} color={theme.textSecondary} size={18} />
+          <TextInput
+            accessibilityLabel="Mã lấy hàng"
+            autoCapitalize="characters"
+            autoCorrect={false}
+            maxLength={PICKUP_CODE_LENGTH + PICKUP_CODE_PREFIX.length}
+            onChangeText={(value) => onChangeCode(normalizePickupCode(value))}
+            onSubmitEditing={() => canDeliver && onSubmitCode()}
+            placeholder="LF-xxxxxx"
+            placeholderTextColor={theme.textSecondary}
+            returnKeyType="done"
+            style={[styles.input, { color: theme.text }]}
+            value={code ? `${PICKUP_CODE_PREFIX}${code}` : ''}
+          />
+          <Pressable
+            accessibilityLabel="Xác nhận giao đơn theo mã lấy hàng"
+            accessibilityRole="button"
+            accessibilityState={{ disabled: !canDeliver }}
+            disabled={!canDeliver}
+            onPress={onSubmitCode}
+            style={[
+              styles.deliverBadge,
+              { backgroundColor: canDeliver ? theme.primary : theme.border },
+            ]}
+          >
+            <Icon
+              name={SellerIcons.check}
+              color={canDeliver ? '#FFFFFF' : theme.textSecondary}
+              size={16}
+            />
+          </Pressable>
+        </View>
       </View>
     </View>
   );
 }
 
-type FilterActionProps = {
-  label: string;
-  accessibilityLabel: string;
-  disabled: boolean;
-  onPress: () => void;
-};
-
-// Nút xám khi chưa bấm được (đang xem đúng hôm nay, hoặc mã chưa đủ 6 số).
-function FilterAction({ label, accessibilityLabel, disabled, onPress }: FilterActionProps) {
-  const theme = useTheme();
-
-  return (
-    <Pressable
-      accessibilityLabel={accessibilityLabel}
-      accessibilityRole="button"
-      accessibilityState={{ disabled }}
-      disabled={disabled}
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.action,
-        { backgroundColor: disabled ? theme.border : theme.primary },
-        pressed && styles.pressed,
-      ]}
-    >
-      <Text style={[styles.actionLabel, { color: disabled ? theme.textSecondary : '#FFFFFF' }]}>
-        {label}
-      </Text>
-    </Pressable>
-  );
-}
-
 const styles = StyleSheet.create({
-  card: { gap: 12, borderWidth: 1, borderRadius: 20, padding: 14 },
-  row: { flexDirection: 'row', alignItems: 'flex-end', gap: 10 },
-  iconBadge: {
-    width: 34,
-    height: 34,
+  container: { gap: 10 },
+  dateRow: { flexDirection: 'row', gap: 8 },
+  dateButton: {
+    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 12,
-    marginBottom: 6,
-  },
-  field: { flex: 1, gap: 4 },
-  label: { fontSize: 11.5, fontWeight: '700' },
-  // Trình duyệt tự vẽ viền focus riêng, chồng lên viền của input.
-  input: {
+    gap: 8,
     minHeight: 44,
     borderWidth: 1,
     borderRadius: 12,
     paddingHorizontal: 12,
-    fontSize: 14,
-    fontWeight: '600',
-    outlineWidth: 0,
   },
-  action: {
+  dateText: { flex: 1, fontSize: 14, fontWeight: '700' },
+  todayButton: {
     minHeight: 44,
     justifyContent: 'center',
     borderRadius: 12,
     paddingHorizontal: 16,
   },
-  actionLabel: { fontSize: 13, fontWeight: '800' },
-  divider: { height: StyleSheet.hairlineWidth },
+  todayLabel: { fontSize: 13, fontWeight: '800' },
+  inputRow: { flexDirection: 'row', gap: 8 },
+  searchInput: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    minHeight: 42,
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 10,
+  },
+  codeInput: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    minHeight: 42,
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 10,
+  },
+  input: { flex: 1, fontSize: 13, fontWeight: '600', paddingVertical: 0, outlineWidth: 0 },
+  deliverBadge: {
+    width: 28,
+    height: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+  },
   pressed: { opacity: 0.85 },
 });

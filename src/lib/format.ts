@@ -1,3 +1,8 @@
+/** "30000" → "30.000". Chỉ giữ chữ số nên dán cả "30.000đ" vẫn ra đúng. */
+export function formatThousands(digits: string): string {
+  return digits.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
 export function formatPrice(amount: number): string {
   const grouped = Math.round(amount)
     .toString()

@@ -1,6 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import * as WebBrowser from 'expo-web-browser';
-import { Platform } from 'react-native';
+import { Platform, TurboModuleRegistry } from 'react-native';
 
 import { toAuthUser } from '@/features/auth/api/signin';
 import {
@@ -12,44 +11,52 @@ import { ApiException } from '@/lib/api-client';
 import { authenticate } from '@/lib/auth-session';
 
 /**
- * OAuth client id của Google, khai trong .env. Mỗi nền tảng cần một client id riêng và cả ba
- * phải nằm trong GOOGLE_CLIENT_IDS của backend, vì backend đối chiếu `aud` của id token.
+ * Client id loại Web của Google. Android Credential Manager cấp id token với `aud` chính là
+ * client id này, nên nó phải nằm trong GOOGLE_CLIENT_IDS của backend. Client loại Android
+ * (package name + SHA-1) vẫn phải tạo trên Google Cloud để Google nhận ra app, nhưng không đưa
+ * vào code.
  */
-const GOOGLE_CLIENT_ID = Platform.select({
-  ios: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS,
-  android: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID,
-  default: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_WEB,
-});
-
-const REDIRECT_URI = process.env.EXPO_PUBLIC_GOOGLE_REDIRECT_URI;
-
-export const isGoogleLoginConfigured = Boolean(GOOGLE_CLIENT_ID && REDIRECT_URI);
+const GOOGLE_WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_WEB;
 
 /**
- * Lấy id token của Google bằng luồng implicit: mở trang đăng nhập, Google trả token ngay trong
- * fragment của URL chuyển hướng. Chọn luồng này vì backend chỉ cần id token đã ký, không cần
- * access token — đổi lại không phải thêm thư viện OAuth nào.
+ * Module native chỉ có trong development build. Expo Go và bản web không có nó, mà thư viện
+ * ném lỗi ngay lúc import — nên phải kiểm tra trước và chỉ `require` khi chắc chắn có, kẻo
+ * cả app sập chứ không riêng nút Google.
+ */
+const hasNativeGoogleModule =
+  Platform.OS === 'android' && TurboModuleRegistry.get('CredentialsManager') !== null;
+
+/** App chỉ phát hành trên Android; bản web và Expo Go chỉ dùng để dựng giao diện. */
+export const isGoogleLoginConfigured = hasNativeGoogleModule && Boolean(GOOGLE_WEB_CLIENT_ID);
+
+type GoogleModule = typeof import('react-native-credentials-manager');
+
+/**
+ * Lấy id token qua hộp chọn tài khoản của hệ thống. Nonce được truyền thẳng vào yêu cầu để
+ * Google nhúng vào token — backend đối chiếu lại nên token chụp từ phiên khác sẽ bị từ chối.
+ * Trả về null khi người dùng đóng hộp chọn.
  */
 async function getGoogleIdToken(nonce: string): Promise<string | null> {
-  const params = new URLSearchParams({
-    client_id: GOOGLE_CLIENT_ID as string,
-    redirect_uri: REDIRECT_URI as string,
-    response_type: 'id_token',
-    scope: 'openid email profile',
-    nonce,
-    prompt: 'select_account',
-  });
+  try {
+    // Xem ghi chú ở hasNativeGoogleModule: không import ở đầu file để Expo Go không sập.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const googleModule = require('react-native-credentials-manager') as GoogleModule;
+    const { signUpWithGoogle } = googleModule;
+    const credential = await signUpWithGoogle({
+      serverClientId: GOOGLE_WEB_CLIENT_ID as string,
+      nonce,
+      // Luôn hiện hộp chọn tài khoản thay vì tự đăng nhập bằng tài khoản dùng lần trước.
+      autoSelectEnabled: false,
+      filterByAuthorizedAccounts: false,
+    });
 
-  const result = await WebBrowser.openAuthSessionAsync(
-    `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`,
-    REDIRECT_URI as string,
-  );
-  if (result.type !== 'success') return null;
+    return credential.idToken || null;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (/cancel/i.test(message)) return null;
 
-  // Google trả token sau dấu #, không phải query string, nên phải tự tách.
-  const fragment = result.url.split('#')[1];
-
-  return fragment ? new URLSearchParams(fragment).get('id_token') : null;
+    throw new ApiException('GOOGLE_SIGNIN_FAILED', message, 500);
+  }
 }
 
 /** Tên hiển thị Google nhúng sẵn trong id token; backend dùng khi tạo tài khoản lần đầu. */

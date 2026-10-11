@@ -7,9 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "lootfastmobilefe",
     "userInterfaceStyle": "automatic",
-    "ios": {
-      "icon": "./assets/expo.icon"
-    },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
@@ -18,7 +15,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.lootfastmobilefe"
+      "package": "vn.lootfast.app"
     },
     "web": {
       "output": "static",
@@ -34,7 +31,20 @@
           "imageWidth": 76
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "LootFast dùng vị trí của bạn để tìm deal gần bạn."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "LootFast cần camera để quét mã QR xác nhận giao hàng và chụp ảnh món, ảnh quán, giấy phép."
+        }
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,

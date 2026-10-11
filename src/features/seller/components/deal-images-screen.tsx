@@ -1,5 +1,4 @@
 import { Image } from 'expo-image';
-import * as ImagePicker from 'expo-image-picker';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -19,6 +18,7 @@ import { SellerPageScaffold } from '@/features/seller/components/seller-page-sca
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
 import { confirmAction } from '@/lib/confirm';
+import { pickImages, useRecoveredPick } from '@/lib/pick-image';
 
 /**
  * Quản lý ảnh của một deal. Backend bắt deal phải có ít nhất một ảnh mới đăng được, nên màn
@@ -37,6 +37,7 @@ export function DealImagesScreen() {
   const reorder = useReorderDealImages();
   const publish = usePublishMerchantDeal();
 
+  const screenRoute = `/seller/deal-images?dealId=${dealId ?? ''}`;
   const images = deal?.images ?? [];
   const isBusy = upload.isPending || remove.isPending || reorder.isPending;
   const actionError = upload.error ?? remove.error ?? reorder.error ?? publish.error;
@@ -49,23 +50,17 @@ export function DealImagesScreen() {
       return;
     }
 
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      Alert.alert(
-        'Cần quyền truy cập',
-        'Vui lòng cấp quyền truy cập thư viện ảnh trong Cài đặt hệ thống.',
-      );
-      return;
-    }
+    const [asset] = await pickImages({ resume: { route: screenRoute } });
+    if (!asset) return;
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      quality: 0.8,
-    });
-    if (result.canceled || !result.assets[0]) return;
-
-    upload.mutate({ dealId, imageUri: result.assets[0].uri });
+    upload.mutate({ dealId, imageUri: asset.uri });
   };
+
+  // Android có thể tắt app khi camera đang mở: tải tiếp ảnh vừa chụp lên deal này.
+  useRecoveredPick(screenRoute, ({ assets }) => {
+    const [asset] = assets;
+    if (dealId && asset) upload.mutate({ dealId, imageUri: asset.uri });
+  });
 
   const askToRemove = (imageId: string) =>
     confirmAction({

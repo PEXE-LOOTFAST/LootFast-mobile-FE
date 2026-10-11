@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/ui/icon';
-import { HomeHeaderColors } from '@/features/home/constants/colors';
+import { SellerHeaderColors } from '@/features/home/constants/colors';
 import { SellerIcons } from '@/features/seller/constants/icons';
 
 // Cùng kiểu header xanh đậm với Tổng quan; nút quét QR để ngay đây vì đó là thao tác
@@ -27,7 +27,7 @@ export function SellerOrderHeader({ onPressScan }: { onPressScan: () => void }) 
         onPress={onPressScan}
         style={({ pressed }) => [styles.scanButton, pressed && styles.pressed]}
       >
-        <Icon name={SellerIcons.qrCode} color={HomeHeaderColors.background} size={18} />
+        <Icon name={SellerIcons.qrCode} color={SellerHeaderColors.background} size={18} />
         <Text style={styles.scanLabel}>Quét QR</Text>
       </Pressable>
     </View>
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
     gap: 4,
-    backgroundColor: HomeHeaderColors.background,
+    backgroundColor: SellerHeaderColors.background,
     borderBottomLeftRadius: 28,
     borderBottomRightRadius: 28,
     paddingHorizontal: 20,
@@ -60,21 +60,21 @@ const styles = StyleSheet.create({
     top: -40,
     right: -60,
     borderRadius: 100,
-    backgroundColor: HomeHeaderColors.decoration,
+    backgroundColor: SellerHeaderColors.decoration,
     opacity: 0.5,
   },
-  title: { color: HomeHeaderColors.text, fontSize: 22, fontWeight: '900', letterSpacing: -0.4 },
-  subtitle: { color: HomeHeaderColors.textMuted, fontSize: 13, fontWeight: '600' },
+  title: { color: SellerHeaderColors.text, fontSize: 22, fontWeight: '900', letterSpacing: -0.4 },
+  subtitle: { color: SellerHeaderColors.textMuted, fontSize: 13, fontWeight: '600' },
   scanButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
     marginTop: 14,
-    backgroundColor: HomeHeaderColors.text,
+    backgroundColor: SellerHeaderColors.text,
     borderRadius: 16,
     paddingVertical: 14,
   },
-  scanLabel: { color: HomeHeaderColors.background, fontSize: 15, fontWeight: '800' },
+  scanLabel: { color: SellerHeaderColors.background, fontSize: 15, fontWeight: '800' },
   pressed: { opacity: 0.85 },
 });

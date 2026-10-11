@@ -40,4 +40,7 @@ export const SellerIcons = {
   schedule: { ios: 'calendar.badge.clock', android: 'event_repeat', web: 'event_repeat' },
   smartSuggest: { ios: 'wand.and.stars', android: 'smart_toy', web: 'smart_toy' },
   shield: { ios: 'checkmark.shield', android: 'verified_user', web: 'verified_user' },
+  photoLibrary: { ios: 'photo.on.rectangle', android: 'photo_library', web: 'photo_library' },
+  search: { ios: 'magnifyingglass', android: 'search', web: 'search' },
+  location: { ios: 'mappin.and.ellipse', android: 'location_on', web: 'location_on' },
 } satisfies IconMap;

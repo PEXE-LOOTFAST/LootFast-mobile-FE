@@ -17,7 +17,7 @@ type SearchPanelProps = {
   categories: DealCategory[];
   selectedCategoryId: DealCategoryId;
   onSelectCategory: (id: DealCategoryId) => void;
-  /** Khách chưa đăng nhập: chạm vào ô tìm kiếm / bán kính sẽ gọi onPressLocked thay vì mở. */
+  /** Chưa đăng nhập hoặc chưa có GPS: chạm vào ô tìm kiếm / bán kính sẽ gọi onPressLocked thay vì mở. */
   isLocked?: boolean;
   onPressLocked?: () => void;
 };

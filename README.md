@@ -354,14 +354,11 @@ File `.env` (đã nằm trong `.gitignore`, không commit):
 ```
 EXPO_PUBLIC_API_URL=http://localhost:8080/api/v1
 
-# Đăng nhập bằng Google — để trống thì nút Google hiện kèm ghi chú chưa cấu hình.
+# Đăng nhập bằng Google (chỉ Android) — để trống thì nút Google hiện kèm ghi chú chưa cấu hình.
 EXPO_PUBLIC_GOOGLE_CLIENT_ID_WEB=
-EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS=
-EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID=
-EXPO_PUBLIC_GOOGLE_REDIRECT_URI=
 ```
 
-Ba client id của Google phải nằm trong `GOOGLE_CLIENT_IDS` của backend, vì backend đối chiếu `aud` trong id token trước khi chấp nhận đăng nhập.
+Client id loại Web của Google phải nằm trong `GOOGLE_CLIENT_IDS` của backend, vì backend đối chiếu `aud` trong id token trước khi chấp nhận đăng nhập. Trên Google Cloud còn cần một client loại Android (package `vn.lootfast.app` + SHA-1 của khoá ký), nhưng id đó không đưa vào code. Đăng nhập Google dùng module native nên phải chạy bằng development build (`npm run android`), không chạy được trong Expo Go.
 
 **Cảnh báo bảo mật:** biến có tiền tố `EXPO_PUBLIC_` được **nhúng thẳng vào file APK**. Ai tải app về cũng đọc được. Tuyệt đối không đặt JWT secret, PayOS key hay bất kỳ khoá bí mật nào ở đây — chúng chỉ được sống ở backend.
 

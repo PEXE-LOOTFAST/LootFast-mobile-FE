@@ -54,7 +54,7 @@ export type DealQuery = {
   categoryCode?: string;
 };
 
-// TODO: thay bằng vị trí thật sau khi bổ sung permission/location service.
+// Toạ độ dự phòng (trung tâm TP.HCM) khi chưa có GPS của người dùng.
 export const DEFAULT_DEAL_LOCATION = {
   latitude: 10.7769,
   longitude: 106.7009,

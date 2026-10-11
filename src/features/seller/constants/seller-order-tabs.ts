@@ -19,5 +19,5 @@ export const PICKUP_EMPTY_MESSAGES: Record<SellerPickupBucket, string> = {
   'no-show': 'Không có đơn nào khách bỏ lỡ. Quá tốt!',
 };
 
-/** Mã lấy hàng khách đọc cho quán luôn gồm 6 chữ số. */
+/** Mã lấy hàng khách đọc cho quán là `LF-` cộng 6 ký tự chữ hoa hoặc số; đây là độ dài phần sau `LF-`. */
 export const PICKUP_CODE_LENGTH = 6;
