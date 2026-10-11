@@ -15,10 +15,14 @@ export default function AdminLayout() {
   if (!isAdmin) return <Redirect href="/admin-login" />;
 
   return (
-    <Tabs screenOptions={{ headerShown: false }} tabBar={(props) => <AdminTabBar {...props} />}>
+    <Tabs
+      initialRouteName="overview"
+      screenOptions={{ headerShown: false }}
+      tabBar={(props) => <AdminTabBar {...props} />}
+    >
+      <Tabs.Screen name="overview" options={{ title: 'Tổng quan' }} />
       <Tabs.Screen name="index" options={{ title: 'Duyệt quán' }} />
       <Tabs.Screen name="moderation" options={{ title: 'Kiểm duyệt' }} />
-      <Tabs.Screen name="overview" options={{ title: 'Tổng quan' }} />
       <Tabs.Screen name="manage" options={{ title: 'Quản lý' }} />
       <Tabs.Screen name="settings" options={{ title: 'Cài đặt' }} />
     </Tabs>

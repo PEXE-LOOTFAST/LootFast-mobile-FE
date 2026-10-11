@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Linking } from 'react-native';
 
 import { toAdminErrorMessage } from '@/features/admin/api/admin-error-messages';
 import type {
@@ -91,6 +90,9 @@ export type StoreApprovalQueue = {
   /** Hồ sơ lỗi tải lên chưa có file trên storage nên không mở được. */
   canViewLicense: (status: StoreApplicationStatus) => boolean;
   viewLicense: (applicationId: string) => void;
+  /** Link ảnh giấy phép đang xem trong app; null là chưa mở. */
+  licenseUrl: string | null;
+  closeLicense: () => void;
   refetch: () => void;
 };
 
@@ -110,6 +112,7 @@ export function useStoreApprovalQueue(tab: StoreApplicationStatus): StoreApprova
   const rejectMutation = useRejectApplication();
   const licenseMutation = useLicenseDownloadUrl();
   const [actionError, setActionError] = useState<string | null>(null);
+  const [licenseUrl, setLicenseUrl] = useState<string | null>(null);
 
   const busyId = approveMutation.isPending
     ? (approveMutation.variables ?? null)
@@ -143,15 +146,13 @@ export function useStoreApprovalQueue(tab: StoreApplicationStatus): StoreApprova
         { onError: (error) => setActionError(toAdminErrorMessage(error)) },
       );
     },
+    licenseUrl,
+    closeLicense: () => setLicenseUrl(null),
     canViewLicense: (status: StoreApplicationStatus) => status !== 'upload-failed',
     viewLicense: (applicationId: string) => {
       setActionError(null);
       licenseMutation.mutate(applicationId, {
-        onSuccess: (response) => {
-          void Linking.openURL(response.url).catch(() =>
-            setActionError('Không mở được giấy phép trên thiết bị này.'),
-          );
-        },
+        onSuccess: (response) => setLicenseUrl(response.url),
         onError: (error) => setActionError(toAdminErrorMessage(error)),
       });
     },
