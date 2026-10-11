@@ -12,6 +12,7 @@ import {
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { MaxContentWidth } from '@/constants/theme';
 import { AdminHeader } from '@/features/admin/components/admin-header';
+import { LicenseViewer } from '@/features/admin/components/license-viewer';
 import { RejectApplicationDialog } from '@/features/admin/components/reject-application-dialog';
 import { StoreApplicationCard } from '@/features/admin/components/store-application-card';
 import { STORE_APPROVAL_TABS } from '@/features/admin/constants/store-approval-tabs';
@@ -131,6 +132,8 @@ export function StoreApprovalScreen() {
           ) : null}
         </View>
       </ScrollView>
+
+      <LicenseViewer onClose={queue.closeLicense} url={queue.licenseUrl} />
 
       {/* key theo hồ sơ: mỗi lần mở là một ô lý do trống. */}
       <RejectApplicationDialog
