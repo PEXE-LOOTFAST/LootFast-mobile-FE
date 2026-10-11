@@ -21,7 +21,7 @@ export function ManagedAccountRow({ account, onPress }: ManagedAccountRowProps) 
 
   return (
     <Pressable
-      accessibilityHint="Mở tuỳ chọn khoá hoặc mở khoá"
+      accessibilityHint="Xem chi tiết tài khoản"
       accessibilityLabel={`${account.name}, ${KIND_LABELS[account.kind]}, ${isLocked ? 'đã khóa' : 'đang hoạt động'}`}
       accessibilityRole="button"
       onPress={onPress}

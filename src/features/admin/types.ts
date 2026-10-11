@@ -73,4 +73,6 @@ export type ManagedAccount = {
   /** Quán: quận/huyện, vd. "Q.10". Người dùng: số deal đã mua. */
   detail: string;
   status: ManagedAccountStatus;
+  /** Lý do admin đã ghi khi khoá; chỉ có khi tài khoản đang bị khoá. */
+  lockReason?: string | null;
 };

@@ -19,6 +19,7 @@ type RejectApplicationDialogProps = {
   title?: string;
   message?: string;
   confirmLabel?: string;
+  placeholder?: string;
 };
 
 /**
@@ -36,6 +37,7 @@ export function RejectApplicationDialog({
   title = 'Từ chối hồ sơ',
   message = 'Người đăng ký sẽ nhận được lý do này, hãy ghi rõ để họ biết cần bổ sung gì.',
   confirmLabel = 'Từ chối',
+  placeholder = 'Vd. Ảnh giấy phép kinh doanh bị mờ, không đọc được số.',
 }: RejectApplicationDialogProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
@@ -75,7 +77,7 @@ export function RejectApplicationDialog({
             multiline
             numberOfLines={3}
             onChangeText={setReason}
-            placeholder="Vd. Ảnh giấy phép kinh doanh bị mờ, không đọc được số."
+            placeholder={placeholder}
             size="compact"
             value={reason}
           />

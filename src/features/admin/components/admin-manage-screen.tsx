@@ -18,6 +18,7 @@ import {
   useSetUserLocked,
   type AdminUserDto,
 } from '@/features/admin/api/admin-users';
+import { AccountDetailDialog } from '@/features/admin/components/account-detail-dialog';
 import { AdminHeader } from '@/features/admin/components/admin-header';
 import { AdminSearchBar } from '@/features/admin/components/admin-search-bar';
 import { ManagedAccountRow } from '@/features/admin/components/managed-account-row';
@@ -36,6 +37,7 @@ function toAccount(user: AdminUserDto): ManagedAccount {
     name: `${user.firstName} ${user.lastName}`.trim() || user.email,
     detail: user.email,
     status: user.locked ? 'locked' : 'active',
+    lockReason: user.lockReason,
   };
 }
 
@@ -47,6 +49,8 @@ export function AdminManageScreen() {
   const [keyword, setKeyword] = useState('');
   // Tài khoản đang chờ admin gõ lý do; null là hộp thoại đang đóng.
   const [target, setTarget] = useState<ManagedAccount | null>(null);
+  // Tài khoản đang xem chi tiết; null là hộp thoại đang đóng.
+  const [detail, setDetail] = useState<ManagedAccount | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
   const users = useAdminUsers(keyword);
@@ -126,7 +130,7 @@ export function AdminManageScreen() {
                     account={account}
                     onPress={() => {
                       setActionError(null);
-                      setTarget(account);
+                      setDetail(account);
                     }}
                   />
                 </View>
@@ -154,6 +158,15 @@ export function AdminManageScreen() {
         </View>
       </ScrollView>
 
+      <AccountDetailDialog
+        account={detail}
+        onClose={() => setDetail(null)}
+        onToggleLock={(account) => {
+          setDetail(null);
+          setTarget(account);
+        }}
+      />
+
       {/* key theo tài khoản: mỗi lần mở là một ô lý do trống. */}
       <RejectApplicationDialog
         key={target?.id ?? 'closed'}
@@ -167,6 +180,7 @@ export function AdminManageScreen() {
         }
         onCancel={() => setTarget(null)}
         onConfirm={confirm}
+        placeholder={isLocking ? 'Nhập lý do khoá tài khoản' : 'Nhập lý do mở khoá tài khoản'}
         title={isLocking ? 'Khoá tài khoản' : 'Mở khoá tài khoản'}
       />
     </View>
