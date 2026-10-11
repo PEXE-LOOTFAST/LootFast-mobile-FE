@@ -15,7 +15,9 @@ import {
   useMerchantDeals,
   useUpdateMerchantDeal,
 } from '@/features/seller/api/use-merchant-deals';
+import { PriceField } from '@/features/seller/components/deal-input-fields';
 import { SellerFormCard } from '@/features/seller/components/seller-form-card';
+import { TimeInputField } from '@/features/seller/components/time-input-field';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import {
   buildDealSchedule,
@@ -173,25 +175,19 @@ function EditDealForm({
 
         <View style={styles.row}>
           <View style={styles.cell}>
-            <TextField
-              size="compact"
+            <PriceField
               error={errors.originalPrice}
-              keyboardType="number-pad"
-              label="Giá gốc (đ)"
-              maxLength={7}
-              onChangeText={(text) => setField('originalPrice', text)}
+              label="Giá gốc"
+              onChange={(digits) => setField('originalPrice', digits)}
               placeholder="65000"
               value={values.originalPrice}
             />
           </View>
           <View style={styles.cell}>
-            <TextField
-              size="compact"
+            <PriceField
               error={errors.price}
-              keyboardType="number-pad"
-              label="Giá deal (đ)"
-              maxLength={7}
-              onChangeText={(text) => setField('price', text)}
+              label="Giá deal"
+              onChange={(digits) => setField('price', digits)}
               placeholder="39000"
               value={values.price}
             />
@@ -202,25 +198,23 @@ function EditDealForm({
 
         <View style={styles.row}>
           <View style={styles.cell}>
-            <TextField
-              size="compact"
+            <TimeInputField
+              defaultTime="18:00"
               editable={!sharedSchedule}
               error={errors.open}
               label="Bắt đầu nhận"
-              maxLength={5}
-              onChangeText={(text) => setField('open', text)}
+              onChange={(time) => setField('open', time)}
               placeholder="18:00"
               value={values.open}
             />
           </View>
           <View style={styles.cell}>
-            <TextField
-              size="compact"
+            <TimeInputField
+              defaultTime="21:00"
               editable={!sharedSchedule}
               error={errors.close}
               label="Kết thúc nhận"
-              maxLength={5}
-              onChangeText={(text) => setField('close', text)}
+              onChange={(time) => setField('close', time)}
               placeholder="21:00"
               value={values.close}
             />

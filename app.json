@@ -41,7 +41,7 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "LootFast cần camera để quét mã QR xác nhận giao hàng."
+          "cameraPermission": "LootFast cần camera để quét mã QR xác nhận giao hàng và chụp ảnh món, ảnh quán, giấy phép."
         }
       ],
       "@react-native-community/datetimepicker"

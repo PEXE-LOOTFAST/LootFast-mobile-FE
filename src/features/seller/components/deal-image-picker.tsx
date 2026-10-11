@@ -1,17 +1,19 @@
 import { Image } from 'expo-image';
-import * as ImagePicker from 'expo-image-picker';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Icon } from '@/components/ui/icon';
 import { MAX_DEAL_IMAGES } from '@/features/seller/api/merchant-deals';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
+import { pickImages, type PickResume } from '@/lib/pick-image';
 
 type DealImagePickerProps = {
   /** URI ảnh đang chọn, chưa gửi lên server. */
   uris: string[];
   onChange: (uris: string[]) => void;
   disabled?: boolean;
+  /** Màn và nội dung form cần khôi phục nếu Android tắt app lúc đang mở camera. */
+  resume?: PickResume;
 };
 
 /**
@@ -20,30 +22,21 @@ type DealImagePickerProps = {
  *
  * Ảnh đầu tiên trở thành ảnh chính vì backend gán thứ tự theo đúng thứ tự tải lên.
  */
-export function DealImagePicker({ uris, onChange, disabled = false }: DealImagePickerProps) {
+export function DealImagePicker({
+  uris,
+  onChange,
+  disabled = false,
+  resume,
+}: DealImagePickerProps) {
   const theme = useTheme();
   const isFull = uris.length >= MAX_DEAL_IMAGES;
 
-  const pickImages = async () => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      Alert.alert(
-        'Cần quyền truy cập',
-        'Vui lòng cấp quyền truy cập thư viện ảnh trong Cài đặt hệ thống.',
-      );
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsMultipleSelection: true,
-      mediaTypes: ['images'],
-      quality: 0.8,
-      selectionLimit: MAX_DEAL_IMAGES - uris.length,
-    });
-    if (result.canceled) return;
+  const addImages = async () => {
+    const assets = await pickImages({ selectionLimit: MAX_DEAL_IMAGES - uris.length, resume });
+    if (assets.length === 0) return;
 
     // Cắt lại lần nữa phòng khi nền tảng bỏ qua selectionLimit.
-    onChange([...uris, ...result.assets.map((asset) => asset.uri)].slice(0, MAX_DEAL_IMAGES));
+    onChange([...uris, ...assets.map((asset) => asset.uri)].slice(0, MAX_DEAL_IMAGES));
   };
 
   return (
@@ -82,7 +75,7 @@ export function DealImagePicker({ uris, onChange, disabled = false }: DealImageP
             accessibilityLabel="Thêm ảnh món"
             accessibilityRole="button"
             disabled={disabled}
-            onPress={() => void pickImages()}
+            onPress={() => void addImages()}
             style={({ pressed }) => [
               styles.tile,
               styles.addTile,

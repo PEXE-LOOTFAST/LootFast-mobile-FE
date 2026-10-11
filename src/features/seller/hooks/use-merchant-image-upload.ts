@@ -1,10 +1,10 @@
-import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
 import { Alert } from 'react-native';
 
 import { merchantApi } from '@/features/seller/api/merchant-api';
 import { MERCHANT_QUERY_KEYS } from '@/features/seller/hooks/use-merchant-shop';
 import { ApiException } from '@/lib/api-client';
+import { pickImages } from '@/lib/pick-image';
 import { queryClient } from '@/lib/query-client';
 
 // Tên mã khớp đúng ErrorCode của backend; bảng cũ dùng những mã không tồn tại nên mọi lỗi
@@ -31,27 +31,15 @@ export function useMerchantImageUpload() {
   const [isUploading, setIsUploading] = useState(false);
 
   const pickAndUpload = async (type: 'logo' | 'cover') => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      Alert.alert(
-        'Cần quyền truy cập',
-        'Vui lòng cấp quyền truy cập thư viện ảnh trong Cài đặt hệ thống.',
-      );
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
+    const [asset] = await pickImages({
       allowsEditing: true,
       aspect: type === 'logo' ? [1, 1] : [16, 9],
-      quality: 0.8,
     });
-
-    if (result.canceled || !result.assets[0]) return;
+    if (!asset) return;
 
     setIsUploading(true);
     try {
-      await merchantApi.uploadImage(type, result.assets[0].uri);
+      await merchantApi.uploadImage(type, asset.uri);
       await queryClient.invalidateQueries({ queryKey: MERCHANT_QUERY_KEYS.profile });
     } catch (error) {
       Alert.alert('Upload thất bại', mapUploadError(error));

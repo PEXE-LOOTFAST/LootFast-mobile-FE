@@ -7,6 +7,7 @@ import { BrandButton } from '@/components/ui/brand-button';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { TextField } from '@/components/ui/text-field';
 import {
+  MAX_DEAL_IMAGES,
   createMerchantDeal,
   publishMerchantDeal,
   toMerchantDealErrorMessage,
@@ -18,7 +19,9 @@ import {
 } from '@/features/seller/api/use-merchant-deals';
 import { MerchantRegistrationRequired } from '@/features/seller/components/merchant-registration-required';
 import { DealImagePicker } from '@/features/seller/components/deal-image-picker';
+import { PriceField } from '@/features/seller/components/deal-input-fields';
 import { SellerFormCard } from '@/features/seller/components/seller-form-card';
+import { TimeInputField } from '@/features/seller/components/time-input-field';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import { ShopSetupCard, getShopSetupSteps } from '@/features/seller/components/shop-setup-card';
 import { useMerchantShop } from '@/features/seller/hooks/use-merchant-shop';
@@ -35,6 +38,9 @@ import {
 import { useForm } from '@/hooks/use-form';
 import { useTheme } from '@/hooks/use-theme';
 import { formatPrice } from '@/lib/format';
+import { useRecoveredPick } from '@/lib/pick-image';
+
+const NEW_DEAL_ROUTE = '/seller/new-deal';
 
 const INITIAL_VALUES: NewDealValues = {
   name: '',
@@ -199,6 +205,21 @@ function NewDealForm({
     },
   });
 
+  // Android có thể tắt app khi camera đang mở: lấy lại nội dung đã nhập và ảnh vừa chụp.
+  useRecoveredPick<{ values: NewDealValues; imageUris: string[] }>(
+    NEW_DEAL_ROUTE,
+    ({ assets, draft }) => {
+      if (draft) {
+        for (const field of Object.keys(draft.values) as (keyof NewDealValues)[]) {
+          setField(field, draft.values[field]);
+        }
+      }
+
+      const restored = [...(draft?.imageUris ?? []), ...assets.map((asset) => asset.uri)];
+      setImageUris(restored.slice(0, MAX_DEAL_IMAGES));
+    },
+  );
+
   const price = toDealNumber(values.price);
   const originalPrice = toDealNumber(values.originalPrice);
   const discount =
@@ -230,25 +251,19 @@ function NewDealForm({
 
         <View style={styles.row}>
           <View style={styles.cell}>
-            <TextField
-              size="compact"
+            <PriceField
               error={errors.originalPrice}
-              keyboardType="number-pad"
-              label="Giá gốc (đ)"
-              maxLength={7}
-              onChangeText={(text) => setField('originalPrice', text)}
+              label="Giá gốc"
+              onChange={(digits) => setField('originalPrice', digits)}
               placeholder="65000"
               value={values.originalPrice}
             />
           </View>
           <View style={styles.cell}>
-            <TextField
-              size="compact"
+            <PriceField
               error={errors.price}
-              keyboardType="number-pad"
-              label="Giá deal (đ)"
-              maxLength={7}
-              onChangeText={(text) => setField('price', text)}
+              label="Giá deal"
+              onChange={(digits) => setField('price', digits)}
               placeholder="39000"
               value={values.price}
             />
@@ -259,25 +274,23 @@ function NewDealForm({
 
         <View style={styles.row}>
           <View style={styles.cell}>
-            <TextField
-              size="compact"
+            <TimeInputField
+              defaultTime="18:00"
               editable={!sharedSchedule}
               error={errors.open}
               label="Bắt đầu nhận"
-              maxLength={5}
-              onChangeText={(text) => setField('open', text)}
+              onChange={(time) => setField('open', time)}
               placeholder="18:00"
               value={values.open}
             />
           </View>
           <View style={styles.cell}>
-            <TextField
-              size="compact"
+            <TimeInputField
+              defaultTime="21:00"
               editable={!sharedSchedule}
               error={errors.close}
               label="Kết thúc nhận"
-              maxLength={5}
-              onChangeText={(text) => setField('close', text)}
+              onChange={(time) => setField('close', time)}
               placeholder="21:00"
               value={values.close}
             />
@@ -292,7 +305,12 @@ function NewDealForm({
               : 'Hôm nay quán không mở cửa nên chưa đăng deal được.'}
         </Text>
 
-        <DealImagePicker disabled={isSubmitting} onChange={setImageUris} uris={imageUris} />
+        <DealImagePicker
+          disabled={isSubmitting}
+          onChange={setImageUris}
+          resume={{ route: NEW_DEAL_ROUTE, draft: { values, imageUris } }}
+          uris={imageUris}
+        />
       </SellerFormCard>
 
       {formError ? <InlineAlert message={formError} /> : null}

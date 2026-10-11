@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { BrandButton } from '@/components/ui/brand-button';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { TextField } from '@/components/ui/text-field';
 import { LocationPickerModal } from '@/features/map/components/location-picker-modal';
 import { useShopCategories } from '@/features/seller/api/shop-categories';
+import { OpeningHoursFields } from '@/features/seller/components/opening-hours-fields';
 import { SellerFormCard } from '@/features/seller/components/seller-form-card';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import type { ShopInfoValues } from '@/features/seller/validation';
@@ -38,7 +38,7 @@ export function ShopInfoFields({
   return (
     <>
       <SectionTitle icon={SellerIcons.store} label="Hồ sơ cửa hàng" />
-      <SellerFormCard>
+      <SellerFormCard compact>
         <TextField
           size="compact"
           error={errors.storeName}
@@ -108,32 +108,38 @@ export function ShopInfoFields({
       </SellerFormCard>
 
       <SectionTitle icon={SellerIcons.person} label="Liên hệ" />
-      <SellerFormCard>
-        <TextField
-          size="compact"
-          autoCapitalize="none"
-          error={errors.contactEmail}
-          keyboardType="email-address"
-          label="Email liên hệ"
-          maxLength={254}
-          onChangeText={(text) => onChange('contactEmail', text)}
-          placeholder="quan@example.com"
-          value={values.contactEmail}
-        />
-        <TextField
-          size="compact"
-          error={errors.contactPhone}
-          keyboardType="phone-pad"
-          label="Số điện thoại liên hệ"
-          maxLength={16}
-          onChangeText={(text) => onChange('contactPhone', text)}
-          placeholder="0901234567"
-          value={values.contactPhone}
-        />
+      <SellerFormCard compact>
+        <View style={styles.row}>
+          <View style={styles.rowWide}>
+            <TextField
+              size="compact"
+              autoCapitalize="none"
+              error={errors.contactEmail}
+              keyboardType="email-address"
+              label="Email liên hệ"
+              maxLength={254}
+              onChangeText={(text) => onChange('contactEmail', text)}
+              placeholder="quan@example.com"
+              value={values.contactEmail}
+            />
+          </View>
+          <View style={styles.rowItem}>
+            <TextField
+              size="compact"
+              error={errors.contactPhone}
+              keyboardType="phone-pad"
+              label="Số điện thoại"
+              maxLength={16}
+              onChangeText={(text) => onChange('contactPhone', text)}
+              placeholder="0901234567"
+              value={values.contactPhone}
+            />
+          </View>
+        </View>
       </SellerFormCard>
 
       <SectionTitle icon={SellerIcons.tag} label="Địa chỉ quán" />
-      <SellerFormCard>
+      <SellerFormCard compact>
         <TextField
           size="compact"
           error={errors.addressLine}
@@ -143,33 +149,56 @@ export function ShopInfoFields({
           placeholder="12 Nguyễn Huệ"
           value={values.addressLine}
         />
-        <TextField
-          size="compact"
-          error={errors.ward}
-          label="Phường/Xã"
-          maxLength={100}
-          onChangeText={(text) => onChange('ward', text)}
-          value={values.ward}
-        />
-        <TextField
-          size="compact"
-          error={errors.district}
-          label="Quận/Huyện"
-          maxLength={100}
-          onChangeText={(text) => onChange('district', text)}
-          value={values.district}
-        />
-        <TextField
-          size="compact"
-          error={errors.city}
-          label="Tỉnh/Thành phố"
-          maxLength={100}
-          onChangeText={(text) => onChange('city', text)}
-          value={values.city}
-        />
-        <BrandButton onPress={() => setIsPickerOpen(true)} variant="secondary">
-          Chọn vị trí trên bản đồ
-        </BrandButton>
+        <View style={styles.row}>
+          <View style={styles.rowItem}>
+            <TextField
+              size="compact"
+              error={errors.ward}
+              label="Phường/Xã"
+              maxLength={100}
+              onChangeText={(text) => onChange('ward', text)}
+              value={values.ward}
+            />
+          </View>
+          <View style={styles.rowItem}>
+            <TextField
+              size="compact"
+              error={errors.district}
+              label="Quận/Huyện"
+              maxLength={100}
+              onChangeText={(text) => onChange('district', text)}
+              value={values.district}
+            />
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.rowItem}>
+            <TextField
+              size="compact"
+              error={errors.city}
+              label="Tỉnh/Thành phố"
+              maxLength={100}
+              onChangeText={(text) => onChange('city', text)}
+              value={values.city}
+            />
+          </View>
+          <View style={styles.mapColumn}>
+            <Text style={[styles.groupLabel, { color: theme.text }]}>Vị trí quán</Text>
+            <Pressable
+              accessibilityLabel="Chọn vị trí trên bản đồ"
+              accessibilityRole="button"
+              onPress={() => setIsPickerOpen(true)}
+              style={({ pressed }) => [
+                styles.mapButton,
+                { backgroundColor: theme.primarySoft, borderColor: theme.primary },
+                pressed && styles.pressed,
+              ]}
+            >
+              <Icon name={SellerIcons.location} color={theme.primary} size={16} />
+              <Text style={[styles.mapButtonLabel, { color: theme.primary }]}>Chọn bản đồ</Text>
+            </Pressable>
+          </View>
+        </View>
         <View style={styles.row}>
           <View style={styles.rowItem}>
             <TextField
@@ -195,36 +224,12 @@ export function ShopInfoFields({
           </View>
         </View>
         <Text style={[styles.hint, { color: theme.textSecondary }]}>
-          Chọn vị trí trên bản đồ hoặc nhập tay. Khách sẽ thấy quán đúng chỗ này trên tab Bản đồ và
-          dùng nó để tính khoảng cách.
+          Chọn trên bản đồ hoặc nhập tay toạ độ. Khách thấy quán đúng chỗ này trên tab Bản đồ.
         </Text>
       </SellerFormCard>
 
       <SectionTitle icon={SellerIcons.clock} label="Giờ hoạt động" />
-      <SellerFormCard>
-        <View style={styles.row}>
-          <View style={styles.rowItem}>
-            <TimeField
-              error={errors.open}
-              label="Giờ mở cửa"
-              onChange={(text) => onChange('open', text)}
-              value={values.open}
-            />
-          </View>
-          <Text style={[styles.dash, { color: theme.text }]}>-</Text>
-          <View style={styles.rowItem}>
-            <TimeField
-              error={errors.close}
-              label="Giờ đóng cửa"
-              onChange={(text) => onChange('close', text)}
-              value={values.close}
-            />
-          </View>
-        </View>
-        <Text style={[styles.hint, { color: theme.textSecondary }]}>
-          Áp dụng cho cả tuần. Giờ đóng phải sau giờ mở trong cùng một ngày.
-        </Text>
-      </SellerFormCard>
+      <OpeningHoursFields errors={errors} onChange={onChange} values={values} />
 
       <LocationPickerModal
         addressHint={
@@ -282,46 +287,24 @@ function SectionTitle({ icon, label }: { icon: IconName; label: string }) {
   );
 }
 
-// Chưa có thư viện chọn giờ gốc nên nhập tay dạng HH:mm; tự chèn dấu ":" sau hai số đầu.
-function TimeField({
-  label,
-  value,
-  error,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  error?: string;
-  onChange: (value: string) => void;
-}) {
-  const theme = useTheme();
-
-  const handleChange = (text: string) => {
-    const digits = text.replace(/\D/g, '').slice(0, 4);
-    onChange(digits.length > 2 ? `${digits.slice(0, 2)}:${digits.slice(2)}` : digits);
-  };
-
-  return (
-    <TextField
-      size="compact"
-      accessibilityLabel={label}
-      error={error}
-      keyboardType="number-pad"
-      label={label}
-      maxLength={5}
-      onChangeText={handleChange}
-      placeholder="HH:mm"
-      trailing={<Icon name={SellerIcons.clock} color={theme.text} size={16} />}
-      value={value}
-    />
-  );
-}
-
 const styles = StyleSheet.create({
-  sectionTitle: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
+  sectionTitle: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
   sectionLabel: { fontSize: 13, fontWeight: '900' },
-  multiline: { minHeight: 76, textAlignVertical: 'top' },
+  multiline: { minHeight: 64, textAlignVertical: 'top' },
   group: { gap: 8 },
+  rowWide: { flex: 1.4 },
+  mapColumn: { flex: 1, gap: 7 },
+  mapButton: {
+    minHeight: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    borderWidth: 1,
+    borderRadius: 14,
+    paddingHorizontal: 8,
+  },
+  mapButtonLabel: { fontSize: 13, fontWeight: '800' },
   groupLabel: { fontSize: 12, fontWeight: '800' },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 9 },
@@ -330,7 +313,6 @@ const styles = StyleSheet.create({
   error: { fontSize: 12, fontWeight: '600' },
   row: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   rowItem: { flex: 1 },
-  dash: { marginTop: 32, fontSize: 16, fontWeight: '700' },
   hint: { fontSize: 12, lineHeight: 17 },
   pressed: { opacity: 0.8 },
 });

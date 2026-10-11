@@ -1,3 +1,4 @@
+import { parseOpenDays } from '@/features/seller/opening-hours';
 import {
   MIN_NAME_LENGTH,
   MIN_PASSWORD_LENGTH,
@@ -25,6 +26,8 @@ export type ShopInfoValues = {
   longitude: string;
   open: string;
   close: string;
+  /** Các ngày quán mở cửa, dạng "MONDAY,TUESDAY"; ngày không có trong danh sách là ngày nghỉ. */
+  openDays: string;
 };
 
 export type OwnerInfoValues = {
@@ -112,6 +115,7 @@ export function validateShopInfo(values: ShopInfoValues): FormErrors<ShopInfoVal
         ? 'Giờ đóng phải sau giờ mở'
         : undefined
       : 'Giờ đóng cửa dạng HH:mm',
+    openDays: parseOpenDays(values.openDays).length ? undefined : 'Chọn ít nhất một ngày mở cửa',
   };
 }
 

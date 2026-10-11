@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { merchantApi } from '@/features/seller/api/merchant-api';
+import { ALL_OPEN_DAYS, WEEK_DAYS } from '@/features/seller/opening-hours';
 import type {
   DayOfWeek,
   MerchantLocationDto,
@@ -33,23 +34,28 @@ const retryUnlessMissing = (failureCount: number, error: unknown) =>
 export function slotsToOpenClose(openingHours: MerchantOpeningHoursDto | undefined): {
   open: string;
   close: string;
+  openDays: string;
 } {
-  const slot = openingHours?.slots.find((s) => s.dayOfWeek === 'MONDAY') ?? openingHours?.slots[0];
-  return { open: slot?.opensAt ?? '', close: slot?.closesAt ?? '' };
+  const slots = openingHours?.slots ?? [];
+  const slot = slots.find((s) => s.dayOfWeek === 'MONDAY') ?? slots[0];
+  // Chưa có khung giờ nào nghĩa là quán chưa cài lịch, mặc định mở cả tuần.
+  const openDays = slots.length
+    ? WEEK_DAYS.filter((day) => slots.some((s) => s.dayOfWeek === day.id))
+        .map((day) => day.id)
+        .join(',')
+    : ALL_OPEN_DAYS;
+
+  return { open: slot?.opensAt ?? '', close: slot?.closesAt ?? '', openDays };
 }
 
-export function openCloseToSlots(open: string, close: string): UpdateOpeningHoursPayload {
-  const days: DayOfWeek[] = [
-    'MONDAY',
-    'TUESDAY',
-    'WEDNESDAY',
-    'THURSDAY',
-    'FRIDAY',
-    'SATURDAY',
-    'SUNDAY',
-  ];
+/** Cùng một khung giờ cho các ngày mở cửa; ngày nghỉ không gửi slot nên backend coi là đóng cửa. */
+export function openCloseToSlots(
+  open: string,
+  close: string,
+  openDays: DayOfWeek[],
+): UpdateOpeningHoursPayload {
   return {
-    slots: days.map((dayOfWeek) => ({ dayOfWeek, opensAt: open, closesAt: close })),
+    slots: openDays.map((dayOfWeek) => ({ dayOfWeek, opensAt: open, closesAt: close })),
   };
 }
 
