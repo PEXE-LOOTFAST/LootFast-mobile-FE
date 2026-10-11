@@ -43,6 +43,17 @@ export function toAdminErrorMessage(error: unknown): string {
   return toMessage(error, REVIEW_MESSAGES, 'Thao tác không thành công. Vui lòng thử lại.');
 }
 
+const USER_MESSAGES: Record<string, string> = {
+  UNAUTHORIZED: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
+  ACCESS_DENIED: 'Tài khoản này không có quyền quản lý người dùng.',
+  VALIDATION_FAILED: 'Lý do không hợp lệ (bắt buộc, tối đa 500 ký tự).',
+};
+
+/** Lỗi khi tải danh sách hoặc khoá / mở khoá người dùng. */
+export function toUserErrorMessage(error: unknown): string {
+  return toMessage(error, USER_MESSAGES, 'Thao tác không thành công. Vui lòng thử lại.');
+}
+
 /** Lỗi khi gỡ ảnh deal vi phạm. */
 export function toDealImageErrorMessage(error: unknown): string {
   return toMessage(error, DEAL_IMAGE_MESSAGES, 'Gỡ ảnh không thành công. Vui lòng thử lại.');
