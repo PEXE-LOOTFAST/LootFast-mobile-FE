@@ -15,7 +15,7 @@ export function useSignin(onSuccess: () => void) {
           { accessToken: response.accessToken, refreshToken: response.refreshToken },
           toAuthUser(response),
         );
-        router.replace('/admin');
+        router.replace('/admin/overview');
         return;
       }
 

@@ -23,10 +23,10 @@ export function AdminLoginScreen() {
   const { isAdmin } = useAuthSession();
 
   // Đã đăng nhập quản trị rồi thì vào thẳng, không bắt nhập lại.
-  if (isAdmin) return <Redirect href="/admin" />;
+  if (isAdmin) return <Redirect href="/admin/overview" />;
 
   // Đăng nhập thật: useAdminSignin đã mở phiên quản trị, ở đây chỉ còn việc điều hướng.
-  const enterAdmin = () => router.replace('/admin');
+  const enterAdmin = () => router.replace('/admin/overview');
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]}>
