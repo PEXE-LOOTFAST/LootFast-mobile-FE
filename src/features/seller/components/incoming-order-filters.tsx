@@ -139,7 +139,7 @@ export function IncomingOrderFilters({
             value={code ? `${PICKUP_CODE_PREFIX}${code}` : ''}
           />
           <Pressable
-            accessibilityLabel="Xác nhận giao đơn theo mã lấy hàng"
+            accessibilityLabel="Xác nhận khách đã nhận món theo mã lấy hàng"
             accessibilityRole="button"
             accessibilityState={{ disabled: !canDeliver }}
             disabled={!canDeliver}

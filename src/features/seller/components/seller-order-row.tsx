@@ -24,7 +24,9 @@ function toTime(value: string) {
 /** Một dòng trạng thái thanh toán dễ hiểu cho người bán, dựa trên cặp phương thức và trạng thái. */
 function describePayment(order: MerchantOrderDto) {
   if (order.paymentMethod === 'CASH') {
-    return order.paymentStatus === 'CONFIRMED' ? 'Đã thu tiền mặt' : 'Thu tiền mặt khi giao';
+    return order.paymentStatus === 'CONFIRMED'
+      ? 'Đã thu tiền mặt'
+      : 'Thu tiền mặt khi khách nhận món';
   }
   if (order.paymentStatus === 'CONFIRMED') return 'Đã nhận chuyển khoản';
   if (order.paymentStatus === 'REVIEW_REQUIRED') return 'Khách báo đã chuyển — cần bạn kiểm tra';
@@ -33,7 +35,7 @@ function describePayment(order: MerchantOrderDto) {
 }
 
 // Một đơn trong danh sách "Đơn hàng đến". Backend không trả tên khách và mã lấy hàng nên dòng
-// chỉ có tên món, giờ nhận và thanh toán; việc đối chiếu khách làm qua mã/QR khi giao.
+// chỉ có tên món, giờ nhận và thanh toán; việc đối chiếu khách làm qua mã/QR khi khách đến nhận món.
 export function SellerOrderRow({
   order,
   isBusy,

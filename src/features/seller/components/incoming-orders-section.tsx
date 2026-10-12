@@ -85,14 +85,14 @@ export function IncomingOrdersSection() {
     if (code.length !== PICKUP_CODE_LENGTH) return;
 
     confirmAction({
-      title: 'Xác nhận giao đơn',
-      message: `Giao đơn có mã ${PICKUP_CODE_PREFIX}${code} cho khách? Không hoàn tác được.`,
-      confirmLabel: 'Đã giao',
+      title: 'Xác nhận khách đã nhận món',
+      message: `Khách đã nhận đơn có mã ${PICKUP_CODE_PREFIX}${code} tại quán? Không hoàn tác được.`,
+      confirmLabel: 'Đã nhận',
       onConfirm: () =>
         confirmPickup.mutate(code, {
           onSuccess: (order) => {
             setCode('');
-            setDeliveredMessage(`Đã giao ${order.dealName} × ${order.quantity}.`);
+            setDeliveredMessage(`Khách đã nhận ${order.dealName} × ${order.quantity}.`);
           },
           onError: () => setDeliveredMessage(null),
         }),
