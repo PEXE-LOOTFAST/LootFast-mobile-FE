@@ -66,15 +66,15 @@ export function QuantityStepper({
 const styles = StyleSheet.create({
   container: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   button: {
-    width: 40,
-    height: 40,
+    width: 34,
+    height: 34,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderRadius: 20,
+    borderRadius: 17,
   },
-  buttonText: { fontSize: 22, fontWeight: '800', lineHeight: 26 },
-  value: { minWidth: 28, fontSize: 20, fontWeight: '900', textAlign: 'center' },
+  buttonText: { fontSize: 20, fontWeight: '800', lineHeight: 24 },
+  value: { minWidth: 24, fontSize: 18, fontWeight: '900', textAlign: 'center' },
   disabled: { opacity: 0.4 },
   pressed: { opacity: 0.8 },
 });

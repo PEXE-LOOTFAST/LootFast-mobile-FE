@@ -174,8 +174,6 @@ function DealDetail({ deal }: { deal: Deal }) {
               </View>
             </Pressable>
 
-            <View style={[styles.divider, { backgroundColor: theme.border }]} />
-
             <View style={styles.priceRow}>
               <Text style={[styles.price, { color: theme.primary }]}>
                 {formatPrice(deal.price)}
@@ -221,9 +219,9 @@ function DealDetail({ deal }: { deal: Deal }) {
                 value={quantity}
               />
             </View>
-          </DetailCard>
 
-          <DetailCard>
+            <View style={[styles.divider, { backgroundColor: theme.border }]} />
+
             <PickupSlotPicker
               disabled={reservation.status !== 'idle'}
               onSelect={(slot) => setSelectedSlotKey(slot.from)}
@@ -232,10 +230,12 @@ function DealDetail({ deal }: { deal: Deal }) {
             />
           </DetailCard>
 
-          <DetailCard title="Vị trí cửa hàng">
-            <View style={[styles.location, { backgroundColor: theme.primarySoft }]}>
+          <DetailCard>
+            <View style={styles.location}>
               <Icon name={HomeIcons.location} color={theme.primary} size={18} />
-              <Text style={[styles.address, { color: theme.text }]}>{deal.store.address}</Text>
+              <Text numberOfLines={2} style={[styles.address, { color: theme.text }]}>
+                {deal.store.address}
+              </Text>
               <Pressable
                 accessibilityLabel="Xem cửa hàng trên bản đồ"
                 accessibilityRole="button"
@@ -344,30 +344,30 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   quantityCopy: { flex: 1, gap: 3 },
-  quantityTitle: { fontSize: 15, fontWeight: '800' },
-  quantityHint: { fontSize: 12, lineHeight: 17 },
+  quantityTitle: { fontSize: 14, fontWeight: '800' },
+  quantityHint: { fontSize: 12, lineHeight: 16 },
   screen: { flex: 1 },
   content: { paddingBottom: 96 },
   cards: {
     width: '100%',
     maxWidth: MaxContentWidth,
     alignSelf: 'center',
-    gap: 12,
-    marginTop: 12,
-    paddingHorizontal: 16,
+    gap: 10,
+    marginTop: 10,
+    paddingHorizontal: 12,
   },
-  name: { fontSize: 20, fontWeight: '900', letterSpacing: -0.3 },
+  name: { fontSize: 18, fontWeight: '900', letterSpacing: -0.3 },
   storeRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   storeIcon: {
-    width: 36,
-    height: 36,
+    width: 32,
+    height: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 18,
+    borderRadius: 16,
   },
   storeCopy: { flex: 1, gap: 3 },
   storeNameRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  storeName: { flexShrink: 1, fontSize: 15, fontWeight: '700' },
+  storeName: { flexShrink: 1, fontSize: 14, fontWeight: '700' },
   metaRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -376,30 +376,24 @@ const styles = StyleSheet.create({
     rowGap: 2,
   },
   rating: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  ratingText: { fontSize: 13, fontWeight: '600' },
+  ratingText: { fontSize: 12, fontWeight: '600' },
   divider: { height: StyleSheet.hairlineWidth },
-  priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 10 },
-  price: { fontSize: 28, fontWeight: '900' },
-  originalPrice: { fontSize: 15, textDecorationLine: 'line-through' },
+  priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 8 },
+  price: { fontSize: 24, fontWeight: '900' },
+  originalPrice: { fontSize: 13, textDecorationLine: 'line-through' },
   stockRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  stock: { fontSize: 13, fontWeight: '600' },
-  savings: { borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5 },
-  savingsText: { fontSize: 12, fontWeight: '800' },
-  location: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    borderRadius: 14,
-    padding: 12,
-  },
-  address: { flex: 1, fontSize: 14, fontWeight: '600' },
+  stock: { fontSize: 12, fontWeight: '600' },
+  savings: { borderRadius: 999, paddingHorizontal: 9, paddingVertical: 3 },
+  savingsText: { fontSize: 11, fontWeight: '800' },
+  location: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  address: { flex: 1, fontSize: 13, lineHeight: 18, fontWeight: '600' },
   mapButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     borderRadius: 999,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
+    paddingHorizontal: 11,
+    paddingVertical: 6,
   },
   mapButtonText: { color: '#FFFFFF', fontSize: 12, fontWeight: '800' },
   pressed: { opacity: 0.85 },

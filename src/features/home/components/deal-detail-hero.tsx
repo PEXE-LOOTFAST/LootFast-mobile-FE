@@ -8,7 +8,7 @@ import type { Deal } from '@/features/home/types';
 import { useTheme } from '@/hooks/use-theme';
 import { formatDiscount } from '@/lib/format';
 
-const HERO_HEIGHT = 230;
+const HERO_HEIGHT = 180;
 
 type DealDetailHeroProps = {
   deal: Deal;
