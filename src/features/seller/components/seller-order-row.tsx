@@ -58,7 +58,7 @@ export function SellerOrderRow({
             {order.dealName} × {order.quantity}
           </Text>
           <Text numberOfLines={1} style={[styles.meta, { color: theme.textSecondary }]}>
-            Nhận {toTime(order.pickupStart)} – {toTime(order.pickupEnd)}
+            Khách hẹn {toTime(order.pickupFrom)} – {toTime(order.pickupTo)}
           </Text>
         </View>
 

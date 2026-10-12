@@ -116,6 +116,7 @@ export function toDeal(response: DealFeedItemResponse | DealDetailResponse): Dea
       start: toTimeLabel(response.pickupStart),
       end: toTimeLabel(response.pickupEnd),
     },
+    pickupWindowIso: { start: response.pickupStart, end: response.pickupEnd },
     distanceKm: response.distanceKm,
     remaining: response.remainingQuantity,
   };

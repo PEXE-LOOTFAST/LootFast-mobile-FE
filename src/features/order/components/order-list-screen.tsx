@@ -109,7 +109,7 @@ export function OrderListScreen() {
                     Mã đơn: {order.orderId}
                   </Text>
                   <Text style={[styles.pickup, { color: theme.textSecondary }]}>
-                    Nhận món: {toTimeLabel(order.pickupStart)}–{toTimeLabel(order.pickupEnd)}
+                    Hẹn lấy: {toTimeLabel(order.pickupFrom)}–{toTimeLabel(order.pickupTo)}
                   </Text>
                   <View style={styles.totalRow}>
                     <Text style={[styles.quantity, { color: theme.textSecondary }]}>

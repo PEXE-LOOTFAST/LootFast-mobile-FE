@@ -32,17 +32,15 @@ function toTimeLabel(value: string) {
  * Backend có 5 trạng thái, màn Đơn hàng chỉ chia hai nhóm: còn bán được hay không. DRAFT cũng
  * xếp vào "đang chạy" để người bán thấy bản nháp mình vừa tạo mà bấm vào đăng tiếp.
  *
- * ACTIVE chỉ là "đang bán" khi còn trong khung bán: backend không tự đổi trạng thái khi hết giờ
- * mà chỉ ẩn deal khỏi trang người mua, nên phải tự xét giờ ở đây để màn người bán khớp với những
- * gì khách thấy.
+ * ACTIVE chỉ là "đang bán" khi chưa hết khung giờ deal: backend không tự đổi trạng thái khi hết
+ * giờ mà chỉ ẩn deal khỏi trang người mua, nên phải tự xét giờ ở đây để màn người bán khớp với
+ * những gì khách thấy.
  */
 export function toSellerDeal(deal: MerchantDealDto): SellerDeal {
-  const now = Date.now();
-  const isSaleOpen = now < new Date(deal.saleEndsAt).getTime();
-  const isPickupOver = now >= new Date(deal.pickupEndsAt).getTime();
-  const isRunning = deal.status === 'DRAFT' || (deal.status === 'ACTIVE' && isSaleOpen);
+  const isOpen = Date.now() < new Date(deal.saleEndsAt).getTime();
+  const isRunning = deal.status === 'DRAFT' || (deal.status === 'ACTIVE' && isOpen);
   const endedReason: SellerDeal['endedReason'] =
-    deal.status === 'SOLD_OUT' ? 'sold-out' : isPickupOver ? 'expired' : 'sale-closed';
+    deal.status === 'SOLD_OUT' ? 'sold-out' : 'expired';
 
   return {
     id: deal.dealId,
@@ -56,8 +54,8 @@ export function toSellerDeal(deal: MerchantDealDto): SellerDeal {
     price: deal.discountedPrice,
     originalPrice: deal.originalPrice,
     pickupWindow: {
-      start: toTimeLabel(deal.pickupStartsAt),
-      end: toTimeLabel(deal.pickupEndsAt),
+      start: toTimeLabel(deal.saleStartsAt),
+      end: toTimeLabel(deal.saleEndsAt),
     },
     saleEndsLabel: `${toTimeInput(deal.saleEndsAt)} · ${vietnamDateKey(deal.saleEndsAt)
       .slice(5)

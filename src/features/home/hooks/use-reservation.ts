@@ -1,3 +1,4 @@
+import type { PickupSlot } from '@/features/home/pickup-slots';
 import { useCreateOrder } from '@/features/order/api/use-orders';
 import { toOrderErrorMessage } from '@/features/order/api/orders';
 import { getSessionState, requireAuth } from '@/lib/auth-session';
@@ -12,8 +13,11 @@ export type ReservationStatus = 'idle' | 'reserving' | 'reserved';
  *
  * Khách chưa đăng nhập thì mở hộp đăng nhập rồi đặt tiếp ngay sau khi có phiên — không gọi API
  * để khỏi nhận 401.
+ *
+ * `pickupSlot` là khoảng giờ khách hẹn đến lấy; backend bắt buộc gửi kèm nên chưa chọn thì không
+ * đặt được.
  */
-export function useReservation(dealId: string) {
+export function useReservation(dealId: string, pickupSlot: PickupSlot | undefined) {
   const createOrder = useCreateOrder();
 
   const status: ReservationStatus = createOrder.isPending
@@ -23,9 +27,15 @@ export function useReservation(dealId: string) {
       : 'idle';
 
   const submit = () => {
-    if (createOrder.isPending || createOrder.isSuccess) return;
+    if (createOrder.isPending || createOrder.isSuccess || !pickupSlot) return;
 
-    createOrder.mutate({ dealId, quantity: 1, paymentMethod: 'CASH' });
+    createOrder.mutate({
+      dealId,
+      quantity: 1,
+      paymentMethod: 'CASH',
+      pickupFrom: pickupSlot.from,
+      pickupTo: pickupSlot.to,
+    });
   };
 
   const reserve = () => {
