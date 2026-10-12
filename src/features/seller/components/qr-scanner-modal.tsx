@@ -113,7 +113,7 @@ export function QrScannerModal({ visible, onClose, onScan }: QrScannerModalProps
         {needsPermission ? (
           <View style={styles.permissionContainer}>
             <Text style={styles.permissionText}>
-              Cho phép LootFast dùng camera để quét mã QR xác nhận giao hàng.
+              Cho phép LootFast dùng camera để quét mã QR xác nhận khách đã nhận món.
             </Text>
             <BrandButton onPress={() => void requestPermission()}>Cho phép camera</BrandButton>
           </View>

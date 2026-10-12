@@ -10,6 +10,10 @@ export type CurrentUserResponse = {
   roles: string[];
   displayName: string;
   avatarUrl: string | null;
+  /** Khu vực nhận món người dùng đã lưu; null nếu chưa đặt. */
+  pickupArea: string | null;
+  /** Mã nhóm món yêu thích (code của /categories). */
+  favoriteCategories: string[];
   createdAt: string;
 };
 

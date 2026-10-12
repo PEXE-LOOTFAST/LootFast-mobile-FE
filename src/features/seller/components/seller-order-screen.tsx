@@ -130,7 +130,7 @@ export function SellerOrderScreen() {
         onScan={(code) => {
           confirmPickup.mutate(code, {
             onSuccess: (order) => {
-              Alert.alert('Giao hàng thành công', `Đã xác nhận giao đơn "${order.dealName}".`);
+              Alert.alert('Xác nhận thành công', `Khách đã nhận món của đơn "${order.dealName}".`);
             },
             onError: (error) => {
               Alert.alert('Không xác nhận được', toMerchantOrderErrorMessage(error));

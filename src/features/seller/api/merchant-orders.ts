@@ -88,12 +88,12 @@ const MESSAGES: Record<string, string> = {
   INVALID_PICKUP_WINDOW: 'Ngày xem đơn không hợp lệ.',
   INVALID_PICKUP_CREDENTIAL: 'Mã lấy hàng không đúng định dạng. Mã gồm LF- và 6 ký tự.',
   ORDER_NOT_FOUND: 'Không tìm thấy đơn ứng với mã này ở quán của bạn.',
-  ORDER_NOT_COMPLETABLE: 'Đơn này đã được xử lý rồi, không giao thêm được.',
+  ORDER_NOT_COMPLETABLE: 'Đơn này đã được xử lý rồi, không xác nhận thêm được.',
   PAYMENT_STATE_CONFLICT:
-    'Đơn chuyển khoản cần xác nhận đã nhận tiền trước khi giao. Kiểm tra trạng thái thanh toán của đơn.',
+    'Đơn chuyển khoản cần xác nhận đã nhận tiền trước khi khách nhận món. Kiểm tra trạng thái thanh toán của đơn.',
   VALIDATION_FAILED: 'Thông tin gửi lên chưa hợp lệ. Kiểm tra lại rồi thử lại.',
   PICKUP_CONFIRMATION_RATE_LIMITED: 'Bạn nhập mã quá nhiều lần. Đợi một lát rồi thử lại.',
-  PICKUP_CONFIRMATION_UNAVAILABLE: 'Chưa xác nhận giao được lúc này. Thử lại sau giây lát.',
+  PICKUP_CONFIRMATION_UNAVAILABLE: 'Chưa xác nhận được lúc này. Thử lại sau giây lát.',
   PAYMENT_RETRY_LATER: 'Hệ thống thanh toán đang bận. Thử lại sau giây lát.',
 };
 

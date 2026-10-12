@@ -10,7 +10,7 @@ const PROFILE_ROUTE = '/profile';
  * Chụp ảnh hoặc chọn từ thư viện rồi đổi ảnh đại diện. Cắt vuông sẵn vì mọi chỗ hiển thị avatar đều
  * bo tròn, để người dùng thấy đúng phần ảnh sẽ được dùng.
  */
-export function useAvatarUpload() {
+export function useAvatarUpload(resumeRoute: string = PROFILE_ROUTE) {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
@@ -23,7 +23,7 @@ export function useAvatarUpload() {
     const [asset] = await pickImages({
       allowsEditing: true,
       aspect: [1, 1],
-      resume: { route: PROFILE_ROUTE },
+      resume: { route: resumeRoute },
     });
     if (!asset) return;
 
@@ -31,7 +31,7 @@ export function useAvatarUpload() {
   };
 
   // Android có thể tắt app khi camera đang mở: đổi tiếp ảnh đại diện bằng ảnh vừa chụp.
-  useRecoveredPick(PROFILE_ROUTE, ({ assets }) => {
+  useRecoveredPick(resumeRoute, ({ assets }) => {
     const [asset] = assets;
     if (asset) mutation.mutate(asset.uri);
   });
