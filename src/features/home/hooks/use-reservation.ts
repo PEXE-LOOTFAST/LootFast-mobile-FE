@@ -1,5 +1,5 @@
 import type { PickupSlot } from '@/features/home/pickup-slots';
-import { useCreateOrder } from '@/features/order/api/use-orders';
+import { useCreateOrder, useOrder } from '@/features/order/api/use-orders';
 import { toOrderErrorMessage } from '@/features/order/api/orders';
 import { getSessionState, requireAuth } from '@/lib/auth-session';
 
@@ -23,15 +23,24 @@ export function useReservation(
   quantity: number,
 ) {
   const createOrder = useCreateOrder();
+  const createdOrder = createOrder.data;
+
+  // Màn deal nằm trong tab nên vẫn sống khi khách sang màn đơn hàng để huỷ. Theo dõi trạng thái thật
+  // của đơn vừa tạo: huỷ (hoặc hoàn tất, quá hạn) ở nơi khác thì đơn không còn "đang giữ" và khách
+  // phải đặt lại được. Huỷ đơn đã làm mới ['orders'] nên truy vấn này tự cập nhật.
+  const trackedOrder = useOrder(createdOrder?.orderId);
+  const isStillReserved =
+    createOrder.isSuccess &&
+    (trackedOrder.data?.orderStatus ?? createdOrder?.orderStatus) === 'RESERVED';
 
   const status: ReservationStatus = createOrder.isPending
     ? 'reserving'
-    : createOrder.isSuccess
+    : isStillReserved
       ? 'reserved'
       : 'idle';
 
   const submit = () => {
-    if (createOrder.isPending || createOrder.isSuccess || !pickupSlot) return;
+    if (createOrder.isPending || isStillReserved || !pickupSlot) return;
 
     createOrder.mutate({
       dealId,
@@ -53,7 +62,7 @@ export function useReservation(
 
   return {
     status,
-    order: createOrder.data,
+    order: isStillReserved ? createdOrder : undefined,
     error: createOrder.error ? toOrderErrorMessage(createOrder.error) : null,
     reserve,
   };
