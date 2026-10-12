@@ -9,12 +9,28 @@ import { getProfileErrorMessage } from '@/features/profile/api/profile';
 import { useAvatarUpload } from '@/features/profile/api/use-avatar';
 import { useProfile } from '@/features/profile/api/use-profile';
 import { ProfileIcons } from '@/features/profile/constants/icons';
+import { getInitials } from '@/features/profile/get-initials';
 import { useAuthSession } from '@/hooks/use-auth-session';
 import { useTheme } from '@/hooks/use-theme';
 import { confirmSignOut } from '@/lib/confirm-sign-out';
 
 // href: mục mở sang route/tab khác khi bấm (vd. Đơn hàng của tôi → tab Đơn hàng).
 type ProfileItem = { icon: IconName; title: string; subtitle: string; href?: Href };
+
+// Thứ tự các nhóm trên màn: thông tin cá nhân → hoạt động mua sắm → quyền lợi → hỗ trợ.
+const ACCOUNT_ITEMS: ProfileItem[] = [
+  {
+    icon: ProfileIcons.profile,
+    title: 'Hồ sơ',
+    subtitle: 'Thông tin tài khoản và gợi ý cho bạn',
+    href: '/profile-info',
+  },
+];
+
+const ACTIVITY_ITEMS: ProfileItem[] = [
+  { icon: ProfileIcons.orders, title: 'Đơn hàng của tôi', subtitle: '', href: '/orders' },
+  { icon: ProfileIcons.favorites, title: 'Món yêu thích', subtitle: '', href: '/favorites' },
+];
 
 const BENEFITS: ProfileItem[] = [
   {
@@ -30,12 +46,7 @@ const BENEFITS: ProfileItem[] = [
   },
 ];
 
-const ACCOUNT_ITEMS: ProfileItem[] = [
-  { icon: ProfileIcons.orders, title: 'Đơn hàng của tôi', subtitle: '', href: '/orders' },
-  { icon: ProfileIcons.location, title: 'Bản đồ và địa chỉ', subtitle: '' },
-  { icon: ProfileIcons.favorites, title: 'Món yêu thích', subtitle: '', href: '/favorites' },
-  { icon: ProfileIcons.payment, title: 'Phương thức thanh toán', subtitle: '' },
-  { icon: ProfileIcons.settings, title: 'Cài đặt', subtitle: '' },
+const SUPPORT_ITEMS: ProfileItem[] = [
   { icon: ProfileIcons.support, title: 'Hỗ trợ', subtitle: '' },
 ];
 
@@ -109,7 +120,7 @@ export function ProfileScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
-      <BuyerHeader subtitle="Quản lý tài khoản, ưu đãi và quyền lợi" title="Hồ sơ" />
+      <BuyerHeader subtitle="Quản lý tài khoản, ưu đãi và quyền lợi" title="Cài đặt" />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View
@@ -176,8 +187,10 @@ export function ProfileScreen() {
             </Pressable>
           </View>
         ) : null}
+        <ProfileSection items={ACCOUNT_ITEMS} title="TÀI KHOẢN" />
+        <ProfileSection items={ACTIVITY_ITEMS} title="HOẠT ĐỘNG CỦA BẠN" />
         <ProfileSection items={BENEFITS} title="QUYỀN LỢI CỦA BẠN" />
-        <ProfileSection items={ACCOUNT_ITEMS} title="TÀI KHOẢN NGƯỜI MUA" />
+        <ProfileSection items={SUPPORT_ITEMS} title="HỖ TRỢ" />
         <Pressable
           accessibilityLabel={isMerchant ? 'Chuyển sang người bán' : 'Đăng ký bán hàng'}
           accessibilityRole="button"
@@ -206,16 +219,6 @@ export function ProfileScreen() {
       </ScrollView>
     </View>
   );
-}
-
-function getInitials(name: string) {
-  return name
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(-2)
-    .map((part) => part[0]?.toUpperCase() ?? '')
-    .join('');
 }
 
 const styles = StyleSheet.create({

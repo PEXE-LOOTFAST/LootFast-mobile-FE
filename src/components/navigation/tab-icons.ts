@@ -6,5 +6,5 @@ export const TabIcons = {
   index: { ios: 'house', android: 'home', web: 'home' },
   orders: { ios: 'dollarsign.square', android: 'request_quote', web: 'request_quote' },
   map: { ios: 'map', android: 'map', web: 'map' },
-  profile: { ios: 'person', android: 'person', web: 'person' },
+  profile: { ios: 'gearshape', android: 'settings', web: 'settings' },
 } satisfies IconMap;
