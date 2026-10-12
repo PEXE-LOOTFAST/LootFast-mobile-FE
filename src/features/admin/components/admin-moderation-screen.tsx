@@ -1,7 +1,8 @@
 import { Image } from 'expo-image';
 import { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 
+import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
 import { BrandButton } from '@/components/ui/brand-button';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { TextField } from '@/components/ui/text-field';
@@ -67,7 +68,7 @@ export function AdminModerationScreen() {
         onPressNotifications={() => Alert.alert('Thông báo', 'Trung tâm thông báo sẽ sớm có.')}
       />
 
-      <ScrollView
+      <KeyboardAwareScrollView
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -149,7 +150,7 @@ export function AdminModerationScreen() {
             </View>
           ) : null}
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </View>
   );
 }

@@ -85,12 +85,12 @@ export function PickupSlotPicker({
 }
 
 const styles = StyleSheet.create({
-  container: { gap: 10 },
+  container: { gap: 8 },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  title: { fontSize: 15, fontWeight: '800' },
+  title: { fontSize: 14, fontWeight: '800' },
   chips: { gap: 8 },
-  chip: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 9 },
-  chipLabel: { fontSize: 13, fontWeight: '600' },
+  chip: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7 },
+  chipLabel: { fontSize: 12, fontWeight: '600' },
   chipLabelSelected: { fontWeight: '800' },
   hint: { fontSize: 12, lineHeight: 17 },
   empty: { fontSize: 13, lineHeight: 19, fontWeight: '600' },

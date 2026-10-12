@@ -18,10 +18,12 @@ import { requireAuth } from '@/lib/auth-session';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { DealDetailHero } from '@/features/home/components/deal-detail-hero';
 import { DealMeta } from '@/features/home/components/deal-meta';
-import { DealReviews } from '@/features/home/components/deal-reviews';
+import { StoreReviewsCard } from '@/features/review/components/store-reviews-card';
 import { DetailCard } from '@/features/home/components/detail-card';
 import { PickupSlotPicker } from '@/features/home/components/pickup-slot-picker';
+import { QuantityStepper } from '@/features/home/components/quantity-stepper';
 import { ReserveBar } from '@/features/home/components/reserve-bar';
+import { ORDER_MAX_QUANTITY } from '@/features/order/api/orders';
 import { RatingColor } from '@/features/home/constants/colors';
 import { HomeIcons } from '@/features/home/constants/icons';
 import { useReservation } from '@/features/home/hooks/use-reservation';
@@ -86,7 +88,13 @@ function DealDetail({ deal }: { deal: Deal }) {
   const [selectedSlotKey, setSelectedSlotKey] = useState<string | null>(null);
   // Lát đang chọn có thể trôi mất khi tới giờ: tự lùi về lát sớm nhất còn đặt được.
   const selectedSlot = slots.find((slot) => slot.from === selectedSlotKey) ?? slots[0];
-  const reservation = useReservation(deal.id, selectedSlot);
+
+  // Số phần tối đa: theo giới hạn của backend và theo số phần deal còn lại.
+  const maxQuantity = Math.max(1, Math.min(ORDER_MAX_QUANTITY, deal.remaining));
+  const [requestedQuantity, setRequestedQuantity] = useState(1);
+  // Số phần còn lại có thể giảm khi người khác đặt: tự kéo số đang chọn về mức còn đặt được.
+  const quantity = Math.min(requestedQuantity, maxQuantity);
+  const reservation = useReservation(deal.id, selectedSlot, quantity);
 
   // Danh sách yêu thích là nguồn sự thật cho nút trái tim: lưu ở màn khác thì vào đây vẫn đúng.
   const favoritesQuery = useFavorites(Boolean(user));
@@ -166,8 +174,6 @@ function DealDetail({ deal }: { deal: Deal }) {
               </View>
             </Pressable>
 
-            <View style={[styles.divider, { backgroundColor: theme.border }]} />
-
             <View style={styles.priceRow}>
               <Text style={[styles.price, { color: theme.primary }]}>
                 {formatPrice(deal.price)}
@@ -192,6 +198,30 @@ function DealDetail({ deal }: { deal: Deal }) {
           </DetailCard>
 
           <DetailCard>
+            <View style={styles.quantityRow}>
+              <View style={styles.quantityCopy}>
+                <Text
+                  accessibilityRole="header"
+                  style={[styles.quantityTitle, { color: theme.text }]}
+                >
+                  Bạn muốn đặt mấy phần?
+                </Text>
+                <Text style={[styles.quantityHint, { color: theme.textSecondary }]}>
+                  {deal.remaining < ORDER_MAX_QUANTITY
+                    ? `Tối đa ${maxQuantity} phần (deal còn ${deal.remaining} phần)`
+                    : `Tối đa ${ORDER_MAX_QUANTITY} phần mỗi lần đặt`}
+                </Text>
+              </View>
+              <QuantityStepper
+                disabled={reservation.status !== 'idle'}
+                max={maxQuantity}
+                onChange={setRequestedQuantity}
+                value={quantity}
+              />
+            </View>
+
+            <View style={[styles.divider, { backgroundColor: theme.border }]} />
+
             <PickupSlotPicker
               disabled={reservation.status !== 'idle'}
               onSelect={(slot) => setSelectedSlotKey(slot.from)}
@@ -200,10 +230,12 @@ function DealDetail({ deal }: { deal: Deal }) {
             />
           </DetailCard>
 
-          <DetailCard title="Vị trí cửa hàng">
-            <View style={[styles.location, { backgroundColor: theme.primarySoft }]}>
+          <DetailCard>
+            <View style={styles.location}>
               <Icon name={HomeIcons.location} color={theme.primary} size={18} />
-              <Text style={[styles.address, { color: theme.text }]}>{deal.store.address}</Text>
+              <Text numberOfLines={2} style={[styles.address, { color: theme.text }]}>
+                {deal.store.address}
+              </Text>
               <Pressable
                 accessibilityLabel="Xem cửa hàng trên bản đồ"
                 accessibilityRole="button"
@@ -220,7 +252,11 @@ function DealDetail({ deal }: { deal: Deal }) {
             </View>
           </DetailCard>
 
-          <DealReviews />
+          <StoreReviewsCard
+            merchantId={deal.store.merchantId}
+            reviewCount={deal.store.reviewCount}
+            storeName={deal.store.name}
+          />
         </View>
       </ScrollView>
 
@@ -243,7 +279,7 @@ function DealDetail({ deal }: { deal: Deal }) {
             : router.navigate('/orders')
         }
         status={reservation.status}
-        total={deal.price}
+        total={deal.price * quantity}
       />
 
       {/* Đặt nút trợ lý phía trên thanh đặt giữ để không che nút "Đặt giữ ngay". */}
@@ -301,28 +337,37 @@ function DealDetailError({
 
 const styles = StyleSheet.create({
   reserveError: { paddingHorizontal: 16, paddingBottom: 8 },
+  quantityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  quantityCopy: { flex: 1, gap: 3 },
+  quantityTitle: { fontSize: 14, fontWeight: '800' },
+  quantityHint: { fontSize: 12, lineHeight: 16 },
   screen: { flex: 1 },
   content: { paddingBottom: 96 },
   cards: {
     width: '100%',
     maxWidth: MaxContentWidth,
     alignSelf: 'center',
-    gap: 12,
-    marginTop: 12,
-    paddingHorizontal: 16,
+    gap: 10,
+    marginTop: 10,
+    paddingHorizontal: 12,
   },
-  name: { fontSize: 20, fontWeight: '900', letterSpacing: -0.3 },
+  name: { fontSize: 18, fontWeight: '900', letterSpacing: -0.3 },
   storeRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   storeIcon: {
-    width: 36,
-    height: 36,
+    width: 32,
+    height: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 18,
+    borderRadius: 16,
   },
   storeCopy: { flex: 1, gap: 3 },
   storeNameRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  storeName: { flexShrink: 1, fontSize: 15, fontWeight: '700' },
+  storeName: { flexShrink: 1, fontSize: 14, fontWeight: '700' },
   metaRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -331,30 +376,24 @@ const styles = StyleSheet.create({
     rowGap: 2,
   },
   rating: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  ratingText: { fontSize: 13, fontWeight: '600' },
+  ratingText: { fontSize: 12, fontWeight: '600' },
   divider: { height: StyleSheet.hairlineWidth },
-  priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 10 },
-  price: { fontSize: 28, fontWeight: '900' },
-  originalPrice: { fontSize: 15, textDecorationLine: 'line-through' },
+  priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 8 },
+  price: { fontSize: 24, fontWeight: '900' },
+  originalPrice: { fontSize: 13, textDecorationLine: 'line-through' },
   stockRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  stock: { fontSize: 13, fontWeight: '600' },
-  savings: { borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5 },
-  savingsText: { fontSize: 12, fontWeight: '800' },
-  location: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    borderRadius: 14,
-    padding: 12,
-  },
-  address: { flex: 1, fontSize: 14, fontWeight: '600' },
+  stock: { fontSize: 12, fontWeight: '600' },
+  savings: { borderRadius: 999, paddingHorizontal: 9, paddingVertical: 3 },
+  savingsText: { fontSize: 11, fontWeight: '800' },
+  location: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  address: { flex: 1, fontSize: 13, lineHeight: 18, fontWeight: '600' },
   mapButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     borderRadius: 999,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
+    paddingHorizontal: 11,
+    paddingVertical: 6,
   },
   mapButtonText: { color: '#FFFFFF', fontSize: 12, fontWeight: '800' },
   pressed: { opacity: 0.85 },

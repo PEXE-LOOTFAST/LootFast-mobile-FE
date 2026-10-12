@@ -75,8 +75,10 @@ type AreaSelectFieldProps = {
   /** Khu vực đang lưu; rỗng là chưa chọn. */
   value: string;
   onChange: (value: string) => void;
-  /** Chú thích hiện dưới ô và trong cửa sổ chọn. */
+  /** Chú thích ngắn hiện dưới ô. */
   description: string;
+  /** Giải thích đầy đủ hiện trong cửa sổ chọn; bỏ trống thì dùng `description`. */
+  detail?: string;
 };
 
 /**
@@ -84,7 +86,13 @@ type AreaSelectFieldProps = {
  * tìm kiếm. Chỉ chọn được từ danh sách chuẩn để không gõ bừa (backend so khớp khu vực theo chữ nên
  * sai chính tả là không khớp).
  */
-export function AreaSelectField({ label, value, onChange, description }: AreaSelectFieldProps) {
+export function AreaSelectField({
+  label,
+  value,
+  onChange,
+  description,
+  detail,
+}: AreaSelectFieldProps) {
   const theme = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   // Tỉnh đang xem ở bước 2; null là đang ở bước 1. Đặt ở đây để nút Back của Android lùi một bước.
@@ -158,7 +166,7 @@ export function AreaSelectField({ label, value, onChange, description }: AreaSel
         {isOpen ? (
           <AreaPickerBody
             key={province?.name ?? 'provinces'}
-            description={description}
+            description={detail ?? description}
             onBack={() => setProvince(null)}
             onClose={close}
             onPickProvince={setProvince}

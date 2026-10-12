@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
+import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
 import { TabHeader } from '@/components/ui/tab-header';
 import { MaxContentWidth } from '@/constants/theme';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
@@ -25,13 +26,13 @@ export function SellerPageScaffold({
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
       <TabHeader onBack={onPressBack} subtitle={subtitle} title={title} variant="seller" />
 
-      <ScrollView
+      <KeyboardAwareScrollView
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.body}>{children}</View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       <AssistantFab bottomOffset={96} />
     </View>

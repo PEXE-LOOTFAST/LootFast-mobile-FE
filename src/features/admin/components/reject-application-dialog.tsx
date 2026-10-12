@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BrandButton } from '@/components/ui/brand-button';
 import { TextField } from '@/components/ui/text-field';
+import { useKeyboardHeight } from '@/hooks/use-keyboard-height';
 import { useTheme } from '@/hooks/use-theme';
 
 /** Backend giới hạn lý do từ chối 500 ký tự (RejectMerchantApplicationRequest). */
@@ -41,6 +42,7 @@ export function RejectApplicationDialog({
 }: RejectApplicationDialogProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const keyboardHeight = useKeyboardHeight();
   const [reason, setReason] = useState('');
   const isOpen = applicationTitle !== null;
   const trimmed = reason.trim();
@@ -55,7 +57,14 @@ export function RejectApplicationDialog({
       visible={isOpen}
     >
       <View
-        style={[styles.overlay, { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 16 }]}
+        // Chừa chỗ cho bàn phím để ô nhập lý do và các nút không bị che.
+        style={[
+          styles.overlay,
+          {
+            paddingTop: insets.top + 16,
+            paddingBottom: Math.max(insets.bottom, keyboardHeight) + 16,
+          },
+        ]}
       >
         <Pressable
           accessibilityLabel="Đóng"

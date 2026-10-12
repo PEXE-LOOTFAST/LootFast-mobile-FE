@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
+import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
 import { BrandButton } from '@/components/ui/brand-button';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { MaxContentWidth } from '@/constants/theme';
@@ -30,7 +31,7 @@ export function SellerShopInfoScreen() {
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
       <SellerHeader subtitle="Hồ sơ, địa chỉ và giờ mở cửa" title="Thông tin quán" />
 
-      <ScrollView
+      <KeyboardAwareScrollView
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -53,7 +54,7 @@ export function SellerShopInfoScreen() {
             <ShopInfoGate shop={shop} />
           )}
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       <AssistantFab bottomOffset={96} />
     </View>

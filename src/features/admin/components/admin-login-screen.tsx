@@ -1,15 +1,8 @@
 import { Redirect, router } from 'expo-router';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
 import { Icon } from '@/components/ui/icon';
 import { AdminLoginForm } from '@/features/admin/components/admin-login-form';
 import { AdminIcons } from '@/features/admin/constants/icons';
@@ -32,49 +25,44 @@ export function AdminLoginScreen() {
     <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]}>
       <AuthBackdrop />
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.safeArea}
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
-        <ScrollView
-          contentContainerStyle={styles.content}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.header}>
-            <View style={[styles.logo, { backgroundColor: theme.primary }]}>
-              <Icon name={AdminIcons.shield} color="#FFFFFF" size={34} />
-            </View>
+        <View style={styles.header}>
+          <View style={[styles.logo, { backgroundColor: theme.primary }]}>
+            <Icon name={AdminIcons.shield} color="#FFFFFF" size={34} />
+          </View>
 
-            <View style={styles.brandRow}>
-              <Text accessibilityRole="header" style={[styles.brand, { color: theme.text }]}>
-                Loot<Text style={{ color: theme.primary }}>Fast</Text> Admin
-              </Text>
-            </View>
-            <Text style={[styles.tagline, { color: theme.textSecondary }]}>
-              Khu vực dành riêng cho quản trị viên
+          <View style={styles.brandRow}>
+            <Text accessibilityRole="header" style={[styles.brand, { color: theme.text }]}>
+              Loot<Text style={{ color: theme.primary }}>Fast</Text> Admin
             </Text>
           </View>
+          <Text style={[styles.tagline, { color: theme.textSecondary }]}>
+            Khu vực dành riêng cho quản trị viên
+          </Text>
+        </View>
 
-          <View
-            style={[
-              styles.card,
-              { backgroundColor: theme.backgroundElement, borderColor: theme.border },
-            ]}
-          >
-            <AdminLoginForm onAuthenticated={enterAdmin} />
-          </View>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: theme.backgroundElement, borderColor: theme.border },
+          ]}
+        >
+          <AdminLoginForm onAuthenticated={enterAdmin} />
+        </View>
 
-          <Pressable
-            accessibilityRole="link"
-            hitSlop={8}
-            onPress={() => router.replace('/')}
-            style={({ pressed }) => [styles.back, pressed && styles.pressed]}
-          >
-            <Text style={[styles.backText, { color: theme.primary }]}>Về trang người mua</Text>
-          </Pressable>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        <Pressable
+          accessibilityRole="link"
+          hitSlop={8}
+          onPress={() => router.replace('/')}
+          style={({ pressed }) => [styles.back, pressed && styles.pressed]}
+        >
+          <Text style={[styles.backText, { color: theme.primary }]}>Về trang người mua</Text>
+        </Pressable>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }

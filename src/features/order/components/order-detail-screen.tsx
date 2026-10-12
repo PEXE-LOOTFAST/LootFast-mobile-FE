@@ -1,15 +1,17 @@
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import QRCode from 'react-native-qrcode-svg';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
 import { BrandButton } from '@/components/ui/brand-button';
 import { EmptyCard } from '@/components/ui/empty-card';
 import { ErrorState } from '@/components/ui/error-state';
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { LoadingState } from '@/components/ui/loading-state';
+import { OrderReviewCard } from '@/features/review/components/order-review-card';
 import { MaxContentWidth } from '@/constants/theme';
 import { HomeIcons } from '@/features/home/constants/icons';
 import {
@@ -89,7 +91,10 @@ export function OrderDetailScreen() {
         </Text>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         {orderQuery.isLoading ? <LoadingState /> : null}
 
         {orderQuery.error ? (
@@ -160,6 +165,13 @@ export function OrderDetailScreen() {
                 <Row label="Mã tham chiếu" value={order.paymentReference} />
               ) : null}
             </View>
+
+            <OrderReviewCard
+              isCompleted={order.orderStatus === 'COMPLETED'}
+              orderId={order.orderId}
+              dealName={order.dealName}
+              storeId={order.storeId}
+            />
 
             <View
               style={[
@@ -243,7 +255,7 @@ export function OrderDetailScreen() {
             ) : null}
           </>
         ) : null}
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }

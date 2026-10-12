@@ -8,26 +8,18 @@ import { ErrorState } from '@/components/ui/error-state';
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { LoadingState } from '@/components/ui/loading-state';
+import { StoreReviewsCard } from '@/features/review/components/store-reviews-card';
 import { MaxContentWidth } from '@/constants/theme';
 import { toDeal } from '@/features/home/api/deals';
-import { toStoreErrorMessage, type OpeningHourSlot } from '@/features/home/api/stores';
+import { toStoreErrorMessage } from '@/features/home/api/stores';
 import { useStore } from '@/features/home/api/use-store';
 import { DealCard } from '@/features/home/components/deal-card';
 import { RatingColor } from '@/features/home/constants/colors';
 import { HomeIcons } from '@/features/home/constants/icons';
+import { groupOpeningHours } from '@/features/home/opening-hours';
 import { useFavorites, useToggleFavoriteStore } from '@/features/profile/api/use-favorites';
 import { useAuthSession } from '@/hooks/use-auth-session';
 import { useTheme } from '@/hooks/use-theme';
-
-const WEEKDAY_LABELS: Record<OpeningHourSlot['dayOfWeek'], string> = {
-  MONDAY: 'Thứ Hai',
-  TUESDAY: 'Thứ Ba',
-  WEDNESDAY: 'Thứ Tư',
-  THURSDAY: 'Thứ Năm',
-  FRIDAY: 'Thứ Sáu',
-  SATURDAY: 'Thứ Bảy',
-  SUNDAY: 'Chủ Nhật',
-};
 
 /** Hồ sơ cửa hàng công khai: thông tin quán, giờ mở cửa và các deal đang bán. */
 export function StoreScreen() {
@@ -44,6 +36,7 @@ export function StoreScreen() {
     (item) => item.type === 'STORE' && item.store?.merchantId === id,
   );
 
+  const hourGroups = store ? groupOpeningHours(store.openingHours) : [];
   const address = store
     ? [store.address.addressLine, store.address.ward, store.address.district, store.address.city]
         .filter(Boolean)
@@ -140,6 +133,32 @@ export function StoreScreen() {
                 </View>
               ) : null}
 
+              {hourGroups.length > 0 ? (
+                <View style={styles.hoursBlock}>
+                  <View style={styles.infoRow}>
+                    <Icon name={HomeIcons.clock} color={theme.textSecondary} size={15} />
+                    <Text style={[styles.meta, { color: theme.textSecondary }]}>
+                      {hourGroups.length === 1 ? 'Mở cửa' : 'Giờ mở cửa'}
+                    </Text>
+                    {hourGroups.length === 1 ? (
+                      <Text style={[styles.meta, styles.hoursValue, { color: theme.text }]}>
+                        {hourGroups[0]?.label} · {hourGroups[0]?.hours}
+                      </Text>
+                    ) : null}
+                  </View>
+                  {hourGroups.length > 1
+                    ? hourGroups.map((group) => (
+                        <View key={group.label} style={styles.hourRow}>
+                          <Text style={[styles.meta, { color: theme.textSecondary }]}>
+                            {group.label}
+                          </Text>
+                          <Text style={[styles.meta, { color: theme.text }]}>{group.hours}</Text>
+                        </View>
+                      ))
+                    : null}
+                </View>
+              ) : null}
+
               {store.contactPhone ? (
                 <Pressable
                   accessibilityHint="Gọi cho cửa hàng"
@@ -154,29 +173,6 @@ export function StoreScreen() {
                 </Pressable>
               ) : null}
             </View>
-
-            {store.openingHours.length > 0 ? (
-              <View
-                style={[
-                  styles.card,
-                  { backgroundColor: theme.backgroundElement, borderColor: theme.border },
-                ]}
-              >
-                <Text accessibilityRole="header" style={[styles.section, { color: theme.text }]}>
-                  Giờ mở cửa
-                </Text>
-                {store.openingHours.map((slot) => (
-                  <View key={`${slot.dayOfWeek}-${slot.opensAt}`} style={styles.hourRow}>
-                    <Text style={[styles.meta, { color: theme.textSecondary }]}>
-                      {WEEKDAY_LABELS[slot.dayOfWeek]}
-                    </Text>
-                    <Text style={[styles.meta, { color: theme.text }]}>
-                      {slot.opensAt}–{slot.closesAt}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            ) : null}
 
             <Text style={[styles.section, { color: theme.text }]}>Deal đang bán</Text>
 
@@ -202,6 +198,12 @@ export function StoreScreen() {
                 title="Chưa có deal"
               />
             )}
+
+            <StoreReviewsCard
+              merchantId={store.merchantId}
+              reviewCount={store.rating?.reviewCount}
+              storeName={store.storeName}
+            />
           </>
         ) : null}
       </ScrollView>
@@ -224,19 +226,26 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: MaxContentWidth,
     alignSelf: 'center',
-    gap: 14,
-    padding: 16,
-    paddingBottom: 48,
+    gap: 10,
+    padding: 12,
+    paddingBottom: 32,
   },
-  cover: { width: '100%', height: 160, borderRadius: 18 },
-  card: { gap: 10, borderWidth: 1, borderRadius: 18, padding: 16 },
+  cover: { width: '100%', height: 120, borderRadius: 14 },
+  card: { gap: 8, borderWidth: 1, borderRadius: 16, padding: 14 },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  name: { flexShrink: 1, fontSize: 18, fontWeight: '900', letterSpacing: -0.3 },
+  name: { flexShrink: 1, fontSize: 17, fontWeight: '900', letterSpacing: -0.3 },
   ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   infoRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   description: { fontSize: 13, lineHeight: 19 },
   meta: { flexShrink: 1, fontSize: 13 },
-  section: { fontSize: 15, fontWeight: '900', letterSpacing: -0.2 },
-  hourRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  deals: { gap: 14 },
+  section: { fontSize: 14, fontWeight: '900', letterSpacing: -0.2 },
+  hoursBlock: { gap: 4 },
+  hoursValue: { marginLeft: 'auto', fontWeight: '700' },
+  hourRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingLeft: 23,
+  },
+  deals: { gap: 10 },
 });

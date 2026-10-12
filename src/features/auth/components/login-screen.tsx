@@ -1,7 +1,8 @@
 import { router } from 'expo-router';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
 import { AuthBackdrop } from '@/features/auth/components/auth-backdrop';
 import { AuthHeader } from '@/features/auth/components/auth-header';
 import { AuthPanel } from '@/features/auth/components/auth-panel';
@@ -14,27 +15,22 @@ export function LoginScreen() {
     <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]}>
       <AuthBackdrop />
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.safeArea}
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
-        <ScrollView
-          contentContainerStyle={styles.content}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          <AuthHeader onBack={router.canGoBack() ? () => router.back() : undefined} />
+        <AuthHeader onBack={router.canGoBack() ? () => router.back() : undefined} />
 
-          <View
-            style={[
-              styles.card,
-              { backgroundColor: theme.backgroundElement, borderColor: theme.border },
-            ]}
-          >
-            <AuthPanel onAuthenticated={() => router.replace('/')} />
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: theme.backgroundElement, borderColor: theme.border },
+          ]}
+        >
+          <AuthPanel onAuthenticated={() => router.replace('/')} />
+        </View>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }

@@ -1,8 +1,6 @@
 import { useRef, useState } from 'react';
 import {
-  KeyboardAvoidingView,
   Modal,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -17,6 +15,7 @@ import { Icon } from '@/components/ui/icon';
 import type { PopoverAnchor } from '@/components/ui/popover';
 import { HomeIcons } from '@/features/home/constants/icons';
 import type { ChatMessage } from '@/features/home/types';
+import { useKeyboardHeight } from '@/hooks/use-keyboard-height';
 import { useTheme } from '@/hooks/use-theme';
 
 const PANEL_MAX_WIDTH = 320;
@@ -50,7 +49,13 @@ export function AssistantPanel({
   const scrollRef = useRef<ScrollView>(null);
   const [draft, setDraft] = useState('');
 
+  const keyboardHeight = useKeyboardHeight();
+
   const canSend = isAvailable && draft.trim().length > 0 && !isReplying;
+  // Khung mở ngay trên nút trợ lý; khi bàn phím hiện thì đẩy lên trên bàn phím để ô chat không bị che.
+  const panelBottom = anchor
+    ? Math.max(dimensions.height - anchor.y + PANEL_GAP, keyboardHeight + PANEL_GAP)
+    : 0;
 
   const handleSend = () => {
     if (!canSend) return;
@@ -67,10 +72,7 @@ export function AssistantPanel({
       transparent
       visible={anchor !== null}
     >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.fill}
-      >
+      <View style={styles.fill}>
         <Pressable
           accessibilityLabel="Đóng trợ lý"
           accessibilityRole="button"
@@ -85,9 +87,12 @@ export function AssistantPanel({
                 styles.panel,
                 {
                   right: dimensions.width - anchor.x - anchor.width,
-                  bottom: dimensions.height - anchor.y + PANEL_GAP,
+                  bottom: panelBottom,
                   width: Math.min(PANEL_MAX_WIDTH, dimensions.width - 32),
-                  height: Math.min(PANEL_MAX_HEIGHT, anchor.y - insets.top - PANEL_GAP * 2),
+                  height: Math.min(
+                    PANEL_MAX_HEIGHT,
+                    dimensions.height - panelBottom - insets.top - PANEL_GAP,
+                  ),
                   backgroundColor: theme.backgroundElement,
                   borderColor: theme.border,
                 },
@@ -215,7 +220,7 @@ export function AssistantPanel({
             </Pressable>
           </>
         ) : null}
-      </KeyboardAvoidingView>
+      </View>
     </Modal>
   );
 }

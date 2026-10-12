@@ -31,12 +31,12 @@ export function DetailCard({ title, action, children }: DetailCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    gap: 12,
+    gap: 10,
     borderWidth: 1,
-    borderRadius: 20,
-    padding: 16,
-    boxShadow: '0px 6px 18px rgba(23, 33, 27, 0.05)',
+    borderRadius: 16,
+    padding: 14,
+    boxShadow: '0px 4px 12px rgba(23, 33, 27, 0.05)',
   },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  title: { fontSize: 16, fontWeight: '800' },
+  title: { fontSize: 15, fontWeight: '800' },
 });
