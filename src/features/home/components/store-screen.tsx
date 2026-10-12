@@ -8,6 +8,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { LoadingState } from '@/components/ui/loading-state';
+import { StoreReviewsCard } from '@/features/review/components/store-reviews-card';
 import { MaxContentWidth } from '@/constants/theme';
 import { toDeal } from '@/features/home/api/deals';
 import { toStoreErrorMessage, type OpeningHourSlot } from '@/features/home/api/stores';
@@ -202,6 +203,12 @@ export function StoreScreen() {
                 title="Chưa có deal"
               />
             )}
+
+            <StoreReviewsCard
+              merchantId={store.merchantId}
+              reviewCount={store.rating?.reviewCount}
+              storeName={store.storeName}
+            />
           </>
         ) : null}
       </ScrollView>

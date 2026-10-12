@@ -10,6 +10,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { LoadingState } from '@/components/ui/loading-state';
+import { OrderReviewCard } from '@/features/review/components/order-review-card';
 import { MaxContentWidth } from '@/constants/theme';
 import { HomeIcons } from '@/features/home/constants/icons';
 import {
@@ -160,6 +161,13 @@ export function OrderDetailScreen() {
                 <Row label="Mã tham chiếu" value={order.paymentReference} />
               ) : null}
             </View>
+
+            <OrderReviewCard
+              isCompleted={order.orderStatus === 'COMPLETED'}
+              orderId={order.orderId}
+              dealName={order.dealName}
+              storeId={order.storeId}
+            />
 
             <View
               style={[

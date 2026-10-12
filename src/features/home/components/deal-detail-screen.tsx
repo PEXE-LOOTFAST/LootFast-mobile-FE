@@ -18,7 +18,7 @@ import { requireAuth } from '@/lib/auth-session';
 import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { DealDetailHero } from '@/features/home/components/deal-detail-hero';
 import { DealMeta } from '@/features/home/components/deal-meta';
-import { DealReviews } from '@/features/home/components/deal-reviews';
+import { StoreReviewsCard } from '@/features/review/components/store-reviews-card';
 import { DetailCard } from '@/features/home/components/detail-card';
 import { PickupSlotPicker } from '@/features/home/components/pickup-slot-picker';
 import { QuantityStepper } from '@/features/home/components/quantity-stepper';
@@ -252,7 +252,11 @@ function DealDetail({ deal }: { deal: Deal }) {
             </View>
           </DetailCard>
 
-          <DealReviews />
+          <StoreReviewsCard
+            merchantId={deal.store.merchantId}
+            reviewCount={deal.store.reviewCount}
+            storeName={deal.store.name}
+          />
         </View>
       </ScrollView>
 

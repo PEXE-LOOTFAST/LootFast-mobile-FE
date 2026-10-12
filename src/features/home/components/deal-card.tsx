@@ -21,6 +21,7 @@ export function DealCard({ deal, onPress }: DealCardProps) {
   const theme = useTheme();
   const discount = formatDiscount(deal.price, deal.originalPrice);
   const isLowStock = deal.remaining <= LOW_STOCK_THRESHOLD;
+  const hasRating = deal.store.rating > 0;
 
   return (
     <Pressable
@@ -62,12 +63,16 @@ export function DealCard({ deal, onPress }: DealCardProps) {
           {deal.store.isVerified ? (
             <Icon name={HomeIcons.verified} color={theme.primary} size={15} />
           ) : null}
-          <View style={styles.rating}>
-            <Icon name={HomeIcons.star} color={RatingColor} size={14} />
-            <Text style={[styles.ratingText, { color: theme.text }]}>
-              {deal.store.rating.toFixed(1)}
-            </Text>
-          </View>
+          {/* Feed deal không kèm điểm đánh giá nên giá trị 0 nghĩa là "chưa biết", không phải 0 sao:
+              ẩn đi thay vì hiện "0.0" mâu thuẫn với điểm thật ở trang chi tiết. */}
+          {hasRating ? (
+            <View style={styles.rating}>
+              <Icon name={HomeIcons.star} color={RatingColor} size={14} />
+              <Text style={[styles.ratingText, { color: theme.text }]}>
+                {deal.store.rating.toFixed(1)}
+              </Text>
+            </View>
+          ) : null}
         </View>
 
         <Text numberOfLines={2} style={[styles.name, { color: theme.text }]}>

@@ -33,13 +33,6 @@ export type Deal = {
   remaining: number;
 };
 
-export type DealReview = {
-  id: string;
-  author: string;
-  rating: number;
-  comment: string;
-};
-
 /** Mức giảm giá tối thiểu (%) của bộ lọc nâng cao; 0 là không lọc. */
 export type DiscountFilter = 0 | 30 | 40 | 50;
 
