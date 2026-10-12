@@ -35,9 +35,11 @@ export type OrderDto = {
   finalizedAt: string | null;
 };
 
+/** Backend giới hạn 1–5 suất mỗi đơn, và tổng suất chưa lấy của cùng một deal cũng không quá 5. */
+export const ORDER_MAX_QUANTITY = 5;
+
 export type CreateOrderPayload = {
   dealId: string;
-  /** Backend giới hạn 1–5 suất mỗi đơn. */
   quantity: number;
   paymentMethod: PaymentMethodDto;
   /** Khoảng giờ khách hẹn đến lấy; bắt buộc và phải nằm trong khung giờ của deal. */
@@ -84,10 +86,10 @@ const MESSAGES: Record<string, string> = {
   UNAUTHORIZED: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
   DEAL_NOT_FOUND: 'Deal không còn tồn tại.',
   DEAL_NOT_RESERVABLE: 'Deal này hiện không nhận đặt giữ.',
-  INSUFFICIENT_STOCK: 'Deal đã hết suất. Thử lại với deal khác nhé.',
+  INSUFFICIENT_STOCK: 'Không còn đủ số phần bạn chọn. Hãy giảm số lượng hoặc thử deal khác.',
   ORDER_PICKUP_TIME_INVALID: 'Giờ đến lấy không hợp lệ. Chọn lại một khung giờ của deal.',
   RESERVED_ORDER_LIMIT: 'Bạn đang giữ quá nhiều đơn. Hoàn tất bớt rồi đặt tiếp.',
-  RESERVED_QUANTITY_LIMIT: 'Vượt quá số suất được giữ cùng lúc.',
+  RESERVED_QUANTITY_LIMIT: `Mỗi deal chỉ giữ tối đa ${ORDER_MAX_QUANTITY} phần chưa lấy cùng lúc. Bạn có thể đã giữ một số phần của deal này, hãy giảm số lượng.`,
   IDEMPOTENCY_CONFLICT: 'Đơn đang được xử lý. Chờ một chút rồi thử lại.',
   IDEMPOTENCY_KEY_EXPIRED: 'Yêu cầu đã hết hạn. Vui lòng đặt lại.',
   RESOURCE_BUSY: 'Deal đang có nhiều người đặt. Thử lại sau giây lát.',

@@ -6,7 +6,7 @@ import { getSessionState, requireAuth } from '@/lib/auth-session';
 export type ReservationStatus = 'idle' | 'reserving' | 'reserved';
 
 /**
- * Đặt giữ một deal qua `POST /orders`.
+ * Đặt giữ một deal qua `POST /orders`, với số phần khách đã chọn (backend nhận 1–5).
  *
  * Mặc định trả tiền mặt khi nhận: backend cũng nhận BANK_TRANSFER nhưng màn chi tiết chưa có
  * bước chọn phương thức, và đơn đã tạo vẫn đổi được bằng `PUT /orders/{id}/payment-method`.
@@ -17,7 +17,11 @@ export type ReservationStatus = 'idle' | 'reserving' | 'reserved';
  * `pickupSlot` là khoảng giờ khách hẹn đến lấy; backend bắt buộc gửi kèm nên chưa chọn thì không
  * đặt được.
  */
-export function useReservation(dealId: string, pickupSlot: PickupSlot | undefined) {
+export function useReservation(
+  dealId: string,
+  pickupSlot: PickupSlot | undefined,
+  quantity: number,
+) {
   const createOrder = useCreateOrder();
 
   const status: ReservationStatus = createOrder.isPending
@@ -31,7 +35,7 @@ export function useReservation(dealId: string, pickupSlot: PickupSlot | undefine
 
     createOrder.mutate({
       dealId,
-      quantity: 1,
+      quantity,
       paymentMethod: 'CASH',
       pickupFrom: pickupSlot.from,
       pickupTo: pickupSlot.to,

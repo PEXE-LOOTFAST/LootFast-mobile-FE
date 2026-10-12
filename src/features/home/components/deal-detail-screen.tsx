@@ -21,7 +21,9 @@ import { DealMeta } from '@/features/home/components/deal-meta';
 import { DealReviews } from '@/features/home/components/deal-reviews';
 import { DetailCard } from '@/features/home/components/detail-card';
 import { PickupSlotPicker } from '@/features/home/components/pickup-slot-picker';
+import { QuantityStepper } from '@/features/home/components/quantity-stepper';
 import { ReserveBar } from '@/features/home/components/reserve-bar';
+import { ORDER_MAX_QUANTITY } from '@/features/order/api/orders';
 import { RatingColor } from '@/features/home/constants/colors';
 import { HomeIcons } from '@/features/home/constants/icons';
 import { useReservation } from '@/features/home/hooks/use-reservation';
@@ -86,7 +88,13 @@ function DealDetail({ deal }: { deal: Deal }) {
   const [selectedSlotKey, setSelectedSlotKey] = useState<string | null>(null);
   // Lát đang chọn có thể trôi mất khi tới giờ: tự lùi về lát sớm nhất còn đặt được.
   const selectedSlot = slots.find((slot) => slot.from === selectedSlotKey) ?? slots[0];
-  const reservation = useReservation(deal.id, selectedSlot);
+
+  // Số phần tối đa: theo giới hạn của backend và theo số phần deal còn lại.
+  const maxQuantity = Math.max(1, Math.min(ORDER_MAX_QUANTITY, deal.remaining));
+  const [requestedQuantity, setRequestedQuantity] = useState(1);
+  // Số phần còn lại có thể giảm khi người khác đặt: tự kéo số đang chọn về mức còn đặt được.
+  const quantity = Math.min(requestedQuantity, maxQuantity);
+  const reservation = useReservation(deal.id, selectedSlot, quantity);
 
   // Danh sách yêu thích là nguồn sự thật cho nút trái tim: lưu ở màn khác thì vào đây vẫn đúng.
   const favoritesQuery = useFavorites(Boolean(user));
@@ -192,6 +200,30 @@ function DealDetail({ deal }: { deal: Deal }) {
           </DetailCard>
 
           <DetailCard>
+            <View style={styles.quantityRow}>
+              <View style={styles.quantityCopy}>
+                <Text
+                  accessibilityRole="header"
+                  style={[styles.quantityTitle, { color: theme.text }]}
+                >
+                  Bạn muốn đặt mấy phần?
+                </Text>
+                <Text style={[styles.quantityHint, { color: theme.textSecondary }]}>
+                  {deal.remaining < ORDER_MAX_QUANTITY
+                    ? `Tối đa ${maxQuantity} phần (deal còn ${deal.remaining} phần)`
+                    : `Tối đa ${ORDER_MAX_QUANTITY} phần mỗi lần đặt`}
+                </Text>
+              </View>
+              <QuantityStepper
+                disabled={reservation.status !== 'idle'}
+                max={maxQuantity}
+                onChange={setRequestedQuantity}
+                value={quantity}
+              />
+            </View>
+          </DetailCard>
+
+          <DetailCard>
             <PickupSlotPicker
               disabled={reservation.status !== 'idle'}
               onSelect={(slot) => setSelectedSlotKey(slot.from)}
@@ -243,7 +275,7 @@ function DealDetail({ deal }: { deal: Deal }) {
             : router.navigate('/orders')
         }
         status={reservation.status}
-        total={deal.price}
+        total={deal.price * quantity}
       />
 
       {/* Đặt nút trợ lý phía trên thanh đặt giữ để không che nút "Đặt giữ ngay". */}
@@ -301,6 +333,15 @@ function DealDetailError({
 
 const styles = StyleSheet.create({
   reserveError: { paddingHorizontal: 16, paddingBottom: 8 },
+  quantityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  quantityCopy: { flex: 1, gap: 3 },
+  quantityTitle: { fontSize: 15, fontWeight: '800' },
+  quantityHint: { fontSize: 12, lineHeight: 17 },
   screen: { flex: 1 },
   content: { paddingBottom: 96 },
   cards: {
