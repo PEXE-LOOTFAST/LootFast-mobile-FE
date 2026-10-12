@@ -1,8 +1,9 @@
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
 import { BrandButton } from '@/components/ui/brand-button';
 import { EmptyCard } from '@/components/ui/empty-card';
 import { ErrorState } from '@/components/ui/error-state';
@@ -16,32 +17,44 @@ import {
   FAVORITE_CATEGORIES_MAX,
   toPreferencesErrorMessage,
 } from '@/features/profile/api/preferences';
-import { getProfileErrorMessage } from '@/features/profile/api/profile';
+import {
+  getProfileErrorMessage,
+  toUpdateProfileErrorMessage,
+} from '@/features/profile/api/profile';
 import { useAvatarUpload } from '@/features/profile/api/use-avatar';
 import { AreaSelectField } from '@/features/profile/components/area-select-field';
 import { useUpdateDiscoveryPreferences } from '@/features/profile/api/use-discovery-preferences';
 import { useProfile } from '@/features/profile/api/use-profile';
+import { useUpdateProfile } from '@/features/profile/api/use-update-profile';
 import { ProfileIcons } from '@/features/profile/constants/icons';
 import { getInitials } from '@/features/profile/get-initials';
+import {
+  buildProfilePayload,
+  NAME_MAX_LENGTH,
+  toProfileFormValues,
+  validateProfileForm,
+  type ProfileFormErrors,
+  type ProfileFormValues,
+} from '@/features/profile/profile-form';
 import { useShopCategories } from '@/features/seller/api/shop-categories';
 import { useAuthSession } from '@/hooks/use-auth-session';
+import { useKeyboardHeight } from '@/hooks/use-keyboard-height';
 import { useTheme } from '@/hooks/use-theme';
+import { ApiException } from '@/lib/api-client';
 
 const ROUTE = '/profile-info';
+// Chiều cao xấp xỉ của dải lưu nổi (nút + đệm), để ô đang nhập được cuộn lên trên cả dải này.
+const SAVE_BAR_HEIGHT = 72;
 
 type Draft = { pickupArea: string; categories: string[] };
 
 const sameSet = (a: string[], b: string[]) =>
   a.length === b.length && a.every((code) => b.includes(code));
 
-// Backend lưu số điện thoại không có số 0 đầu; hiển thị như người dùng vẫn gõ.
-const toDisplayPhone = (phone: string | null) =>
-  !phone ? '' : phone.startsWith('0') || phone.startsWith('+') ? phone : `0${phone}`;
-
 /**
- * Hồ sơ người mua. Chỉ sửa được những gì backend cho phép: ảnh đại diện và tuỳ chọn khám phá (khu
- * vực nhận món, nhóm món yêu thích). Họ tên, email, số điện thoại hiện chỉ xem vì backend chưa có
- * endpoint cập nhật.
+ * Hồ sơ người mua: đổi ảnh đại diện, "Họ & Tên" (displayName), số điện thoại (PUT /users/me/profile) và
+ * tuỳ chọn khám phá (khu vực nhận món, nhóm món yêu thích). Email chỉ xem vì đổi email cần luồng OTP
+ * riêng. Một nút "Lưu thay đổi" gửi những phần đã sửa.
  */
 export function ProfileInfoScreen() {
   const theme = useTheme();
@@ -49,8 +62,11 @@ export function ProfileInfoScreen() {
   const profileQuery = useProfile(Boolean(user));
   const categories = useShopCategories();
   const avatar = useAvatarUpload(ROUTE);
-  const update = useUpdateDiscoveryPreferences();
+  const updatePrefs = useUpdateDiscoveryPreferences();
+  const updateProfileMutation = useUpdateProfile();
   const [draft, setDraft] = useState<Draft | null>(null);
+  const [profileDraft, setProfileDraft] = useState<ProfileFormValues | null>(null);
+  const [errors, setErrors] = useState<ProfileFormErrors>({});
   const [justSaved, setJustSaved] = useState(false);
 
   const profile = profileQuery.data;
@@ -59,10 +75,25 @@ export function ProfileInfoScreen() {
     categories: profile?.favoriteCategories ?? [],
   };
   const values = draft ?? saved;
-  const isDirty =
+  const savedProfile = toProfileFormValues(profile);
+  const profileValues = profileDraft ?? savedProfile;
+
+  const isPrefsDirty =
     draft !== null &&
     (draft.pickupArea.trim() !== saved.pickupArea.trim() ||
       !sameSet(draft.categories, saved.categories));
+  const isProfileDirty =
+    profileDraft !== null && buildProfilePayload(profileDraft, savedProfile) !== null;
+  const isDirty = isPrefsDirty || isProfileDirty;
+  const isSaving = updatePrefs.isPending || updateProfileMutation.isPending;
+
+  const isDuplicatePhone =
+    updateProfileMutation.error instanceof ApiException &&
+    updateProfileMutation.error.code === 'DUPLICATE_PHONE';
+
+  const phoneServerError = isDuplicatePhone
+    ? toUpdateProfileErrorMessage(updateProfileMutation.error)
+    : undefined;
 
   const displayName =
     profile?.displayName ||
@@ -70,10 +101,27 @@ export function ProfileInfoScreen() {
     [user?.firstName, user?.lastName].filter(Boolean).join(' ');
   const initials = getInitials(displayName);
 
-  const edit = (next: Partial<Draft>) => {
+  const resetStatus = () => {
     setJustSaved(false);
-    update.reset();
+    updatePrefs.reset();
+    updateProfileMutation.reset();
+  };
+
+  const edit = (next: Partial<Draft>) => {
+    resetStatus();
     setDraft({ ...values, ...next });
+  };
+
+  const editProfile = (next: Partial<ProfileFormValues>) => {
+    resetStatus();
+    // Sửa ô nào thì xoá lỗi của ô đó.
+    setErrors((current) => {
+      const updated = { ...current };
+      for (const key of Object.keys(next) as (keyof ProfileFormValues)[]) delete updated[key];
+
+      return updated;
+    });
+    setProfileDraft({ ...profileValues, ...next });
   };
 
   const toggleCategory = (code: string) => {
@@ -87,27 +135,43 @@ export function ProfileInfoScreen() {
     });
   };
 
-  const handleSave = () => {
-    update.mutate(
-      {
-        pickupArea: values.pickupArea.trim() || null,
-        favoriteCategories: values.categories,
-      },
-      {
-        onSuccess: () => {
-          setDraft(null);
-          setJustSaved(true);
-        },
-      },
-    );
+  const handleSave = async () => {
+    resetStatus();
+
+    const formErrors = profileDraft ? validateProfileForm(profileDraft, savedProfile) : {};
+    setErrors(formErrors);
+    if (Object.keys(formErrors).length > 0) return;
+
+    try {
+      const payload = profileDraft ? buildProfilePayload(profileDraft, savedProfile) : null;
+      if (payload) {
+        await updateProfileMutation.mutateAsync(payload);
+        setProfileDraft(null);
+      }
+      if (isPrefsDirty) {
+        await updatePrefs.mutateAsync({
+          pickupArea: values.pickupArea.trim() || null,
+          favoriteCategories: values.categories,
+        });
+        setDraft(null);
+      }
+      setJustSaved(true);
+    } catch {
+      // Lỗi hiện bên dưới qua trạng thái của từng thao tác lưu.
+    }
   };
 
   const goBack = () => router.navigate('/profile');
+  const keyboardHeight = useKeyboardHeight();
+
+  // Dải lưu nổi ở đáy: chỉ hiện khi có gì để lưu hoặc cần báo kết quả, để màn hình bình thường gọn.
+  const showSaveBar = isDirty || justSaved || updateProfileMutation.isError || updatePrefs.isError;
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
-      <ScrollView
-        contentContainerStyle={styles.content}
+      <KeyboardAwareScrollView
+        bottomOffset={showSaveBar ? SAVE_BAR_HEIGHT : 0}
+        contentContainerStyle={[styles.content, showSaveBar && styles.contentWithBar]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
@@ -155,6 +219,9 @@ export function ProfileInfoScreen() {
                   <Text numberOfLines={1} style={[styles.name, { color: theme.text }]}>
                     {displayName}
                   </Text>
+                  <Text numberOfLines={1} style={[styles.email, { color: theme.textSecondary }]}>
+                    {profile?.email}
+                  </Text>
                   <Pressable
                     accessibilityRole="button"
                     disabled={avatar.isUploading}
@@ -164,7 +231,7 @@ export function ProfileInfoScreen() {
                     {avatar.isUploading ? (
                       <ActivityIndicator color={theme.primary} size="small" />
                     ) : (
-                      <Icon name={ProfileIcons.camera} color={theme.primary} size={14} />
+                      <Icon name={ProfileIcons.camera} color={theme.primary} size={13} />
                     )}
                     <Text style={[styles.changePhotoText, { color: theme.primary }]}>
                       Đổi ảnh đại diện
@@ -174,7 +241,7 @@ export function ProfileInfoScreen() {
               </View>
 
               <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>
-                THÔNG TIN TÀI KHOẢN
+                THÔNG TIN CÁ NHÂN
               </Text>
               <View
                 style={[
@@ -182,23 +249,25 @@ export function ProfileInfoScreen() {
                   { backgroundColor: theme.backgroundElement, borderColor: theme.border },
                 ]}
               >
-                <TextField editable={false} label="Họ và tên" size="compact" value={displayName} />
                 <TextField
-                  editable={false}
-                  label="Email"
+                  autoCapitalize="words"
+                  error={errors.displayName}
+                  label="Họ & Tên"
+                  maxLength={NAME_MAX_LENGTH}
+                  onChangeText={(text) => editProfile({ displayName: text })}
                   size="compact"
-                  value={profile?.email ?? ''}
+                  value={profileValues.displayName}
                 />
                 <TextField
-                  editable={false}
+                  error={errors.phone ?? phoneServerError}
+                  keyboardType="phone-pad"
                   label="Số điện thoại"
-                  placeholder="Chưa cập nhật"
+                  maxLength={16}
+                  onChangeText={(text) => editProfile({ phone: text })}
+                  placeholder="0912345678"
                   size="compact"
-                  value={toDisplayPhone(profile?.phoneNumber ?? null)}
+                  value={profileValues.phone}
                 />
-                <Text style={[styles.hint, { color: theme.textSecondary }]}>
-                  Họ tên, email và số điện thoại hiện chưa chỉnh sửa được trong ứng dụng.
-                </Text>
               </View>
 
               <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>
@@ -211,14 +280,20 @@ export function ProfileInfoScreen() {
                 ]}
               >
                 <AreaSelectField
-                  description="Bạn sẽ nhận thông báo khi quán thuộc khu vực này đăng deal mới. Chọn xã, phường hoặc tỉnh/thành có trong địa chỉ quán. Khu vực chỉ dùng để gửi thông báo, không làm thay đổi danh sách deal ở Trang chủ."
+                  description="Nhận thông báo khi quán trong khu vực này đăng deal mới."
+                  detail="Bạn sẽ nhận thông báo khi quán thuộc khu vực này đăng deal mới. Chọn xã, phường hoặc tỉnh/thành có trong địa chỉ quán. Khu vực chỉ dùng để gửi thông báo, không làm thay đổi danh sách deal ở Trang chủ."
                   label="Khu vực nhận món"
                   onChange={(next) => edit({ pickupArea: next })}
                   value={values.pickupArea}
                 />
 
                 <View style={styles.group}>
-                  <Text style={[styles.groupLabel, { color: theme.text }]}>Món yêu thích</Text>
+                  <View style={styles.groupHeader}>
+                    <Text style={[styles.groupLabel, { color: theme.text }]}>Món yêu thích</Text>
+                    <Text style={[styles.count, { color: theme.textSecondary }]}>
+                      {values.categories.length}/{FAVORITE_CATEGORIES_MAX}
+                    </Text>
+                  </View>
                   {categories.isLoading ? <ActivityIndicator color={theme.primary} /> : null}
                   {categories.isError ? (
                     <Text style={[styles.errorText, { color: theme.danger }]}>
@@ -256,64 +331,103 @@ export function ProfileInfoScreen() {
                       );
                     })}
                   </View>
-                  <Text style={[styles.hint, { color: theme.textSecondary }]}>
-                    Chọn tối đa {FAVORITE_CATEGORIES_MAX} nhóm món bạn thích.
-                  </Text>
                 </View>
               </View>
-
-              {update.isError ? (
-                <InlineAlert message={toPreferencesErrorMessage(update.error)} />
-              ) : null}
-              {justSaved && !isDirty ? (
-                <InlineAlert message="Đã lưu thay đổi." tone="success" />
-              ) : null}
-
-              <BrandButton disabled={!isDirty} loading={update.isPending} onPress={handleSave}>
-                Lưu thay đổi
-              </BrandButton>
             </>
           )}
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
+
+      {showSaveBar ? (
+        <View
+          style={[
+            styles.saveBar,
+            // Nằm ngay trên bàn phím khi đang nhập, thay vì bị bàn phím che.
+            {
+              bottom: keyboardHeight,
+              backgroundColor: theme.backgroundElement,
+              borderTopColor: theme.border,
+            },
+          ]}
+        >
+          {updateProfileMutation.isError && !isDuplicatePhone ? (
+            <InlineAlert message={toUpdateProfileErrorMessage(updateProfileMutation.error)} />
+          ) : null}
+          {updatePrefs.isError ? (
+            <InlineAlert message={toPreferencesErrorMessage(updatePrefs.error)} />
+          ) : null}
+          {justSaved && !isDirty ? <InlineAlert message="Đã lưu thay đổi." tone="success" /> : null}
+
+          {isDirty ? (
+            <BrandButton
+              loading={isSaving}
+              onPress={() => void handleSave()}
+              style={styles.saveButton}
+            >
+              Lưu thay đổi
+            </BrandButton>
+          ) : null}
+        </View>
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
-  content: { paddingBottom: 110 },
+  content: { paddingBottom: 24 },
+  // Chừa chỗ cho dải lưu nổi để phần cuối không bị che.
+  contentWithBar: { paddingBottom: 150 },
   body: {
     width: '100%',
     maxWidth: MaxContentWidth,
     alignSelf: 'center',
-    gap: 12,
-    padding: 16,
+    gap: 10,
+    padding: 12,
   },
-  card: { gap: 12, borderWidth: 1, borderRadius: 18, padding: 16 },
-  avatarCard: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  card: { gap: 10, borderWidth: 1, borderRadius: 16, padding: 14 },
+  avatarCard: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   avatar: {
-    width: 72,
-    height: 72,
+    width: 64,
+    height: 64,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 36,
+    borderRadius: 32,
     overflow: 'hidden',
   },
   avatarImage: { width: '100%', height: '100%' },
-  avatarText: { fontSize: 22, fontWeight: '900' },
-  avatarCopy: { flex: 1, gap: 6 },
-  name: { fontSize: 17, fontWeight: '900' },
-  changePhoto: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start' },
-  changePhotoText: { fontSize: 13, fontWeight: '800' },
-  sectionTitle: { fontSize: 11, fontWeight: '900', letterSpacing: 0.4, marginTop: 4 },
-  hint: { fontSize: 12, lineHeight: 17 },
+  avatarText: { fontSize: 20, fontWeight: '900' },
+  avatarCopy: { flex: 1, minWidth: 0, gap: 2 },
+  name: { fontSize: 16, fontWeight: '900' },
+  email: { fontSize: 12 },
+  changePhoto: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    alignSelf: 'flex-start',
+    marginTop: 2,
+  },
+  changePhotoText: { fontSize: 12, fontWeight: '800' },
+  sectionTitle: { fontSize: 11, fontWeight: '900', letterSpacing: 0.4, marginTop: 2 },
   group: { gap: 8 },
+  groupHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   groupLabel: { fontSize: 12, fontWeight: '800' },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 9 },
+  count: { fontSize: 12 },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  chip: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7 },
   chipLabel: { fontSize: 12, fontWeight: '600' },
   chipLabelSelected: { fontWeight: '800' },
   errorText: { fontSize: 12, fontWeight: '600' },
   pressed: { opacity: 0.8 },
+  saveBar: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    left: 0,
+    gap: 8,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    padding: 12,
+    boxShadow: '0px -6px 16px rgba(23, 33, 27, 0.12)',
+  },
+  saveButton: { minHeight: 46 },
 });
