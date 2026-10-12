@@ -245,5 +245,5 @@ const styles = StyleSheet.create({
   meta: { flexShrink: 1, fontSize: 13 },
   section: { fontSize: 15, fontWeight: '900', letterSpacing: -0.2 },
   hourRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  deals: { gap: 14 },
+  deals: { gap: 10 },
 });

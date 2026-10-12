@@ -157,6 +157,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingHorizontal: HORIZONTAL_INSET,
   },
-  section: { gap: 14 },
+  section: { gap: 10 },
   feedback: { gap: 12 },
 });

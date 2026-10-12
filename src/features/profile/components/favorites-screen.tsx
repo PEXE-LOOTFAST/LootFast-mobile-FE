@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     paddingBottom: 48,
   },
   section: { fontSize: 11, fontWeight: '800', letterSpacing: 0.6 },
-  deals: { gap: 14 },
+  deals: { gap: 10 },
   stores: { gap: 10 },
   storeRow: {
     flexDirection: 'row',
