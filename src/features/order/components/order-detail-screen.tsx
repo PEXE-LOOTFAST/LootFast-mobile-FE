@@ -1,9 +1,10 @@
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import QRCode from 'react-native-qrcode-svg';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
 import { BrandButton } from '@/components/ui/brand-button';
 import { EmptyCard } from '@/components/ui/empty-card';
 import { ErrorState } from '@/components/ui/error-state';
@@ -90,7 +91,10 @@ export function OrderDetailScreen() {
         </Text>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         {orderQuery.isLoading ? <LoadingState /> : null}
 
         {orderQuery.error ? (
@@ -251,7 +255,7 @@ export function OrderDetailScreen() {
             ) : null}
           </>
         ) : null}
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }

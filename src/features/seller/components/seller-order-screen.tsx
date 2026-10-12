@@ -1,7 +1,8 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, View } from 'react-native';
 
+import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
 import { EmptyCard } from '@/components/ui/empty-card';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { MaxContentWidth } from '@/constants/theme';
@@ -96,7 +97,10 @@ export function SellerOrderScreen() {
         title="Đơn hàng"
       />
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.body}>
           <SegmentedTabs items={SELLER_ORDER_TABS} onChange={setTab} value={tab} />
 
@@ -120,7 +124,7 @@ export function SellerOrderScreen() {
               })
             : null}
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       <AssistantFab bottomOffset={96} />
 

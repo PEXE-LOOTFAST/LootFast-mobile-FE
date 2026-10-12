@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
 
+import { useScrollFocusedIntoView } from '@/components/ui/keyboard-aware-scroll-view';
 import { useTheme } from '@/hooks/use-theme';
 
 /**
@@ -30,6 +31,7 @@ export function TextField({
 }: TextFieldProps) {
   const theme = useTheme();
   const [isFocused, setIsFocused] = useState(false);
+  const scrollFocusedIntoView = useScrollFocusedIntoView();
 
   const variant = size === 'compact' ? compact : comfortable;
   const borderColor = error ? theme.danger : isFocused ? theme.primary : theme.border;
@@ -52,6 +54,8 @@ export function TextField({
           {...inputProps}
           onFocus={(event) => {
             setIsFocused(true);
+            // Chuyển sang ô khác khi bàn phím đang mở thì bàn phím không "hiện lại", nên tự gọi cuộn.
+            scrollFocusedIntoView?.();
             onFocus?.(event);
           }}
           onBlur={(event) => {

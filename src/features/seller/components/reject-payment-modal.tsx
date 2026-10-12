@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useKeyboardHeight } from '@/hooks/use-keyboard-height';
 import { useTheme } from '@/hooks/use-theme';
 
 const MAX_REASON_LENGTH = 500;
@@ -22,6 +23,7 @@ export function RejectPaymentModal({
 }: RejectPaymentModalProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const keyboardHeight = useKeyboardHeight();
   const [reason, setReason] = useState('');
   const trimmed = reason.trim();
   const canSubmit = trimmed.length > 0 && !isSubmitting;
@@ -41,7 +43,14 @@ export function RejectPaymentModal({
       visible={visible}
     >
       <View
-        style={[styles.overlay, { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 16 }]}
+        // Chừa chỗ cho bàn phím để ô nhập lý do và các nút không bị che.
+        style={[
+          styles.overlay,
+          {
+            paddingTop: insets.top + 16,
+            paddingBottom: Math.max(insets.bottom, keyboardHeight) + 16,
+          },
+        ]}
       >
         <Pressable
           accessibilityLabel="Đóng"
