@@ -27,6 +27,8 @@ export type Deal = {
   price: number;
   originalPrice: number;
   pickupWindow: { start: string; end: string };
+  /** Cùng khung giờ nhưng giữ nguyên mốc ISO của backend, để gửi lại khi đặt đơn. */
+  pickupWindowIso: { start: string; end: string };
   distanceKm: number;
   remaining: number;
 };

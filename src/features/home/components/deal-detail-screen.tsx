@@ -1,6 +1,6 @@
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { setStatusBarStyle } from 'expo-status-bar';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -20,10 +20,12 @@ import { DealDetailHero } from '@/features/home/components/deal-detail-hero';
 import { DealMeta } from '@/features/home/components/deal-meta';
 import { DealReviews } from '@/features/home/components/deal-reviews';
 import { DetailCard } from '@/features/home/components/detail-card';
+import { PickupSlotPicker } from '@/features/home/components/pickup-slot-picker';
 import { ReserveBar } from '@/features/home/components/reserve-bar';
 import { RatingColor } from '@/features/home/constants/colors';
 import { HomeIcons } from '@/features/home/constants/icons';
 import { useReservation } from '@/features/home/hooks/use-reservation';
+import { buildPickupSlots } from '@/features/home/pickup-slots';
 import type { Deal } from '@/features/home/types';
 import { useTheme } from '@/hooks/use-theme';
 import { formatDistance, formatPrice } from '@/lib/format';
@@ -66,9 +68,25 @@ export function DealDetailScreen() {
 
 function DealDetail({ deal }: { deal: Deal }) {
   const theme = useTheme();
-  const reservation = useReservation(deal.id);
   const { user } = useAuthSession();
   const [barHeight, setBarHeight] = useState(0);
+
+  // Khung giờ co lại theo thời gian thực nên tính lại mỗi phút; lát đã qua tự biến mất.
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 60_000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const slots = useMemo(
+    () => buildPickupSlots(deal.pickupWindowIso.start, deal.pickupWindowIso.end, now),
+    [deal.pickupWindowIso.start, deal.pickupWindowIso.end, now],
+  );
+  const [selectedSlotKey, setSelectedSlotKey] = useState<string | null>(null);
+  // Lát đang chọn có thể trôi mất khi tới giờ: tự lùi về lát sớm nhất còn đặt được.
+  const selectedSlot = slots.find((slot) => slot.from === selectedSlotKey) ?? slots[0];
+  const reservation = useReservation(deal.id, selectedSlot);
 
   // Danh sách yêu thích là nguồn sự thật cho nút trái tim: lưu ở màn khác thì vào đây vẫn đúng.
   const favoritesQuery = useFavorites(Boolean(user));
@@ -173,6 +191,15 @@ function DealDetail({ deal }: { deal: Deal }) {
             </View>
           </DetailCard>
 
+          <DetailCard>
+            <PickupSlotPicker
+              disabled={reservation.status !== 'idle'}
+              onSelect={(slot) => setSelectedSlotKey(slot.from)}
+              selected={selectedSlot}
+              slots={slots}
+            />
+          </DetailCard>
+
           <DetailCard title="Vị trí cửa hàng">
             <View style={[styles.location, { backgroundColor: theme.primarySoft }]}>
               <Icon name={HomeIcons.location} color={theme.primary} size={18} />
@@ -204,6 +231,7 @@ function DealDetail({ deal }: { deal: Deal }) {
       ) : null}
 
       <ReserveBar
+        disabled={!selectedSlot}
         onLayout={(event) => setBarHeight(event.nativeEvent.layout.height)}
         onReserve={reservation.reserve}
         onViewOrder={() =>

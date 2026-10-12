@@ -12,8 +12,12 @@ export type MerchantOrderDto = {
   dealName: string;
   quantity: number;
   totalAmount: number;
+  /** Khung giờ của deal. */
   pickupStart: string;
   pickupEnd: string;
+  /** Khoảng giờ khách đã hẹn đến lấy, nằm trong khung của deal. */
+  pickupFrom: string;
+  pickupTo: string;
   orderStatus: OrderStatusDto;
   paymentMethod: PaymentMethodDto;
   paymentStatus: PaymentStatusDto;

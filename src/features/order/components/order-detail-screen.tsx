@@ -131,7 +131,11 @@ export function OrderDetailScreen() {
               <Row label="Số lượng" value={`${order.quantity} phần`} />
               <Row label="Tổng tiền" value={formatPrice(order.totalAmount)} />
               <Row
-                label="Giờ nhận"
+                label="Giờ bạn hẹn lấy"
+                value={`${toTimeLabel(order.pickupFrom)}–${toTimeLabel(order.pickupTo)}`}
+              />
+              <Row
+                label="Khung giờ deal"
                 value={`${toTimeLabel(order.pickupStart)}–${toTimeLabel(order.pickupEnd)}`}
               />
               {order.pickupCode ? (

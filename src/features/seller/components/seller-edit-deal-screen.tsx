@@ -10,22 +10,12 @@ import {
   toMerchantDealErrorMessage,
   type MerchantDealDto,
 } from '@/features/seller/api/merchant-deals';
-import {
-  useMerchantDeal,
-  useMerchantDeals,
-  useUpdateMerchantDeal,
-} from '@/features/seller/api/use-merchant-deals';
+import { useMerchantDeal, useUpdateMerchantDeal } from '@/features/seller/api/use-merchant-deals';
 import { PriceField } from '@/features/seller/components/deal-input-fields';
 import { SellerFormCard } from '@/features/seller/components/seller-form-card';
 import { TimeInputField } from '@/features/seller/components/time-input-field';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
-import {
-  buildDealSchedule,
-  findSharedDaySchedule,
-  toDealNumber,
-  toTimeInput,
-  type DealSchedule,
-} from '@/features/seller/deal-schedule';
+import { buildDealSchedule, toDealNumber, toTimeInput } from '@/features/seller/deal-schedule';
 import { useMerchantShop } from '@/features/seller/hooks/use-merchant-shop';
 import type { MerchantOpeningHoursDto } from '@/features/seller/types/api';
 import { validateNewDeal, type NewDealValues } from '@/features/seller/validation';
@@ -41,9 +31,8 @@ export function SellerEditDealScreen() {
   const theme = useTheme();
   const { dealId } = useLocalSearchParams<{ dealId?: string }>();
   const { deal, isLoading: isDealLoading, error } = useMerchantDeal(dealId);
-  const dealsQuery = useMerchantDeals();
   const shop = useMerchantShop();
-  const isLoading = isDealLoading || dealsQuery.isLoading || shop.isLoading;
+  const isLoading = isDealLoading || shop.isLoading;
 
   const backToImages = () =>
     dealId
@@ -53,7 +42,7 @@ export function SellerEditDealScreen() {
   return (
     <SellerPageScaffold
       onPressBack={backToImages}
-      subtitle="Đổi tên món, số phần, giá và khung giờ nhận"
+      subtitle="Đổi tên món, số phần, giá và khung giờ bán"
       title="Sửa bản nháp"
     >
       {isLoading ? <ActivityIndicator color={theme.primary} /> : null}
@@ -75,12 +64,7 @@ export function SellerEditDealScreen() {
 
       {/* Chờ tải xong mới dựng form: useForm chốt giá trị ban đầu ngay lần render đầu tiên. */}
       {deal && deal.status === 'DRAFT' && !isLoading ? (
-        <EditDealForm
-          deal={deal}
-          onSaved={backToImages}
-          openingHours={shop.openingHours}
-          sharedSchedule={findSharedDaySchedule(dealsQuery.data?.items ?? [], deal.dealId)}
-        />
+        <EditDealForm deal={deal} onSaved={backToImages} openingHours={shop.openingHours} />
       ) : null}
     </SellerPageScaffold>
   );
@@ -90,12 +74,10 @@ function EditDealForm({
   deal,
   onSaved,
   openingHours,
-  sharedSchedule,
 }: {
   deal: MerchantDealDto;
   onSaved: () => void;
   openingHours?: MerchantOpeningHoursDto;
-  sharedSchedule?: DealSchedule;
 }) {
   const theme = useTheme();
   const updateDeal = useUpdateMerchantDeal();
@@ -107,17 +89,14 @@ function EditDealForm({
       portions: String(deal.totalQuantity),
       price: String(deal.discountedPrice),
       originalPrice: String(deal.originalPrice),
-      open: toTimeInput((sharedSchedule ?? deal).pickupStartsAt),
-      close: toTimeInput((sharedSchedule ?? deal).pickupEndsAt),
+      open: toTimeInput(deal.saleStartsAt),
+      close: toTimeInput(deal.saleEndsAt),
     },
     validate: validateNewDeal,
     onSubmit: async (next) => {
       setFormError(null);
 
-      const result = buildDealSchedule(next.open, next.close, {
-        shared: sharedSchedule,
-        openingHours,
-      });
+      const result = buildDealSchedule(next.open, next.close, { openingHours });
       if ('error' in result) {
         setFormError(result.error);
         return;
@@ -200,9 +179,8 @@ function EditDealForm({
           <View style={styles.cell}>
             <TimeInputField
               defaultTime="18:00"
-              editable={!sharedSchedule}
               error={errors.open}
-              label="Bắt đầu nhận"
+              label="Mở bán"
               onChange={(time) => setField('open', time)}
               placeholder="18:00"
               value={values.open}
@@ -211,9 +189,8 @@ function EditDealForm({
           <View style={styles.cell}>
             <TimeInputField
               defaultTime="21:00"
-              editable={!sharedSchedule}
               error={errors.close}
-              label="Kết thúc nhận"
+              label="Đóng deal"
               onChange={(time) => setField('close', time)}
               placeholder="21:00"
               value={values.close}

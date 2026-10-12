@@ -19,8 +19,12 @@ export type OrderDto = {
   quantity: number;
   unitPrice: number;
   totalAmount: number;
+  /** Khung giờ của deal. */
   pickupStart: string;
   pickupEnd: string;
+  /** Khoảng giờ khách đã hẹn đến lấy, nằm trong khung của deal. */
+  pickupFrom: string;
+  pickupTo: string;
   orderStatus: OrderStatusDto;
   paymentMethod: PaymentMethodDto;
   paymentStatus: PaymentStatusDto;
@@ -36,6 +40,9 @@ export type CreateOrderPayload = {
   /** Backend giới hạn 1–5 suất mỗi đơn. */
   quantity: number;
   paymentMethod: PaymentMethodDto;
+  /** Khoảng giờ khách hẹn đến lấy; bắt buộc và phải nằm trong khung giờ của deal. */
+  pickupFrom: string;
+  pickupTo: string;
 };
 
 export type PagedOrdersDto = {
@@ -78,16 +85,15 @@ const MESSAGES: Record<string, string> = {
   DEAL_NOT_FOUND: 'Deal không còn tồn tại.',
   DEAL_NOT_RESERVABLE: 'Deal này hiện không nhận đặt giữ.',
   INSUFFICIENT_STOCK: 'Deal đã hết suất. Thử lại với deal khác nhé.',
-  ORDER_CUTOFF_REACHED: 'Đã quá giờ nhận đặt giữ của deal này.',
+  ORDER_PICKUP_TIME_INVALID: 'Giờ đến lấy không hợp lệ. Chọn lại một khung giờ của deal.',
   RESERVED_ORDER_LIMIT: 'Bạn đang giữ quá nhiều đơn. Hoàn tất bớt rồi đặt tiếp.',
   RESERVED_QUANTITY_LIMIT: 'Vượt quá số suất được giữ cùng lúc.',
-  STORE_SCHEDULE_CONFLICT: 'Quán đã đóng cửa trong khung giờ nhận món.',
   IDEMPOTENCY_CONFLICT: 'Đơn đang được xử lý. Chờ một chút rồi thử lại.',
   IDEMPOTENCY_KEY_EXPIRED: 'Yêu cầu đã hết hạn. Vui lòng đặt lại.',
   RESOURCE_BUSY: 'Deal đang có nhiều người đặt. Thử lại sau giây lát.',
   ORDER_NOT_FOUND: 'Không tìm thấy đơn này.',
   ORDER_NOT_CANCELLABLE: 'Đơn này không huỷ được nữa.',
-  ORDER_CANCEL_WINDOW_CLOSED: 'Đã quá hạn huỷ — chỉ huỷ được trước giờ nhận 30 phút.',
+  ORDER_CANCEL_WINDOW_CLOSED: 'Đã quá hạn huỷ — chỉ huỷ được trước giờ hẹn lấy 30 phút.',
 };
 
 export function toOrderErrorMessage(error: unknown): string {

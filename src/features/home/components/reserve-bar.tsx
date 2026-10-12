@@ -11,9 +11,18 @@ type ReserveBarProps = {
   onReserve: () => void;
   onViewOrder: () => void;
   onLayout?: (event: LayoutChangeEvent) => void;
+  /** Chưa chọn được giờ đến lấy thì không đặt được. */
+  disabled?: boolean;
 };
 
-export function ReserveBar({ total, status, onReserve, onViewOrder, onLayout }: ReserveBarProps) {
+export function ReserveBar({
+  total,
+  status,
+  onReserve,
+  onViewOrder,
+  onLayout,
+  disabled = false,
+}: ReserveBarProps) {
   const theme = useTheme();
   const isReserved = status === 'reserved';
 
@@ -33,6 +42,7 @@ export function ReserveBar({ total, status, onReserve, onViewOrder, onLayout }: 
       </View>
 
       <BrandButton
+        disabled={disabled && !isReserved}
         loading={status === 'reserving'}
         onPress={isReserved ? onViewOrder : onReserve}
         style={styles.button}

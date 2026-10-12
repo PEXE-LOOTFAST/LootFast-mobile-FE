@@ -26,6 +26,7 @@ export type MerchantDealDto = {
   preparationMinutes: number;
   saleStartsAt: string;
   saleEndsAt: string;
+  /** Backend vẫn trả hai mốc này nhưng nay luôn bằng saleStartsAt/saleEndsAt (một khung duy nhất). */
   pickupStartsAt: string;
   pickupEndsAt: string;
   status: DealStatusDto;
@@ -42,11 +43,12 @@ export type CreateMerchantDealPayload = {
   discountedPrice: number;
   totalQuantity: number;
   preparationMinutes: number;
-  /** Bốn mốc thời gian đều là ISO-8601 có múi giờ (Instant của backend). */
+  /**
+   * Khung giờ duy nhất của deal (ISO-8601 có múi giờ): vừa là lúc deal nhận đặt, vừa là phạm vi
+   * người mua chọn giờ đến lấy.
+   */
   saleStartsAt: string;
   saleEndsAt: string;
-  pickupStartsAt: string;
-  pickupEndsAt: string;
 };
 
 const BASE_PATH = '/merchants/me/deals';
@@ -124,10 +126,9 @@ const MESSAGES: Record<string, string> = {
   DEAL_NOT_PUBLISHABLE: 'Deal chưa đủ điều kiện đăng — kiểm tra ảnh, giá và lịch bán.',
   DEAL_IMAGE_REQUIRED: 'Deal cần ít nhất một ảnh trước khi đăng.',
   INVALID_DEAL_PRICE: 'Giá deal phải nhỏ hơn giá gốc.',
-  INVALID_DEAL_SCHEDULE: 'Khung giờ bán hoặc giờ nhận món không hợp lệ.',
-  DEAL_OUTSIDE_OPENING_HOURS: 'Giờ nhận món nằm ngoài giờ mở cửa của quán.',
-  STORE_SCHEDULE_CONFLICT:
-    'Mọi deal trong cùng một ngày phải dùng chung khung giờ bán và nhận với deal đã đăng hôm nay.',
+  INVALID_DEAL_SCHEDULE:
+    'Khung giờ deal không hợp lệ — giờ đóng phải sau giờ mở và trong cùng ngày.',
+  DEAL_OUTSIDE_OPENING_HOURS: 'Khung giờ deal nằm ngoài giờ mở cửa của quán.',
   DEAL_QUANTITY_CONFLICT: 'Số lượng mới nhỏ hơn số suất khách đã đặt.',
   DEAL_VERSION_CONFLICT: 'Deal vừa được cập nhật ở nơi khác. Tải lại rồi thử lại.',
   VALIDATION_FAILED: 'Thông tin deal không hợp lệ. Kiểm tra lại các ô đã nhập.',
