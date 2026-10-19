@@ -72,6 +72,10 @@ export type ManagedAccount = {
   name: string;
   /** Quán: quận/huyện, vd. "Q.10". Người dùng: số deal đã mua. */
   detail: string;
+  /** Số điện thoại đã định dạng để hiển thị; rỗng khi tài khoản chưa có số. */
+  phone?: string;
+  /** Tài khoản đã xác thực email hay chưa. */
+  verified?: boolean;
   status: ManagedAccountStatus;
   /** Lý do admin đã ghi khi khoá; chỉ có khi tài khoản đang bị khoá. */
   lockReason?: string | null;

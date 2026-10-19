@@ -1,12 +1,20 @@
 import { ApiException } from '@/lib/api-client';
 
 // Backend trả message tiếng Anh, chỉ error.code là enum ổn định — map sang câu tiếng Việt ở đây.
+// Thông báo khi tài khoản bị quản trị viên khoá. Backend có thể trả một trong vài mã tuỳ phiên
+// bản, nên map tất cả về cùng một câu rõ ràng thay vì để rơi vào thông báo chung chung.
+const ACCOUNT_LOCKED_MESSAGE =
+  'Tài khoản của bạn đã bị quản trị viên khoá. Vui lòng liên hệ hỗ trợ để được mở khoá.';
+
 const SIGNIN_MESSAGES: Record<string, string> = {
   VALIDATION_FAILED: 'Email hoặc mật khẩu không đúng định dạng.',
   INVALID_CREDENTIALS: 'Email hoặc mật khẩu không đúng.',
   ACCOUNT_NOT_VERIFIED:
     'Tài khoản chưa xác thực email. Kiểm tra hộp thư để xác thực trước khi đăng nhập.',
   USER_NOT_FOUND: 'Email hoặc mật khẩu không đúng.',
+  ACCOUNT_LOCKED: ACCOUNT_LOCKED_MESSAGE,
+  ACCOUNT_DISABLED: ACCOUNT_LOCKED_MESSAGE,
+  USER_LOCKED: ACCOUNT_LOCKED_MESSAGE,
 };
 
 const SIGNUP_MESSAGES: Record<string, string> = {

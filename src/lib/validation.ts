@@ -24,7 +24,13 @@ export function checkPhone(value: string, { optional = false } = {}) {
 }
 
 export function checkFullName(value: string) {
-  return value.trim().length >= MIN_NAME_LENGTH ? undefined : 'Vui lòng nhập họ và tên';
+  const name = value.trim();
+
+  if (name.length < MIN_NAME_LENGTH) return 'Vui lòng nhập họ và tên';
+
+  // Bắt buộc ít nhất hai từ (họ và tên). Backend bắt firstName + lastName không rỗng, nên nếu
+  // chỉ có một từ thì lastName bị lấy lại chính từ đó và tên hiển thị bị lặp đôi ("Tester Tester").
+  return /\s/.test(name) ? undefined : 'Vui lòng nhập cả họ và tên';
 }
 
 export function checkRequired(value: string, message: string) {

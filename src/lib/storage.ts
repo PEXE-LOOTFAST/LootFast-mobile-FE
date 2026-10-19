@@ -3,6 +3,8 @@ import { Platform } from 'react-native';
 
 const ACCESS_TOKEN_KEY = 'lootfast.access_token';
 const REFRESH_TOKEN_KEY = 'lootfast.refresh_token';
+// Đánh dấu phiên đã đăng nhập qua cổng quản trị, để mở lại app vẫn khôi phục được khu /admin.
+const ADMIN_GATE_KEY = 'lootfast.admin_gate';
 
 const isWeb = Platform.OS === 'web';
 
@@ -38,8 +40,16 @@ export const tokenStorage = {
       setItem(REFRESH_TOKEN_KEY, refreshToken),
     ]);
   },
+  // Phiên admin: lưu riêng khỏi token vì chỉ phiên qua cổng quản trị mới được bật `isAdmin`.
+  setAdminGate: (isAdmin: boolean) =>
+    isAdmin ? setItem(ADMIN_GATE_KEY, '1') : removeItem(ADMIN_GATE_KEY),
+  isAdminGate: async () => (await getItem(ADMIN_GATE_KEY)) === '1',
   clear: async () => {
-    await Promise.all([removeItem(ACCESS_TOKEN_KEY), removeItem(REFRESH_TOKEN_KEY)]);
+    await Promise.all([
+      removeItem(ACCESS_TOKEN_KEY),
+      removeItem(REFRESH_TOKEN_KEY),
+      removeItem(ADMIN_GATE_KEY),
+    ]);
   },
 };
 
