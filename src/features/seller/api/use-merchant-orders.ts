@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { MERCHANT_PERFORMANCE_QUERY_KEY } from '@/features/seller/api/merchant-performance';
 import {
   confirmMerchantPayment,
   confirmMerchantPickup,
@@ -24,7 +25,12 @@ export function useMerchantOrders(range: { from: Date; to: Date } | null) {
 function useInvalidateOrders() {
   const queryClient = useQueryClient();
 
-  return () => queryClient.invalidateQueries({ queryKey: MERCHANT_ORDERS_QUERY_KEY });
+  // Báo cáo (Hôm nay/7 ngày/30 ngày và tổng quan) tính từ đơn nên cũng phải tải lại khi đơn đổi trạng thái.
+  return () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: MERCHANT_ORDERS_QUERY_KEY }),
+      queryClient.invalidateQueries({ queryKey: MERCHANT_PERFORMANCE_QUERY_KEY }),
+    ]);
 }
 
 export function useConfirmPickup() {

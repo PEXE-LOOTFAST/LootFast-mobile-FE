@@ -30,6 +30,8 @@ export type MerchantPerformanceDto = {
   topDeals: TopDeal[];
 };
 
+export const MERCHANT_PERFORMANCE_QUERY_KEY = ['merchant', 'performance'];
+
 function toDateString(date: Date): string {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -48,7 +50,7 @@ export function useMerchantPerformance(from: Date, to: Date) {
   const toStr = toDateString(to);
 
   return useQuery({
-    queryKey: ['merchant', 'performance', fromStr, toStr],
+    queryKey: [...MERCHANT_PERFORMANCE_QUERY_KEY, fromStr, toStr],
     queryFn: () => fetchPerformance(fromStr, toStr),
     staleTime: 60 * 1000,
   });
