@@ -108,6 +108,29 @@ function toGrowth(counts: number[]) {
   return before > 0 ? Math.round(((recent - before) / before) * 100) : 0;
 }
 
+// Kỳ năm gộp theo tháng (365 cột li ti thì không đọc được); tuần/tháng giữ nguyên theo ngày.
+function toChartPoints(daily: SystemReportDto['daily'], period: ReportPeriod) {
+  if (period !== 'year') {
+    return daily.map((day) => ({
+      key: day.date,
+      label: `${day.date.slice(8, 10)}/${day.date.slice(5, 7)}`,
+      count: day.discountedPortions,
+    }));
+  }
+
+  const byMonth = new Map<string, number>();
+  for (const day of daily) {
+    const month = day.date.slice(0, 7);
+    byMonth.set(month, (byMonth.get(month) ?? 0) + day.discountedPortions);
+  }
+
+  return [...byMonth].map(([month, count]) => ({
+    key: month,
+    label: `T${Number(month.slice(5, 7))}`,
+    count,
+  }));
+}
+
 /** Tổng quan toàn sàn, đọc từ GET /admin/reports/overview của 7 ngày gần nhất. */
 export function AdminOverviewScreen() {
   const theme = useTheme();
@@ -119,7 +142,8 @@ export function AdminOverviewScreen() {
   useLightStatusBar();
 
   const data = report.data;
-  const counts = data?.daily.map((day) => day.discountedPortions) ?? [];
+  const points = data ? toChartPoints(data.daily, period) : [];
+  const unit = period === 'year' ? 'tháng' : 'ngày';
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
@@ -155,12 +179,10 @@ export function AdminOverviewScreen() {
                 ))}
               </View>
               <PlatformSalesChartCard
-                daily={data.daily.map((day) => ({
-                  key: day.date,
-                  label: `${day.date.slice(8, 10)}/${day.date.slice(5, 7)}`,
-                  count: day.discountedPortions,
-                }))}
-                growth={toGrowth(counts)}
+                daily={points}
+                growth={toGrowth(points.map((point) => point.count))}
+                range={PERIOD_CAPTION[period].range}
+                unit={unit}
               />
               <RecentAlertsCard alerts={toAlerts(data)} />
             </>
