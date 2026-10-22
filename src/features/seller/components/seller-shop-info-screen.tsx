@@ -11,6 +11,7 @@ import {
   toShopErrorMessage,
   toShopInfoValues,
 } from '@/features/seller/api/shop-info-save';
+import { geocodeAddress } from '@/features/map/api/geocode';
 import { MerchantProfileNotCreated } from '@/features/seller/components/merchant-registration-required';
 import { SellerHeader } from '@/features/seller/components/seller-header';
 import { ShopInfoFields } from '@/features/seller/components/shop-info-fields';
@@ -143,7 +144,23 @@ function ShopInfoForm({ shop, fallback }: { shop: MerchantShop; fallback?: ShopI
   }
 
   async function submit() {
-    const nextErrors = validateShopInfo(values);
+    let current = values;
+
+    // Chưa có toạ độ (người bán chỉ nhập địa chỉ) thì tra từ địa chỉ; tra lỗi thì để validate báo.
+    if (!current.latitude.trim() || !current.longitude.trim()) {
+      const address = [current.addressLine, current.ward, current.district, current.city]
+        .map((part) => part.trim())
+        .filter(Boolean)
+        .join(', ');
+
+      try {
+        const { latitude, longitude } = await geocodeAddress(address);
+        current = { ...current, latitude: latitude.toFixed(6), longitude: longitude.toFixed(6) };
+        setValues(current);
+      } catch {}
+    }
+
+    const nextErrors = validateShopInfo(current);
     setErrors(nextErrors);
     if (Object.values(nextErrors).some(Boolean)) return;
 
@@ -151,7 +168,7 @@ function ShopInfoForm({ shop, fallback }: { shop: MerchantShop; fallback?: ShopI
     setSaved(false);
 
     try {
-      await saveShopInfo(shop, values, initial);
+      await saveShopInfo(shop, current, initial);
       setSaved(true);
     } catch (error) {
       setSubmitError(toShopErrorMessage(error));

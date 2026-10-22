@@ -131,6 +131,64 @@ export async function geocodeAddress(address: string, signal?: AbortSignal): Pro
   return { latitude: location.lat, longitude: location.lng };
 }
 
+export type AddressSuggestion = { placeId: string; description: string };
+
+/** Gợi ý địa chỉ thật ở Việt Nam theo chữ người bán đang gõ (Goong Place AutoComplete). */
+export async function suggestAddresses(
+  input: string,
+  signal?: AbortSignal,
+): Promise<AddressSuggestion[]> {
+  if (!isGoongApiConfigured) throw new GeocodeError('NOT_CONFIGURED');
+
+  let response: Response;
+  try {
+    response = await fetch(goongApiUrl('/Place/AutoComplete', { input }), { signal });
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') throw error;
+    throw new GeocodeError('NETWORK');
+  }
+  if (!response.ok) throw new GeocodeError('NETWORK');
+
+  const payload = (await response.json()) as {
+    predictions?: { place_id?: string; description?: string }[];
+  };
+
+  return (payload.predictions ?? []).flatMap((item) =>
+    item.place_id && item.description
+      ? [{ placeId: item.place_id, description: item.description }]
+      : [],
+  );
+}
+
+/** Lấy toạ độ và địa chỉ tách ô của một gợi ý đã chọn (Goong Place Detail). */
+export async function getSuggestedPlace(
+  placeId: string,
+  signal?: AbortSignal,
+): Promise<{ coordinate: Coordinate; parts: AddressParts }> {
+  if (!isGoongApiConfigured) throw new GeocodeError('NOT_CONFIGURED');
+
+  let response: Response;
+  try {
+    response = await fetch(goongApiUrl('/Place/Detail', { place_id: placeId }), { signal });
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') throw error;
+    throw new GeocodeError('NETWORK');
+  }
+  if (!response.ok) throw new GeocodeError('NETWORK');
+
+  const { result } = (await response.json()) as {
+    result?: GeocodeResult & { geometry?: { location?: { lat: number; lng: number } } };
+  };
+  const location = result?.geometry?.location;
+
+  if (!result || !location) throw new GeocodeError('NOT_FOUND');
+
+  return {
+    coordinate: { latitude: location.lat, longitude: location.lng },
+    parts: parseGoongAddress(result),
+  };
+}
+
 export function toGeocodeErrorMessage(error: unknown): string {
   if (error instanceof GeocodeError) {
     const messages: Record<GeocodeErrorCode, string> = {

@@ -80,11 +80,18 @@ export function validateNewDeal(values: NewDealValues): FormErrors<NewDealValues
 // Backend chỉ nhận số điện thoại 8–15 chữ số, có thể có dấu "+" ở đầu.
 const SHOP_PHONE_PATTERN = /^\+?[0-9]{8,15}$/;
 
-function checkCoordinate(value: string, limit: number, message: string) {
+// Khung bao gồm cả đảo của Việt Nam; ngoài khung này chắc chắn không phải vị trí quán.
+const VIETNAM_LATITUDE: [number, number] = [6.5, 23.5];
+const VIETNAM_LONGITUDE: [number, number] = [102, 118];
+
+function checkCoordinate(value: string, range: [number, number]) {
   const text = value.trim().replace(',', '.');
   const parsed = Number(text);
 
-  if (!text || !Number.isFinite(parsed) || Math.abs(parsed) > limit) return message;
+  if (!text) return 'Chưa xác định được vị trí quán. Hãy kiểm tra địa chỉ hoặc chọn trên bản đồ.';
+  if (!Number.isFinite(parsed) || parsed < range[0] || parsed > range[1]) {
+    return 'Vị trí quán phải nằm trong Việt Nam';
+  }
 
   // Backend giới hạn tối đa 6 chữ số thập phân.
   return /\.\d{7,}$/.test(text) ? 'Tối đa 6 chữ số thập phân' : undefined;
@@ -106,8 +113,8 @@ export function validateShopInfo(values: ShopInfoValues): FormErrors<ShopInfoVal
     ward: requireText(values.ward, 100, 'Vui lòng nhập phường/xã'),
     district: requireText(values.district, 100, 'Vui lòng nhập quận/huyện'),
     city: requireText(values.city, 100, 'Vui lòng nhập tỉnh/thành phố'),
-    latitude: checkCoordinate(values.latitude, 90, 'Vĩ độ từ -90 đến 90'),
-    longitude: checkCoordinate(values.longitude, 180, 'Kinh độ từ -180 đến 180'),
+    latitude: checkCoordinate(values.latitude, VIETNAM_LATITUDE),
+    longitude: checkCoordinate(values.longitude, VIETNAM_LONGITUDE),
     open: checkTime(values.open, 'Giờ mở cửa dạng HH:mm'),
     // Backend không nhận khung giờ qua nửa đêm: giờ đóng phải sau giờ mở trong cùng một ngày.
     close: !checkTime(values.close, '')
