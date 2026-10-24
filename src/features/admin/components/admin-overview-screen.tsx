@@ -12,11 +12,17 @@ import {
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { MaxContentWidth } from '@/constants/theme';
 import { toAdminErrorMessage } from '@/features/admin/api/admin-error-messages';
-import { useSystemReport, type SystemReportDto } from '@/features/admin/api/system-report';
+import {
+  REPORT_PERIODS,
+  useSystemReport,
+  type ReportPeriod,
+  type SystemReportDto,
+} from '@/features/admin/api/system-report';
 import { AdminHeader } from '@/features/admin/components/admin-header';
 import { AdminStatCard } from '@/features/admin/components/admin-stat-card';
 import { PlatformSalesChartCard } from '@/features/admin/components/platform-sales-chart-card';
 import { RecentAlertsCard } from '@/features/admin/components/recent-alerts-card';
+import { SegmentedTabs } from '@/features/seller/components/segmented-tabs';
 import type { AdminAlert, AdminStat } from '@/features/admin/types';
 import { useLightStatusBar } from '@/hooks/use-light-status-bar';
 import { useTheme } from '@/hooks/use-theme';
@@ -24,7 +30,16 @@ import { formatPrice } from '@/lib/format';
 
 const sum = (values: number[]) => values.reduce((total, value) => total + value, 0);
 
-function toStats(report: SystemReportDto): AdminStat[] {
+// Mô tả khoảng thời gian trong caption các ô số liệu theo kỳ admin đang chọn.
+const PERIOD_CAPTION: Record<ReportPeriod, { newAccounts: string; range: string }> = {
+  week: { newAccounts: 'mới trong tuần', range: '7 ngày gần nhất' },
+  month: { newAccounts: 'mới trong tháng', range: '30 ngày gần nhất' },
+  year: { newAccounts: 'mới trong năm', range: '365 ngày gần nhất' },
+};
+
+function toStats(report: SystemReportDto, period: ReportPeriod): AdminStat[] {
+  const caption = PERIOD_CAPTION[period];
+
   return [
     {
       id: 'stores',
@@ -38,7 +53,7 @@ function toStats(report: SystemReportDto): AdminStat[] {
       id: 'accounts',
       label: 'Tài khoản',
       value: String(report.accounts.totalAccounts),
-      caption: `${report.accounts.newAccounts} mới trong tuần`,
+      caption: `${report.accounts.newAccounts} ${caption.newAccounts}`,
       icon: 'people',
       tone: 'accent',
     },
@@ -46,7 +61,7 @@ function toStats(report: SystemReportDto): AdminStat[] {
       id: 'orders',
       label: 'Đơn hoàn thành',
       value: String(report.completedOrders),
-      caption: '7 ngày gần nhất',
+      caption: caption.range,
       icon: 'food',
       tone: 'primary',
     },
@@ -93,17 +108,42 @@ function toGrowth(counts: number[]) {
   return before > 0 ? Math.round(((recent - before) / before) * 100) : 0;
 }
 
+// Kỳ năm gộp theo tháng (365 cột li ti thì không đọc được); tuần/tháng giữ nguyên theo ngày.
+function toChartPoints(daily: SystemReportDto['daily'], period: ReportPeriod) {
+  if (period !== 'year') {
+    return daily.map((day) => ({
+      key: day.date,
+      label: `${day.date.slice(8, 10)}/${day.date.slice(5, 7)}`,
+      count: day.discountedPortions,
+    }));
+  }
+
+  const byMonth = new Map<string, number>();
+  for (const day of daily) {
+    const month = day.date.slice(0, 7);
+    byMonth.set(month, (byMonth.get(month) ?? 0) + day.discountedPortions);
+  }
+
+  return [...byMonth].map(([month, count]) => ({
+    key: month,
+    label: `T${Number(month.slice(5, 7))}`,
+    count,
+  }));
+}
+
 /** Tổng quan toàn sàn, đọc từ GET /admin/reports/overview của 7 ngày gần nhất. */
 export function AdminOverviewScreen() {
   const theme = useTheme();
   // Chốt ngày lúc mount để dòng ngày trên header không nhảy giữa các lần render.
   const [today] = useState(() => new Date());
-  const report = useSystemReport();
+  const [period, setPeriod] = useState<ReportPeriod>('week');
+  const report = useSystemReport(period);
 
   useLightStatusBar();
 
   const data = report.data;
-  const counts = data?.daily.map((day) => day.discountedPortions) ?? [];
+  const points = data ? toChartPoints(data.daily, period) : [];
+  const unit = period === 'year' ? 'tháng' : 'ngày';
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
@@ -116,6 +156,8 @@ export function AdminOverviewScreen() {
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.body}>
+          <SegmentedTabs items={REPORT_PERIODS} onChange={setPeriod} value={period} />
+
           {report.isLoading ? (
             <ActivityIndicator color={theme.primary} size="large" style={styles.loader} />
           ) : report.error || !data ? (
@@ -132,17 +174,15 @@ export function AdminOverviewScreen() {
           ) : (
             <>
               <View style={styles.stats}>
-                {toStats(data).map((stat) => (
+                {toStats(data, period).map((stat) => (
                   <AdminStatCard key={stat.id} stat={stat} />
                 ))}
               </View>
               <PlatformSalesChartCard
-                daily={data.daily.map((day) => ({
-                  key: day.date,
-                  label: `${day.date.slice(8, 10)}/${day.date.slice(5, 7)}`,
-                  count: day.discountedPortions,
-                }))}
-                growth={toGrowth(counts)}
+                daily={points}
+                growth={toGrowth(points.map((point) => point.count))}
+                range={PERIOD_CAPTION[period].range}
+                unit={unit}
               />
               <RecentAlertsCard alerts={toAlerts(data)} />
             </>

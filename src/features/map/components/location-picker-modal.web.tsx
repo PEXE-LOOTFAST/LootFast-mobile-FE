@@ -5,7 +5,7 @@ import { EmptyCard } from '@/components/ui/empty-card';
 import type { LocationPickerModalProps } from '@/features/map/components/location-picker.types';
 import { useTheme } from '@/hooks/use-theme';
 
-// WebView native không có trên web: chỉ báo để người bán nhập tay vĩ độ và kinh độ.
+// WebView native không có trên web: chỉ báo để người bán nhập địa chỉ, toạ độ tự xác định khi lưu.
 export function LocationPickerModal({ visible, onClose }: LocationPickerModalProps) {
   const theme = useTheme();
 
@@ -14,7 +14,7 @@ export function LocationPickerModal({ visible, onClose }: LocationPickerModalPro
       <View style={styles.backdrop}>
         <View style={[styles.card, { backgroundColor: theme.background }]}>
           <EmptyCard
-            description="Chọn vị trí bằng bản đồ chỉ có trên ứng dụng Android và iOS. Hãy nhập tay vĩ độ và kinh độ."
+            description="Chọn vị trí bằng bản đồ chỉ có trên ứng dụng Android và iOS. Hãy nhập địa chỉ, toạ độ sẽ tự xác định khi lưu."
             title="Chưa hỗ trợ trên web"
           />
           <BrandButton onPress={onClose} variant="outline">

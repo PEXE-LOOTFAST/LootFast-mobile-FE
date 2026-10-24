@@ -389,7 +389,7 @@ function PickerBody({ initial, addressHint, onConfirm, onClose }: PickerBodyProp
         ) : (
           <View style={styles.overlay}>
             <EmptyCard
-              description="Thêm EXPO_PUBLIC_GOONG_MAPTILES_KEY vào file .env rồi chạy lại. Bạn vẫn nhập tay vĩ độ và kinh độ được."
+              description="Thêm EXPO_PUBLIC_GOONG_MAPTILES_KEY vào file .env rồi chạy lại. Bạn vẫn nhập địa chỉ, toạ độ sẽ tự xác định khi lưu."
               title="Chưa cấu hình bản đồ Goong"
             />
           </View>

@@ -1,10 +1,15 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/ui/icon';
+import { SelectField } from '@/components/ui/select-field';
 import { TextField } from '@/components/ui/text-field';
 import { LocationPickerModal } from '@/features/map/components/location-picker-modal';
+import { useProfile } from '@/features/profile/api/use-profile';
+import { toDisplayPhone } from '@/features/profile/profile-form';
+import { findProvince, useProvinces, useWards } from '@/features/seller/api/administrative-units';
 import { useShopCategories } from '@/features/seller/api/shop-categories';
+import { AddressSuggestions } from '@/features/seller/components/address-suggestions';
 import { OpeningHoursFields } from '@/features/seller/components/opening-hours-fields';
 import { SellerFormCard } from '@/features/seller/components/seller-form-card';
 import { SellerIcons } from '@/features/seller/constants/icons';
@@ -34,6 +39,24 @@ export function ShopInfoFields({
   const theme = useTheme();
   const categories = useShopCategories();
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [addressQuery, setAddressQuery] = useState('');
+  // Địa chỉ đã lấy từ gợi ý/bản đồ (hoặc đã lưu) thì khoá phường/quận/tỉnh, tránh sửa lệch địa chỉ thật.
+  const [isAddressLocked, setIsAddressLocked] = useState(() =>
+    Boolean(values.latitude.trim() && values.longitude.trim()),
+  );
+  // Ô liên hệ còn trống thì điền sẵn email/số điện thoại của tài khoản (người bán vẫn sửa được).
+  const account = useProfile(true).data;
+  const accountEmail = account?.email;
+  const accountPhone = toDisplayPhone(account?.phoneNumber ?? null);
+  useEffect(() => {
+    if (accountEmail && !values.contactEmail.trim()) onChange('contactEmail', accountEmail);
+    if (accountPhone && !values.contactPhone.trim()) onChange('contactPhone', accountPhone);
+    // Chỉ điền một lần khi hồ sơ tải xong, không ghi đè lại khi người bán xoá ô.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountEmail, accountPhone]);
+  const provinces = useProvinces();
+  const province = findProvince(provinces.data, values.city);
+  const wards = useWards(province?.code);
 
   return (
     <>
@@ -145,29 +168,69 @@ export function ShopInfoFields({
           error={errors.addressLine}
           label="Số nhà, đường"
           maxLength={255}
-          onChangeText={(text) => onChange('addressLine', text)}
+          onChangeText={(text) => {
+            onChange('addressLine', text);
+            setAddressQuery(text);
+            // Địa chỉ đã đổi thì toạ độ cũ không còn đúng: xoá để lúc lưu tra lại từ địa chỉ mới.
+            onChange('latitude', '');
+            onChange('longitude', '');
+          }}
           placeholder="12 Nguyễn Huệ"
           value={values.addressLine}
         />
-        <View style={styles.row}>
-          <View style={styles.rowItem}>
-            <TextField
-              size="compact"
-              error={errors.ward}
-              label="Phường/Xã"
-              maxLength={100}
-              onChangeText={(text) => onChange('ward', text)}
-              value={values.ward}
+        <AddressSuggestions
+          query={addressQuery}
+          onSelect={({ coordinate, parts }) => {
+            setAddressQuery('');
+            setIsAddressLocked(true);
+            onChange('addressLine', parts.addressLine);
+            onChange('ward', parts.ward);
+            onChange('district', parts.district);
+            onChange('city', parts.city);
+            onChange('latitude', coordinate.latitude.toFixed(6));
+            onChange('longitude', coordinate.longitude.toFixed(6));
+          }}
+        />
+        <View style={styles.stack}>
+          <View>
+            <SelectField
+              error={errors.city}
+              label="Tỉnh/Thành phố"
+              loading={provinces.isLoading}
+              onSelect={(option) => {
+                onChange('city', option.label);
+                onChange('ward', '');
+                onChange('district', '');
+                setIsAddressLocked(false);
+                // Đổi tỉnh thì địa chỉ khác đi: xoá toạ độ để lúc lưu tra lại và kiểm tra.
+                onChange('latitude', '');
+                onChange('longitude', '');
+              }}
+              options={(provinces.data ?? []).map((item) => ({
+                value: String(item.code),
+                label: item.name,
+              }))}
+              placeholder="Chọn tỉnh/thành"
+              value={values.city}
             />
           </View>
-          <View style={styles.rowItem}>
-            <TextField
-              size="compact"
-              error={errors.district}
-              label="Quận/Huyện"
-              maxLength={100}
-              onChangeText={(text) => onChange('district', text)}
-              value={values.district}
+          <View>
+            <SelectField
+              disabled={!province}
+              error={errors.ward}
+              label="Phường/Xã"
+              loading={wards.isLoading}
+              onSelect={(option) => {
+                onChange('ward', option.label);
+                onChange('latitude', '');
+                onChange('longitude', '');
+              }}
+              options={(wards.data ?? []).map((item) => ({
+                value: String(item.code),
+                label: item.name,
+              }))}
+              placeholder={province ? 'Chọn phường/xã' : 'Chọn tỉnh trước'}
+              value={values.ward}
             />
           </View>
         </View>
@@ -175,11 +238,12 @@ export function ShopInfoFields({
           <View style={styles.rowItem}>
             <TextField
               size="compact"
-              error={errors.city}
-              label="Tỉnh/Thành phố"
+              editable={!(isAddressLocked && values.district.trim())}
+              error={errors.district}
+              label="Quận/Huyện"
               maxLength={100}
-              onChangeText={(text) => onChange('city', text)}
-              value={values.city}
+              onChangeText={(text) => onChange('district', text)}
+              value={values.district}
             />
           </View>
           <View style={styles.mapColumn}>
@@ -199,32 +263,18 @@ export function ShopInfoFields({
             </Pressable>
           </View>
         </View>
-        <View style={styles.row}>
-          <View style={styles.rowItem}>
-            <TextField
-              size="compact"
-              error={errors.latitude}
-              keyboardType="numbers-and-punctuation"
-              label="Vĩ độ"
-              onChangeText={(text) => onChange('latitude', text)}
-              placeholder="10.776889"
-              value={values.latitude}
-            />
-          </View>
-          <View style={styles.rowItem}>
-            <TextField
-              size="compact"
-              error={errors.longitude}
-              keyboardType="numbers-and-punctuation"
-              label="Kinh độ"
-              onChangeText={(text) => onChange('longitude', text)}
-              placeholder="106.700806"
-              value={values.longitude}
-            />
-          </View>
-        </View>
-        <Text style={[styles.hint, { color: theme.textSecondary }]}>
-          Chọn trên bản đồ hoặc nhập tay toạ độ. Khách thấy quán đúng chỗ này trên tab Bản đồ.
+        {/* Toạ độ chỉ hiển thị: lấy từ bản đồ hoặc tự tra từ địa chỉ khi lưu, người bán không nhập. */}
+        <Text
+          style={[
+            styles.hint,
+            { color: errors.latitude || errors.longitude ? theme.danger : theme.textSecondary },
+          ]}
+        >
+          {values.latitude.trim() && values.longitude.trim()
+            ? `Vĩ độ ${values.latitude.trim()} · Kinh độ ${values.longitude.trim()}`
+            : (errors.latitude ??
+              errors.longitude ??
+              'Chưa có toạ độ — sẽ tự xác định từ địa chỉ khi lưu.')}
         </Text>
       </SellerFormCard>
 
@@ -249,6 +299,7 @@ export function ShopInfoFields({
 
           // Địa chỉ chỉ là gợi ý từ vị trí; các ô vẫn sửa tay được sau khi điền.
           if (address) {
+            setIsAddressLocked(true);
             onChange('addressLine', address.addressLine);
             onChange('ward', address.ward);
             onChange('district', address.district);
@@ -313,6 +364,7 @@ const styles = StyleSheet.create({
   error: { fontSize: 12, fontWeight: '600' },
   row: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   rowItem: { flex: 1 },
+  stack: { gap: 10 },
   hint: { fontSize: 12, lineHeight: 17 },
   pressed: { opacity: 0.8 },
 });

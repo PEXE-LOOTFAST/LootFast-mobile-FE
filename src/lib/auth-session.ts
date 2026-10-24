@@ -95,6 +95,8 @@ export async function authenticateAsAdmin(
   user: AuthUser,
 ) {
   await tokenStorage.save(tokens.accessToken, tokens.refreshToken);
+  // Ghi cờ để `restoreSession` khôi phục lại khu /admin khi mở lại app.
+  await tokenStorage.setAdminGate(true);
 
   queryClient.clear();
 
@@ -166,8 +168,8 @@ export async function syncSessionRoles(): Promise<boolean> {
 /**
  * Khôi phục phiên từ token đã lưu khi mở app. Access token thường đã hết hạn sau một thời gian
  * tắt app nên luôn làm mới trước rồi mới đọc `/users/me`. Lỗi mạng thì giữ nguyên trạng thái
- * khách mà không xoá token, lần mở sau sẽ thử lại. Phiên admin không được khôi phục: `isAdmin`
- * chỉ bật qua cổng quản trị nên admin phải đăng nhập lại ở đó.
+ * khách mà không xoá token, lần mở sau sẽ thử lại. Phiên admin được khôi phục khi có cờ cổng
+ * quản trị đã lưu VÀ tài khoản vẫn còn role ADMIN — quyền thật vẫn do backend kiểm tra ở /admin/*.
  */
 export async function restoreSession(): Promise<void> {
   if (state.status === 'authenticated') return;
@@ -187,8 +189,13 @@ export async function restoreSession(): Promise<void> {
     // Người dùng có thể đã tự đăng nhập trong lúc chờ; không ghi đè phiên mới đó.
     if (getSessionState().status === 'authenticated') return;
 
+    // Chỉ bật lại khu /admin khi phiên trước đăng nhập qua cổng quản trị và vẫn còn quyền ADMIN
+    // (admin có thể đã bị gỡ quyền trong lúc tắt app).
+    const isAdmin = (await tokenStorage.isAdminGate()) && me.roles.includes('ADMIN');
+
     setState({
       status: 'authenticated',
+      isAdmin,
       user: {
         firstName: me.firstName,
         lastName: me.lastName,

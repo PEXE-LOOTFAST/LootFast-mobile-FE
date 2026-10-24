@@ -27,7 +27,9 @@ export function AccountDetailDialog({ account, onClose, onToggleLock }: AccountD
   const rows: [string, string][] = account
     ? [
         ['Email', account.detail],
+        ['Số điện thoại', account.phone || 'Chưa có'],
         ['Loại tài khoản', KIND_LABELS[account.kind]],
+        ['Xác thực email', account.verified ? 'Đã xác thực' : 'Chưa xác thực'],
         ['Trạng thái', isLocked ? 'Đã khóa' : 'Đang hoạt động'],
         ...(isLocked && account.lockReason
           ? [['Lý do khoá', account.lockReason] as [string, string]]

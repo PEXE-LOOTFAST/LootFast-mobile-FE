@@ -9,7 +9,9 @@ export type AdminUserDto = {
   firstName: string;
   lastName: string;
   email: string;
+  phoneNumber: string | null;
   roles: string[];
+  verificationStatus: 'UNVERIFIED' | 'VERIFIED';
   locked: boolean;
   lockReason: string | null;
 };
@@ -30,6 +32,9 @@ export function useAdminUsers(keyword: string) {
     initialPageParam: 0,
     getNextPageParam: (lastPage) =>
       lastPage.page + 1 < lastPage.totalPages ? lastPage.page + 1 : undefined,
+    // Tải lại mỗi lần mở màn Quản lý để admin thấy thay đổi mới nhất (vd. người dùng vừa đổi tên),
+    // thay vì đọc bản đã cache từ lần xem trước.
+    refetchOnMount: 'always',
   });
 }
 

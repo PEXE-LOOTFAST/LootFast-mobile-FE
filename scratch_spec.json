@@ -1,0 +1,6 @@
+{
+  "success": false,
+  "error": { "code": "UNAUTHORIZED", "message": "Authentication is required" },
+  "traceId": "777cf22d-1437-40d7-9c36-1caa034bacf6",
+  "timestamp": "2026-10-19T07:04:09.038147707Z"
+}

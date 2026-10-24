@@ -9,6 +9,7 @@ import { SellerFormCard } from '@/features/seller/components/seller-form-card';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import { useMerchantCurrentUser } from '@/features/seller/hooks/use-merchant-shop';
 import { useTheme } from '@/hooks/use-theme';
+import { toDisplayPhone } from '@/lib/phone';
 
 const goToSettings = () => router.navigate('/seller/settings');
 
@@ -40,7 +41,8 @@ export function SellerOwnerInfoScreen() {
 
   const fullName = currentUser.displayName ?? '';
   const email = currentUser.email ?? '';
-  const phone = currentUser.phoneNumber ? `0${currentUser.phoneNumber}` : '';
+  // Chỉ thêm số 0 đầu cho số 9 chữ số của backend; số đã có 0 đầu giữ nguyên, tránh hiện "00…".
+  const phone = toDisplayPhone(currentUser.phoneNumber);
 
   return (
     <SellerOwnerInfoScaffold>

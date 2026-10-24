@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Alert,
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -26,6 +27,7 @@ import { RejectApplicationDialog } from '@/features/admin/components/reject-appl
 import type { ManagedAccount } from '@/features/admin/types';
 import { useLightStatusBar } from '@/hooks/use-light-status-bar';
 import { useTheme } from '@/hooks/use-theme';
+import { toDisplayPhone, toSearchKeyword } from '@/lib/phone';
 
 /** Chờ người dùng ngừng gõ rồi mới gọi API, tránh một request cho mỗi phím. */
 const SEARCH_DEBOUNCE_MS = 400;
@@ -36,6 +38,8 @@ function toAccount(user: AdminUserDto): ManagedAccount {
     kind: user.roles.includes('MERCHANT') ? 'store' : 'user',
     name: `${user.firstName} ${user.lastName}`.trim() || user.email,
     detail: user.email,
+    phone: toDisplayPhone(user.phoneNumber),
+    verified: user.verificationStatus === 'VERIFIED',
     status: user.locked ? 'locked' : 'active',
     lockReason: user.lockReason,
   };
@@ -59,7 +63,8 @@ export function AdminManageScreen() {
   useLightStatusBar();
 
   useEffect(() => {
-    const timer = setTimeout(() => setKeyword(search.trim()), SEARCH_DEBOUNCE_MS);
+    // Chuẩn hoá để gõ số điện thoại kiểu nội địa (0xxxxxxxxx) vẫn khớp dữ liệu 9 chữ số của backend.
+    const timer = setTimeout(() => setKeyword(toSearchKeyword(search)), SEARCH_DEBOUNCE_MS);
 
     return () => clearTimeout(timer);
   }, [search]);
@@ -90,6 +95,13 @@ export function AdminManageScreen() {
       <ScrollView
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
+        refreshControl={
+          <RefreshControl
+            refreshing={users.isRefetching}
+            onRefresh={() => void users.refetch()}
+            tintColor={theme.primary}
+          />
+        }
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.body}>
