@@ -39,6 +39,12 @@ const METHOD_LABELS: Record<PaymentMethodDto, string> = {
   BANK_TRANSFER: 'Chuyển khoản ngân hàng',
 };
 
+// Backend trả `message` bằng tiếng Anh nên không hiển thị lại; lời nhắn do app tự viết theo phương thức.
+const METHOD_NOTES: Record<PaymentMethodDto, string> = {
+  CASH: 'Thanh toán cho cửa hàng khi nhận món.',
+  BANK_TRANSFER: 'Chuyển khoản theo thông tin bên dưới, ghi đúng nội dung chuyển khoản.',
+};
+
 function toTimeLabel(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '--:--';
@@ -197,11 +203,9 @@ export function OrderDetailScreen() {
                   <Row label="Phương thức" value={METHOD_LABELS[instructions.method]} />
                   <Row label="Số tiền" value={formatPrice(instructions.amount)} />
 
-                  {instructions.message ? (
-                    <Text style={[styles.note, { color: theme.textSecondary }]}>
-                      {instructions.message}
-                    </Text>
-                  ) : null}
+                  <Text style={[styles.note, { color: theme.textSecondary }]}>
+                    {METHOD_NOTES[instructions.method]}
+                  </Text>
 
                   {instructions.qrImageUrl ? (
                     <Image
