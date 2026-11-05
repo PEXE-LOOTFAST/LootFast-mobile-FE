@@ -37,7 +37,9 @@ async function readLocation(ask: boolean): Promise<Snapshot> {
     }
 
     const current = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Balanced,
+      // Android có thể đọc GPS dù người dùng tắt Google Location Accuracy.
+      accuracy: Platform.OS === 'android' ? Location.Accuracy.High : Location.Accuracy.Balanced,
+      mayShowUserSettingsDialog: false,
     });
 
     return {
@@ -45,7 +47,8 @@ async function readLocation(ask: boolean): Promise<Snapshot> {
       coords: { latitude: current.coords.latitude, longitude: current.coords.longitude },
       canAskAgain: true,
     };
-  } catch {
+  } catch (error) {
+    if (__DEV__) console.warn('[location] Failed to read current position', error);
     return { status: 'unavailable', coords: null, canAskAgain: true };
   }
 }
@@ -132,24 +135,20 @@ const getSnapshot = () => snapshot;
 export const peekUserLocation = () => snapshot;
 
 /**
- * Xin quyền / bật GPS / đọc lại vị trí tuỳ tình huống. Khi hệ điều hành không cho hỏi lại
- * (đã chọn "đừng hỏi lại") hoặc không có hộp thoại bật GPS (iOS) thì đưa vào Cài đặt.
+ * Xin quyền / đọc lại vị trí tuỳ tình huống. Dịch vụ vị trí đang tắt thì mở cài đặt vị trí;
+ * quyền bị chặn (đã chọn "đừng hỏi lại") thì mở cài đặt ứng dụng.
  */
 async function request() {
   const { status, canAskAgain } = snapshot;
 
   if (status === 'gps-off') {
-    if (Platform.OS !== 'android') {
+    if (Platform.OS === 'android') {
+      await Linking.sendIntent('android.settings.LOCATION_SOURCE_SETTINGS').catch(() =>
+        Linking.openSettings(),
+      );
+    } else {
       await Linking.openSettings();
-      return;
     }
-
-    try {
-      await Location.enableNetworkProviderAsync();
-    } catch {
-      // Người dùng từ chối hộp thoại bật GPS: chỉ báo trạng thái hiện tại, không ép.
-    }
-    await refresh(false);
     return;
   }
 
