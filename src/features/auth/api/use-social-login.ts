@@ -65,10 +65,14 @@ function readNameFromIdToken(idToken: string) {
     const claims = idToken.split('.')[1];
     if (!claims) return {};
 
-    const payload = JSON.parse(
-      // atob không hiểu base64url nên đổi hai ký tự khác biệt trước khi giải mã.
-      atob(claims.replace(/-/g, '+').replace(/_/g, '/')),
-    ) as { given_name?: string; family_name?: string };
+    // atob không hiểu base64url nên đổi hai ký tự khác biệt trước khi giải mã.
+    const binary = atob(claims.replace(/-/g, '+').replace(/_/g, '/'));
+    // atob trả về mỗi byte thành một ký tự, còn nội dung JWT là UTF-8: phải ghép lại các byte
+    // thành ký tự, nếu không tên có dấu như "Văn" sẽ thành "VÄn".
+    const json = decodeURIComponent(
+      Array.from(binary, (char) => `%${char.charCodeAt(0).toString(16).padStart(2, '0')}`).join(''),
+    );
+    const payload = JSON.parse(json) as { given_name?: string; family_name?: string };
 
     return { firstName: payload.given_name, lastName: payload.family_name };
   } catch {
