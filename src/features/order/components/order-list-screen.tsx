@@ -7,7 +7,6 @@ import { EmptyCard } from '@/components/ui/empty-card';
 import { ErrorState } from '@/components/ui/error-state';
 import { LoadingState } from '@/components/ui/loading-state';
 import { MaxContentWidth } from '@/constants/theme';
-import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { BuyerHeader } from '@/features/home/components/buyer-header';
 import { type OrderListStatusDto, toOrderErrorMessage } from '@/features/order/api/orders';
 import { useOrders } from '@/features/order/api/use-orders';
@@ -149,8 +148,6 @@ export function OrderListScreen() {
           )}
         </View>
       </ScrollView>
-
-      <AssistantFab />
     </View>
   );
 }

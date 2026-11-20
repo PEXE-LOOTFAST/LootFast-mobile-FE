@@ -3,7 +3,6 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Icon } from '@/components/ui/icon';
 import { MaxContentWidth } from '@/constants/theme';
-import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { SellerMenuList, type SellerMenuItem } from '@/features/seller/components/seller-menu-list';
 import { SellerHeader } from '@/features/seller/components/seller-header';
 import { SellerIcons } from '@/features/seller/constants/icons';
@@ -83,8 +82,6 @@ export function SellerSettingsScreen() {
           </Pressable>
         </View>
       </ScrollView>
-
-      <AssistantFab bottomOffset={96} />
     </View>
   );
 }

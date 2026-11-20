@@ -45,9 +45,3 @@ export type AppNotification = {
   timeLabel: string;
   isRead: boolean;
 };
-
-export type ChatMessage = {
-  id: string;
-  role: 'assistant' | 'user';
-  text: string;
-};

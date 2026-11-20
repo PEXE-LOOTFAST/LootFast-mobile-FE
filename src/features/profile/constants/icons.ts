@@ -2,8 +2,6 @@ import type { IconMap } from '@/components/ui/icon';
 
 // SF Symbols chỉ có trên iOS, Android và web dùng Material Symbols — mỗi icon phải khai báo đủ cả hai tên.
 export const ProfileIcons = {
-  premium: { ios: 'crown.fill', android: 'workspace_premium', web: 'workspace_premium' },
-  rewards: { ios: 'star.fill', android: 'stars', web: 'stars' },
   orders: { ios: 'bag.fill', android: 'shopping_bag', web: 'shopping_bag' },
   favorites: { ios: 'heart.fill', android: 'favorite', web: 'favorite' },
   profile: { ios: 'person.fill', android: 'person', web: 'person' },

@@ -4,7 +4,6 @@ import { Alert, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } 
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { MaxContentWidth } from '@/constants/theme';
-import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { SellerMenuList, type SellerMenuItem } from '@/features/seller/components/seller-menu-list';
 import { MerchantRegistrationRequired } from '@/features/seller/components/merchant-registration-required';
 import { ShopSetupCard, getShopSetupSteps } from '@/features/seller/components/shop-setup-card';
@@ -130,8 +129,6 @@ export function SellerShopScreen() {
           </Pressable>
         </View>
       </ScrollView>
-
-      <AssistantFab bottomOffset={96} />
     </View>
   );
 }

@@ -5,7 +5,6 @@ import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-v
 import { BrandButton } from '@/components/ui/brand-button';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { MaxContentWidth } from '@/constants/theme';
-import { AssistantFab } from '@/features/home/components/assistant-fab';
 import {
   saveShopInfo,
   toShopErrorMessage,
@@ -56,8 +55,6 @@ export function SellerShopInfoScreen() {
           )}
         </View>
       </KeyboardAwareScrollView>
-
-      <AssistantFab bottomOffset={96} />
     </View>
   );
 }

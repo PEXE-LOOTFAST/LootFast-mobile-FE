@@ -15,7 +15,6 @@ import { useDeal } from '@/features/home/api/use-deals';
 import { useFavorites, useToggleFavoriteDeal } from '@/features/profile/api/use-favorites';
 import { useAuthSession } from '@/hooks/use-auth-session';
 import { requireAuth } from '@/lib/auth-session';
-import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { DealDetailHero } from '@/features/home/components/deal-detail-hero';
 import { DealMeta } from '@/features/home/components/deal-meta';
 import { StoreReviewsCard } from '@/features/review/components/store-reviews-card';
@@ -71,7 +70,6 @@ export function DealDetailScreen() {
 function DealDetail({ deal }: { deal: Deal }) {
   const theme = useTheme();
   const { user } = useAuthSession();
-  const [barHeight, setBarHeight] = useState(0);
 
   // Khung giờ co lại theo thời gian thực nên tính lại mỗi phút; lát đã qua tự biến mất.
   const [now, setNow] = useState(() => Date.now());
@@ -268,7 +266,6 @@ function DealDetail({ deal }: { deal: Deal }) {
 
       <ReserveBar
         disabled={!selectedSlot}
-        onLayout={(event) => setBarHeight(event.nativeEvent.layout.height)}
         onReserve={reservation.reserve}
         onViewOrder={() =>
           reservation.order
@@ -281,9 +278,6 @@ function DealDetail({ deal }: { deal: Deal }) {
         status={reservation.status}
         total={deal.price * quantity}
       />
-
-      {/* Đặt nút trợ lý phía trên thanh đặt giữ để không che nút "Đặt giữ ngay". */}
-      <AssistantFab bottomOffset={barHeight + 12} />
     </View>
   );
 }

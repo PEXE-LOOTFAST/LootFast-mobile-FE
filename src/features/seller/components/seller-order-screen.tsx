@@ -6,7 +6,6 @@ import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-v
 import { EmptyCard } from '@/components/ui/empty-card';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { MaxContentWidth } from '@/constants/theme';
-import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { toMerchantDealErrorMessage } from '@/features/seller/api/merchant-deals';
 import { toMerchantOrderErrorMessage } from '@/features/seller/api/merchant-orders';
 import { useConfirmPickup } from '@/features/seller/api/use-merchant-orders';
@@ -125,8 +124,6 @@ export function SellerOrderScreen() {
             : null}
         </View>
       </KeyboardAwareScrollView>
-
-      <AssistantFab bottomOffset={96} />
 
       <QrScannerModal
         visible={isScannerOpen}
