@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Alert, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
@@ -63,7 +63,7 @@ export function SellerShopScreen() {
       key: 'support',
       icon: SellerIcons.support,
       title: 'Hỗ trợ đối tác',
-      onPress: () => Alert.alert('Hỗ trợ đối tác', 'Kênh hỗ trợ đối tác đang được phát triển.'),
+      onPress: () => router.navigate('/support'),
     },
   ];
 

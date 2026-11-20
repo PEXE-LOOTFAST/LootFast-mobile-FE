@@ -33,7 +33,12 @@ const ACTIVITY_ITEMS: ProfileItem[] = [
 ];
 
 const SUPPORT_ITEMS: ProfileItem[] = [
-  { icon: ProfileIcons.support, title: 'Hỗ trợ', subtitle: '' },
+  {
+    icon: ProfileIcons.support,
+    title: 'Hỗ trợ',
+    subtitle: 'Liên hệ, xóa tài khoản và chính sách quyền riêng tư',
+    href: '/support',
+  },
 ];
 
 function ProfileItemRow({ item, onPress }: { item: ProfileItem; onPress?: () => void }) {

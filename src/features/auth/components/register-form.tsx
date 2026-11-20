@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
@@ -12,6 +13,7 @@ import { FormSection } from '@/features/auth/components/form-section';
 import { AuthIcons } from '@/features/auth/constants/icons';
 import type { RegisterValues } from '@/features/auth/types';
 import { validateRegister } from '@/features/auth/validation';
+import { PrivacyPolicyModal } from '@/features/support/components/privacy-policy-modal';
 import { useForm } from '@/hooks/use-form';
 import { useTheme } from '@/hooks/use-theme';
 import { MIN_PASSWORD_LENGTH } from '@/lib/validation';
@@ -31,6 +33,7 @@ type RegisterFormProps = {
 
 export function RegisterForm({ onRegistered }: RegisterFormProps) {
   const theme = useTheme();
+  const [isPolicyOpen, setIsPolicyOpen] = useState(false);
   const signup = useSignup(onRegistered);
   const { values, errors, isSubmitting, setField, submit } = useForm<RegisterValues>({
     initialValues: INITIAL_VALUES,
@@ -129,9 +132,17 @@ export function RegisterForm({ onRegistered }: RegisterFormProps) {
       <Text style={[styles.terms, { color: theme.textSecondary }]}>
         Bằng việc đăng ký, bạn đồng ý với{' '}
         <Text style={[styles.link, { color: theme.primary }]}>Điều khoản sử dụng</Text> và{' '}
-        <Text style={[styles.link, { color: theme.primary }]}>Chính sách bảo mật</Text> của
-        LootFast.
+        <Text
+          accessibilityRole="link"
+          onPress={() => setIsPolicyOpen(true)}
+          style={[styles.link, { color: theme.primary }]}
+        >
+          Chính sách bảo mật
+        </Text>{' '}
+        của LootFast.
       </Text>
+
+      <PrivacyPolicyModal onClose={() => setIsPolicyOpen(false)} visible={isPolicyOpen} />
     </View>
   );
 }
