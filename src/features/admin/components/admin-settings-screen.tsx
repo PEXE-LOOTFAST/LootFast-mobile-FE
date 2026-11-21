@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 
+import { AppearanceSection } from '@/components/settings/appearance-section';
 import { Icon } from '@/components/ui/icon';
 import {
   FontSize,
@@ -183,6 +184,8 @@ export function AdminSettingsScreen() {
               <Icon name={AdminIcons.chevronRight} color={theme.textSecondary} size={18} />
             </Pressable>
           </View>
+
+          <AppearanceSection />
 
           <Pressable
             accessibilityLabel="Đăng xuất"

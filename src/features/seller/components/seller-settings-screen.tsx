@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { AppearanceSection } from '@/components/settings/appearance-section';
 import { Icon } from '@/components/ui/icon';
 import { FontSize, FontWeight, MaxContentWidth, Radius, Shadow, Spacing } from '@/constants/theme';
 import { MenuSection, type MenuItem } from '@/components/ui/menu-section';
@@ -52,6 +53,8 @@ export function SellerSettingsScreen() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.body}>
           <MenuSection compact items={SETTINGS_ITEMS} />
+
+          <AppearanceSection />
 
           <Pressable
             accessibilityLabel="Chuyển sang người mua"

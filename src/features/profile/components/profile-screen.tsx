@@ -3,6 +3,7 @@ import { router, type Href } from 'expo-router';
 import { Image } from 'expo-image';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { AppearanceSection } from '@/components/settings/appearance-section';
 import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { MenuSection, type MenuItem } from '@/components/ui/menu-section';
 import { Screen } from '@/components/ui/screen';
@@ -143,6 +144,7 @@ export function ProfileScreen() {
       ) : null}
       <MenuSection items={toMenuItems(ACCOUNT_ITEMS)} title="TÀI KHOẢN" />
       <MenuSection items={toMenuItems(ACTIVITY_ITEMS)} title="HOẠT ĐỘNG CỦA BẠN" />
+      <AppearanceSection />
       <MenuSection items={toMenuItems(SUPPORT_ITEMS)} title="HỖ TRỢ" />
       <Pressable
         accessibilityLabel={isMerchant ? 'Chuyển sang người bán' : 'Đăng ký bán hàng'}
