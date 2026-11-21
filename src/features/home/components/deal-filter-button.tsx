@@ -16,8 +16,6 @@ type DealFilterButtonProps = {
   pickup: PickupFilter;
   onChangePickup: (value: PickupFilter) => void;
   isActive: boolean;
-  isLocked: boolean;
-  onPressLocked: () => void;
 };
 
 export function DealFilterButton({
@@ -26,8 +24,6 @@ export function DealFilterButton({
   pickup,
   onChangePickup,
   isActive,
-  isLocked,
-  onPressLocked,
 }: DealFilterButtonProps) {
   const { ref, anchor, open, close } = useAnchor();
 
@@ -38,7 +34,7 @@ export function DealFilterButton({
         accessibilityLabel="Bộ lọc nâng cao"
         icon={HomeIcons.filter}
         isActive={isActive}
-        onPress={isLocked ? onPressLocked : open}
+        onPress={open}
       />
 
       {/* Không tự đóng khi chọn để người dùng chỉnh cả hai nhóm lọc trong một lần mở. */}

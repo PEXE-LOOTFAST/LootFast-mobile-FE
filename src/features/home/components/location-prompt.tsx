@@ -15,12 +15,12 @@ type LocationPromptProps = {
   purpose?: string;
 };
 
-// Thẻ nhắc bật vị trí, dùng ở nơi tính năng cần GPS (bộ lọc Trang chủ, tab Bản đồ).
+// Thẻ nhắc bật vị trí, dùng ở nơi tính năng cần GPS (bán kính ở Trang chủ, tab Bản đồ).
 export function LocationPrompt({
   status,
   canAskAgain,
   onRequest,
-  purpose = 'dùng bộ lọc và xem deal gần bạn',
+  purpose = 'xem deal gần bạn nhất',
 }: LocationPromptProps) {
   const theme = useTheme();
 

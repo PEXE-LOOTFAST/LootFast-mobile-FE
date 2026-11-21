@@ -18,9 +18,12 @@ type SearchPanelProps = {
   categories: DealCategory[];
   selectedCategoryId: DealCategoryId;
   onSelectCategory: (id: DealCategoryId) => void;
-  /** Chưa đăng nhập hoặc chưa có GPS: chạm vào ô tìm kiếm / bán kính sẽ gọi onPressLocked thay vì mở. */
-  isLocked?: boolean;
-  onPressLocked?: () => void;
+  /**
+   * Chưa có GPS thì "gần bạn" chưa có nghĩa: chạm nút bán kính gọi `onPressRadiusLocked` (xin vị
+   * trí) thay vì mở menu. Ô tìm kiếm và danh mục luôn dùng được, kể cả khi chưa đăng nhập.
+   */
+  isRadiusLocked?: boolean;
+  onPressRadiusLocked?: () => void;
 };
 
 export function SearchPanel({
@@ -31,8 +34,8 @@ export function SearchPanel({
   categories,
   selectedCategoryId,
   onSelectCategory,
-  isLocked = false,
-  onPressLocked,
+  isRadiusLocked = false,
+  onPressRadiusLocked,
 }: SearchPanelProps) {
   const theme = useTheme();
   const {
@@ -52,9 +55,13 @@ export function SearchPanel({
       <View style={styles.row}>
         <Pressable
           ref={radiusRef}
-          accessibilityLabel={`Bán kính tìm kiếm ${formatRadius(radiusKm)}`}
+          accessibilityLabel={
+            isRadiusLocked
+              ? 'Bật vị trí để tìm deal gần bạn'
+              : `Bán kính tìm kiếm ${formatRadius(radiusKm)}`
+          }
           accessibilityRole="button"
-          onPress={isLocked ? onPressLocked : openRadius}
+          onPress={isRadiusLocked ? onPressRadiusLocked : openRadius}
           style={[
             styles.radius,
             { backgroundColor: theme.primarySoft, borderColor: theme.backgroundSelected },
@@ -68,21 +75,14 @@ export function SearchPanel({
           <Icon name={HomeIcons.chevronDown} color={theme.textSecondary} size={15} />
         </Pressable>
 
-        <Pressable
-          accessibilityLabel={isLocked ? 'Tìm món hoặc quán' : undefined}
-          accessibilityRole={isLocked ? 'button' : undefined}
-          disabled={!isLocked}
-          onPress={onPressLocked}
+        <View
           style={[styles.search, { backgroundColor: theme.background, borderColor: theme.border }]}
         >
           <Icon name={HomeIcons.search} color={theme.textSecondary} size={16} />
-          {/* Khi bị khoá, ô nhập không nhận chạm để cú bấm rơi xuống Pressable bọc ngoài
-              thay vì mở bàn phím. */}
-          <View style={[styles.inputWrapper, isLocked && styles.passThrough]}>
+          <View style={styles.inputWrapper}>
             <TextInput
               accessibilityLabel="Tìm món hoặc quán"
               autoCorrect={false}
-              editable={!isLocked}
               onChangeText={onChangeQuery}
               placeholder="Tìm món hoặc quán"
               placeholderTextColor={theme.textSecondary}
@@ -91,7 +91,7 @@ export function SearchPanel({
               value={query}
             />
           </View>
-          {query && !isLocked ? (
+          {query ? (
             <Pressable
               accessibilityLabel="Xoá từ khoá"
               accessibilityRole="button"
@@ -101,7 +101,7 @@ export function SearchPanel({
               <Icon name={HomeIcons.clear} color={theme.textSecondary} />
             </Pressable>
           ) : null}
-        </Pressable>
+        </View>
       </View>
 
       <CategoryChips
@@ -151,7 +151,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   inputWrapper: { flex: 1, minWidth: 0 },
-  passThrough: { pointerEvents: 'none' },
   // Trình duyệt tự vẽ viền focus riêng, lệch khỏi khung bo tròn của ô tìm kiếm.
   input: { height: 36, fontSize: FontSize.bodySm, outlineWidth: 0 },
 });

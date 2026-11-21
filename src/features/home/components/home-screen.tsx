@@ -15,13 +15,10 @@ import { DEAL_CATEGORIES } from '@/features/home/constants/deal-categories';
 import { HomeIcons } from '@/features/home/constants/icons';
 import { filterDeals, useDealFilters } from '@/features/home/hooks/use-deal-filters';
 import type { Deal } from '@/features/home/types';
-import { useAuthSession } from '@/hooks/use-auth-session';
 import { useUserLocation } from '@/hooks/use-user-location';
-import { requireAuth, withAuth } from '@/lib/auth-session';
 import { formatRadius } from '@/lib/format';
 
 export function HomeScreen() {
-  const { isAuthenticated } = useAuthSession();
   const filters = useDealFilters([]);
   const location = useUserLocation();
   const dealsQuery = useDeals({
@@ -32,12 +29,12 @@ export function HomeScreen() {
   });
   const filteredDeals = filterDeals(dealsQuery.data ?? [], filters);
 
-  // Bộ lọc cần cả đăng nhập lẫn GPS: không có vị trí thì "gần bạn" và bán kính không có nghĩa.
-  const canFilter = isAuthenticated && location.isReady;
-  const unlockFilters = () => requireAuth(() => void location.request());
+  // Khách xem, tìm và lọc deal thoải mái; chỉ khi đặt giữ hoặc lưu món mới cần đăng nhập. Riêng bán
+  // kính cần GPS, vì chưa có vị trí thì "gần bạn" không có nghĩa.
+  const requestLocation = () => void location.request();
 
   const openDeal = (deal: Deal) => {
-    requireAuth(() => router.navigate({ pathname: '/deal/[id]', params: { id: deal.id } }));
+    router.navigate({ pathname: '/deal/[id]', params: { id: deal.id } });
   };
 
   return (
@@ -48,7 +45,7 @@ export function HomeScreen() {
           empty={
             <EmptyDeals
               isFiltering={filters.isFiltering}
-              onReset={withAuth(filters.resetFilters)}
+              onReset={filters.resetFilters}
               radiusLabel={formatRadius(filters.radiusKm)}
             />
           }
@@ -70,17 +67,17 @@ export function HomeScreen() {
         <>
           <LocationPrompt
             canAskAgain={location.canAskAgain}
-            onRequest={unlockFilters}
+            onRequest={requestLocation}
             status={location.status}
           />
 
           <SearchPanel
             categories={DEAL_CATEGORIES}
-            isLocked={!canFilter}
+            isRadiusLocked={!location.isReady}
             onChangeQuery={filters.setQuery}
             onChangeRadius={filters.setRadiusKm}
-            onPressLocked={unlockFilters}
-            onSelectCategory={(id) => (canFilter ? filters.setCategoryId(id) : unlockFilters())}
+            onPressRadiusLocked={requestLocation}
+            onSelectCategory={filters.setCategoryId}
             query={filters.query}
             radiusKm={filters.radiusKm}
             selectedCategoryId={filters.categoryId}
@@ -96,11 +93,9 @@ export function HomeScreen() {
             action={
               <DealFilterButton
                 isActive={filters.hasAdvancedFilters}
-                isLocked={!canFilter}
                 minDiscount={filters.minDiscount}
                 onChangeDiscount={filters.setMinDiscount}
                 onChangePickup={filters.setPickup}
-                onPressLocked={unlockFilters}
                 pickup={filters.pickup}
               />
             }

@@ -14,8 +14,8 @@ export default function TabsLayout() {
   // giao diện người mua. Chặn ở layout để cold start không dừng lại ở tab người mua.
   if (isAdmin) return <Redirect href="/admin/overview" />;
 
-  // Khách chỉ được xem Trang chủ: chặn chuyển tab, mở modal đăng nhập và chỉ chuyển tab
-  // sau khi đăng nhập xong.
+  // Khách xem được Trang chủ và Bản đồ (deal và cửa hàng là dữ liệu công khai). Đơn hàng và Tài
+  // khoản gắn với người dùng nên chặn chuyển tab, mở modal đăng nhập rồi mới chuyển.
   const guardTab = (href: Href) => ({
     tabPress: (event: { preventDefault: () => void }) => {
       if (isAuthenticated) return;
@@ -28,7 +28,7 @@ export default function TabsLayout() {
     <Tabs screenOptions={{ headerShown: false }} tabBar={(props) => <AppTabBar {...props} />}>
       <Tabs.Screen name="index" options={{ title: 'Trang chủ' }} />
       <Tabs.Screen name="orders" listeners={guardTab('/orders')} options={{ title: 'Đơn hàng' }} />
-      <Tabs.Screen name="map" listeners={guardTab('/map')} options={{ title: 'Bản đồ' }} />
+      <Tabs.Screen name="map" options={{ title: 'Bản đồ' }} />
       <Tabs.Screen name="profile" listeners={guardTab('/profile')} options={{ title: 'Cài đặt' }} />
       <Tabs.Screen name="deal/[id]" options={{ href: null }} />
       <Tabs.Screen name="premium" options={{ href: null }} />
