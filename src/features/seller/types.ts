@@ -61,8 +61,8 @@ export type SellerPlan = {
   renewsAt?: string;
 };
 
-/** 'premium': đã có trong gói Cao cấp; 'backend': giao diện có sẵn nhưng chờ API. */
-export type SellerPlanFeatureStatus = 'premium' | 'backend';
+/** 'premium': đã có trong gói Cao cấp; 'soon': đã lên kế hoạch nhưng chưa mở. */
+export type SellerPlanFeatureStatus = 'premium' | 'soon';
 
 /** Ba mục lớn của trang Đơn hàng người bán. */
 export type SellerOrderTab = 'incoming' | 'running' | 'ended';

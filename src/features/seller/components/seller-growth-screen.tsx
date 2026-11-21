@@ -2,14 +2,13 @@ import { router } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { FontSize, FontWeight, Radius, Shadow, Spacing } from '@/constants/theme';
-import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/ui/icon';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
 
-// Backend chưa có API chiến dịch nên trang chỉ có trạng thái rỗng; khi có danh sách thì
-// mỗi chương trình là một thẻ cùng kiểu với thẻ bên dưới.
+// Backend chưa có API chiến dịch nên trang chỉ có trạng thái rỗng, nói bằng lời của người bán;
+// khi có danh sách thì mỗi chương trình là một thẻ cùng kiểu với thẻ bên dưới.
 export function SellerGrowthScreen() {
   const theme = useTheme();
   const goToShop = () => router.navigate('/seller/shop');
@@ -31,12 +30,9 @@ export function SellerGrowthScreen() {
           <Text accessibilityRole="header" style={[styles.title, { color: theme.text }]}>
             Chưa có chương trình đang mở
           </Text>
-          <Badge label="Cần backend" />
           <Text style={[styles.description, { color: theme.textSecondary }]}>
-            Backend chưa cung cấp danh sách chiến dịch, điều kiện, ngân sách hoặc luồng đăng ký.
-          </Text>
-          <Text style={[styles.eligibility, { color: theme.text }]}>
-            Quyền đăng ký hiện tại: Chưa khả dụng
+            Khi LootFast mở chiến dịch mới (giảm phí, đẩy deal lên đầu trang…), chương trình sẽ hiện
+            ở đây kèm điều kiện tham gia. Bạn chưa cần làm gì lúc này.
           </Text>
         </View>
       </View>
@@ -75,7 +71,6 @@ const styles = StyleSheet.create({
   copy: { flex: 1, gap: Spacing.sm },
   title: { fontSize: FontSize.bodyLg, fontWeight: FontWeight.heavy },
   description: { fontSize: FontSize.bodySm, lineHeight: 19 },
-  eligibility: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold },
   note: {
     flexDirection: 'row',
     alignItems: 'flex-start',
