@@ -15,18 +15,9 @@ import {
 } from '@/features/seller/api/merchant-deals';
 import { toTimeInput, vietnamDateKey } from '@/features/seller/deal-schedule';
 import type { SellerDeal } from '@/features/seller/types';
+import { formatTime } from '@/lib/format';
 
 export const MERCHANT_DEALS_QUERY_KEY = ['merchant', 'deals'];
-
-function toTimeLabel(value: string) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '--:--';
-
-  return `${date.getHours().toString().padStart(2, '0')}:${date
-    .getMinutes()
-    .toString()
-    .padStart(2, '0')}`;
-}
 
 /**
  * Backend có 5 trạng thái, màn Đơn hàng chỉ chia hai nhóm: còn bán được hay không. DRAFT cũng
@@ -54,8 +45,8 @@ export function toSellerDeal(deal: MerchantDealDto): SellerDeal {
     price: deal.discountedPrice,
     originalPrice: deal.originalPrice,
     pickupWindow: {
-      start: toTimeLabel(deal.saleStartsAt),
-      end: toTimeLabel(deal.saleEndsAt),
+      start: formatTime(deal.saleStartsAt),
+      end: formatTime(deal.saleEndsAt),
     },
     saleEndsLabel: `${toTimeInput(deal.saleEndsAt)} · ${vietnamDateKey(deal.saleEndsAt)
       .slice(5)

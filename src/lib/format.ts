@@ -45,6 +45,13 @@ export function formatTimeOfDay(date: Date): string {
   return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
+// Chuỗi thời gian ISO từ API → "19:58" theo giờ máy; chuỗi không hợp lệ thành "--:--".
+export function formatTime(value: string): string {
+  const date = new Date(value);
+
+  return Number.isNaN(date.getTime()) ? '--:--' : formatTimeOfDay(date);
+}
+
 const startOfDayMs = (date: Date) =>
   new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
 

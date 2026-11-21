@@ -4,7 +4,7 @@ import { Icon } from '@/components/ui/icon';
 import type { MerchantOrderDto } from '@/features/seller/api/merchant-orders';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
-import { formatPrice } from '@/lib/format';
+import { formatPrice, formatTime } from '@/lib/format';
 
 type SellerOrderRowProps = {
   order: MerchantOrderDto;
@@ -12,14 +12,6 @@ type SellerOrderRowProps = {
   onConfirmPayment: () => void;
   onRejectPayment: () => void;
 };
-
-const pad = (value: number) => value.toString().padStart(2, '0');
-
-function toTime(value: string) {
-  const date = new Date(value);
-
-  return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
-}
 
 /** Một dòng trạng thái thanh toán dễ hiểu cho người bán, dựa trên cặp phương thức và trạng thái. */
 function describePayment(order: MerchantOrderDto) {
@@ -60,7 +52,7 @@ export function SellerOrderRow({
             {order.dealName} × {order.quantity}
           </Text>
           <Text numberOfLines={1} style={[styles.meta, { color: theme.textSecondary }]}>
-            Khách hẹn {toTime(order.pickupFrom)} – {toTime(order.pickupTo)}
+            Khách hẹn {formatTime(order.pickupFrom)} – {formatTime(order.pickupTo)}
           </Text>
         </View>
 

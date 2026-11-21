@@ -7,11 +7,10 @@ import { TextField } from '@/components/ui/text-field';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { formatTimeTyping, normalizeTime, toMinutes } from '@/features/seller/opening-hours';
 import { useTheme } from '@/hooks/use-theme';
+import { formatTimeOfDay } from '@/lib/format';
 
 // Thư viện chọn giờ gốc không có bản web nên trên web chỉ còn cách gõ tay.
 const CAN_PICK_TIME = Platform.OS !== 'web';
-
-const pad = (value: number) => value.toString().padStart(2, '0');
 
 function timeToDate(time: string, fallback: string): Date {
   const minutes = toMinutes(time) ?? toMinutes(fallback) ?? 0;
@@ -53,7 +52,7 @@ export function TimeInputField({
     if (Platform.OS !== 'ios') setIsPickerOpen(false);
     if (event.type !== 'set' || !selected) return;
 
-    onChange(`${pad(selected.getHours())}:${pad(selected.getMinutes())}`);
+    onChange(formatTimeOfDay(selected));
   };
 
   const pickerValue = timeToDate(value, defaultTime);

@@ -24,7 +24,7 @@ import { useCancelOrder, useOrder } from '@/features/order/api/use-orders';
 import { useChangePaymentMethod, usePaymentInstructions } from '@/features/order/api/use-payments';
 import { useTheme } from '@/hooks/use-theme';
 import { confirmAction } from '@/lib/confirm';
-import { formatPrice } from '@/lib/format';
+import { formatPrice, formatTime } from '@/lib/format';
 
 const STATUS_LABELS: Record<OrderStatusDto, string> = {
   RESERVED: 'Đang giữ chỗ',
@@ -44,16 +44,6 @@ const METHOD_NOTES: Record<PaymentMethodDto, string> = {
   CASH: 'Thanh toán cho cửa hàng khi nhận món.',
   BANK_TRANSFER: 'Chuyển khoản theo thông tin bên dưới, ghi đúng nội dung chuyển khoản.',
 };
-
-function toTimeLabel(value: string) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '--:--';
-
-  return `${date.getHours().toString().padStart(2, '0')}:${date
-    .getMinutes()
-    .toString()
-    .padStart(2, '0')}`;
-}
 
 /**
  * Chi tiết một đơn đã giữ, kèm hướng dẫn thanh toán. Mở từ màn deal ngay sau khi đặt — backend
@@ -143,11 +133,11 @@ export function OrderDetailScreen() {
               <Row label="Tổng tiền" value={formatPrice(order.totalAmount)} />
               <Row
                 label="Giờ bạn hẹn lấy"
-                value={`${toTimeLabel(order.pickupFrom)}–${toTimeLabel(order.pickupTo)}`}
+                value={`${formatTime(order.pickupFrom)}–${formatTime(order.pickupTo)}`}
               />
               <Row
                 label="Khung giờ deal"
-                value={`${toTimeLabel(order.pickupStart)}–${toTimeLabel(order.pickupEnd)}`}
+                value={`${formatTime(order.pickupStart)}–${formatTime(order.pickupEnd)}`}
               />
               {order.pickupCode ? (
                 <View style={styles.pickupCodeSection}>

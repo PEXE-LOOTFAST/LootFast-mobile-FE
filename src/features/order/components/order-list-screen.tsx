@@ -12,7 +12,7 @@ import { BuyerHeader } from '@/features/home/components/buyer-header';
 import { type OrderListStatusDto, toOrderErrorMessage } from '@/features/order/api/orders';
 import { useOrders } from '@/features/order/api/use-orders';
 import { useTheme } from '@/hooks/use-theme';
-import { formatPrice } from '@/lib/format';
+import { formatPrice, formatTime } from '@/lib/format';
 
 const STATUS_TABS: { value: OrderListStatusDto; label: string }[] = [
   { value: 'RESERVED', label: 'Đang giữ' },
@@ -102,7 +102,7 @@ export function OrderListScreen() {
                     Mã đơn: {order.orderId}
                   </Text>
                   <Text style={[styles.pickup, { color: theme.textSecondary }]}>
-                    Hẹn lấy: {toTimeLabel(order.pickupFrom)}–{toTimeLabel(order.pickupTo)}
+                    Hẹn lấy: {formatTime(order.pickupFrom)}–{formatTime(order.pickupTo)}
                   </Text>
                   <View style={styles.totalRow}>
                     <Text style={[styles.quantity, { color: theme.textSecondary }]}>
@@ -171,12 +171,3 @@ const styles = StyleSheet.create({
   pagination: { alignItems: 'center', gap: 10 },
   pageLabel: { fontSize: 13, fontWeight: '700' },
 });
-
-function toTimeLabel(value: string) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '--:--';
-  return `${date.getHours().toString().padStart(2, '0')}:${date
-    .getMinutes()
-    .toString()
-    .padStart(2, '0')}`;
-}

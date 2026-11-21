@@ -1,5 +1,6 @@
 import { apiRequest, ApiException } from '@/lib/api-client';
 import type { Deal, DealCategoryId } from '@/features/home/types';
+import { formatTime } from '@/lib/format';
 
 export type DealFeedItemResponse = {
   dealId: string;
@@ -60,16 +61,6 @@ export const DEFAULT_DEAL_LOCATION = {
   longitude: 106.7009,
 };
 
-function toTimeLabel(value: string) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '--:--';
-
-  return `${date.getHours().toString().padStart(2, '0')}:${date
-    .getMinutes()
-    .toString()
-    .padStart(2, '0')}`;
-}
-
 function toAddress(merchant: DealFeedItemResponse['merchant']) {
   return [merchant.addressLine, merchant.ward, merchant.district, merchant.city]
     .filter(Boolean)
@@ -113,8 +104,8 @@ export function toDeal(response: DealFeedItemResponse | DealDetailResponse): Dea
     price: response.discountedPrice,
     originalPrice: response.originalPrice,
     pickupWindow: {
-      start: toTimeLabel(response.pickupStart),
-      end: toTimeLabel(response.pickupEnd),
+      start: formatTime(response.pickupStart),
+      end: formatTime(response.pickupEnd),
     },
     pickupWindowIso: { start: response.pickupStart, end: response.pickupEnd },
     distanceKm: response.distanceKm,
