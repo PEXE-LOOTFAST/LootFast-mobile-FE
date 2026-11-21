@@ -2,6 +2,7 @@ import type { PickupSlot } from '@/features/home/pickup-slots';
 import { useCreateOrder, useOrder } from '@/features/order/api/use-orders';
 import { toOrderErrorMessage } from '@/features/order/api/orders';
 import { getSessionState, requireAuth } from '@/lib/auth-session';
+import { haptics } from '@/lib/haptics';
 
 export type ReservationStatus = 'idle' | 'reserving' | 'reserved';
 
@@ -42,13 +43,16 @@ export function useReservation(
   const submit = () => {
     if (createOrder.isPending || isStillReserved || !pickupSlot) return;
 
-    createOrder.mutate({
-      dealId,
-      quantity,
-      paymentMethod: 'CASH',
-      pickupFrom: pickupSlot.from,
-      pickupTo: pickupSlot.to,
-    });
+    createOrder.mutate(
+      {
+        dealId,
+        quantity,
+        paymentMethod: 'CASH',
+        pickupFrom: pickupSlot.from,
+        pickupTo: pickupSlot.to,
+      },
+      { onSuccess: () => haptics.success(), onError: () => haptics.error() },
+    );
   };
 
   const reserve = () => {

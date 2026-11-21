@@ -66,7 +66,7 @@ export function PickupSlotPicker({
           </ScrollView>
 
           <Text style={[styles.hint, { color: theme.textSecondary }]}>
-            Quán giữ phần của bạn trong khung giờ này. Huỷ đơn được đến trước giờ hẹn 30 phút.
+            Quán giữ phần của bạn trong khung giờ này.
           </Text>
         </>
       )}

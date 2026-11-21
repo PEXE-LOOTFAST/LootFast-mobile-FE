@@ -28,6 +28,10 @@ import { StoreReviewsCard } from '@/features/review/components/store-reviews-car
 import { DetailCard } from '@/features/home/components/detail-card';
 import { PickupSlotPicker } from '@/features/home/components/pickup-slot-picker';
 import { QuantityStepper } from '@/features/home/components/quantity-stepper';
+import {
+  ReservationInfoCard,
+  ReservedNotice,
+} from '@/features/home/components/reservation-info-card';
 import { ReserveBar } from '@/features/home/components/reserve-bar';
 import { ORDER_MAX_QUANTITY } from '@/features/order/api/orders';
 import { HomeIcons } from '@/features/home/constants/icons';
@@ -108,6 +112,7 @@ function DealDetail({ deal }: { deal: Deal }) {
   );
 
   const savings = deal.originalPrice - deal.price;
+  const total = deal.price * quantity;
 
   const handleShare = async () => {
     try {
@@ -234,6 +239,8 @@ function DealDetail({ deal }: { deal: Deal }) {
             />
           </DetailCard>
 
+          <ReservationInfoCard now={now} slot={selectedSlot} total={total} />
+
           <DetailCard>
             <View style={styles.location}>
               <Icon name={HomeIcons.location} color={theme.primary} size={18} />
@@ -265,8 +272,18 @@ function DealDetail({ deal }: { deal: Deal }) {
       </ScrollView>
 
       {reservation.error ? (
-        <View style={styles.reserveError}>
+        <View style={styles.bottomNotice}>
           <InlineAlert message={reservation.error} />
+        </View>
+      ) : null}
+
+      {reservation.status === 'reserved' ? (
+        <View style={styles.bottomNotice}>
+          <ReservedNotice
+            slotLabel={selectedSlot?.label}
+            storeName={deal.store.name}
+            total={total}
+          />
         </View>
       ) : null}
 
@@ -282,7 +299,7 @@ function DealDetail({ deal }: { deal: Deal }) {
             : router.navigate('/orders')
         }
         status={reservation.status}
-        total={deal.price * quantity}
+        total={total}
       />
     </View>
   );
@@ -336,7 +353,7 @@ function DealDetailError({
 }
 
 const styles = StyleSheet.create({
-  reserveError: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.sm },
+  bottomNotice: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.sm },
   quantityRow: {
     flexDirection: 'row',
     alignItems: 'center',

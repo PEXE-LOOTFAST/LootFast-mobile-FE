@@ -48,7 +48,7 @@ export function ReserveBar({
         onPress={isReserved ? onViewOrder : onReserve}
         style={styles.button}
       >
-        {isReserved ? 'Xem đơn đã giữ' : 'Đặt giữ ngay'}
+        {isReserved ? 'Mở mã nhận món' : 'Đặt giữ ngay'}
       </BrandButton>
     </View>
   );

@@ -31,4 +31,8 @@ export const HomeIcons = {
   send: { ios: 'paperplane.fill', android: 'send', web: 'send' },
   doneAll: { ios: 'checkmark.circle', android: 'done_all', web: 'done_all' },
   trash: { ios: 'trash', android: 'delete', web: 'delete' },
+  cash: { ios: 'banknote', android: 'payments', web: 'payments' },
+  qrCode: { ios: 'qrcode', android: 'qr_code_2', web: 'qr_code_2' },
+  cancelWindow: { ios: 'clock.badge.xmark', android: 'event_busy', web: 'event_busy' },
+  success: { ios: 'checkmark.circle.fill', android: 'check_circle', web: 'check_circle' },
 } satisfies IconMap;
