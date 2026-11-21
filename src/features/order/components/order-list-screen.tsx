@@ -8,6 +8,7 @@ import { Chip } from '@/components/ui/chip';
 import { EmptyCard } from '@/components/ui/empty-card';
 import { QueryListEmpty } from '@/components/ui/query-boundary';
 import { ScreenList } from '@/components/ui/screen';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ScreenGutter, Spacing } from '@/constants/theme';
 import { BuyerHeader } from '@/features/home/components/buyer-header';
 import {
@@ -52,7 +53,7 @@ export function OrderListScreen() {
             />
           }
           errorMessage={toOrderErrorMessage}
-          loadingLabel="Đang tải danh sách đơn..."
+          loading={<OrderListSkeleton />}
           query={ordersQuery}
         />
       }
@@ -119,7 +120,31 @@ function OrderCard({ order, statusLabel }: { order: OrderDto; statusLabel: strin
   );
 }
 
+// Ba thẻ giữ chỗ cùng dáng thẻ đơn thật: tên món, mã đơn, giờ hẹn, tổng tiền.
+function OrderListSkeleton() {
+  return (
+    <View
+      accessibilityLabel="Đang tải danh sách đơn"
+      accessibilityRole="progressbar"
+      style={styles.skeletons}
+    >
+      {[0, 1, 2].map((index) => (
+        <Card key={index} gap="sm">
+          <Skeleton height={18} width="60%" />
+          <Skeleton height={12} width="40%" />
+          <Skeleton height={14} width="50%" />
+          <View style={styles.totalRow}>
+            <Skeleton height={14} width={60} />
+            <Skeleton height={18} width={90} />
+          </View>
+        </Card>
+      ))}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
+  skeletons: { gap: Spacing.lg },
   tabs: { gap: Spacing.sm, paddingRight: ScreenGutter },
   cardHeader: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
   dealName: { flex: 1 },

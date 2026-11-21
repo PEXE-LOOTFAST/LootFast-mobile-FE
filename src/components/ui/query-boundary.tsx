@@ -17,6 +17,8 @@ type QueryListEmptyProps = {
   query: Omit<QueryState<unknown>, 'data'>;
   errorMessage: (error: unknown) => string;
   loadingLabel?: string;
+  /** Khung xương thay cho vòng xoay lúc tải lần đầu, dựng theo hình dáng mục trong danh sách. */
+  loading?: ReactNode;
   /** Tải xong mà không có mục nào. */
   empty: ReactNode;
 };
@@ -25,8 +27,14 @@ type QueryListEmptyProps = {
  * `ListEmptyComponent` cho danh sách lấy từ API. FlatList chỉ hiện nó khi chưa có mục nào, nên
  * một chỗ phủ đủ ba trường hợp: đang tải lần đầu, lỗi (kèm Thử lại) và thật sự rỗng.
  */
-export function QueryListEmpty({ query, errorMessage, loadingLabel, empty }: QueryListEmptyProps) {
-  if (query.isPending) return <LoadingState label={loadingLabel} />;
+export function QueryListEmpty({
+  query,
+  errorMessage,
+  loadingLabel,
+  loading,
+  empty,
+}: QueryListEmptyProps) {
+  if (query.isPending) return loading ? <>{loading}</> : <LoadingState label={loadingLabel} />;
 
   if (query.isError) {
     return (
