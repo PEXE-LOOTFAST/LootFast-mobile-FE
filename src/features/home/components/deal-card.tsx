@@ -1,24 +1,29 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
+import { AppText } from '@/components/ui/app-text';
 import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/ui/icon';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Radius, RatingColor, Shadow, Spacing } from '@/constants/theme';
 import { DealImage } from '@/features/home/components/deal-image';
 import { DealMeta } from '@/features/home/components/deal-meta';
-import { FontSize, FontWeight, Radius, RatingColor, Shadow, Spacing } from '@/constants/theme';
 import { LOW_STOCK_THRESHOLD } from '@/features/home/constants/deals';
 import { HomeIcons } from '@/features/home/constants/icons';
 import type { Deal } from '@/features/home/types';
 import { useTheme } from '@/hooks/use-theme';
 import { formatDiscount, formatDistance, formatPrice } from '@/lib/format';
 
-const IMAGE_SIZE = 96;
+const IMAGE_HEIGHT = 148;
 
 type DealCardProps = {
   deal: Deal;
   onPress?: () => void;
 };
 
-// Thẻ ngang gọn (ảnh vuông bên trái, thông tin bên phải) để một màn hình xem được nhiều deal.
+/**
+ * Thẻ deal ảnh lớn phía trên: món ăn là thứ khiến người ta bấm vào, nên ảnh chiếm phần lớn thẻ.
+ * Trên ảnh chỉ đặt % giảm, khoảng cách và cảnh báo sắp hết; tên, quán, giá và giờ lấy nằm dưới.
+ */
 export function DealCard({ deal, onPress }: DealCardProps) {
   const theme = useTheme();
   const discount = formatDiscount(deal.price, deal.originalPrice);
@@ -27,7 +32,7 @@ export function DealCard({ deal, onPress }: DealCardProps) {
 
   return (
     <Pressable
-      accessibilityLabel={`${deal.name}, ${deal.store.name}, giá ${formatPrice(deal.price)}`}
+      accessibilityLabel={`${deal.name}, ${deal.store.name}, giá ${formatPrice(deal.price)}, lấy từ ${deal.pickupWindow.start} đến ${deal.pickupWindow.end}`}
       accessibilityRole="button"
       onPress={onPress}
       style={({ pressed }) => [
@@ -36,104 +41,132 @@ export function DealCard({ deal, onPress }: DealCardProps) {
         pressed && styles.pressed,
       ]}
     >
-      <View style={styles.mediaWrap}>
-        <DealImage emoji={deal.emoji} emojiSize={36} style={styles.media} uri={deal.imageUrl} />
+      <View style={styles.media}>
+        <DealImage emoji={deal.emoji} emojiSize={48} style={styles.image} uri={deal.imageUrl} />
 
-        {discount ? (
-          <Badge label={discount} size="sm" style={styles.discount} tone="danger" />
-        ) : null}
+        <View style={styles.overlayTop}>
+          {discount ? <Badge label={discount} size="lg" tone="danger" /> : <View />}
+          <View style={[styles.pill, { backgroundColor: theme.backgroundElement }]}>
+            <Icon name={HomeIcons.distance} color={theme.text} size={12} />
+            <AppText variant="footnote" weight="bold">
+              {formatDistance(deal.distanceKm)}
+            </AppText>
+          </View>
+        </View>
 
-        {/* Chỉ báo số phần khi sắp hết, nằm sát đáy ảnh để không che món. */}
         {isLowStock ? (
-          <View style={[styles.stock, { backgroundColor: theme.accent }]}>
-            <Icon name={HomeIcons.flame} color={theme.onAccent} size={11} />
-            <Text style={[styles.stockText, { color: theme.onAccent }]}>
-              Còn {deal.remaining} phần
-            </Text>
+          <View style={[styles.pill, styles.stock, { backgroundColor: theme.accent }]}>
+            <Icon name={HomeIcons.flame} color={theme.onAccent} size={12} />
+            <AppText tone="onAccent" variant="footnote" weight="bold">
+              Chỉ còn {deal.remaining} phần
+            </AppText>
           </View>
         ) : null}
       </View>
 
       <View style={styles.body}>
+        <AppText numberOfLines={2} variant="subtitle" weight="bold">
+          {deal.name}
+        </AppText>
+
         <View style={styles.storeRow}>
-          <Text numberOfLines={1} style={[styles.storeName, { color: theme.textSecondary }]}>
+          <AppText numberOfLines={1} style={styles.storeName} tone="textSecondary" variant="bodySm">
             {deal.store.name}
-          </Text>
+          </AppText>
           {deal.store.isVerified ? (
-            <Icon name={HomeIcons.verified} color={theme.primary} size={13} />
+            <Icon name={HomeIcons.verified} color={theme.primary} size={14} />
           ) : null}
-          {/* Feed deal không kèm điểm đánh giá nên giá trị 0 nghĩa là "chưa biết", không phải 0 sao:
-              ẩn đi thay vì hiện "0.0" mâu thuẫn với điểm thật ở trang chi tiết. */}
+          {/* Feed deal không kèm điểm đánh giá nên 0 nghĩa là "chưa biết", không phải 0 sao. */}
           {hasRating ? (
             <View style={styles.rating}>
-              <Icon name={HomeIcons.star} color={RatingColor} size={12} />
-              <Text style={[styles.ratingText, { color: theme.text }]}>
+              <Icon name={HomeIcons.star} color={RatingColor} size={13} />
+              <AppText variant="bodySm" weight="bold">
                 {deal.store.rating.toFixed(1)}
-              </Text>
+              </AppText>
             </View>
           ) : null}
         </View>
 
-        <Text numberOfLines={2} style={[styles.name, { color: theme.text }]}>
-          {deal.name}
-        </Text>
-
-        <View style={styles.priceRow}>
-          <Text style={[styles.price, { color: theme.primary }]}>{formatPrice(deal.price)}</Text>
-          <Text style={[styles.originalPrice, { color: theme.textSecondary }]}>
-            {formatPrice(deal.originalPrice)}
-          </Text>
-        </View>
-
-        <View style={styles.metaRow}>
+        <View style={styles.footer}>
+          <View style={styles.priceRow}>
+            <AppText tone="primary" variant="title" weight="heavy">
+              {formatPrice(deal.price)}
+            </AppText>
+            <AppText style={styles.originalPrice} tone="textSecondary" variant="footnote">
+              {formatPrice(deal.originalPrice)}
+            </AppText>
+          </View>
           <DealMeta
             compact
             icon={HomeIcons.clock}
-            label={`${deal.pickupWindow.start}–${deal.pickupWindow.end}`}
+            label={`Lấy ${deal.pickupWindow.start}–${deal.pickupWindow.end}`}
           />
-          <DealMeta compact icon={HomeIcons.distance} label={formatDistance(deal.distanceKm)} />
         </View>
       </View>
     </Pressable>
   );
 }
 
+/** Thẻ giữ chỗ cùng dáng `DealCard`, hiện lúc feed đang tải lần đầu. */
+export function DealCardSkeleton() {
+  const theme = useTheme();
+
+  return (
+    <View
+      style={[styles.card, { backgroundColor: theme.backgroundElement, borderColor: theme.border }]}
+    >
+      <Skeleton height={IMAGE_HEIGHT} radius="none" />
+      <View style={styles.body}>
+        <Skeleton height={18} width="70%" />
+        <Skeleton height={14} width="45%" />
+        <View style={styles.footer}>
+          <Skeleton height={20} width={90} />
+          <Skeleton height={14} width={110} />
+        </View>
+      </View>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
+    overflow: 'hidden',
     borderWidth: 1,
     borderRadius: Radius.lg,
-    padding: 10,
     boxShadow: Shadow.card,
   },
   pressed: { transform: [{ scale: 0.985 }] },
-  mediaWrap: { width: IMAGE_SIZE, height: IMAGE_SIZE },
-  media: { width: IMAGE_SIZE, height: IMAGE_SIZE, borderRadius: Radius.md },
-  discount: { position: 'absolute', top: 6, left: 6 },
-  stock: {
+  media: { height: IMAGE_HEIGHT },
+  image: { width: '100%', height: IMAGE_HEIGHT },
+  overlayTop: {
     position: 'absolute',
-    right: 0,
-    bottom: 0,
-    left: 0,
+    top: Spacing.sm,
+    right: Spacing.sm,
+    left: Spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 3,
-    borderBottomLeftRadius: Radius.md,
-    borderBottomRightRadius: Radius.md,
+    justifyContent: 'space-between',
+  },
+  pill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.sm,
     paddingVertical: Spacing.xxs,
   },
-  stockText: { fontSize: FontSize.micro, fontWeight: FontWeight.bold },
-  body: { flex: 1, minWidth: 0, gap: 3 },
+  stock: { position: 'absolute', bottom: Spacing.sm, left: Spacing.sm },
+  body: { gap: Spacing.xs, padding: Spacing.md },
   storeRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },
-  storeName: { flexShrink: 1, fontSize: FontSize.footnote, fontWeight: FontWeight.medium },
+  storeName: { flexShrink: 1 },
   rating: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xxs, marginLeft: 'auto' },
-  ratingText: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold },
-  name: { fontSize: FontSize.bodyLg, fontWeight: FontWeight.bold, lineHeight: 20 },
-  priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 6 },
-  price: { fontSize: FontSize.title, fontWeight: FontWeight.heavy },
-  originalPrice: { fontSize: FontSize.footnote, textDecorationLine: 'line-through' },
-  metaRow: { flexDirection: 'row', flexWrap: 'wrap', columnGap: Spacing.md, rowGap: Spacing.xxs },
+  footer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.sm,
+    marginTop: Spacing.xxs,
+  },
+  priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: Spacing.xs },
+  originalPrice: { textDecorationLine: 'line-through' },
 });

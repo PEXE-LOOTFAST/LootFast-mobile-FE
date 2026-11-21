@@ -1,11 +1,14 @@
 import { router } from 'expo-router';
+import { StyleSheet, View } from 'react-native';
 
 import { QueryListEmpty } from '@/components/ui/query-boundary';
 import { ScreenList } from '@/components/ui/screen';
+import { SlowLoadingHint } from '@/components/ui/slow-loading-hint';
+import { Spacing } from '@/constants/theme';
 import { getDealErrorMessage } from '@/features/home/api/deals';
 import { useDeals } from '@/features/home/api/use-deals';
 import { BuyerHeader } from '@/features/home/components/buyer-header';
-import { DealCard } from '@/features/home/components/deal-card';
+import { DealCard, DealCardSkeleton } from '@/features/home/components/deal-card';
 import { DealFilterButton } from '@/features/home/components/deal-filter-button';
 import { EmptyDeals } from '@/features/home/components/empty-deals';
 import { LocationPrompt } from '@/features/home/components/location-prompt';
@@ -50,6 +53,7 @@ export function HomeScreen() {
             />
           }
           errorMessage={getDealErrorMessage}
+          loading={<DealListSkeleton />}
           query={dealsQuery}
         />
       }
@@ -108,3 +112,18 @@ export function HomeScreen() {
     />
   );
 }
+
+/** Hai thẻ giữ chỗ đúng dáng thẻ deal, để lần mở đầu thấy ngay bố cục thay vì vòng xoay. */
+function DealListSkeleton() {
+  return (
+    <View style={styles.skeleton}>
+      <DealCardSkeleton />
+      <DealCardSkeleton />
+      <SlowLoadingHint />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  skeleton: { gap: Spacing.md },
+});
