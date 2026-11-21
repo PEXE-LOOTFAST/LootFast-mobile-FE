@@ -11,7 +11,6 @@ import { toDealImageErrorMessage } from '@/features/admin/api/admin-error-messag
 import { MAX_REMOVAL_REASON_LENGTH } from '@/features/admin/api/deal-images';
 import { useRemoveViolatingImage } from '@/features/admin/api/use-deal-images';
 import { AdminHeader } from '@/features/admin/components/admin-header';
-import { useLightStatusBar } from '@/hooks/use-light-status-bar';
 import { useTheme } from '@/hooks/use-theme';
 
 /**
@@ -29,8 +28,6 @@ export function AdminModerationScreen() {
   const [reason, setReason] = useState('');
   const [formError, setFormError] = useState<string>();
   const remove = useRemoveViolatingImage();
-
-  useLightStatusBar();
 
   const trimmedReason = reason.trim();
   const removedDeal = remove.data;

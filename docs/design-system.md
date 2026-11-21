@@ -29,7 +29,6 @@ Khoảng cách lệch thang (6, 10, 14…) vẫn còn ở vài chỗ cũ và đ�
 
 **Màu cố định**, không đổi theo chế độ:
 
-- `HeaderColors.buyer` / `HeaderColors.seller`: header xanh đậm ở cả hai chế độ, kèm màu chữ, chữ phụ và nút trong suốt trên header.
 - `StaticColors`: `white`, `black`, `backdrop` / `backdropStrong` (nền mờ sau dialog), `imageScrim` (lớp tối trên ảnh), `cameraScrim`.
 - `PremiumColors[scheme]`: bảng màu xanh dương riêng của gói Cao cấp.
 - `IndicatorColor`, `RatingColor`, `UserLocationColor`: chấm trạng thái, sao đánh giá, chấm vị trí trên bản đồ.
@@ -54,7 +53,7 @@ Cần màu mới thì thêm token vào `src/constants/theme/colors.ts` kèm comm
 | `TextField`, `PasswordField`, `SelectField`              | Ô nhập.                                                                                                                                                 |
 | `EmptyCard`, `ErrorState`, `LoadingState`, `InlineAlert` | Trạng thái rỗng, lỗi, đang tải, cảnh báo trong dòng.                                                                                                    |
 | `ConfirmDialog`, `Popover`                               | Hộp xác nhận và menu nổi.                                                                                                                               |
-| `TabHeader`                                              | Header của tab và màn con, `variant` là `buyer` hoặc `seller`.                                                                                          |
+| `TabHeader`                                              | Header của tab và màn con, nền trùng nền trang. `variant="seller"` thêm nhãn "Người bán".                                                               |
 | `Divider`                                                | Đường kẻ mảnh.                                                                                                                                          |
 
 ## Công thức thường gặp

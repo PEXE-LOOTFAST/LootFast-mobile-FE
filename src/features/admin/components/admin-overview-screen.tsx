@@ -24,7 +24,6 @@ import { PlatformSalesChartCard } from '@/features/admin/components/platform-sal
 import { RecentAlertsCard } from '@/features/admin/components/recent-alerts-card';
 import { SegmentedTabs } from '@/components/ui/segmented-tabs';
 import type { AdminAlert, AdminStat } from '@/features/admin/types';
-import { useLightStatusBar } from '@/hooks/use-light-status-bar';
 import { useTheme } from '@/hooks/use-theme';
 import { formatPrice } from '@/lib/format';
 
@@ -138,8 +137,6 @@ export function AdminOverviewScreen() {
   const [today] = useState(() => new Date());
   const [period, setPeriod] = useState<ReportPeriod>('week');
   const report = useSystemReport(period);
-
-  useLightStatusBar();
 
   const data = report.data;
   const points = data ? toChartPoints(data.daily, period) : [];

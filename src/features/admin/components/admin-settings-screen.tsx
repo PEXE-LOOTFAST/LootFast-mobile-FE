@@ -25,7 +25,6 @@ import { AdminHeader } from '@/features/admin/components/admin-header';
 import { AdminIcons } from '@/features/admin/constants/icons';
 import { useProfile } from '@/features/profile/api/use-profile';
 import { useAuthSession } from '@/hooks/use-auth-session';
-import { useLightStatusBar } from '@/hooks/use-light-status-bar';
 import { useTheme } from '@/hooks/use-theme';
 import { confirmAction } from '@/lib/confirm';
 import { confirmSignOut } from '@/lib/confirm-sign-out';
@@ -84,8 +83,6 @@ export function AdminSettingsScreen() {
   const accountRole = (profile?.roles ?? user?.roles ?? []).includes('ADMIN')
     ? 'Quản trị viên'
     : 'Tài khoản';
-
-  useLightStatusBar();
 
   // Bật bảo trì sẽ chặn toàn bộ người mua và người bán nên hỏi lại trước; tắt thì làm luôn.
   const toggleMaintenance = (value: boolean) => {

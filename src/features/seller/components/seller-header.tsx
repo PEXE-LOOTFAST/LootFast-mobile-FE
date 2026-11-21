@@ -4,10 +4,11 @@ import { Pressable, StyleSheet, Text } from 'react-native';
 import { useUnreadCount } from '@/api/notifications';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { TabHeader } from '@/components/ui/tab-header';
-import { FontSize, FontWeight, HeaderColors, Radius, Spacing } from '@/constants/theme';
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { IconButton } from '@/components/ui/icon-button';
 import { NotificationSheet } from '@/features/home/components/notification-sheet';
 import { HomeIcons } from '@/features/home/constants/icons';
+import { useTheme } from '@/hooks/use-theme';
 
 const BRAND_NAME = 'LootFast';
 
@@ -35,7 +36,6 @@ export function SellerHeader({ title, subtitle, subtitleIcon, onBack }: SellerHe
           <IconButton
             accessibilityLabel="Thông báo"
             badgeCount={unreadCount}
-            headerVariant="seller"
             icon={HomeIcons.bell}
             onPress={() => setIsNotificationsOpen(true)}
             tone="header"
@@ -66,6 +66,8 @@ export function SellerHeaderWithAction({
   actionIcon,
   onPressAction,
 }: SellerHeaderWithActionProps) {
+  const theme = useTheme();
+
   return (
     <TabHeader
       onBack={onBack}
@@ -78,12 +80,14 @@ export function SellerHeaderWithAction({
           accessibilityLabel={actionLabel}
           accessibilityRole="button"
           onPress={onPressAction}
-          style={({ pressed }) => [styles.actionButton, pressed && styles.pressed]}
+          style={({ pressed }) => [
+            styles.actionButton,
+            { backgroundColor: theme.primarySoft },
+            pressed && styles.pressed,
+          ]}
         >
-          <Icon name={actionIcon} color={HeaderColors.seller.text} size={16} />
-          <Text style={[styles.actionLabel, { color: HeaderColors.seller.text }]}>
-            {actionLabel}
-          </Text>
+          <Icon name={actionIcon} color={theme.primary} size={18} />
+          <Text style={[styles.actionLabel, { color: theme.primary }]}>{actionLabel}</Text>
         </Pressable>
       }
     />
@@ -95,12 +99,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: HeaderColors.seller.control,
-    borderWidth: 1,
-    borderColor: HeaderColors.seller.controlBorder,
-    borderRadius: Radius.md,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
+    minHeight: 44,
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.lg,
   },
   actionLabel: { fontSize: FontSize.bodySm, fontWeight: FontWeight.bold },
   pressed: { opacity: 0.8 },

@@ -20,7 +20,6 @@ import { useStoreApprovalQueue } from '@/features/admin/hooks/use-store-approval
 import type { StoreApplicationStatus } from '@/features/admin/types';
 import { SegmentedTabs } from '@/components/ui/segmented-tabs';
 import { EmptyCard } from '@/components/ui/empty-card';
-import { useLightStatusBar } from '@/hooks/use-light-status-bar';
 import { useTheme } from '@/hooks/use-theme';
 
 const EMPTY_STATES: Record<StoreApplicationStatus, { title: string; description: string }> = {
@@ -53,8 +52,6 @@ export function StoreApprovalScreen() {
   const tabs = STORE_APPROVAL_TABS.map((item) =>
     item.id === 'pending' ? { ...item, label: `${item.label} (${queue.pendingCount})` } : item,
   );
-
-  useLightStatusBar();
 
   const confirmReject = (reason: string) => {
     if (!rejecting) return;

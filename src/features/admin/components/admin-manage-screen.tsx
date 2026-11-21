@@ -25,7 +25,6 @@ import { AdminSearchBar } from '@/features/admin/components/admin-search-bar';
 import { ManagedAccountRow } from '@/features/admin/components/managed-account-row';
 import { RejectApplicationDialog } from '@/features/admin/components/reject-application-dialog';
 import type { ManagedAccount } from '@/features/admin/types';
-import { useLightStatusBar } from '@/hooks/use-light-status-bar';
 import { useTheme } from '@/hooks/use-theme';
 import { toDisplayPhone, toSearchKeyword } from '@/lib/phone';
 
@@ -59,8 +58,6 @@ export function AdminManageScreen() {
 
   const users = useAdminUsers(keyword);
   const setLocked = useSetUserLocked();
-
-  useLightStatusBar();
 
   useEffect(() => {
     // Chuẩn hoá để gõ số điện thoại kiểu nội địa (0xxxxxxxxx) vẫn khớp dữ liệu 9 chữ số của backend.

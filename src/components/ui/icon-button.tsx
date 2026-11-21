@@ -3,13 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/ui/app-text';
 import { Icon, type IconName } from '@/components/ui/icon';
-import {
-  HeaderColors,
-  IndicatorColor,
-  Radius,
-  Spacing,
-  type HeaderVariant,
-} from '@/constants/theme';
+import { IndicatorColor, Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 const BUTTON_SIZE = 44;
@@ -20,10 +14,8 @@ type IconButtonProps = {
   icon: IconName;
   accessibilityLabel: string;
   onPress?: () => void;
-  /** `header`: nút trong suốt đặt trên header xanh đậm; `surface`: nút có nền trên thẻ/màn sáng. */
+  /** `header`: nút trong suốt đặt trên header; `surface`: nút có nền và viền trên thẻ/màn. */
   tone?: 'header' | 'surface';
-  /** Header nào đang chứa nút, để viền badge/chấm trùng màu nền header. */
-  headerVariant?: HeaderVariant;
   badgeCount?: number;
   /** Tô nổi nút khi tính năng nó điều khiển đang bật (vd. bộ lọc đang áp dụng). */
   isActive?: boolean;
@@ -37,7 +29,6 @@ export function IconButton({
   accessibilityLabel,
   onPress,
   tone = 'surface',
-  headerVariant = 'buyer',
   badgeCount = 0,
   isActive = false,
   indicator,
@@ -45,10 +36,9 @@ export function IconButton({
 }: IconButtonProps) {
   const theme = useTheme();
   const onHeader = tone === 'header';
-  const header = HeaderColors[headerVariant];
-  const iconColor = onHeader ? header.text : isActive ? theme.primary : theme.text;
+  const iconColor = isActive ? theme.primary : theme.text;
   // Viền badge/chấm cùng màu nền phía sau để chúng trông như khoét vào nút.
-  const ringColor = onHeader ? header.background : theme.backgroundElement;
+  const ringColor = onHeader ? theme.background : theme.backgroundElement;
   const surface = isActive
     ? { backgroundColor: theme.primarySoft, borderColor: theme.primary }
     : { backgroundColor: theme.backgroundElement, borderColor: theme.border };

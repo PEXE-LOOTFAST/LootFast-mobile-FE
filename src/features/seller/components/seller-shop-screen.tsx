@@ -9,14 +9,12 @@ import { MerchantRegistrationRequired } from '@/features/seller/components/merch
 import { ShopSetupCard, getShopSetupSteps } from '@/features/seller/components/shop-setup-card';
 import { SellerHeader } from '@/features/seller/components/seller-header';
 import { SellerIcons } from '@/features/seller/constants/icons';
-import { useLightStatusBar } from '@/hooks/use-light-status-bar';
 import { useMerchantShop } from '@/features/seller/hooks/use-merchant-shop';
 import { useTheme } from '@/hooks/use-theme';
 import { confirmSignOut } from '@/lib/confirm-sign-out';
 
 export function SellerShopScreen() {
   const theme = useTheme();
-  useLightStatusBar();
 
   const { profile, location, openingHours, profileMissing, isLoading, isError, refetch } =
     useMerchantShop();

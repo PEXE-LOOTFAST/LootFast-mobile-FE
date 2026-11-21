@@ -42,41 +42,6 @@ export const Colors = {
 
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
-export type HeaderPalette = {
-  background: string;
-  decoration: string;
-  text: string;
-  textMuted: string;
-  /** Nền nút trong suốt đặt trên header (vd. nút quay lại). */
-  control: string;
-  controlBorder: string;
-};
-
-/**
- * Header giữ màu xanh đậm ở cả light lẫn dark mode: theme.primary bản dark là xanh nhạt,
- * đặt chữ trắng lên sẽ không đủ tương phản.
- */
-export const HeaderColors = {
-  buyer: {
-    background: '#12703F',
-    decoration: '#1D8A52',
-    text: '#FFFFFF',
-    textMuted: '#CFEBDA',
-    control: 'rgba(255, 255, 255, 0.16)',
-    controlBorder: 'rgba(255, 255, 255, 0.3)',
-  },
-  seller: {
-    background: '#1A5C3A',
-    decoration: '#D4943A',
-    text: '#FFFFFF',
-    textMuted: '#C8DDD0',
-    control: 'rgba(255, 255, 255, 0.16)',
-    controlBorder: 'rgba(255, 255, 255, 0.3)',
-  },
-} as const satisfies Record<string, HeaderPalette>;
-
-export type HeaderVariant = keyof typeof HeaderColors;
-
 /**
  * Bảng màu xanh dương riêng của gói Cao cấp, để thẻ Premium tách khỏi màu xanh lá thương hiệu.
  * Nút mua giữ cùng màu ở hai chế độ.

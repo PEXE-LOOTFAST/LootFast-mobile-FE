@@ -1,13 +1,16 @@
-import { useFocusEffect } from 'expo-router';
-import { setStatusBarStyle } from 'expo-status-bar';
-import { useCallback, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppText } from '@/components/ui/app-text';
+import { Badge } from '@/components/ui/badge';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { UiIcons } from '@/constants/icons';
-import { HeaderColors, Radius, Spacing, type HeaderVariant } from '@/constants/theme';
+import { Radius, Spacing } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
+
+/** Khu đang đứng: `seller` thêm nhãn "Người bán" để người vừa mua vừa bán biết mình ở chế độ nào. */
+export type HeaderVariant = 'buyer' | 'seller';
 
 type TabHeaderProps = {
   title: string;
@@ -22,8 +25,9 @@ type TabHeaderProps = {
 };
 
 /**
- * Header xanh đậm dùng chung cho các tab của người mua: cùng chiều cao, cùng cấu trúc
- * (tiêu đề + dòng phụ bên trái, hành động bên phải) để chuyển tab không thấy khung nhảy.
+ * Header dùng chung cho các tab: cùng chiều cao, cùng cấu trúc (tiêu đề + dòng phụ bên trái,
+ * hành động bên phải) để chuyển tab không thấy khung nhảy. Nền trùng nền trang thay vì một mảng
+ * màu đậm, để nội dung bên dưới là thứ nổi bật nhất.
  */
 export function TabHeader({
   title,
@@ -34,28 +38,15 @@ export function TabHeader({
   variant = 'buyer',
 }: TabHeaderProps) {
   const insets = useSafeAreaInsets();
-  const colors = HeaderColors[variant];
-
-  // Nền xanh đậm cần icon status bar màu sáng. Trả về 'auto' khi rời màn,
-  // nếu không các màn nền sáng khác sẽ bị icon trắng chìm mất.
-  useFocusEffect(
-    useCallback(() => {
-      setStatusBarStyle('light');
-      return () => setStatusBarStyle('auto');
-    }, []),
-  );
+  const theme = useTheme();
 
   return (
     <View
       style={[
         styles.container,
-        { paddingTop: insets.top + Spacing.sm, backgroundColor: colors.background },
+        { paddingTop: insets.top + Spacing.sm, backgroundColor: theme.background },
       ]}
     >
-      <View style={styles.decorationLayer}>
-        <View style={[styles.decoration, { backgroundColor: colors.decoration }]} />
-      </View>
-
       <View style={styles.row}>
         {onBack ? (
           <Pressable
@@ -65,36 +56,38 @@ export function TabHeader({
             onPress={onBack}
             style={({ pressed }) => [
               styles.backButton,
-              { backgroundColor: colors.control },
+              { backgroundColor: theme.backgroundElement, borderColor: theme.border },
               pressed && styles.pressed,
             ]}
           >
-            <Icon name={UiIcons.back} color={colors.text} size={18} />
+            <Icon name={UiIcons.back} color={theme.text} size={20} />
           </Pressable>
         ) : null}
 
         <View style={styles.copy}>
-          <AppText
-            accessibilityRole="header"
-            adjustsFontSizeToFit
-            color={colors.text}
-            minimumFontScale={0.8}
-            numberOfLines={1}
-            style={styles.title}
-            variant="titleLg"
-            weight="heavy"
-          >
-            {title}
-          </AppText>
+          <View style={styles.titleRow}>
+            <AppText
+              accessibilityRole="header"
+              adjustsFontSizeToFit
+              minimumFontScale={0.8}
+              numberOfLines={1}
+              style={styles.title}
+              variant="titleLg"
+              weight="heavy"
+            >
+              {title}
+            </AppText>
+            {variant === 'seller' ? <Badge label="Người bán" size="sm" tone="primarySoft" /> : null}
+          </View>
           {subtitle ? (
             <View style={styles.subtitleRow}>
               {subtitleIcon ? (
-                <Icon name={subtitleIcon} color={colors.textMuted} size={13} />
+                <Icon name={subtitleIcon} color={theme.textSecondary} size={13} />
               ) : null}
               <AppText
-                color={colors.textMuted}
                 numberOfLines={1}
                 style={styles.subtitle}
+                tone="textSecondary"
                 variant="footnote"
                 weight="medium"
               >
@@ -112,42 +105,23 @@ export function TabHeader({
 
 const styles = StyleSheet.create({
   container: {
-    overflow: 'hidden',
-    borderBottomLeftRadius: Radius.xl,
-    borderBottomRightRadius: Radius.xl,
     paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.md,
+    paddingBottom: Spacing.sm,
   },
-  decorationLayer: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    overflow: 'hidden',
-    pointerEvents: 'none',
-  },
-  decoration: {
-    position: 'absolute',
-    width: 150,
-    height: 150,
-    top: -50,
-    right: -50,
-    borderRadius: Radius.full,
-    opacity: 0.5,
-  },
-  row: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
+  row: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
   backButton: {
-    width: 36,
-    height: 36,
+    width: 44,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderRadius: Radius.full,
   },
   pressed: { opacity: 0.8 },
   trailing: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },
   copy: { flex: 1, minWidth: 0, gap: Spacing.xxs },
-  title: { letterSpacing: -0.3 },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
+  title: { flexShrink: 1, letterSpacing: -0.3 },
   subtitleRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },
   subtitle: { flexShrink: 1 },
 });
