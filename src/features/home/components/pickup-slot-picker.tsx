@@ -6,6 +6,7 @@ import { Icon } from '@/components/ui/icon';
 import { HomeIcons } from '@/features/home/constants/icons';
 import type { PickupSlot } from '@/features/home/pickup-slots';
 import { useTheme } from '@/hooks/use-theme';
+import { haptics } from '@/lib/haptics';
 
 type PickupSlotPickerProps = {
   slots: PickupSlot[];
@@ -53,7 +54,10 @@ export function PickupSlotPicker({
                   accessibilityLabel={`Đến lấy lúc ${slot.label}`}
                   disabled={disabled}
                   label={slot.label}
-                  onPress={() => onSelect(slot)}
+                  onPress={() => {
+                    haptics.select();
+                    onSelect(slot);
+                  }}
                   role="radio"
                   selected={isSelected}
                 />

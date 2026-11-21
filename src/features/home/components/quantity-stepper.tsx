@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { FontSize, FontWeight, Radius } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { haptics } from '@/lib/haptics';
 
 type QuantityStepperProps = {
   value: number;
@@ -37,7 +38,10 @@ export function QuantityStepper({
       accessibilityState={{ disabled: !enabled }}
       disabled={!enabled}
       hitSlop={6}
-      onPress={() => onChange(next)}
+      onPress={() => {
+        haptics.select();
+        onChange(next);
+      }}
       style={({ pressed }) => [
         styles.button,
         { backgroundColor: theme.primarySoft, borderColor: theme.border },

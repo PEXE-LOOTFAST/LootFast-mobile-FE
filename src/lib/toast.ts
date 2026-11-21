@@ -1,3 +1,5 @@
+import { haptics } from '@/lib/haptics';
+
 export type ToastTone = 'success' | 'error' | 'info';
 
 export type Toast = {
@@ -36,6 +38,9 @@ export function showToast(message: string, { tone = 'info', durationMs }: ToastO
     tone,
     durationMs: durationMs ?? (tone === 'error' ? 5000 : 3000),
   };
+  // Kết quả thành công/thất bại kèm rung nhẹ để cảm nhận được cả khi không nhìn màn hình.
+  if (tone === 'success') haptics.success();
+  if (tone === 'error') haptics.error();
   emit();
 }
 
