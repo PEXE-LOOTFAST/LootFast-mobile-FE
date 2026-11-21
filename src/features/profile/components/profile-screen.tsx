@@ -3,6 +3,7 @@ import { router, type Href } from 'expo-router';
 import { Image } from 'expo-image';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { MenuSection, type MenuItem } from '@/components/ui/menu-section';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { BuyerHeader } from '@/features/home/components/buyer-header';
 import { getProfileErrorMessage } from '@/features/profile/api/profile';
@@ -41,54 +42,14 @@ const SUPPORT_ITEMS: ProfileItem[] = [
   },
 ];
 
-function ProfileItemRow({ item, onPress }: { item: ProfileItem; onPress?: () => void }) {
-  const theme = useTheme();
-
-  return (
-    <Pressable
-      accessibilityLabel={item.title}
-      accessibilityRole="button"
-      onPress={onPress}
-      style={({ pressed }) => [styles.item, pressed && styles.pressed]}
-    >
-      <View style={[styles.itemIcon, { backgroundColor: theme.primarySoft }]}>
-        <Icon name={item.icon} color={theme.primary} size={19} />
-      </View>
-      <View style={styles.itemCopy}>
-        <Text style={[styles.itemTitle, { color: theme.text }]}>{item.title}</Text>
-        {item.subtitle ? (
-          <Text style={[styles.itemSubtitle, { color: theme.textSecondary }]}>{item.subtitle}</Text>
-        ) : null}
-      </View>
-      <Icon name={ProfileIcons.chevronRight} color={theme.textSecondary} size={17} />
-    </Pressable>
-  );
-}
-
-function ProfileSection({ items, title }: { items: ProfileItem[]; title: string }) {
-  const theme = useTheme();
-
-  return (
-    <View
-      style={[
-        styles.section,
-        { backgroundColor: theme.backgroundElement, borderColor: theme.border },
-      ]}
-    >
-      <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>{title}</Text>
-      {items.map((item, index) => (
-        <View key={item.title}>
-          <ProfileItemRow
-            item={item}
-            onPress={item.href ? () => router.navigate(item.href as Href) : undefined}
-          />
-          {index < items.length - 1 ? (
-            <View style={[styles.divider, { backgroundColor: theme.border }]} />
-          ) : null}
-        </View>
-      ))}
-    </View>
-  );
+function toMenuItems(items: ProfileItem[]): MenuItem[] {
+  return items.map((item) => ({
+    key: item.title,
+    icon: item.icon,
+    title: item.title,
+    subtitle: item.subtitle || undefined,
+    onPress: item.href ? () => router.navigate(item.href as Href) : undefined,
+  }));
 }
 
 export function ProfileScreen() {
@@ -178,9 +139,9 @@ export function ProfileScreen() {
             </Pressable>
           </View>
         ) : null}
-        <ProfileSection items={ACCOUNT_ITEMS} title="TÀI KHOẢN" />
-        <ProfileSection items={ACTIVITY_ITEMS} title="HOẠT ĐỘNG CỦA BẠN" />
-        <ProfileSection items={SUPPORT_ITEMS} title="HỖ TRỢ" />
+        <MenuSection items={toMenuItems(ACCOUNT_ITEMS)} title="TÀI KHOẢN" />
+        <MenuSection items={toMenuItems(ACTIVITY_ITEMS)} title="HOẠT ĐỘNG CỦA BẠN" />
+        <MenuSection items={toMenuItems(SUPPORT_ITEMS)} title="HỖ TRỢ" />
         <Pressable
           accessibilityLabel={isMerchant ? 'Chuyển sang người bán' : 'Đăng ký bán hàng'}
           accessibilityRole="button"
@@ -243,34 +204,7 @@ const styles = StyleSheet.create({
     width: 28,
   },
   cameraText: { fontSize: 15, fontWeight: '900' },
-  section: { borderRadius: 18, borderWidth: 1, overflow: 'hidden' },
-  sectionTitle: {
-    fontSize: 11,
-    fontWeight: '900',
-    letterSpacing: 0.4,
-    paddingHorizontal: 16,
-    paddingVertical: 11,
-  },
-  item: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    minHeight: 72,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-  },
   pressed: { opacity: 0.7 },
-  itemIcon: {
-    alignItems: 'center',
-    borderRadius: 999,
-    height: 38,
-    justifyContent: 'center',
-    width: 38,
-  },
-  itemCopy: { flex: 1, gap: 3, marginLeft: 12 },
-  itemTitle: { fontSize: 14, fontWeight: '800' },
-  itemSubtitle: { fontSize: 12, lineHeight: 17 },
-  chevron: { marginLeft: 8 },
-  divider: { height: 1, marginLeft: 66 },
   sellerButton: {
     alignItems: 'center',
     borderRadius: 22,

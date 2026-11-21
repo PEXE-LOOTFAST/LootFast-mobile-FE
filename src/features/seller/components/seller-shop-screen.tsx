@@ -4,7 +4,7 @@ import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'r
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { MaxContentWidth } from '@/constants/theme';
-import { SellerMenuList, type SellerMenuItem } from '@/features/seller/components/seller-menu-list';
+import { MenuSection, type MenuItem } from '@/components/ui/menu-section';
 import { MerchantRegistrationRequired } from '@/features/seller/components/merchant-registration-required';
 import { ShopSetupCard, getShopSetupSteps } from '@/features/seller/components/shop-setup-card';
 import { SellerHeader } from '@/features/seller/components/seller-header';
@@ -22,7 +22,7 @@ export function SellerShopScreen() {
     useMerchantShop();
   const setupDone = getShopSetupSteps({ profile, location, openingHours }).every((s) => s.done);
 
-  const menuItems: SellerMenuItem[] = [
+  const menuItems: MenuItem[] = [
     {
       key: 'info',
       icon: SellerIcons.store,
@@ -98,7 +98,7 @@ export function SellerShopScreen() {
             <ShopSetupCard location={location} openingHours={openingHours} profile={profile} />
           )}
 
-          <SellerMenuList items={menuItems} title="QUẢN LÝ CỬA HÀNG" />
+          <MenuSection items={menuItems} title="QUẢN LÝ CỬA HÀNG" />
 
           <Pressable
             accessibilityLabel="Chuyển sang người mua"

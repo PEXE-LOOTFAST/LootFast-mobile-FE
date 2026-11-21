@@ -3,13 +3,13 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Icon } from '@/components/ui/icon';
 import { MaxContentWidth } from '@/constants/theme';
-import { SellerMenuList, type SellerMenuItem } from '@/features/seller/components/seller-menu-list';
+import { MenuSection, type MenuItem } from '@/components/ui/menu-section';
 import { SellerHeader } from '@/features/seller/components/seller-header';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
 import { confirmSignOut } from '@/lib/confirm-sign-out';
 
-const SETTINGS_ITEMS: SellerMenuItem[] = [
+const SETTINGS_ITEMS: MenuItem[] = [
   {
     key: 'owner',
     icon: SellerIcons.store,
@@ -51,7 +51,7 @@ export function SellerSettingsScreen() {
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.body}>
-          <SellerMenuList compact items={SETTINGS_ITEMS} />
+          <MenuSection compact items={SETTINGS_ITEMS} />
 
           <Pressable
             accessibilityLabel="Chuyển sang người mua"

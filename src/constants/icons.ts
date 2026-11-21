@@ -8,5 +8,6 @@ export const UiIcons = {
   hide: { ios: 'eye.slash', android: 'visibility_off', web: 'visibility_off' },
   warning: { ios: 'exclamationmark.triangle', android: 'warning', web: 'warning' },
   back: { ios: 'chevron.left', android: 'arrow_back', web: 'arrow_back' },
+  chevronRight: { ios: 'chevron.right', android: 'chevron_right', web: 'chevron_right' },
   success: { ios: 'checkmark.seal.fill', android: 'check_circle', web: 'check_circle' },
 } satisfies IconMap;
