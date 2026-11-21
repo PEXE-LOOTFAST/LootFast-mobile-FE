@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Alert } from 'react-native';
 
 import { toAvatarErrorMessage, uploadAvatar } from '@/features/profile/api/avatar';
 import { pickImages, useRecoveredPick } from '@/lib/pick-image';
+import { showToast } from '@/lib/toast';
 
 const PROFILE_ROUTE = '/profile';
 
@@ -15,8 +15,11 @@ export function useAvatarUpload(resumeRoute: string = PROFILE_ROUTE) {
 
   const mutation = useMutation({
     mutationFn: (imageUri: string) => uploadAvatar(imageUri),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['profile', 'me'] }),
-    onError: (error) => Alert.alert('Đổi ảnh thất bại', toAvatarErrorMessage(error)),
+    onSuccess: () => {
+      showToast('Đã đổi ảnh đại diện.', { tone: 'success' });
+      return queryClient.invalidateQueries({ queryKey: ['profile', 'me'] });
+    },
+    onError: (error) => showToast(toAvatarErrorMessage(error), { tone: 'error' }),
   });
 
   const pickAndUpload = async () => {

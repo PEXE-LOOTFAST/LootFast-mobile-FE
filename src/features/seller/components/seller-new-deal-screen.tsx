@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { BrandButton } from '@/components/ui/brand-button';
@@ -30,6 +30,7 @@ import { useForm } from '@/hooks/use-form';
 import { useTheme } from '@/hooks/use-theme';
 import { formatPrice } from '@/lib/format';
 import { useRecoveredPick } from '@/lib/pick-image';
+import { showToast } from '@/lib/toast';
 
 const NEW_DEAL_ROUTE = '/seller/new-deal';
 
@@ -153,7 +154,9 @@ function NewDealForm({
         await queryClient.invalidateQueries({ queryKey: ['deals'] });
 
         router.navigate('/seller/orders');
-        Alert.alert('Đã đăng deal', `"${deal.name}" đã lên sàn, khách đặt giữ được ngay.`);
+        showToast(`Đã đăng "${deal.name}". Khách quanh đây đặt giữ được ngay.`, {
+          tone: 'success',
+        });
       } catch (error) {
         const message = toMerchantDealErrorMessage(error);
 
@@ -162,7 +165,10 @@ function NewDealForm({
         if (dealId) {
           await queryClient.invalidateQueries({ queryKey: MERCHANT_DEALS_QUERY_KEY });
           router.navigate({ pathname: '/seller/deal-images', params: { dealId } });
-          Alert.alert('Deal đã lưu ở dạng nháp', `${message} Thêm ảnh rồi đăng lại tại đây nhé.`);
+          showToast(`${message} Deal đã lưu nháp, thêm ảnh rồi đăng lại ở đây nhé.`, {
+            tone: 'error',
+            durationMs: 7000,
+          });
           return;
         }
 

@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Alert, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { Icon, type IconName } from '@/components/ui/icon';
@@ -10,6 +10,7 @@ import {
   SUPPORT_EMAIL,
 } from '@/features/support/constants/privacy-policy';
 import { useTheme } from '@/hooks/use-theme';
+import { showToast } from '@/lib/toast';
 
 /** Mở ứng dụng email; máy không có ứng dụng email thì hiện địa chỉ để người dùng tự chép. */
 async function openMail(subject?: string) {
@@ -17,7 +18,11 @@ async function openMail(subject?: string) {
   try {
     await Linking.openURL(`mailto:${SUPPORT_EMAIL}${query}`);
   } catch {
-    Alert.alert('Không mở được ứng dụng email', `Vui lòng gửi email đến ${SUPPORT_EMAIL}.`);
+    // Để lâu hơn bình thường cho người dùng kịp chép địa chỉ.
+    showToast(`Không mở được ứng dụng email. Hãy gửi thư tới ${SUPPORT_EMAIL}.`, {
+      tone: 'error',
+      durationMs: 8000,
+    });
   }
 }
 

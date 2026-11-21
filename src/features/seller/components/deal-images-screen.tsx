@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { BrandButton } from '@/components/ui/brand-button';
@@ -21,6 +21,7 @@ import { SellerIcons } from '@/features/seller/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
 import { confirmAction } from '@/lib/confirm';
 import { pickImages, useRecoveredPick } from '@/lib/pick-image';
+import { showToast } from '@/lib/toast';
 
 /**
  * Quản lý ảnh của một deal. Backend bắt deal phải có ít nhất một ảnh mới đăng được, nên màn
@@ -48,7 +49,7 @@ export function DealImagesScreen() {
     if (!dealId) return;
 
     if (images.length >= MAX_DEAL_IMAGES) {
-      Alert.alert('Đã đủ ảnh', `Mỗi deal chỉ đăng được tối đa ${MAX_DEAL_IMAGES} ảnh.`);
+      showToast(`Mỗi deal có tối đa ${MAX_DEAL_IMAGES} ảnh. Xoá bớt một ảnh để thêm ảnh mới.`);
       return;
     }
 

@@ -23,6 +23,7 @@ import { SellerIcons } from '@/features/seller/constants/icons';
 import { SELLER_ORDER_TABS } from '@/features/seller/constants/seller-order-tabs';
 import type { SellerOrderTab } from '@/features/seller/types';
 import { useTheme } from '@/hooks/use-theme';
+import { showToast } from '@/lib/toast';
 
 /**
  * Deal của quán đọc từ `GET /merchants/me/deals`, sửa số suất qua
@@ -131,10 +132,10 @@ export function SellerOrderScreen() {
         onScan={(code) => {
           confirmPickup.mutate(code, {
             onSuccess: (order) => {
-              Alert.alert('Xác nhận thành công', `Khách đã nhận món của đơn "${order.dealName}".`);
+              showToast(`Đã xác nhận: khách nhận ${order.dealName}.`, { tone: 'success' });
             },
             onError: (error) => {
-              Alert.alert('Không xác nhận được', toMerchantOrderErrorMessage(error));
+              showToast(toMerchantOrderErrorMessage(error), { tone: 'error' });
             },
           });
         }}
