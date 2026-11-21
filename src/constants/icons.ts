@@ -10,4 +10,5 @@ export const UiIcons = {
   back: { ios: 'chevron.left', android: 'arrow_back', web: 'arrow_back' },
   chevronRight: { ios: 'chevron.right', android: 'chevron_right', web: 'chevron_right' },
   success: { ios: 'checkmark.seal.fill', android: 'check_circle', web: 'check_circle' },
+  info: { ios: 'info.circle', android: 'info', web: 'info' },
 } satisfies IconMap;

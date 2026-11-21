@@ -3,6 +3,7 @@ import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import { useEffect } from 'react';
 
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { ToastHost } from '@/components/ui/toast-host';
 import { AuthModal } from '@/features/auth/components/auth-modal';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { restoreSession } from '@/lib/auth-session';
@@ -34,6 +35,7 @@ export default function RootLayout() {
         </Stack>
         <AuthModal />
         <ConfirmDialog />
+        <ToastHost />
       </ThemeProvider>
     </QueryClientProvider>
   );
