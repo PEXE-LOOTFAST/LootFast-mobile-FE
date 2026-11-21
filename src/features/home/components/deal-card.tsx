@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/ui/icon';
 import { DealImage } from '@/features/home/components/deal-image';
 import { DealMeta } from '@/features/home/components/deal-meta';
@@ -40,9 +41,7 @@ export function DealCard({ deal, onPress }: DealCardProps) {
         <DealImage emoji={deal.emoji} emojiSize={36} style={styles.media} uri={deal.imageUrl} />
 
         {discount ? (
-          <View style={[styles.discount, { backgroundColor: theme.danger }]}>
-            <Text style={[styles.discountText, { color: theme.onDanger }]}>{discount}</Text>
-          </View>
+          <Badge label={discount} size="sm" style={styles.discount} tone="danger" />
         ) : null}
 
         {/* Chỉ báo số phần khi sắp hết, nằm sát đáy ảnh để không che món. */}
@@ -111,15 +110,7 @@ const styles = StyleSheet.create({
   pressed: { transform: [{ scale: 0.985 }] },
   mediaWrap: { width: IMAGE_SIZE, height: IMAGE_SIZE },
   media: { width: IMAGE_SIZE, height: IMAGE_SIZE, borderRadius: 12 },
-  discount: {
-    position: 'absolute',
-    top: 6,
-    left: 6,
-    borderRadius: 999,
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-  },
-  discountText: { fontSize: 11, fontWeight: '900' },
+  discount: { position: 'absolute', top: 6, left: 6 },
   stock: {
     position: 'absolute',
     right: 0,

@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Badge } from '@/components/ui/badge';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { DealImage } from '@/features/home/components/deal-image';
 import { HomeIcons } from '@/features/home/constants/icons';
@@ -53,11 +54,7 @@ export function DealDetailHero({
         </View>
       </View>
 
-      {discount ? (
-        <View style={[styles.discount, { backgroundColor: theme.danger }]}>
-          <Text style={[styles.discountText, { color: theme.onDanger }]}>{discount}</Text>
-        </View>
-      ) : null}
+      {discount ? <Badge label={discount} size="lg" style={styles.discount} tone="danger" /> : null}
     </View>
   );
 }
@@ -106,13 +103,5 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(23, 33, 27, 0.4)',
   },
   pressed: { opacity: 0.8 },
-  discount: {
-    position: 'absolute',
-    left: 16,
-    bottom: 14,
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  discountText: { fontSize: 13, fontWeight: '900' },
+  discount: { position: 'absolute', left: 16, bottom: 14 },
 });

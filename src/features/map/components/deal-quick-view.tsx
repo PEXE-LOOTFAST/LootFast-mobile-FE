@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/ui/icon';
 import { DealImage } from '@/features/home/components/deal-image';
 import { DealMeta } from '@/features/home/components/deal-meta';
@@ -45,11 +46,7 @@ export function DealQuickView({ deal, onOpen, onClose }: DealQuickViewProps) {
             <Text style={[styles.originalPrice, { color: theme.textSecondary }]}>
               {formatPrice(deal.originalPrice)}
             </Text>
-            {discount ? (
-              <View style={[styles.discount, { backgroundColor: theme.danger }]}>
-                <Text style={[styles.discountText, { color: theme.onDanger }]}>{discount}</Text>
-              </View>
-            ) : null}
+            {discount ? <Badge label={discount} size="sm" tone="danger" /> : null}
           </View>
 
           <View style={styles.meta}>
@@ -97,8 +94,6 @@ const styles = StyleSheet.create({
   priceRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6 },
   price: { fontSize: 16, fontWeight: '900' },
   originalPrice: { fontSize: 12, textDecorationLine: 'line-through' },
-  discount: { borderRadius: 999, paddingHorizontal: 7, paddingVertical: 2 },
-  discountText: { fontSize: 11, fontWeight: '900' },
   meta: { flexDirection: 'row', gap: 12 },
   stock: { fontSize: 12, fontWeight: '800' },
   address: { fontSize: 11 },

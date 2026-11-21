@@ -1,9 +1,9 @@
 import { Alert, StyleSheet, Text, View } from 'react-native';
 
+import { Badge } from '@/components/ui/badge';
 import { ApiPendingCard } from '@/components/ui/api-pending-card';
 import { BrandButton } from '@/components/ui/brand-button';
 import { Icon } from '@/components/ui/icon';
-import { SellerBadge } from '@/features/seller/components/seller-badge';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import {
   PENDING_PLAN_POLICIES,
@@ -54,7 +54,7 @@ export function SellerPlanScreen({ onBack }: { onBack: () => void }) {
             {/* Nhãn "Cần backend" ngắn nên đứng cùng hàng tiêu đề, nhãn gói xuống dòng riêng. */}
             <View style={[styles.featureTitleRow, feature.status === 'premium' && styles.stacked]}>
               <Text style={[styles.featureTitle, { color: theme.text }]}>{feature.title}</Text>
-              <SellerBadge label={PLAN_FEATURE_STATUS_LABEL[feature.status]} />
+              <Badge label={PLAN_FEATURE_STATUS_LABEL[feature.status]} />
             </View>
             <Text style={[styles.featureDescription, { color: theme.textSecondary }]}>
               {feature.description}

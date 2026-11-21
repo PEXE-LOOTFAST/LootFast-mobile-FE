@@ -1,8 +1,8 @@
 import { router } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/ui/icon';
-import { SellerBadge } from '@/features/seller/components/seller-badge';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
@@ -30,7 +30,7 @@ export function SellerGrowthScreen() {
           <Text accessibilityRole="header" style={[styles.title, { color: theme.text }]}>
             Chưa có chương trình đang mở
           </Text>
-          <SellerBadge label="Cần backend" />
+          <Badge label="Cần backend" />
           <Text style={[styles.description, { color: theme.textSecondary }]}>
             Backend chưa cung cấp danh sách chiến dịch, điều kiện, ngân sách hoặc luồng đăng ký.
           </Text>
