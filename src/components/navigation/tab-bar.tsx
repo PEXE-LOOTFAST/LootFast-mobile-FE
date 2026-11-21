@@ -70,7 +70,7 @@ export function TabBar({
           >
             {isCenter ? (
               <View style={[styles.centerButton, { backgroundColor: theme.primary }]}>
-                <Icon name={icon} color="#FFFFFF" size={28} />
+                <Icon name={icon} color={theme.onPrimary} size={28} />
               </View>
             ) : (
               <View style={[styles.indicator, isFocused && { backgroundColor: theme.primarySoft }]}>

@@ -47,7 +47,7 @@ export function RadiusMenu({ anchor, onClose, valueKm, onChange }: RadiusMenuPro
               <Text
                 style={[
                   styles.optionText,
-                  { color: isSelected ? '#FFFFFF' : theme.textSecondary },
+                  { color: isSelected ? theme.onPrimary : theme.textSecondary },
                   isSelected && styles.optionTextSelected,
                 ]}
               >

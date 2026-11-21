@@ -32,7 +32,7 @@ export function SellerLanguageScreen() {
           </Text>
         </View>
         <View style={[styles.check, { backgroundColor: theme.primary }]}>
-          <Icon name={SellerIcons.check} color="#FFFFFF" size={14} />
+          <Icon name={SellerIcons.check} color={theme.onPrimary} size={14} />
         </View>
       </View>
     </SellerPageScaffold>

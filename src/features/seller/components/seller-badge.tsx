@@ -22,7 +22,9 @@ export function SellerBadge({ label, tone = 'soft' }: SellerBadgeProps) {
           : { backgroundColor: theme.primarySoft, borderColor: theme.primarySoft },
       ]}
     >
-      <Text style={[styles.label, { color: isSolid ? '#FFFFFF' : theme.primary }]}>{label}</Text>
+      <Text style={[styles.label, { color: isSolid ? theme.onPrimary : theme.primary }]}>
+        {label}
+      </Text>
     </View>
   );
 }

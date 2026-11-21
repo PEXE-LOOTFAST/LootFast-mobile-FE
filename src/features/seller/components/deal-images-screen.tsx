@@ -117,7 +117,9 @@ export function DealImagesScreen() {
 
                   {index === 0 ? (
                     <View style={[styles.primaryBadge, { backgroundColor: theme.primary }]}>
-                      <Text style={styles.primaryLabel}>Ảnh chính</Text>
+                      <Text style={[styles.primaryLabel, { color: theme.onPrimary }]}>
+                        Ảnh chính
+                      </Text>
                     </View>
                   ) : null}
 
@@ -212,7 +214,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 3,
   },
-  primaryLabel: { color: '#FFFFFF', fontSize: 10, fontWeight: '800' },
+  primaryLabel: { fontSize: 10, fontWeight: '800' },
   tileActions: {
     flexDirection: 'row',
     alignItems: 'center',

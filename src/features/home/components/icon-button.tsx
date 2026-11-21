@@ -75,7 +75,9 @@ export function IconButton({
             },
           ]}
         >
-          <Text style={styles.badgeText}>{badgeCount > 9 ? '9+' : badgeCount}</Text>
+          <Text style={[styles.badgeText, { color: theme.onDanger }]}>
+            {badgeCount > 9 ? '9+' : badgeCount}
+          </Text>
         </View>
       ) : null}
     </Pressable>
@@ -114,5 +116,5 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 4,
   },
-  badgeText: { color: '#FFFFFF', fontSize: 10, fontWeight: '900' },
+  badgeText: { fontSize: 10, fontWeight: '900' },
 });

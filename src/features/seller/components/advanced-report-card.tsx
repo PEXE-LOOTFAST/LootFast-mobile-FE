@@ -30,8 +30,8 @@ export function AdvancedReportCard({ onPressPlan }: { onPressPlan: () => void })
             pressed && styles.pressed,
           ]}
         >
-          <Icon name={SellerIcons.crown} color="#FFFFFF" size={14} />
-          <Text style={styles.buttonLabel}>Xem gói Cao cấp</Text>
+          <Icon name={SellerIcons.crown} color={theme.onPrimary} size={14} />
+          <Text style={[styles.buttonLabel, { color: theme.onPrimary }]}>Xem gói Cao cấp</Text>
         </Pressable>
       </View>
     </View>
@@ -61,6 +61,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
-  buttonLabel: { color: '#FFFFFF', fontSize: 13, fontWeight: '800' },
+  buttonLabel: { fontSize: 13, fontWeight: '800' },
   pressed: { opacity: 0.85 },
 });

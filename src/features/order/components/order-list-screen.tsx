@@ -60,7 +60,7 @@ export function OrderListScreen() {
                     },
                   ]}
                 >
-                  <Text style={{ color: active ? '#FFFFFF' : theme.text }}>{tab.label}</Text>
+                  <Text style={{ color: active ? theme.onPrimary : theme.text }}>{tab.label}</Text>
                 </Pressable>
               );
             })}

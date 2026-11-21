@@ -47,7 +47,7 @@ export function DealQuickView({ deal, onOpen, onClose }: DealQuickViewProps) {
             </Text>
             {discount ? (
               <View style={[styles.discount, { backgroundColor: theme.danger }]}>
-                <Text style={styles.discountText}>{discount}</Text>
+                <Text style={[styles.discountText, { color: theme.onDanger }]}>{discount}</Text>
               </View>
             ) : null}
           </View>
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   price: { fontSize: 16, fontWeight: '900' },
   originalPrice: { fontSize: 12, textDecorationLine: 'line-through' },
   discount: { borderRadius: 999, paddingHorizontal: 7, paddingVertical: 2 },
-  discountText: { color: '#FFFFFF', fontSize: 11, fontWeight: '900' },
+  discountText: { fontSize: 11, fontWeight: '900' },
   meta: { flexDirection: 'row', gap: 12 },
   stock: { fontSize: 12, fontWeight: '800' },
   address: { fontSize: 11 },

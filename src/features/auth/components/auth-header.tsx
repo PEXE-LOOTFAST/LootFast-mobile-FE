@@ -31,7 +31,7 @@ export function AuthHeader({ onBack }: AuthHeaderProps) {
       </View>
 
       <View style={[styles.logo, { backgroundColor: theme.primary }]}>
-        <Text style={styles.logoText}>L</Text>
+        <Text style={[styles.logoText, { color: theme.onPrimary }]}>L</Text>
       </View>
 
       <Text accessibilityRole="header" style={[styles.brand, { color: theme.text }]}>
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     boxShadow: '0px 12px 28px rgba(22, 121, 75, 0.32)',
   },
-  logoText: { color: '#FFFFFF', fontSize: 34, fontWeight: '900' },
+  logoText: { fontSize: 34, fontWeight: '900' },
   brand: { marginTop: 18, fontSize: 34, fontWeight: '900', letterSpacing: -0.8 },
   taglineRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8 },
   tagline: { fontSize: 14, fontWeight: '500' },

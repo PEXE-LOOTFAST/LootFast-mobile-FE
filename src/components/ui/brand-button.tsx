@@ -31,7 +31,7 @@ export function BrandButton({
   const isInactive = disabled || loading;
 
   const palette = {
-    primary: { background: theme.primary, border: theme.primary, label: '#FFFFFF' },
+    primary: { background: theme.primary, border: theme.primary, label: theme.onPrimary },
     secondary: { background: theme.primarySoft, border: theme.primarySoft, label: theme.primary },
     outline: { background: theme.backgroundElement, border: theme.border, label: theme.text },
   }[variant];

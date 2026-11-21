@@ -16,9 +16,13 @@ export const Colors = {
     textSecondary: '#667069',
     primary: '#16794B',
     primarySoft: '#DDF2E5',
+    /** Chữ/icon đặt trên nền `primary`. */
+    onPrimary: '#FFFFFF',
     accent: '#F3A83B',
     border: '#E2E7E2',
     danger: '#C44636',
+    /** Chữ/icon đặt trên nền `danger`. */
+    onDanger: '#FFFFFF',
   },
   dark: {
     text: '#F4F7F4',
@@ -28,9 +32,12 @@ export const Colors = {
     textSecondary: '#AAB7AE',
     primary: '#5BD08B',
     primarySoft: '#203D2B',
+    // primary/danger bản dark là màu sáng: chữ trắng trên đó chỉ đạt ~2:1, nên dùng chữ tối (~8:1).
+    onPrimary: '#0B1F14',
     accent: '#F2B85E',
     border: '#2A382F',
     danger: '#FF8A78',
+    onDanger: '#2B0B06',
   },
 } as const;
 

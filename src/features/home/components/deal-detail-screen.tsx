@@ -244,8 +244,8 @@ function DealDetail({ deal }: { deal: Deal }) {
                   pressed && styles.pressed,
                 ]}
               >
-                <Icon name={HomeIcons.location} color="#FFFFFF" size={14} />
-                <Text style={styles.mapButtonText}>Bản đồ</Text>
+                <Icon name={HomeIcons.location} color={theme.onPrimary} size={14} />
+                <Text style={[styles.mapButtonText, { color: theme.onPrimary }]}>Bản đồ</Text>
               </Pressable>
             </View>
           </DetailCard>
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 11,
     paddingVertical: 6,
   },
-  mapButtonText: { color: '#FFFFFF', fontSize: 12, fontWeight: '800' },
+  mapButtonText: { fontSize: 12, fontWeight: '800' },
   pressed: { opacity: 0.85 },
   notFound: { flex: 1, justifyContent: 'center', gap: 12, padding: 24 },
   notFoundTitle: { fontSize: 22, fontWeight: '900', textAlign: 'center' },

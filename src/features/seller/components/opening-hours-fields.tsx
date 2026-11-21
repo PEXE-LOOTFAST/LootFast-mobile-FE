@@ -73,7 +73,7 @@ export function OpeningHoursFields({ values, errors, onChange }: OpeningHoursFie
               <Text
                 style={[
                   styles.chipLabel,
-                  { color: isSelected ? '#FFFFFF' : theme.text },
+                  { color: isSelected ? theme.onPrimary : theme.text },
                   isSelected && styles.chipLabelSelected,
                 ]}
               >
@@ -141,7 +141,10 @@ export function OpeningHoursFields({ values, errors, onChange }: OpeningHoursFie
                 ]}
               >
                 <Text
-                  style={[styles.dayLabel, { color: isOpen ? '#FFFFFF' : theme.textSecondary }]}
+                  style={[
+                    styles.dayLabel,
+                    { color: isOpen ? theme.onPrimary : theme.textSecondary },
+                  ]}
                 >
                   {day.label}
                 </Text>

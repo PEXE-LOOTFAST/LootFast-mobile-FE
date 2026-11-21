@@ -80,7 +80,9 @@ export function IncomingOrderFilters({
             pressed && styles.pressed,
           ]}
         >
-          <Text style={[styles.todayLabel, { color: isToday ? theme.textSecondary : '#FFFFFF' }]}>
+          <Text
+            style={[styles.todayLabel, { color: isToday ? theme.textSecondary : theme.onPrimary }]}
+          >
             Hôm nay
           </Text>
         </Pressable>
@@ -151,7 +153,7 @@ export function IncomingOrderFilters({
           >
             <Icon
               name={SellerIcons.check}
-              color={canDeliver ? '#FFFFFF' : theme.textSecondary}
+              color={canDeliver ? theme.onPrimary : theme.textSecondary}
               size={16}
             />
           </Pressable>

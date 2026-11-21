@@ -111,7 +111,7 @@ export function RejectPaymentModal({
                 pressed && styles.pressed,
               ]}
             >
-              <Text style={[styles.buttonLabel, styles.confirmLabel]}>Gửi từ chối</Text>
+              <Text style={[styles.buttonLabel, { color: theme.onDanger }]}>Gửi từ chối</Text>
             </Pressable>
           </View>
         </View>
@@ -154,6 +154,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   buttonLabel: { fontSize: 14, fontWeight: '800' },
-  confirmLabel: { color: '#FFFFFF' },
   pressed: { opacity: 0.85 },
 });

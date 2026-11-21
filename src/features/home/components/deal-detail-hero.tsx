@@ -55,7 +55,7 @@ export function DealDetailHero({
 
       {discount ? (
         <View style={[styles.discount, { backgroundColor: theme.danger }]}>
-          <Text style={styles.discountText}>{discount}</Text>
+          <Text style={[styles.discountText, { color: theme.onDanger }]}>{discount}</Text>
         </View>
       ) : null}
     </View>
@@ -114,5 +114,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  discountText: { color: '#FFFFFF', fontSize: 13, fontWeight: '900' },
+  discountText: { fontSize: 13, fontWeight: '900' },
 });

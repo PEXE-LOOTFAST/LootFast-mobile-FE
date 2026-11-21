@@ -94,13 +94,13 @@ function FilterSection<T extends string | number>({
             <Text
               style={[
                 styles.optionText,
-                { color: isSelected ? '#FFFFFF' : theme.text },
+                { color: isSelected ? theme.onPrimary : theme.text },
                 isSelected && styles.optionTextSelected,
               ]}
             >
               {option.label}
             </Text>
-            {isSelected ? <Icon name={HomeIcons.check} color="#FFFFFF" size={16} /> : null}
+            {isSelected ? <Icon name={HomeIcons.check} color={theme.onPrimary} size={16} /> : null}
           </Pressable>
         );
       })}

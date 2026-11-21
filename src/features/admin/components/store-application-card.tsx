@@ -152,13 +152,11 @@ export function StoreApplicationCard({
             ]}
           >
             {isBusy ? (
-              <ActivityIndicator color={theme.backgroundElement} size="small" />
+              <ActivityIndicator color={theme.onPrimary} size="small" />
             ) : (
               <>
-                <Icon name={AdminIcons.check} color={theme.backgroundElement} size={15} />
-                <Text style={[styles.actionLabel, { color: theme.backgroundElement }]}>
-                  Phê duyệt
-                </Text>
+                <Icon name={AdminIcons.check} color={theme.onPrimary} size={15} />
+                <Text style={[styles.actionLabel, { color: theme.onPrimary }]}>Phê duyệt</Text>
               </>
             )}
           </Pressable>

@@ -102,9 +102,9 @@ export function SellerOrderRow({
             ]}
           >
             {isBusy ? (
-              <ActivityIndicator color="#FFFFFF" size="small" />
+              <ActivityIndicator color={theme.onPrimary} size="small" />
             ) : (
-              <Text style={[styles.actionLabel, styles.primaryLabel]}>Đã nhận tiền</Text>
+              <Text style={[styles.actionLabel, { color: theme.onPrimary }]}>Đã nhận tiền</Text>
             )}
           </Pressable>
         </View>
@@ -133,6 +133,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   actionLabel: { fontSize: 13, fontWeight: '800' },
-  primaryLabel: { color: '#FFFFFF' },
   pressed: { opacity: 0.85 },
 });

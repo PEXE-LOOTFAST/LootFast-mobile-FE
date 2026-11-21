@@ -114,7 +114,7 @@ export function ShopInfoFields({
                   <Text
                     style={[
                       styles.chipLabel,
-                      { color: isSelected ? '#FFFFFF' : theme.text },
+                      { color: isSelected ? theme.onPrimary : theme.text },
                       isSelected && styles.chipLabelSelected,
                     ]}
                   >

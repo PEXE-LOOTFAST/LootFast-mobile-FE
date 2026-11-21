@@ -32,7 +32,7 @@ export function AdminLoginScreen() {
       >
         <View style={styles.header}>
           <View style={[styles.logo, { backgroundColor: theme.primary }]}>
-            <Icon name={AdminIcons.shield} color="#FFFFFF" size={34} />
+            <Icon name={AdminIcons.shield} color={theme.onPrimary} size={34} />
           </View>
 
           <View style={styles.brandRow}>

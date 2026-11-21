@@ -41,7 +41,7 @@ export function DealCard({ deal, onPress }: DealCardProps) {
 
         {discount ? (
           <View style={[styles.discount, { backgroundColor: theme.danger }]}>
-            <Text style={styles.discountText}>{discount}</Text>
+            <Text style={[styles.discountText, { color: theme.onDanger }]}>{discount}</Text>
           </View>
         ) : null}
 
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 7,
     paddingVertical: 2,
   },
-  discountText: { color: '#FFFFFF', fontSize: 11, fontWeight: '900' },
+  discountText: { fontSize: 11, fontWeight: '900' },
   stock: {
     position: 'absolute',
     right: 0,

@@ -35,7 +35,7 @@ export function CategoryChips({ categories, selectedId, onSelect }: CategoryChip
             <Text
               style={[
                 styles.label,
-                { color: isSelected ? '#FFFFFF' : theme.text },
+                { color: isSelected ? theme.onPrimary : theme.text },
                 isSelected && styles.labelSelected,
               ]}
             >

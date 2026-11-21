@@ -138,7 +138,9 @@ export function AdminSettingsScreen() {
                     {accountEmail}
                   </Text>
                   <View style={[styles.roleBadge, { backgroundColor: theme.primary }]}>
-                    <Text style={styles.roleLabel}>{accountRole}</Text>
+                    <Text style={[styles.roleLabel, { color: theme.onPrimary }]}>
+                      {accountRole}
+                    </Text>
                   </View>
                 </>
               )}
@@ -235,7 +237,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  roleLabel: { color: '#FFFFFF', fontSize: 11, fontWeight: '800' },
+  roleLabel: { fontSize: 11, fontWeight: '800' },
   row: {
     minHeight: 56,
     flexDirection: 'row',

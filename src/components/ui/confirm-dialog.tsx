@@ -15,6 +15,7 @@ export function ConfirmDialog() {
   const request = useSyncExternalStore(subscribeConfirm, getConfirmRequest, getConfirmRequest);
 
   const confirmColor = request?.isDestructive ? theme.danger : theme.primary;
+  const confirmLabelColor = request?.isDestructive ? theme.onDanger : theme.onPrimary;
 
   return (
     <Modal
@@ -66,7 +67,7 @@ export function ConfirmDialog() {
                   pressed && styles.pressed,
                 ]}
               >
-                <Text style={[styles.buttonLabel, styles.confirmLabel]}>
+                <Text style={[styles.buttonLabel, { color: confirmLabelColor }]}>
                   {request.confirmLabel}
                 </Text>
               </Pressable>
@@ -102,6 +103,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   buttonLabel: { fontSize: 14, fontWeight: '800' },
-  confirmLabel: { color: '#FFFFFF' },
   pressed: { opacity: 0.85 },
 });
