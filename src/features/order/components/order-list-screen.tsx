@@ -9,6 +9,7 @@ import { EmptyCard } from '@/components/ui/empty-card';
 import { QueryListEmpty } from '@/components/ui/query-boundary';
 import { ScreenList } from '@/components/ui/screen';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SlowLoadingHint } from '@/components/ui/slow-loading-hint';
 import { ScreenGutter, Spacing } from '@/constants/theme';
 import { BuyerHeader } from '@/features/home/components/buyer-header';
 import {
@@ -139,6 +140,7 @@ function OrderListSkeleton() {
           </View>
         </Card>
       ))}
+      <SlowLoadingHint />
     </View>
   );
 }

@@ -1,6 +1,7 @@
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/ui/app-text';
+import { SlowLoadingHint } from '@/components/ui/slow-loading-hint';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -28,6 +29,8 @@ export function LoadingState({ label, size = 'large', fill = false }: LoadingSta
           {label}
         </AppText>
       ) : null}
+      {/* Chỉ các vùng tải lớn mới giải thích chờ lâu; vòng xoay nhỏ trong nút thì không. */}
+      {size === 'large' ? <SlowLoadingHint /> : null}
     </View>
   );
 }
