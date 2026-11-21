@@ -4,7 +4,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/ui/icon';
-import { MaxContentWidth } from '@/constants/theme';
+import { FontSize, FontWeight, MaxContentWidth, Spacing } from '@/constants/theme';
 import { SupportIcons } from '@/features/support/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -47,18 +47,18 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: Spacing.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
   },
-  title: { fontSize: 18, fontWeight: '900', letterSpacing: -0.3 },
+  title: { fontSize: FontSize.title, fontWeight: FontWeight.heavy, letterSpacing: -0.3 },
   content: {
     width: '100%',
     maxWidth: MaxContentWidth,
     alignSelf: 'center',
     gap: 14,
-    padding: 16,
-    paddingBottom: 48,
+    padding: Spacing.lg,
+    paddingBottom: Spacing.huge,
   },
 });

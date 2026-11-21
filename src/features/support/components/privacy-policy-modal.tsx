@@ -1,6 +1,7 @@
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { Icon } from '@/components/ui/icon';
 import { PrivacyPolicyContent } from '@/features/support/components/privacy-policy-content';
 import { SupportIcons } from '@/features/support/constants/icons';
@@ -48,11 +49,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 12,
+    gap: Spacing.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
   },
-  title: { flex: 1, fontSize: 18, fontWeight: '900', letterSpacing: -0.3 },
-  content: { padding: 16, paddingBottom: 48 },
+  title: { flex: 1, fontSize: FontSize.title, fontWeight: FontWeight.heavy, letterSpacing: -0.3 },
+  content: { padding: Spacing.lg, paddingBottom: Spacing.huge },
 });

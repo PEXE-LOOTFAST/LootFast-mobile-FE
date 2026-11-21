@@ -7,7 +7,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { LoadingState } from '@/components/ui/loading-state';
-import { MaxContentWidth } from '@/constants/theme';
+import { FontSize, FontWeight, MaxContentWidth, Radius, Spacing } from '@/constants/theme';
 import { toDeal } from '@/features/home/api/deals';
 import { DealCard } from '@/features/home/components/deal-card';
 import { toFavoriteErrorMessage, type FavoriteItemDto } from '@/features/profile/api/favorites';
@@ -168,33 +168,33 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: Spacing.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
   },
-  title: { fontSize: 18, fontWeight: '900', letterSpacing: -0.3 },
+  title: { fontSize: FontSize.title, fontWeight: FontWeight.heavy, letterSpacing: -0.3 },
   content: {
     width: '100%',
     maxWidth: MaxContentWidth,
     alignSelf: 'center',
     gap: 14,
-    padding: 16,
-    paddingBottom: 48,
+    padding: Spacing.lg,
+    paddingBottom: Spacing.huge,
   },
-  section: { fontSize: 11, fontWeight: '800', letterSpacing: 0.6 },
+  section: { fontSize: FontSize.caption, fontWeight: FontWeight.bold, letterSpacing: 0.6 },
   deals: { gap: 10 },
   stores: { gap: 10 },
   storeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: Spacing.md,
     borderWidth: 1,
-    borderRadius: 16,
+    borderRadius: Radius.lg,
     paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingVertical: Spacing.md,
   },
-  storeCopy: { flex: 1, gap: 2 },
-  storeName: { fontSize: 15, fontWeight: '800' },
-  storeAddress: { fontSize: 12 },
+  storeCopy: { flex: 1, gap: Spacing.xxs },
+  storeName: { fontSize: FontSize.bodyLg, fontWeight: FontWeight.bold },
+  storeAddress: { fontSize: FontSize.footnote },
 });

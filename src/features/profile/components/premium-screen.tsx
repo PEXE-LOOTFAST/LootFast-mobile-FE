@@ -1,5 +1,6 @@
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, PremiumColors, Radius, Spacing } from '@/constants/theme';
 import { ErrorState } from '@/components/ui/error-state';
 import { Icon } from '@/components/ui/icon';
 import { BuyerHeader } from '@/features/home/components/buyer-header';
@@ -64,23 +65,6 @@ function BenefitRow({
   );
 }
 
-const PREMIUM_COLORS = {
-  light: {
-    cardBg: '#DDF2FC',
-    cardBorder: '#8BC8E8',
-    accent: '#12659A',
-    accentSoft: '#247EA9',
-    badgeBg: '#C4E4F5',
-  },
-  dark: {
-    cardBg: '#132A3A',
-    cardBorder: '#2A5A7A',
-    accent: '#6DC0E8',
-    accentSoft: '#5AACDA',
-    badgeBg: '#1A3A50',
-  },
-} as const;
-
 // current: gói người dùng đang có; available: có thể mua; included: đã nằm trong gói cao hơn
 // người dùng đang có nên không cần nút.
 type PlanStatus = 'current' | 'available' | 'included';
@@ -105,7 +89,7 @@ function PlanCard({
   const theme = useTheme();
   const scheme = useColorScheme();
   const mode = scheme === 'dark' ? 'dark' : 'light';
-  const pc = PREMIUM_COLORS[mode];
+  const pc = PremiumColors[mode];
 
   return (
     <View
@@ -146,8 +130,12 @@ function PlanCard({
         </View>
       ) : null}
       {status === 'available' ? (
-        <Pressable onPress={onPress} style={styles.buyButton}>
-          <Text style={styles.buyButtonText}>Mua Premium</Text>
+        <Pressable
+          accessibilityRole="button"
+          onPress={onPress}
+          style={[styles.buyButton, { backgroundColor: pc.buyButton }]}
+        >
+          <Text style={[styles.buyButtonText, { color: pc.onBuyButton }]}>Mua Premium</Text>
         </Pressable>
       ) : null}
     </View>
@@ -175,7 +163,7 @@ export function PremiumScreen({ onBack }: PremiumScreenProps) {
           <Text style={[styles.eyebrow, { color: theme.textSecondary }]}>GÓI DỊCH VỤ</Text>
           <Text style={[styles.status, { color: theme.textSecondary }]}>
             Gói hiện tại:{' '}
-            <Text style={{ color: theme.text, fontWeight: '800' }}>{currentPlan}</Text>
+            <Text style={{ color: theme.text, fontWeight: FontWeight.bold }}>{currentPlan}</Text>
           </Text>
 
           {benefitsQuery.isError ? (
@@ -197,7 +185,7 @@ export function PremiumScreen({ onBack }: PremiumScreenProps) {
             benefits={buildPremiumBenefits(
               benefitsQuery.data?.savedFilterLimit ?? DEFAULT_FILTER_LIMIT,
             )}
-            color="#DDF2FC"
+            color={theme.backgroundElement}
             onPress={() => Alert.alert('Mua Premium', 'Tính năng thanh toán đang được phát triển.')}
             premium
             price="29.000 VND"
@@ -213,34 +201,49 @@ export function PremiumScreen({ onBack }: PremiumScreenProps) {
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   content: { paddingBottom: 110 },
-  body: { gap: 8, padding: 16 },
-  eyebrow: { fontSize: 11, fontWeight: '900', letterSpacing: 0.4, marginTop: 8 },
-  status: { fontSize: 12, marginBottom: 2 },
-  planCard: { borderRadius: 18, borderWidth: 1.5, gap: 14, marginTop: 8, padding: 16 },
+  body: { gap: Spacing.sm, padding: Spacing.lg },
+  eyebrow: {
+    fontSize: FontSize.caption,
+    fontWeight: FontWeight.heavy,
+    letterSpacing: 0.4,
+    marginTop: Spacing.sm,
+  },
+  status: { fontSize: FontSize.footnote, marginBottom: Spacing.xxs },
+  planCard: {
+    borderRadius: Radius.xl,
+    borderWidth: 1.5,
+    gap: 14,
+    marginTop: Spacing.sm,
+    padding: Spacing.lg,
+  },
   planHeader: { alignItems: 'flex-start', flexDirection: 'row', justifyContent: 'space-between' },
-  planTitle: { fontSize: 16, fontWeight: '900' },
-  planPrice: { fontSize: 21, fontWeight: '900', marginTop: 4 },
+  planTitle: { fontSize: FontSize.subtitle, fontWeight: FontWeight.heavy },
+  planPrice: { fontSize: FontSize.headline, fontWeight: FontWeight.heavy, marginTop: Spacing.xs },
   benefits: { gap: 9 },
   benefitRow: { alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', gap: 7 },
-  benefitLabel: { flexShrink: 1, fontSize: 13, fontWeight: '600', lineHeight: 18 },
-  badge: { borderRadius: 8, paddingHorizontal: 7, paddingVertical: 3 },
-  badgeText: { fontSize: 10, fontWeight: '900' },
+  benefitLabel: {
+    flexShrink: 1,
+    fontSize: FontSize.bodySm,
+    fontWeight: FontWeight.medium,
+    lineHeight: 18,
+  },
+  badge: { borderRadius: Radius.sm, paddingHorizontal: 7, paddingVertical: 3 },
+  badgeText: { fontSize: FontSize.micro, fontWeight: FontWeight.heavy },
   currentButton: {
     alignItems: 'center',
-    borderRadius: 11,
+    borderRadius: Radius.md,
     borderWidth: 1,
     minHeight: 44,
     justifyContent: 'center',
-    marginTop: 2,
+    marginTop: Spacing.xxs,
   },
-  currentButtonText: { fontSize: 14, fontWeight: '900' },
+  currentButtonText: { fontSize: FontSize.body, fontWeight: FontWeight.heavy },
   buyButton: {
     alignItems: 'center',
-    backgroundColor: '#126FA6',
-    borderRadius: 11,
+    borderRadius: Radius.md,
     minHeight: 44,
     justifyContent: 'center',
-    marginTop: 2,
+    marginTop: Spacing.xxs,
   },
-  buyButtonText: { color: '#FFFFFF', fontSize: 14, fontWeight: '900' },
+  buyButtonText: { fontSize: FontSize.body, fontWeight: FontWeight.heavy },
 });

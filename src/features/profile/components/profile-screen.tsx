@@ -3,6 +3,7 @@ import { router, type Href } from 'expo-router';
 import { Image } from 'expo-image';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { MenuSection, type MenuItem } from '@/components/ui/menu-section';
 import { Screen } from '@/components/ui/screen';
 import { Icon, type IconName } from '@/components/ui/icon';
@@ -169,58 +170,63 @@ export function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  avatarImage: { borderRadius: 999, height: '100%', width: '100%' },
+  avatarImage: { borderRadius: Radius.full, height: '100%', width: '100%' },
   accountCard: {
     alignItems: 'center',
     flexDirection: 'row',
-    borderRadius: 18,
+    borderRadius: Radius.xl,
     borderWidth: 1,
-    padding: 16,
+    padding: Spacing.lg,
   },
   avatar: {
     alignItems: 'center',
-    borderRadius: 999,
+    borderRadius: Radius.full,
     height: 58,
     justifyContent: 'center',
     width: 58,
   },
-  avatarText: { fontSize: 16, fontWeight: '900' },
-  accountCopy: { flex: 1, gap: 4, marginLeft: 12 },
-  name: { fontSize: 16, fontWeight: '900' },
-  email: { fontSize: 13 },
-  phone: { fontSize: 13 },
+  avatarText: { fontSize: FontSize.subtitle, fontWeight: FontWeight.heavy },
+  accountCopy: { flex: 1, gap: Spacing.xs, marginLeft: Spacing.md },
+  name: { fontSize: FontSize.subtitle, fontWeight: FontWeight.heavy },
+  email: { fontSize: FontSize.bodySm },
+  phone: { fontSize: FontSize.bodySm },
   camera: {
     alignItems: 'center',
-    borderRadius: 999,
+    borderRadius: Radius.full,
     borderWidth: 1,
     height: 28,
     justifyContent: 'center',
     width: 28,
   },
-  cameraText: { fontSize: 15, fontWeight: '900' },
+  cameraText: { fontSize: FontSize.bodyLg, fontWeight: FontWeight.heavy },
   pressed: { opacity: 0.7 },
   sellerButton: {
     alignItems: 'center',
-    borderRadius: 22,
+    borderRadius: Radius.xxl,
     borderWidth: 1,
     flexDirection: 'row',
     minHeight: 48,
-    paddingHorizontal: 16,
+    paddingHorizontal: Spacing.lg,
   },
   sellerIcon: { marginRight: 10 },
-  sellerText: { flex: 1, fontSize: 14, fontWeight: '800', textAlign: 'center' },
+  sellerText: {
+    flex: 1,
+    fontSize: FontSize.body,
+    fontWeight: FontWeight.bold,
+    textAlign: 'center',
+  },
   signOut: { alignItems: 'center', padding: 10 },
-  signOutText: { fontSize: 14, fontWeight: '800' },
+  signOutText: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
   errorBox: {
     alignItems: 'center',
-    borderRadius: 14,
+    borderRadius: Radius.lg,
     borderWidth: 1,
     flexDirection: 'row',
-    gap: 12,
+    gap: Spacing.md,
     paddingHorizontal: 14,
     paddingVertical: 11,
   },
-  errorText: { flex: 1, fontSize: 12, lineHeight: 17 },
-  retryButton: { padding: 4 },
-  retryText: { fontSize: 13, fontWeight: '800' },
+  errorText: { flex: 1, fontSize: FontSize.footnote, lineHeight: 17 },
+  retryButton: { padding: Spacing.xs },
+  retryText: { fontSize: FontSize.bodySm, fontWeight: FontWeight.bold },
 });

@@ -12,7 +12,7 @@ import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { LoadingState } from '@/components/ui/loading-state';
 import { TextField } from '@/components/ui/text-field';
-import { MaxContentWidth } from '@/constants/theme';
+import { FontSize, FontWeight, MaxContentWidth, Radius, Shadow, Spacing } from '@/constants/theme';
 import { BuyerHeader } from '@/features/home/components/buyer-header';
 import {
   FAVORITE_CATEGORIES_MAX,
@@ -360,7 +360,7 @@ export function ProfileInfoScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
-  content: { paddingBottom: 24 },
+  content: { paddingBottom: Spacing.xxl },
   // Chừa chỗ cho dải lưu nổi để phần cuối không bị che.
   contentWithBar: { paddingBottom: 150 },
   body: {
@@ -368,48 +368,53 @@ const styles = StyleSheet.create({
     maxWidth: MaxContentWidth,
     alignSelf: 'center',
     gap: 10,
-    padding: 12,
+    padding: Spacing.md,
   },
-  card: { gap: 10, borderWidth: 1, borderRadius: 16, padding: 14 },
-  avatarCard: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  card: { gap: 10, borderWidth: 1, borderRadius: Radius.lg, padding: 14 },
+  avatarCard: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
   avatar: {
     width: 64,
     height: 64,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 32,
+    borderRadius: Radius.full,
     overflow: 'hidden',
   },
   avatarImage: { width: '100%', height: '100%' },
-  avatarText: { fontSize: 20, fontWeight: '900' },
-  avatarCopy: { flex: 1, minWidth: 0, gap: 2 },
-  name: { fontSize: 16, fontWeight: '900' },
-  email: { fontSize: 12 },
+  avatarText: { fontSize: FontSize.titleLg, fontWeight: FontWeight.heavy },
+  avatarCopy: { flex: 1, minWidth: 0, gap: Spacing.xxs },
+  name: { fontSize: FontSize.subtitle, fontWeight: FontWeight.heavy },
+  email: { fontSize: FontSize.footnote },
   changePhoto: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
     alignSelf: 'flex-start',
-    marginTop: 2,
+    marginTop: Spacing.xxs,
   },
-  changePhotoText: { fontSize: 12, fontWeight: '800' },
-  sectionTitle: { fontSize: 11, fontWeight: '900', letterSpacing: 0.4, marginTop: 2 },
-  group: { gap: 8 },
+  changePhotoText: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold },
+  sectionTitle: {
+    fontSize: FontSize.caption,
+    fontWeight: FontWeight.heavy,
+    letterSpacing: 0.4,
+    marginTop: Spacing.xxs,
+  },
+  group: { gap: Spacing.sm },
   groupHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  groupLabel: { fontSize: 12, fontWeight: '800' },
-  count: { fontSize: 12 },
+  groupLabel: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold },
+  count: { fontSize: FontSize.footnote },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  errorText: { fontSize: 12, fontWeight: '600' },
+  errorText: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium },
   pressed: { opacity: 0.8 },
   saveBar: {
     position: 'absolute',
     right: 0,
     bottom: 0,
     left: 0,
-    gap: 8,
+    gap: Spacing.sm,
     borderTopWidth: StyleSheet.hairlineWidth,
-    padding: 12,
-    boxShadow: '0px -6px 16px rgba(23, 33, 27, 0.12)',
+    padding: Spacing.md,
+    boxShadow: Shadow.tabBar,
   },
   saveButton: { minHeight: 46 },
 });

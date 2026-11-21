@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Spacing } from '@/constants/theme';
 import {
   PRIVACY_POLICY_INTRO,
   PRIVACY_POLICY_SECTIONS,
@@ -47,13 +48,13 @@ export function PrivacyPolicyContent() {
 }
 
 const styles = StyleSheet.create({
-  container: { gap: 16 },
-  updated: { fontSize: 12, fontWeight: '700' },
-  section: { gap: 8 },
-  heading: { fontSize: 15, fontWeight: '900' },
-  paragraph: { fontSize: 14, lineHeight: 21 },
-  bullet: { flexDirection: 'row', gap: 8, paddingLeft: 4 },
-  dot: { fontSize: 14, lineHeight: 21, fontWeight: '900' },
+  container: { gap: Spacing.lg },
+  updated: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold },
+  section: { gap: Spacing.sm },
+  heading: { fontSize: FontSize.bodyLg, fontWeight: FontWeight.heavy },
+  paragraph: { fontSize: FontSize.body, lineHeight: 21 },
+  bullet: { flexDirection: 'row', gap: Spacing.sm, paddingLeft: Spacing.xs },
+  dot: { fontSize: FontSize.body, lineHeight: 21, fontWeight: FontWeight.heavy },
   bulletText: { flex: 1 },
-  label: { fontWeight: '800' },
+  label: { fontWeight: FontWeight.bold },
 });

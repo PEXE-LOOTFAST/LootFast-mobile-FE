@@ -75,6 +75,31 @@ export const HeaderColors = {
 
 export type HeaderVariant = keyof typeof HeaderColors;
 
+/**
+ * Bảng màu xanh dương riêng của gói Cao cấp, để thẻ Premium tách khỏi màu xanh lá thương hiệu.
+ * Nút mua giữ cùng màu ở hai chế độ.
+ */
+export const PremiumColors = {
+  light: {
+    cardBg: '#DDF2FC',
+    cardBorder: '#8BC8E8',
+    accent: '#12659A',
+    accentSoft: '#247EA9',
+    badgeBg: '#C4E4F5',
+    buyButton: '#126FA6',
+    onBuyButton: '#FFFFFF',
+  },
+  dark: {
+    cardBg: '#132A3A',
+    cardBorder: '#2A5A7A',
+    accent: '#6DC0E8',
+    accentSoft: '#5AACDA',
+    badgeBg: '#1A3A50',
+    buyButton: '#126FA6',
+    onBuyButton: '#FFFFFF',
+  },
+} as const;
+
 // Chấm trạng thái trên nút (vd. GPS): đủ sáng để nổi trên cả nền header xanh đậm lẫn nền thẻ.
 export const IndicatorColor = {
   on: '#34D27B',

@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { Alert, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { SupportPage } from '@/features/support/components/support-page';
 import { SupportIcons } from '@/features/support/constants/icons';
@@ -87,21 +88,21 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: Spacing.md,
     borderWidth: 1,
-    borderRadius: 18,
+    borderRadius: Radius.xl,
     padding: 14,
   },
   pressed: { opacity: 0.7 },
   icon: {
     alignItems: 'center',
-    borderRadius: 999,
+    borderRadius: Radius.full,
     height: 38,
     justifyContent: 'center',
     width: 38,
   },
-  copy: { flex: 1, gap: 4 },
-  cardTitle: { fontSize: 14, fontWeight: '800' },
-  description: { fontSize: 12, lineHeight: 17 },
-  action: { fontSize: 13, fontWeight: '800' },
+  copy: { flex: 1, gap: Spacing.xs },
+  cardTitle: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
+  description: { fontSize: FontSize.footnote, lineHeight: 17 },
+  action: { fontSize: FontSize.bodySm, fontWeight: FontWeight.bold },
 });
