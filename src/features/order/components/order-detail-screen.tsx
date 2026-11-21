@@ -12,7 +12,14 @@ import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { LoadingState } from '@/components/ui/loading-state';
 import { OrderReviewCard } from '@/features/review/components/order-review-card';
-import { MaxContentWidth } from '@/constants/theme';
+import {
+  FontSize,
+  FontWeight,
+  MaxContentWidth,
+  Radius,
+  Spacing,
+  StaticColors,
+} from '@/constants/theme';
 import { HomeIcons } from '@/features/home/constants/icons';
 import {
   toOrderErrorMessage,
@@ -270,32 +277,57 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: Spacing.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
   },
-  headerTitle: { flex: 1, fontSize: 17, fontWeight: '900', letterSpacing: -0.3 },
+  headerTitle: {
+    flex: 1,
+    fontSize: FontSize.title,
+    fontWeight: FontWeight.heavy,
+    letterSpacing: -0.3,
+  },
   content: {
     width: '100%',
     maxWidth: MaxContentWidth,
     alignSelf: 'center',
     gap: 14,
-    padding: 16,
-    paddingBottom: 48,
+    padding: Spacing.lg,
+    paddingBottom: Spacing.huge,
   },
-  card: { gap: 10, borderWidth: 1, borderRadius: 18, padding: 16 },
-  dealName: { fontSize: 17, fontWeight: '900', letterSpacing: -0.3 },
-  pill: { alignSelf: 'flex-start', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 4 },
-  pillLabel: { fontSize: 12, fontWeight: '800' },
-  section: { fontSize: 15, fontWeight: '900', letterSpacing: -0.2 },
-  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
-  rowLabel: { fontSize: 13 },
-  rowValue: { flexShrink: 1, fontSize: 13, fontWeight: '700', textAlign: 'right' },
-  note: { fontSize: 13, lineHeight: 19 },
+  card: { gap: 10, borderWidth: 1, borderRadius: Radius.xl, padding: Spacing.lg },
+  dealName: { fontSize: FontSize.title, fontWeight: FontWeight.heavy, letterSpacing: -0.3 },
+  pill: {
+    alignSelf: 'flex-start',
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+  },
+  pillLabel: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold },
+  section: { fontSize: FontSize.bodyLg, fontWeight: FontWeight.heavy, letterSpacing: -0.2 },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.md,
+  },
+  rowLabel: { fontSize: FontSize.bodySm },
+  rowValue: {
+    flexShrink: 1,
+    fontSize: FontSize.bodySm,
+    fontWeight: FontWeight.bold,
+    textAlign: 'right',
+  },
+  note: { fontSize: FontSize.bodySm, lineHeight: 19 },
   qr: { width: '100%', height: 220 },
-  bank: { gap: 8 },
-  pickupCodeSection: { gap: 10, alignItems: 'center', marginTop: 4 },
-  pickupCode: { fontSize: 28, fontWeight: '900', letterSpacing: 2 },
-  pickupQr: { alignItems: 'center', backgroundColor: '#FFFFFF', borderRadius: 12, padding: 12 },
+  bank: { gap: Spacing.sm },
+  pickupCodeSection: { gap: 10, alignItems: 'center', marginTop: Spacing.xs },
+  pickupCode: { fontSize: FontSize.display, fontWeight: FontWeight.heavy, letterSpacing: 2 },
+  pickupQr: {
+    alignItems: 'center',
+    backgroundColor: StaticColors.white,
+    borderRadius: Radius.md,
+    padding: Spacing.md,
+  },
 });

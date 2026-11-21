@@ -1,13 +1,15 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { AppText } from '@/components/ui/app-text';
 import { BrandButton } from '@/components/ui/brand-button';
+import { Card } from '@/components/ui/card';
 import { Chip } from '@/components/ui/chip';
 import { EmptyCard } from '@/components/ui/empty-card';
 import { QueryBoundary } from '@/components/ui/query-boundary';
 import { Screen } from '@/components/ui/screen';
-import { ScreenGutter, Spacing } from '@/constants/theme';
+import { FontSize, FontWeight, ScreenGutter, Spacing } from '@/constants/theme';
 import { BuyerHeader } from '@/features/home/components/buyer-header';
 import { type OrderListStatusDto, toOrderErrorMessage } from '@/features/order/api/orders';
 import { useOrders } from '@/features/order/api/use-orders';
@@ -76,43 +78,40 @@ export function OrderListScreen() {
         {(data) => (
           <>
             {data.items.map((order) => (
-              <Pressable
+              <Card
                 key={order.orderId}
                 accessibilityLabel={`Mở đơn ${order.orderId}`}
-                accessibilityRole="button"
+                gap="sm"
                 onPress={() => router.push(`/order/${order.orderId}`)}
-                style={({ pressed }) => [
-                  styles.card,
-                  {
-                    backgroundColor: theme.backgroundElement,
-                    borderColor: theme.border,
-                  },
-                  pressed && styles.pressed,
-                ]}
               >
                 <View style={styles.cardHeader}>
-                  <Text numberOfLines={1} style={[styles.dealName, { color: theme.text }]}>
+                  <AppText
+                    numberOfLines={1}
+                    style={styles.dealName}
+                    variant="subtitle"
+                    weight="bold"
+                  >
                     {order.dealName}
-                  </Text>
-                  <Text style={[styles.status, { color: theme.primary }]}>
+                  </AppText>
+                  <AppText tone="primary" variant="footnote" weight="bold">
                     {STATUS_LABELS[status]}
-                  </Text>
+                  </AppText>
                 </View>
-                <Text style={[styles.orderId, { color: theme.textSecondary }]}>
+                <AppText tone="textSecondary" variant="caption">
                   Mã đơn: {order.orderId}
-                </Text>
-                <Text style={[styles.pickup, { color: theme.textSecondary }]}>
+                </AppText>
+                <AppText tone="textSecondary" variant="bodySm">
                   Hẹn lấy: {formatTime(order.pickupFrom)}–{formatTime(order.pickupTo)}
-                </Text>
+                </AppText>
                 <View style={styles.totalRow}>
-                  <Text style={[styles.quantity, { color: theme.textSecondary }]}>
+                  <AppText tone="textSecondary" variant="bodySm">
                     {order.quantity} phần
-                  </Text>
-                  <Text style={[styles.total, { color: theme.primary }]}>
+                  </AppText>
+                  <AppText tone="primary" variant="bodyLg" weight="heavy">
                     {formatPrice(order.totalAmount)}
-                  </Text>
+                  </AppText>
                 </View>
-              </Pressable>
+              </Card>
             ))}
 
             {data.totalPages > 1 ? (
@@ -145,16 +144,9 @@ export function OrderListScreen() {
 
 const styles = StyleSheet.create({
   tabs: { gap: Spacing.sm, paddingRight: ScreenGutter },
-  card: { gap: 8, borderWidth: 1, borderRadius: 18, padding: 16 },
-  pressed: { opacity: 0.8 },
-  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  dealName: { flex: 1, fontSize: 16, fontWeight: '800' },
-  status: { fontSize: 12, fontWeight: '800' },
-  orderId: { fontSize: 11 },
-  pickup: { fontSize: 13 },
+  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  dealName: { flex: 1 },
   totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  quantity: { fontSize: 13 },
-  total: { fontSize: 15, fontWeight: '900' },
   pagination: { alignItems: 'center', gap: 10 },
-  pageLabel: { fontSize: 13, fontWeight: '700' },
+  pageLabel: { fontSize: FontSize.bodySm, fontWeight: FontWeight.bold },
 });

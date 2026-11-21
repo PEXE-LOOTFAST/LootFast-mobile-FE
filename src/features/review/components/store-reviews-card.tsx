@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, Spacing } from '@/constants/theme';
 import { BrandButton } from '@/components/ui/brand-button';
 import { ErrorState } from '@/components/ui/error-state';
 import { LoadingState } from '@/components/ui/loading-state';
@@ -73,8 +74,8 @@ export function StoreReviewsCard({ merchantId, storeName, reviewCount }: StoreRe
 }
 
 const styles = StyleSheet.create({
-  count: { fontSize: 12 },
-  scope: { fontSize: 12, lineHeight: 17 },
-  empty: { fontSize: 14, lineHeight: 21 },
-  divided: { borderTopWidth: StyleSheet.hairlineWidth, paddingTop: 12 },
+  count: { fontSize: FontSize.footnote },
+  scope: { fontSize: FontSize.footnote, lineHeight: 17 },
+  empty: { fontSize: FontSize.body, lineHeight: 21 },
+  divided: { borderTopWidth: StyleSheet.hairlineWidth, paddingTop: Spacing.md },
 });

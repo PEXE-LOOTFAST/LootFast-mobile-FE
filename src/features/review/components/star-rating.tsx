@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
-import { RatingColor } from '@/constants/theme';
+import { RatingColor, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 type StarRatingProps = {
@@ -64,7 +64,7 @@ export function StarRating({ value, onChange, size = 14, disabled = false }: Sta
 }
 
 const styles = StyleSheet.create({
-  container: { flexDirection: 'row', gap: 2 },
-  interactive: { gap: 8 },
+  container: { flexDirection: 'row', gap: Spacing.xxs },
+  interactive: { gap: Spacing.sm },
   pressed: { opacity: 0.7 },
 });

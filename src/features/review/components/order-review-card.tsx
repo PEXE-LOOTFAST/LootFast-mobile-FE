@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { BrandButton } from '@/components/ui/brand-button';
 import { ErrorState } from '@/components/ui/error-state';
 import { InlineAlert } from '@/components/ui/inline-alert';
@@ -124,11 +125,11 @@ export function OrderReviewCard({ orderId, storeId, dealName, isCompleted }: Ord
 }
 
 const styles = StyleSheet.create({
-  card: { gap: 12, borderWidth: 1, borderRadius: 18, padding: 16 },
-  title: { fontSize: 16, fontWeight: '900' },
-  hint: { fontSize: 13, lineHeight: 19 },
-  starsRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  ratingLabel: { fontSize: 14, fontWeight: '800' },
+  card: { gap: Spacing.md, borderWidth: 1, borderRadius: Radius.xl, padding: Spacing.lg },
+  title: { fontSize: FontSize.subtitle, fontWeight: FontWeight.heavy },
+  hint: { fontSize: FontSize.bodySm, lineHeight: 19 },
+  starsRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  ratingLabel: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
   multiline: { minHeight: 90, textAlignVertical: 'top' },
-  counter: { fontSize: 12, textAlign: 'right' },
+  counter: { fontSize: FontSize.footnote, textAlign: 'right' },
 });

@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import type { ReviewDto } from '@/features/review/api/reviews';
 import { StarRating } from '@/features/review/components/star-rating';
 import { getInitials } from '@/features/profile/get-initials';
@@ -51,21 +52,21 @@ export function ReviewItem({ review }: ReviewItemProps) {
 }
 
 const styles = StyleSheet.create({
-  container: { flexDirection: 'row', gap: 12 },
+  container: { flexDirection: 'row', gap: Spacing.md },
   avatar: {
     width: 36,
     height: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 18,
+    borderRadius: Radius.full,
   },
-  initials: { fontSize: 12, fontWeight: '800' },
-  copy: { flex: 1, gap: 4 },
+  initials: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold },
+  copy: { flex: 1, gap: Spacing.xs },
   header: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6 },
-  author: { flexShrink: 1, fontSize: 14, fontWeight: '700' },
-  date: { fontSize: 12 },
-  comment: { fontSize: 14, lineHeight: 21 },
-  reply: { gap: 2, borderRadius: 12, padding: 10 },
-  replyLabel: { fontSize: 12, fontWeight: '800' },
-  replyText: { fontSize: 13, lineHeight: 19 },
+  author: { flexShrink: 1, fontSize: FontSize.body, fontWeight: FontWeight.bold },
+  date: { fontSize: FontSize.footnote },
+  comment: { fontSize: FontSize.body, lineHeight: 21 },
+  reply: { gap: Spacing.xxs, borderRadius: Radius.md, padding: 10 },
+  replyLabel: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold },
+  replyText: { fontSize: FontSize.bodySm, lineHeight: 19 },
 });
