@@ -5,7 +5,6 @@ import { BrandButton } from '@/components/ui/brand-button';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { MaxContentWidth } from '@/constants/theme';
 import { getDealErrorMessage } from '@/features/home/api/deals';
-import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { BuyerHeader } from '@/features/home/components/buyer-header';
 import { DealCard } from '@/features/home/components/deal-card';
 import { DealFilterButton } from '@/features/home/components/deal-filter-button';
@@ -139,8 +138,6 @@ export function HomeScreen() {
           </View>
         </View>
       </ScrollView>
-
-      <AssistantFab />
     </View>
   );
 }

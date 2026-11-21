@@ -59,6 +59,11 @@ export function DealQuickView({ deal, onOpen, onClose }: DealQuickViewProps) {
             />
             <DealMeta icon={HomeIcons.distance} label={formatDistance(deal.distanceKm)} />
           </View>
+
+          <Text style={[styles.stock, { color: theme.primary }]}>Còn {deal.remaining} phần</Text>
+          <Text numberOfLines={1} style={[styles.address, { color: theme.textSecondary }]}>
+            {deal.store.address}
+          </Text>
         </View>
       </Pressable>
 
@@ -76,7 +81,9 @@ export function DealQuickView({ deal, onOpen, onClose }: DealQuickViewProps) {
 }
 
 const styles = StyleSheet.create({
+  // Lớp phủ bản đồ căn phải (flex-end) nên thẻ mặc định co vừa ảnh, chữ bị ép về 0 chiều rộng.
   card: {
+    alignSelf: 'stretch',
     borderWidth: 1,
     borderRadius: 20,
     boxShadow: '0px 10px 24px rgba(23, 33, 27, 0.18)',
@@ -93,5 +100,7 @@ const styles = StyleSheet.create({
   discount: { borderRadius: 999, paddingHorizontal: 7, paddingVertical: 2 },
   discountText: { color: '#FFFFFF', fontSize: 11, fontWeight: '900' },
   meta: { flexDirection: 'row', gap: 12 },
+  stock: { fontSize: 12, fontWeight: '800' },
+  address: { fontSize: 11 },
   close: { position: 'absolute', top: 10, right: 10, padding: 4 },
 });

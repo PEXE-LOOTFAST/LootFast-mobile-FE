@@ -17,7 +17,7 @@ import { confirmSignOut } from '@/lib/confirm-sign-out';
 // href: mục mở sang route/tab khác khi bấm (vd. Đơn hàng của tôi → tab Đơn hàng).
 type ProfileItem = { icon: IconName; title: string; subtitle: string; href?: Href };
 
-// Thứ tự các nhóm trên màn: thông tin cá nhân → hoạt động mua sắm → quyền lợi → hỗ trợ.
+// Thứ tự các nhóm trên màn: thông tin cá nhân → hoạt động mua sắm → hỗ trợ.
 const ACCOUNT_ITEMS: ProfileItem[] = [
   {
     icon: ProfileIcons.profile,
@@ -32,22 +32,13 @@ const ACTIVITY_ITEMS: ProfileItem[] = [
   { icon: ProfileIcons.favorites, title: 'Món yêu thích', subtitle: '', href: '/favorites' },
 ];
 
-const BENEFITS: ProfileItem[] = [
-  {
-    icon: ProfileIcons.premium,
-    title: 'Gói Người mua Cao cấp',
-    subtitle: 'Quản lý gói và quyền lợi Cao cấp',
-    href: { pathname: '/premium', params: { from: '/profile' } },
-  },
-  {
-    icon: ProfileIcons.rewards,
-    title: 'Điểm thưởng và quyền lợi',
-    subtitle: 'Theo dõi điểm thưởng và quyền lợi đã mở khóa',
-  },
-];
-
 const SUPPORT_ITEMS: ProfileItem[] = [
-  { icon: ProfileIcons.support, title: 'Hỗ trợ', subtitle: '' },
+  {
+    icon: ProfileIcons.support,
+    title: 'Hỗ trợ',
+    subtitle: 'Liên hệ, xóa tài khoản và chính sách quyền riêng tư',
+    href: '/support',
+  },
 ];
 
 function ProfileItemRow({ item, onPress }: { item: ProfileItem; onPress?: () => void }) {
@@ -120,7 +111,7 @@ export function ProfileScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
-      <BuyerHeader subtitle="Quản lý tài khoản, ưu đãi và quyền lợi" title="Cài đặt" />
+      <BuyerHeader subtitle="Quản lý tài khoản và hoạt động của bạn" title="Cài đặt" />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View
@@ -189,7 +180,6 @@ export function ProfileScreen() {
         ) : null}
         <ProfileSection items={ACCOUNT_ITEMS} title="TÀI KHOẢN" />
         <ProfileSection items={ACTIVITY_ITEMS} title="HOẠT ĐỘNG CỦA BẠN" />
-        <ProfileSection items={BENEFITS} title="QUYỀN LỢI CỦA BẠN" />
         <ProfileSection items={SUPPORT_ITEMS} title="HỖ TRỢ" />
         <Pressable
           accessibilityLabel={isMerchant ? 'Chuyển sang người bán' : 'Đăng ký bán hàng'}

@@ -4,7 +4,6 @@ import { StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
 import { TabHeader } from '@/components/ui/tab-header';
 import { MaxContentWidth } from '@/constants/theme';
-import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { useTheme } from '@/hooks/use-theme';
 
 type SellerPageScaffoldProps = {
@@ -33,8 +32,6 @@ export function SellerPageScaffold({
       >
         <View style={styles.body}>{children}</View>
       </KeyboardAwareScrollView>
-
-      <AssistantFab bottomOffset={96} />
     </View>
   );
 }

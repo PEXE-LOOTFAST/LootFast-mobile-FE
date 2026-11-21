@@ -14,6 +14,7 @@ import {
   useReorderDealImages,
   useUploadDealImage,
 } from '@/features/seller/api/use-merchant-deals';
+import { DealInfoCard } from '@/features/seller/components/deal-info-card';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
@@ -81,8 +82,8 @@ export function DealImagesScreen() {
   return (
     <SellerPageScaffold
       onPressBack={() => router.navigate('/seller/orders')}
-      subtitle={deal?.name ?? 'Ảnh món hiển thị với khách'}
-      title="Ảnh của deal"
+      subtitle={deal?.name ?? 'Thông tin và ảnh món hiển thị với khách'}
+      title="Chi tiết deal"
     >
       {isLoading ? <ActivityIndicator color={theme.primary} /> : null}
 
@@ -98,6 +99,8 @@ export function DealImagesScreen() {
 
       {deal ? (
         <>
+          <DealInfoCard deal={deal} />
+
           {images.length === 0 ? (
             <EmptyCard
               description="Deal cần ít nhất một ảnh trước khi lên sàn."

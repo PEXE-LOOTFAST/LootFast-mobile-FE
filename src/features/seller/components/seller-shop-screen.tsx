@@ -1,10 +1,9 @@
 import { router } from 'expo-router';
-import { Alert, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { MaxContentWidth } from '@/constants/theme';
-import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { SellerMenuList, type SellerMenuItem } from '@/features/seller/components/seller-menu-list';
 import { MerchantRegistrationRequired } from '@/features/seller/components/merchant-registration-required';
 import { ShopSetupCard, getShopSetupSteps } from '@/features/seller/components/shop-setup-card';
@@ -64,7 +63,7 @@ export function SellerShopScreen() {
       key: 'support',
       icon: SellerIcons.support,
       title: 'Hỗ trợ đối tác',
-      onPress: () => Alert.alert('Hỗ trợ đối tác', 'Kênh hỗ trợ đối tác đang được phát triển.'),
+      onPress: () => router.navigate('/support'),
     },
   ];
 
@@ -130,8 +129,6 @@ export function SellerShopScreen() {
           </Pressable>
         </View>
       </ScrollView>
-
-      <AssistantFab bottomOffset={96} />
     </View>
   );
 }

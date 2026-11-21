@@ -26,7 +26,6 @@ export const HomeIcons = {
   phone: { ios: 'phone', android: 'call', web: 'call' },
   heart: { ios: 'heart', android: 'favorite', web: 'favorite' },
   share: { ios: 'square.and.arrow.up', android: 'share', web: 'share' },
-  chat: { ios: 'bubble.left', android: 'chat_bubble', web: 'chat_bubble' },
   sparkles: { ios: 'sparkles', android: 'auto_awesome', web: 'auto_awesome' },
   refresh: { ios: 'arrow.clockwise', android: 'refresh', web: 'refresh' },
   send: { ios: 'paperplane.fill', android: 'send', web: 'send' },

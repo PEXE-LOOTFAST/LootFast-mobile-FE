@@ -6,7 +6,6 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { MaxContentWidth } from '@/constants/theme';
-import { AssistantFab } from '@/features/home/components/assistant-fab';
 import { useMerchantPerformance } from '@/features/seller/api/merchant-performance';
 import { MetricCard } from '@/features/seller/components/metric-card';
 import { SellerOverviewHeader } from '@/features/seller/components/seller-overview-header';
@@ -176,8 +175,6 @@ export function SellerOverviewScreen() {
           </Pressable>
         </View>
       </ScrollView>
-
-      <AssistantFab bottomOffset={96} />
     </View>
   );
 }
