@@ -11,6 +11,7 @@ import {
 import Animated, { SlideInDown, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { FontSize, FontWeight, Radius, Spacing, StaticColors } from '@/constants/theme';
 import { Icon } from '@/components/ui/icon';
 import { AuthPanel } from '@/features/auth/components/auth-panel';
 import { AuthIcons } from '@/features/auth/constants/icons';
@@ -113,7 +114,7 @@ export function AuthModal() {
 
 const styles = StyleSheet.create({
   overlay: { flex: 1, justifyContent: 'center', paddingHorizontal: OUTER_PADDING },
-  backdrop: { backgroundColor: 'rgba(10, 20, 14, 0.55)' },
+  backdrop: { backgroundColor: StaticColors.backdrop },
   shifter: { width: '100%' },
   sheet: {
     flexShrink: 1,
@@ -121,13 +122,23 @@ const styles = StyleSheet.create({
     maxWidth: 520,
     alignSelf: 'center',
     overflow: 'hidden',
-    borderRadius: 28,
-    paddingBottom: 16,
+    borderRadius: Radius.xxl,
+    paddingBottom: Spacing.lg,
   },
   // Tiêu đề căn giữa cả bề ngang tấm thẻ nên nút đóng phải nằm ngoài luồng, nếu không
   // nó sẽ đẩy tiêu đề lệch sang trái.
-  header: { justifyContent: 'center', paddingHorizontal: 56, paddingTop: 20, paddingBottom: 4 },
-  title: { fontSize: 20, fontWeight: '900', letterSpacing: -0.3, textAlign: 'center' },
+  header: {
+    justifyContent: 'center',
+    paddingHorizontal: 56,
+    paddingTop: Spacing.xl,
+    paddingBottom: Spacing.xs,
+  },
+  title: {
+    fontSize: FontSize.titleLg,
+    fontWeight: FontWeight.heavy,
+    letterSpacing: -0.3,
+    textAlign: 'center',
+  },
   close: {
     position: 'absolute',
     top: 14,
@@ -136,7 +147,7 @@ const styles = StyleSheet.create({
     height: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 18,
+    borderRadius: Radius.full,
   },
   scroll: { flexGrow: 0 },
 });

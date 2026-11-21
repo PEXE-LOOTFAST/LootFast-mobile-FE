@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Shadow, Spacing } from '@/constants/theme';
 import { Icon } from '@/components/ui/icon';
 import { AuthIcons } from '@/features/auth/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
@@ -57,18 +58,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderRadius: 14,
+    borderRadius: Radius.lg,
   },
   logo: {
     width: 76,
     height: 76,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 24,
-    boxShadow: '0px 12px 28px rgba(22, 121, 75, 0.32)',
+    borderRadius: Radius.xxl,
+    boxShadow: Shadow.brandStrong,
   },
-  logoText: { fontSize: 34, fontWeight: '900' },
-  brand: { marginTop: 18, fontSize: 34, fontWeight: '900', letterSpacing: -0.8 },
-  taglineRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8 },
-  tagline: { fontSize: 14, fontWeight: '500' },
+  logoText: { fontSize: FontSize.hero, fontWeight: FontWeight.heavy },
+  brand: {
+    marginTop: 18,
+    fontSize: FontSize.hero,
+    fontWeight: FontWeight.heavy,
+    letterSpacing: -0.8,
+  },
+  taglineRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: Spacing.sm },
+  tagline: { fontSize: FontSize.body, fontWeight: FontWeight.medium },
 });

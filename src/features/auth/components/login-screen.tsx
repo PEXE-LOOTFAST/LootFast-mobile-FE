@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Radius, Shadow, Spacing } from '@/constants/theme';
 import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
 import { AuthBackdrop } from '@/features/auth/components/auth-backdrop';
 import { AuthHeader } from '@/features/auth/components/auth-header';
@@ -37,14 +38,14 @@ export function LoginScreen() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
-  content: { flexGrow: 1, gap: 28, paddingHorizontal: 20, paddingBottom: 32 },
+  content: { flexGrow: 1, gap: 28, paddingHorizontal: Spacing.xl, paddingBottom: Spacing.xxxl },
   card: {
     width: '100%',
     maxWidth: 460,
     alignSelf: 'center',
     overflow: 'hidden',
     borderWidth: 1,
-    borderRadius: 28,
-    boxShadow: '0px 18px 40px rgba(23, 33, 27, 0.08)',
+    borderRadius: Radius.xxl,
+    boxShadow: Shadow.overlay,
   },
 });

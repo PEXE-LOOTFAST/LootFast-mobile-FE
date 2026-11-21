@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import type { AuthTab } from '@/features/auth/types';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -53,8 +54,8 @@ export function AuthTabs({ value, onChange }: AuthTabsProps) {
 
 const styles = StyleSheet.create({
   container: { flexDirection: 'row', borderBottomWidth: 1 },
-  tab: { flex: 1, alignItems: 'center', paddingTop: 20 },
-  label: { fontSize: 16, fontWeight: '700' },
-  activeLabel: { fontWeight: '800' },
-  indicator: { alignSelf: 'stretch', height: 3, marginTop: 16, borderRadius: 3 },
+  tab: { flex: 1, alignItems: 'center', paddingTop: Spacing.xl },
+  label: { fontSize: FontSize.subtitle, fontWeight: FontWeight.bold },
+  activeLabel: { fontWeight: FontWeight.bold },
+  indicator: { alignSelf: 'stretch', height: 3, marginTop: Spacing.lg, borderRadius: Radius.full },
 });

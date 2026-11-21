@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { AuthTabs } from '@/features/auth/components/auth-tabs';
 import { ForgotPasswordForm } from '@/features/auth/components/forgot-password-form';
@@ -126,8 +127,8 @@ export function AuthPanel({ onAuthenticated }: AuthPanelProps) {
 }
 
 const styles = StyleSheet.create({
-  body: { gap: 20, padding: 20 },
+  body: { gap: Spacing.xl, padding: Spacing.xl },
   adminLink: { alignSelf: 'center' },
-  adminLinkText: { fontSize: 13, fontWeight: '600', textAlign: 'center' },
+  adminLinkText: { fontSize: FontSize.bodySm, fontWeight: FontWeight.medium, textAlign: 'center' },
   pressed: { opacity: 0.7 },
 });

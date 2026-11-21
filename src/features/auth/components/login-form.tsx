@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { BrandButton } from '@/components/ui/brand-button';
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
@@ -115,11 +116,11 @@ export function LoginForm({ initialEmail = '', onSuccess, onForgotPassword }: Lo
 }
 
 const styles = StyleSheet.create({
-  container: { gap: 20 },
+  container: { gap: Spacing.xl },
   forgot: { alignSelf: 'flex-end', marginTop: -6 },
-  forgotText: { fontSize: 13, fontWeight: '700' },
-  divider: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  forgotText: { fontSize: FontSize.bodySm, fontWeight: FontWeight.bold },
+  divider: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
   dividerLine: { flex: 1, height: StyleSheet.hairlineWidth },
-  dividerLabel: { fontSize: 12, fontWeight: '600' },
-  socialNote: { fontSize: 12, lineHeight: 17, textAlign: 'center' },
+  dividerLabel: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium },
+  socialNote: { fontSize: FontSize.footnote, lineHeight: 17, textAlign: 'center' },
 });

@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { BrandButton } from '@/components/ui/brand-button';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { PasswordField } from '@/components/ui/password-field';
@@ -98,10 +99,10 @@ export function ResetPasswordForm({ email, onDone, onBack }: ResetPasswordFormPr
 }
 
 const styles = StyleSheet.create({
-  container: { gap: 16 },
+  container: { gap: Spacing.lg },
   intro: { gap: 6 },
-  title: { fontSize: 18, fontWeight: '900', letterSpacing: -0.3 },
-  description: { fontSize: 13, lineHeight: 19 },
+  title: { fontSize: FontSize.title, fontWeight: FontWeight.heavy, letterSpacing: -0.3 },
+  description: { fontSize: FontSize.bodySm, lineHeight: 19 },
   back: { alignSelf: 'center' },
-  link: { fontSize: 13, fontWeight: '800' },
+  link: { fontSize: FontSize.bodySm, fontWeight: FontWeight.bold },
 });

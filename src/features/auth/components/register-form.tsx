@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { BrandButton } from '@/components/ui/brand-button';
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
@@ -148,7 +149,7 @@ export function RegisterForm({ onRegistered }: RegisterFormProps) {
 }
 
 const styles = StyleSheet.create({
-  container: { gap: 20 },
-  terms: { textAlign: 'center', fontSize: 12, lineHeight: 18 },
-  link: { fontWeight: '700' },
+  container: { gap: Spacing.xl },
+  terms: { textAlign: 'center', fontSize: FontSize.footnote, lineHeight: 18 },
+  link: { fontWeight: FontWeight.bold },
 });

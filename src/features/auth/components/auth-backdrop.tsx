@@ -1,5 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 
+import { Radius } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 export function AuthBackdrop() {
@@ -15,7 +16,7 @@ export function AuthBackdrop() {
 
 const styles = StyleSheet.create({
   container: { overflow: 'hidden', pointerEvents: 'none' },
-  blob: { position: 'absolute', borderRadius: 999 },
+  blob: { position: 'absolute', borderRadius: Radius.full },
   warm: { width: 300, height: 300, top: -120, right: -110, opacity: 0.14 },
   fresh: { width: 260, height: 260, top: 260, left: -170, opacity: 0.07 },
 });
