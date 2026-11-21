@@ -62,12 +62,13 @@ const styles = StyleSheet.create({
   // Bo góc trong = bo góc ngoài - padding, để hai lớp đồng tâm.
   tab: {
     flex: 1,
-    minHeight: 34,
+    // Cộng padding của dải tab là đủ 44–48px, mức ngón tay bấm trúng dễ dàng.
+    minHeight: 40,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: Radius.md,
     paddingHorizontal: Spacing.xs,
   },
-  tabSmall: { minHeight: 28, paddingHorizontal: Spacing.xxs },
+  tabSmall: { minHeight: 36, paddingHorizontal: Spacing.xxs },
   activeTab: { boxShadow: Shadow.raised },
 });

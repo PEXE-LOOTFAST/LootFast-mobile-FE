@@ -51,5 +51,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: Radius.full,
   },
-  compactToggle: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
+  compactToggle: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
 });

@@ -28,7 +28,7 @@ const SIZES: Record<
   NonNullable<ChipProps['size']>,
   { minHeight: number; paddingHorizontal: number; text: FontSizeToken }
 > = {
-  sm: { minHeight: 32, paddingHorizontal: Spacing.md, text: 'footnote' },
+  sm: { minHeight: 36, paddingHorizontal: Spacing.md, text: 'footnote' },
   md: { minHeight: 40, paddingHorizontal: Spacing.lg, text: 'body' },
 };
 
@@ -61,6 +61,8 @@ export function Chip({
         role === 'checkbox' ? { checked: selected, disabled } : { selected, disabled }
       }
       disabled={disabled}
+      // Chip nhỏ cao 36px: nới vùng chạm lên trên/dưới để đủ 44px mà không làm dải chip dày thêm.
+      hitSlop={{ top: Spacing.xs, bottom: Spacing.xs }}
       onPress={onPress}
       style={({ pressed }) => [
         styles.chip,
