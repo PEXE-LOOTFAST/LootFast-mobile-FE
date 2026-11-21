@@ -11,7 +11,7 @@ import { useTheme } from '@/hooks/use-theme';
 
 export type TextTone = Extract<
   ThemeColor,
-  'text' | 'textSecondary' | 'primary' | 'danger' | 'accent' | 'onPrimary' | 'onDanger'
+  'text' | 'textSecondary' | 'primary' | 'danger' | 'accent' | 'onPrimary' | 'onDanger' | 'onAccent'
 >;
 
 type AppTextProps = TextProps & {

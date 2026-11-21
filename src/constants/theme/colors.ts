@@ -13,6 +13,8 @@ export const Colors = {
     /** Chữ/icon đặt trên nền `primary`. */
     onPrimary: '#FFFFFF',
     accent: '#F3A83B',
+    /** Chữ/icon đặt trên nền `accent` (cam nhạt ở cả hai chế độ nên luôn là chữ tối). */
+    onAccent: '#3B2400',
     border: '#E2E7E2',
     danger: '#C44636',
     /** Chữ/icon đặt trên nền `danger`. */
@@ -29,6 +31,7 @@ export const Colors = {
     // primary/danger bản dark là màu sáng: chữ trắng trên đó chỉ đạt ~2:1, nên dùng chữ tối (~8:1).
     onPrimary: '#0B1F14',
     accent: '#F2B85E',
+    onAccent: '#3B2400',
     border: '#2A382F',
     danger: '#FF8A78',
     onDanger: '#2B0B06',

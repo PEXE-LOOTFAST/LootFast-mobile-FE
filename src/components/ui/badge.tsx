@@ -33,7 +33,7 @@ export function Badge({ label, tone = 'primarySoft', size = 'md', style }: Badge
     primary: { background: theme.primary, label: theme.onPrimary },
     primarySoft: { background: theme.primarySoft, label: theme.primary },
     danger: { background: theme.danger, label: theme.onDanger },
-    accent: { background: theme.accent, label: theme.text },
+    accent: { background: theme.accent, label: theme.onAccent },
     neutral: { background: theme.backgroundSelected, label: theme.textSecondary },
   }[tone];
 
