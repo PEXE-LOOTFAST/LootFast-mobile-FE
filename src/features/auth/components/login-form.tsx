@@ -87,30 +87,30 @@ export function LoginForm({ initialEmail = '', onSuccess, onForgotPassword }: Lo
         Đăng nhập
       </BrandButton>
 
-      <View style={styles.divider}>
-        <View style={[styles.dividerLine, { backgroundColor: theme.border }]} />
-        <Text style={[styles.dividerLabel, { color: theme.textSecondary }]}>hoặc</Text>
-        <View style={[styles.dividerLine, { backgroundColor: theme.border }]} />
-      </View>
+      {/* Bản không có Google (web, Expo Go, thiếu client id) thì ẩn hẳn nút thay vì để người dùng
+          bấm rồi gặp lỗi, hay đọc một dòng giải thích kỹ thuật họ không làm gì được. */}
+      {isGoogleLoginConfigured ? (
+        <>
+          <View style={styles.divider}>
+            <View style={[styles.dividerLine, { backgroundColor: theme.border }]} />
+            <Text style={[styles.dividerLabel, { color: theme.textSecondary }]}>hoặc</Text>
+            <View style={[styles.dividerLine, { backgroundColor: theme.border }]} />
+          </View>
 
-      {socialLogin.error ? <InlineAlert message={toSocialErrorMessage(socialLogin.error)} /> : null}
+          {socialLogin.error ? (
+            <InlineAlert message={toSocialErrorMessage(socialLogin.error)} />
+          ) : null}
 
-      <BrandButton
-        disabled={isSubmitting}
-        loading={socialLogin.isPending}
-        onPress={() => socialLogin.mutate('GOOGLE')}
-        variant="outline"
-      >
-        Đăng nhập bằng Google
-      </BrandButton>
-
-      {/* Nói trước để người dùng không bấm rồi mới gặp lỗi khó hiểu. */}
-      {isGoogleLoginConfigured ? null : (
-        <Text style={[styles.socialNote, { color: theme.textSecondary }]}>
-          Đăng nhập Google chỉ dùng được trên bản dựng Android (không chạy trong Expo Go) và cần cấu
-          hình OAuth client.
-        </Text>
-      )}
+          <BrandButton
+            disabled={isSubmitting}
+            loading={socialLogin.isPending}
+            onPress={() => socialLogin.mutate('GOOGLE')}
+            variant="outline"
+          >
+            Đăng nhập bằng Google
+          </BrandButton>
+        </>
+      ) : null}
     </View>
   );
 }
@@ -122,5 +122,4 @@ const styles = StyleSheet.create({
   divider: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
   dividerLine: { flex: 1, height: StyleSheet.hairlineWidth },
   dividerLabel: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium },
-  socialNote: { fontSize: FontSize.footnote, lineHeight: 17, textAlign: 'center' },
 });
