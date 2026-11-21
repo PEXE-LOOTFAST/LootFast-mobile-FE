@@ -1,10 +1,11 @@
 import { router } from 'expo-router';
-import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { BrandButton } from '@/components/ui/brand-button';
-import { InlineAlert } from '@/components/ui/inline-alert';
-import { MaxContentWidth } from '@/constants/theme';
+import { QueryBoundary } from '@/components/ui/query-boundary';
+import { Screen } from '@/components/ui/screen';
+import { Spacing } from '@/constants/theme';
 import { getDealErrorMessage } from '@/features/home/api/deals';
+import { useDeals } from '@/features/home/api/use-deals';
 import { BuyerHeader } from '@/features/home/components/buyer-header';
 import { DealCard } from '@/features/home/components/deal-card';
 import { DealFilterButton } from '@/features/home/components/deal-filter-button';
@@ -12,21 +13,16 @@ import { EmptyDeals } from '@/features/home/components/empty-deals';
 import { LocationPrompt } from '@/features/home/components/location-prompt';
 import { SearchPanel } from '@/features/home/components/search-panel';
 import { SectionHeader } from '@/features/home/components/section-header';
-import { useDeals } from '@/features/home/api/use-deals';
 import { DEAL_CATEGORIES } from '@/features/home/constants/deal-categories';
 import { HomeIcons } from '@/features/home/constants/icons';
 import { filterDeals, useDealFilters } from '@/features/home/hooks/use-deal-filters';
 import type { Deal } from '@/features/home/types';
 import { useAuthSession } from '@/hooks/use-auth-session';
-import { useTheme } from '@/hooks/use-theme';
 import { useUserLocation } from '@/hooks/use-user-location';
 import { requireAuth, withAuth } from '@/lib/auth-session';
 import { formatRadius } from '@/lib/format';
 
-const HORIZONTAL_INSET = 16;
-
 export function HomeScreen() {
-  const theme = useTheme();
   const { isAuthenticated } = useAuthSession();
   const filters = useDealFilters([]);
   const location = useUserLocation();
@@ -36,8 +32,7 @@ export function HomeScreen() {
     keyword: filters.query,
     radiusKm: filters.radiusKm,
   });
-  const deals = dealsQuery.data ?? [];
-  const filteredDeals = filterDeals(deals, filters);
+  const filteredDeals = filterDeals(dealsQuery.data ?? [], filters);
 
   // Bộ lọc cần cả đăng nhập lẫn GPS: không có vị trí thì "gần bạn" và bán kính không có nghĩa.
   const canFilter = isAuthenticated && location.isReady;
@@ -48,111 +43,81 @@ export function HomeScreen() {
   };
 
   return (
-    <View style={[styles.screen, { backgroundColor: theme.background }]}>
-      <BuyerHeader
-        subtitle={
-          location.isReady ? `Gần bạn · ${formatRadius(filters.radiusKm)}` : 'Chưa bật vị trí'
-        }
-        subtitleIcon={HomeIcons.location}
-        title="Trang chủ"
+    <Screen
+      header={
+        <BuyerHeader
+          subtitle={
+            location.isReady ? `Gần bạn · ${formatRadius(filters.radiusKm)}` : 'Chưa bật vị trí'
+          }
+          subtitleIcon={HomeIcons.location}
+          title="Trang chủ"
+        />
+      }
+      onRefresh={() => void dealsQuery.refetch()}
+      refreshing={dealsQuery.isRefetching}
+    >
+      <LocationPrompt
+        canAskAgain={location.canAskAgain}
+        onRequest={unlockFilters}
+        status={location.status}
       />
 
-      <ScrollView
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            colors={[theme.primary]}
-            onRefresh={() => void dealsQuery.refetch()}
-            refreshing={dealsQuery.isRefetching}
-            tintColor={theme.primary}
-          />
-        }
-      >
-        <View style={styles.body}>
-          <LocationPrompt
-            canAskAgain={location.canAskAgain}
-            onRequest={unlockFilters}
-            status={location.status}
-          />
+      <SearchPanel
+        categories={DEAL_CATEGORIES}
+        isLocked={!canFilter}
+        onChangeQuery={filters.setQuery}
+        onChangeRadius={filters.setRadiusKm}
+        onPressLocked={unlockFilters}
+        onSelectCategory={(id) => (canFilter ? filters.setCategoryId(id) : unlockFilters())}
+        query={filters.query}
+        radiusKm={filters.radiusKm}
+        selectedCategoryId={filters.categoryId}
+      />
 
-          <SearchPanel
-            categories={DEAL_CATEGORIES}
-            isLocked={!canFilter}
-            onChangeQuery={filters.setQuery}
-            onChangeRadius={filters.setRadiusKm}
-            onPressLocked={unlockFilters}
-            onSelectCategory={(id) => (canFilter ? filters.setCategoryId(id) : unlockFilters())}
-            query={filters.query}
-            radiusKm={filters.radiusKm}
-            selectedCategoryId={filters.categoryId}
-          />
-
-          <View style={styles.section}>
-            <SectionHeader
-              title={filters.isFiltering ? 'Kết quả tìm kiếm' : 'Gợi ý gần bạn'}
-              subtitle={
-                filters.isFiltering
-                  ? `${filteredDeals.length} deal phù hợp`
-                  : 'Ưu tiên món gần, tiết kiệm và được đánh giá cao'
-              }
-              action={
-                <DealFilterButton
-                  isActive={filters.hasAdvancedFilters}
-                  isLocked={!canFilter}
-                  minDiscount={filters.minDiscount}
-                  onChangeDiscount={filters.setMinDiscount}
-                  onChangePickup={filters.setPickup}
-                  onPressLocked={unlockFilters}
-                  pickup={filters.pickup}
-                />
-              }
+      <View style={styles.section}>
+        <SectionHeader
+          title={filters.isFiltering ? 'Kết quả tìm kiếm' : 'Gợi ý gần bạn'}
+          subtitle={
+            filters.isFiltering
+              ? `${filteredDeals.length} deal phù hợp`
+              : 'Ưu tiên món gần, tiết kiệm và được đánh giá cao'
+          }
+          action={
+            <DealFilterButton
+              isActive={filters.hasAdvancedFilters}
+              isLocked={!canFilter}
+              minDiscount={filters.minDiscount}
+              onChangeDiscount={filters.setMinDiscount}
+              onChangePickup={filters.setPickup}
+              onPressLocked={unlockFilters}
+              pickup={filters.pickup}
             />
+          }
+        />
 
-            {dealsQuery.isPending ? (
-              <View style={styles.feedback}>
-                <ActivityIndicator color={theme.primary} />
-              </View>
-            ) : dealsQuery.isError ? (
-              <View style={styles.feedback}>
-                <InlineAlert message={getDealErrorMessage(dealsQuery.error)} />
-                <BrandButton
-                  loading={dealsQuery.isRefetching}
-                  onPress={() => void dealsQuery.refetch()}
-                >
-                  Thử lại
-                </BrandButton>
-              </View>
-            ) : filteredDeals.length > 0 ? (
-              filteredDeals.map((deal) => (
-                <DealCard key={deal.id} deal={deal} onPress={() => openDeal(deal)} />
-              ))
-            ) : (
-              <EmptyDeals
-                isFiltering={filters.isFiltering}
-                onReset={withAuth(filters.resetFilters)}
-                radiusLabel={formatRadius(filters.radiusKm)}
-              />
-            )}
-          </View>
-        </View>
-      </ScrollView>
-    </View>
+        <QueryBoundary
+          empty={
+            <EmptyDeals
+              isFiltering={filters.isFiltering}
+              onReset={withAuth(filters.resetFilters)}
+              radiusLabel={formatRadius(filters.radiusKm)}
+            />
+          }
+          errorMessage={getDealErrorMessage}
+          isEmpty={() => filteredDeals.length === 0}
+          query={dealsQuery}
+        >
+          {() =>
+            filteredDeals.map((deal) => (
+              <DealCard key={deal.id} deal={deal} onPress={() => openDeal(deal)} />
+            ))
+          }
+        </QueryBoundary>
+      </View>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1 },
-  content: { paddingBottom: 96 },
-  body: {
-    width: '100%',
-    maxWidth: MaxContentWidth,
-    alignSelf: 'center',
-    gap: 20,
-    marginTop: 16,
-    paddingHorizontal: HORIZONTAL_INSET,
-  },
-  section: { gap: 10 },
-  feedback: { gap: 12 },
+  section: { gap: Spacing.md },
 });
