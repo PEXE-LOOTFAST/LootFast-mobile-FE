@@ -1,6 +1,6 @@
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { setStatusBarStyle } from 'expo-status-bar';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -21,6 +21,7 @@ import { getDealErrorMessage } from '@/features/home/api/deals';
 import { useDeal } from '@/features/home/api/use-deals';
 import { useFavorites, useToggleFavoriteDeal } from '@/features/profile/api/use-favorites';
 import { useAuthSession } from '@/hooks/use-auth-session';
+import { useNow } from '@/hooks/use-now';
 import { requireAuth } from '@/lib/auth-session';
 import { DealDetailHero } from '@/features/home/components/deal-detail-hero';
 import { DealMeta } from '@/features/home/components/deal-meta';
@@ -82,12 +83,7 @@ function DealDetail({ deal }: { deal: Deal }) {
   const { user } = useAuthSession();
 
   // Khung giờ co lại theo thời gian thực nên tính lại mỗi phút; lát đã qua tự biến mất.
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), 60_000);
-
-    return () => clearInterval(timer);
-  }, []);
+  const now = useNow();
 
   const slots = useMemo(
     () => buildPickupSlots(deal.pickupWindowIso.start, deal.pickupWindowIso.end, now),

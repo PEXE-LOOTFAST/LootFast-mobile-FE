@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/ui/app-text';
+import { Badge } from '@/components/ui/badge';
+import { BrandButton } from '@/components/ui/brand-button';
 import { Card } from '@/components/ui/card';
 import { Chip } from '@/components/ui/chip';
 import { EmptyCard } from '@/components/ui/empty-card';
@@ -11,14 +13,19 @@ import { ScreenList } from '@/components/ui/screen';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SlowLoadingHint } from '@/components/ui/slow-loading-hint';
 import { ScreenGutter, Spacing } from '@/constants/theme';
+import { Icon, type IconName } from '@/components/ui/icon';
 import { BuyerHeader } from '@/features/home/components/buyer-header';
+import { HomeIcons } from '@/features/home/constants/icons';
 import {
   type OrderDto,
   type OrderListStatusDto,
   toOrderErrorMessage,
 } from '@/features/order/api/orders';
 import { useOrders } from '@/features/order/api/use-orders';
-import { formatPrice, formatTime } from '@/lib/format';
+import { getPickupTiming } from '@/features/order/pickup-timing';
+import { useNow } from '@/hooks/use-now';
+import { useTheme } from '@/hooks/use-theme';
+import { formatPrice, formatShortDate, formatTime } from '@/lib/format';
 
 const STATUS_TABS: { value: OrderListStatusDto; label: string }[] = [
   { value: 'RESERVED', label: 'Đang giữ' },
@@ -35,6 +42,8 @@ export function OrderListScreen() {
   const [status, setStatus] = useState<OrderListStatusDto>('RESERVED');
   const ordersQuery = useOrders(status);
   const orders = ordersQuery.data?.pages.flatMap((page) => page.items) ?? [];
+  // Đếm ngược tới giờ lấy chỉ cần cho tab "Đang giữ"; nửa phút một lần là đủ mượt.
+  const now = useNow(30_000);
 
   const loadMore = () => {
     if (ordersQuery.hasNextPage && !ordersQuery.isFetchingNextPage) {
@@ -83,37 +92,90 @@ export function OrderListScreen() {
       onEndReached={loadMore}
       onRefresh={() => void ordersQuery.refetch()}
       refreshing={ordersQuery.isRefetching && !ordersQuery.isFetchingNextPage}
-      renderItem={(order) => <OrderCard order={order} statusLabel={STATUS_LABELS[status]} />}
+      renderItem={(order) =>
+        status === 'RESERVED' ? (
+          <ActiveOrderCard now={now} order={order} />
+        ) : (
+          <OrderCard order={order} statusLabel={STATUS_LABELS[status]} />
+        )
+      }
     />
+  );
+}
+
+const openOrder = (orderId: string) => router.push(`/order/${orderId}`);
+
+function paymentLine(order: OrderDto) {
+  const total = formatPrice(order.totalAmount);
+  if (order.paymentMethod === 'CASH') return `Trả ${total} tiền mặt khi nhận`;
+  if (order.paymentStatus === 'CONFIRMED') return `Đã chuyển khoản ${total}`;
+  if (order.paymentStatus === 'REVIEW_REQUIRED') return `Quán đang kiểm tra khoản chuyển ${total}`;
+
+  return `Cần chuyển khoản ${total} trước khi đến`;
+}
+
+/**
+ * Đơn đang giữ là việc khách cần làm tiếp, nên thẻ nói rõ còn bao lâu tới giờ lấy, trả tiền thế
+ * nào, và có nút mở thẳng mã nhận món để đưa quán quét.
+ */
+function ActiveOrderCard({ order, now }: { order: OrderDto; now: number }) {
+  const timing = getPickupTiming(order, now);
+
+  return (
+    <Card elevated gap="md">
+      <Badge label={timing.label} tone={timing.tone} />
+      <AppText numberOfLines={2} variant="subtitle" weight="bold">
+        {order.dealName}
+      </AppText>
+      <View style={styles.lines}>
+        <InfoLine
+          icon={HomeIcons.clock}
+          label={`Hẹn lấy ${formatTime(order.pickupFrom)}–${formatTime(order.pickupTo)} · ${order.quantity} phần`}
+        />
+        <InfoLine icon={HomeIcons.cash} label={paymentLine(order)} />
+      </View>
+      <BrandButton onPress={() => openOrder(order.orderId)}>Mở mã nhận món</BrandButton>
+    </Card>
+  );
+}
+
+function InfoLine({ icon, label }: { icon: IconName; label: string }) {
+  const theme = useTheme();
+
+  return (
+    <View style={styles.infoLine}>
+      <Icon name={icon} color={theme.textSecondary} size={16} />
+      <AppText style={styles.infoText} variant="bodySm">
+        {label}
+      </AppText>
+    </View>
   );
 }
 
 function OrderCard({ order, statusLabel }: { order: OrderDto; statusLabel: string }) {
   return (
     <Card
-      accessibilityLabel={`Mở đơn ${order.orderId}`}
+      accessibilityLabel={`${order.dealName}, ${statusLabel}, ${formatPrice(order.totalAmount)}`}
       gap="sm"
-      onPress={() => router.push(`/order/${order.orderId}`)}
+      onPress={() => openOrder(order.orderId)}
     >
       <View style={styles.cardHeader}>
         <AppText numberOfLines={1} style={styles.dealName} variant="subtitle" weight="bold">
           {order.dealName}
         </AppText>
-        <AppText tone="primary" variant="footnote" weight="bold">
+        <AppText tone="textSecondary" variant="footnote" weight="bold">
           {statusLabel}
         </AppText>
       </View>
-      <AppText tone="textSecondary" variant="caption">
-        Mã đơn: {order.orderId}
-      </AppText>
       <AppText tone="textSecondary" variant="bodySm">
-        Hẹn lấy: {formatTime(order.pickupFrom)}–{formatTime(order.pickupTo)}
+        Đặt ngày {formatShortDate(new Date(order.createdAt))} · hẹn lấy{' '}
+        {formatTime(order.pickupFrom)}–{formatTime(order.pickupTo)}
       </AppText>
       <View style={styles.totalRow}>
         <AppText tone="textSecondary" variant="bodySm">
           {order.quantity} phần
         </AppText>
-        <AppText tone="primary" variant="bodyLg" weight="heavy">
+        <AppText variant="bodyLg" weight="heavy">
           {formatPrice(order.totalAmount)}
         </AppText>
       </View>
@@ -151,4 +213,7 @@ const styles = StyleSheet.create({
   cardHeader: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
   dealName: { flex: 1 },
   totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  lines: { gap: Spacing.xs },
+  infoLine: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
+  infoText: { flex: 1 },
 });
