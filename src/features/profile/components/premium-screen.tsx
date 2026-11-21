@@ -1,4 +1,4 @@
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { FontSize, FontWeight, PremiumColors, Radius, Spacing } from '@/constants/theme';
 import { ErrorState } from '@/components/ui/error-state';
@@ -65,14 +65,14 @@ function BenefitRow({
   );
 }
 
-// current: gói người dùng đang có; available: có thể mua; included: đã nằm trong gói cao hơn
+// current: gói người dùng đang có; available: chưa có, sắp mở đăng ký (app chưa nối thanh toán
+// VNPay của backend nên không đặt nút mua dẫn vào ngõ cụt); included: đã nằm trong gói cao hơn
 // người dùng đang có nên không cần nút.
 type PlanStatus = 'current' | 'available' | 'included';
 
 function PlanCard({
   benefits,
   color,
-  onPress,
   premium = false,
   price,
   status,
@@ -80,7 +80,6 @@ function PlanCard({
 }: {
   benefits: Benefit[];
   color: string;
-  onPress?: () => void;
   premium?: boolean;
   price: string;
   status: PlanStatus;
@@ -130,13 +129,12 @@ function PlanCard({
         </View>
       ) : null}
       {status === 'available' ? (
-        <Pressable
-          accessibilityRole="button"
-          onPress={onPress}
-          style={[styles.buyButton, { backgroundColor: pc.buyButton }]}
-        >
-          <Text style={[styles.buyButtonText, { color: pc.onBuyButton }]}>Mua Premium</Text>
-        </Pressable>
+        <View style={[styles.soonBox, { borderColor: pc.cardBorder }]}>
+          <Text style={[styles.currentButtonText, { color: pc.accent }]}>Sắp mở đăng ký</Text>
+          <Text style={[styles.soonNote, { color: theme.textSecondary }]}>
+            Gói Cao cấp sẽ mở đăng ký trong bản cập nhật tới. Bạn chưa cần làm gì lúc này.
+          </Text>
+        </View>
       ) : null}
     </View>
   );
@@ -186,7 +184,6 @@ export function PremiumScreen({ onBack }: PremiumScreenProps) {
               benefitsQuery.data?.savedFilterLimit ?? DEFAULT_FILTER_LIMIT,
             )}
             color={theme.backgroundElement}
-            onPress={() => Alert.alert('Mua Premium', 'Tính năng thanh toán đang được phát triển.')}
             premium
             price="29.000 VND"
             status={isPremium ? 'current' : 'available'}
@@ -238,12 +235,13 @@ const styles = StyleSheet.create({
     marginTop: Spacing.xxs,
   },
   currentButtonText: { fontSize: FontSize.body, fontWeight: FontWeight.heavy },
-  buyButton: {
+  soonBox: {
     alignItems: 'center',
-    borderRadius: Radius.md,
-    minHeight: 44,
-    justifyContent: 'center',
-    marginTop: Spacing.xxs,
+    gap: Spacing.xs,
+    borderRadius: Radius.lg,
+    borderStyle: 'dashed',
+    borderWidth: 1,
+    padding: Spacing.md,
   },
-  buyButtonText: { fontSize: FontSize.body, fontWeight: FontWeight.heavy },
+  soonNote: { fontSize: FontSize.footnote, lineHeight: 17, textAlign: 'center' },
 });
