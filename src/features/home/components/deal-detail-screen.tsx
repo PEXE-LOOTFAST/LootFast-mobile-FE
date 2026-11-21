@@ -9,7 +9,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { LoadingState } from '@/components/ui/loading-state';
-import { MaxContentWidth } from '@/constants/theme';
+import { MaxContentWidth, RatingColor } from '@/constants/theme';
 import { getDealErrorMessage } from '@/features/home/api/deals';
 import { useDeal } from '@/features/home/api/use-deals';
 import { useFavorites, useToggleFavoriteDeal } from '@/features/profile/api/use-favorites';
@@ -23,7 +23,6 @@ import { PickupSlotPicker } from '@/features/home/components/pickup-slot-picker'
 import { QuantityStepper } from '@/features/home/components/quantity-stepper';
 import { ReserveBar } from '@/features/home/components/reserve-bar';
 import { ORDER_MAX_QUANTITY } from '@/features/order/api/orders';
-import { RatingColor } from '@/features/home/constants/colors';
 import { HomeIcons } from '@/features/home/constants/icons';
 import { useReservation } from '@/features/home/hooks/use-reservation';
 import { buildPickupSlots } from '@/features/home/pickup-slots';

@@ -2,7 +2,7 @@ import type { Ref } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/ui/icon';
-import { HomeHeaderColors, IndicatorColor } from '@/features/home/constants/colors';
+import { HeaderColors, IndicatorColor } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 type IconButtonProps = {
@@ -30,7 +30,7 @@ export function IconButton({
 }: IconButtonProps) {
   const theme = useTheme();
   const onHeader = tone === 'header';
-  const iconColor = onHeader ? HomeHeaderColors.text : isActive ? theme.primary : theme.text;
+  const iconColor = onHeader ? HeaderColors.buyer.text : isActive ? theme.primary : theme.text;
   const surface = isActive
     ? { backgroundColor: theme.primarySoft, borderColor: theme.primary }
     : { backgroundColor: theme.backgroundElement, borderColor: theme.border };
@@ -59,7 +59,7 @@ export function IconButton({
             styles.dot,
             {
               backgroundColor: indicator === 'on' ? IndicatorColor.on : IndicatorColor.off,
-              borderColor: onHeader ? HomeHeaderColors.background : theme.backgroundElement,
+              borderColor: onHeader ? HeaderColors.buyer.background : theme.backgroundElement,
             },
           ]}
         />
@@ -71,7 +71,7 @@ export function IconButton({
             styles.badge,
             {
               backgroundColor: theme.danger,
-              borderColor: onHeader ? HomeHeaderColors.background : theme.backgroundElement,
+              borderColor: onHeader ? HeaderColors.buyer.background : theme.backgroundElement,
             },
           ]}
         >

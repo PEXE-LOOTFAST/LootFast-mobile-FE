@@ -6,18 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon, type IconName } from '@/components/ui/icon';
 import { UiIcons } from '@/constants/icons';
-import {
-  HomeHeaderColors,
-  SellerHeaderColors,
-  type HeaderColors,
-} from '@/features/home/constants/colors';
-
-export type HeaderVariant = 'buyer' | 'seller';
-
-const VARIANT_COLORS: Record<HeaderVariant, HeaderColors> = {
-  buyer: HomeHeaderColors,
-  seller: SellerHeaderColors,
-};
+import { HeaderColors, type HeaderVariant } from '@/constants/theme';
 
 type TabHeaderProps = {
   title: string;
@@ -44,7 +33,7 @@ export function TabHeader({
   variant = 'buyer',
 }: TabHeaderProps) {
   const insets = useSafeAreaInsets();
-  const colors = VARIANT_COLORS[variant];
+  const colors = HeaderColors[variant];
 
   // Nền xanh đậm cần icon status bar màu sáng. Trả về 'auto' khi rời màn,
   // nếu không các màn nền sáng khác sẽ bị icon trắng chìm mất.
@@ -70,7 +59,11 @@ export function TabHeader({
             accessibilityRole="button"
             hitSlop={4}
             onPress={onBack}
-            style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
+            style={({ pressed }) => [
+              styles.backButton,
+              { backgroundColor: colors.control },
+              pressed && styles.pressed,
+            ]}
           >
             <Icon name={UiIcons.back} color={colors.text} size={18} />
           </Pressable>
@@ -137,7 +130,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.16)',
   },
   pressed: { opacity: 0.8 },
   trailing: { flexDirection: 'row', alignItems: 'center', gap: 4 },

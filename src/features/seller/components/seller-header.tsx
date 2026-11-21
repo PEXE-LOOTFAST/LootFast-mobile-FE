@@ -4,9 +4,9 @@ import { Pressable, StyleSheet, Text } from 'react-native';
 import { useUnreadCount } from '@/api/notifications';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { TabHeader } from '@/components/ui/tab-header';
+import { HeaderColors } from '@/constants/theme';
 import { IconButton } from '@/features/home/components/icon-button';
 import { NotificationSheet } from '@/features/home/components/notification-sheet';
-import { SellerHeaderColors } from '@/features/home/constants/colors';
 import { HomeIcons } from '@/features/home/constants/icons';
 
 const BRAND_NAME = 'LootFast';
@@ -79,8 +79,8 @@ export function SellerHeaderWithAction({
           onPress={onPressAction}
           style={({ pressed }) => [styles.actionButton, pressed && styles.pressed]}
         >
-          <Icon name={actionIcon} color={SellerHeaderColors.text} size={16} />
-          <Text style={[styles.actionLabel, { color: SellerHeaderColors.text }]}>
+          <Icon name={actionIcon} color={HeaderColors.seller.text} size={16} />
+          <Text style={[styles.actionLabel, { color: HeaderColors.seller.text }]}>
             {actionLabel}
           </Text>
         </Pressable>
@@ -94,9 +94,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(255,255,255,0.16)',
+    backgroundColor: HeaderColors.seller.control,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
+    borderColor: HeaderColors.seller.controlBorder,
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,

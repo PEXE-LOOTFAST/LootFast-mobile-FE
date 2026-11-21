@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 
 import { ErrorState } from '@/components/ui/error-state';
-import { IndicatorColor } from '@/features/home/constants/colors';
+import { IndicatorColor } from '@/constants/theme';
 import { buildMapHtml } from '@/features/map/components/goong-map-html';
 import type { DealMapProps } from '@/features/map/components/deal-map.types';
 import { useColorScheme } from '@/hooks/use-color-scheme';

@@ -2,8 +2,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/ui/icon';
+import { HeaderColors } from '@/constants/theme';
 import { AdminIcons } from '@/features/admin/constants/icons';
-import { HomeHeaderColors } from '@/features/home/constants/colors';
 import { useTheme } from '@/hooks/use-theme';
 import { formatFullDate } from '@/lib/format';
 
@@ -45,12 +45,12 @@ export function AdminHeader({ date, hasUnread, onPressNotifications }: AdminHead
           onPress={onPressNotifications}
           style={({ pressed }) => [styles.bellButton, pressed && styles.pressed]}
         >
-          <Icon name={AdminIcons.bell} color={HomeHeaderColors.text} size={20} />
+          <Icon name={AdminIcons.bell} color={HeaderColors.buyer.text} size={20} />
           {hasUnread ? (
             <View
               style={[
                 styles.unreadDot,
-                { backgroundColor: theme.accent, borderColor: HomeHeaderColors.background },
+                { backgroundColor: theme.accent, borderColor: HeaderColors.buyer.background },
               ]}
             />
           ) : null}
@@ -63,7 +63,7 @@ export function AdminHeader({ date, hasUnread, onPressNotifications }: AdminHead
 const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
-    backgroundColor: HomeHeaderColors.background,
+    backgroundColor: HeaderColors.buyer.background,
     borderBottomLeftRadius: 28,
     borderBottomRightRadius: 28,
     paddingHorizontal: 20,
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     top: -40,
     right: -60,
     borderRadius: 100,
-    backgroundColor: HomeHeaderColors.decoration,
+    backgroundColor: HeaderColors.buyer.decoration,
     opacity: 0.5,
   },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
@@ -93,26 +93,26 @@ const styles = StyleSheet.create({
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   title: {
     flexShrink: 1,
-    color: HomeHeaderColors.text,
+    color: HeaderColors.buyer.text,
     fontSize: 22,
     fontWeight: '900',
     letterSpacing: -0.4,
   },
   roleBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.16)',
+    backgroundColor: HeaderColors.buyer.control,
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 3,
   },
-  roleLabel: { color: HomeHeaderColors.text, fontSize: 11, fontWeight: '800' },
-  date: { color: HomeHeaderColors.textMuted, fontSize: 14, fontWeight: '600' },
+  roleLabel: { color: HeaderColors.buyer.text, fontSize: 11, fontWeight: '800' },
+  date: { color: HeaderColors.buyer.textMuted, fontSize: 14, fontWeight: '600' },
   bellButton: {
     width: 42,
     height: 42,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 21,
-    backgroundColor: 'rgba(255, 255, 255, 0.16)',
+    backgroundColor: HeaderColors.buyer.control,
   },
   unreadDot: {
     position: 'absolute',

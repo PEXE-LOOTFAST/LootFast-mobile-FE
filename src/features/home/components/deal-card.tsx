@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Icon } from '@/components/ui/icon';
 import { DealImage } from '@/features/home/components/deal-image';
 import { DealMeta } from '@/features/home/components/deal-meta';
-import { RatingColor } from '@/features/home/constants/colors';
+import { RatingColor } from '@/constants/theme';
 import { LOW_STOCK_THRESHOLD } from '@/features/home/constants/deals';
 import { HomeIcons } from '@/features/home/constants/icons';
 import type { Deal } from '@/features/home/types';

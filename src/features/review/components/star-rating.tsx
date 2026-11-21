@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
-import { RatingColor } from '@/features/home/constants/colors';
+import { RatingColor } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 type StarRatingProps = {
