@@ -1,9 +1,7 @@
 import { router } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
 
-import { QueryBoundary } from '@/components/ui/query-boundary';
-import { Screen } from '@/components/ui/screen';
-import { Spacing } from '@/constants/theme';
+import { QueryListEmpty } from '@/components/ui/query-boundary';
+import { ScreenList } from '@/components/ui/screen';
 import { getDealErrorMessage } from '@/features/home/api/deals';
 import { useDeals } from '@/features/home/api/use-deals';
 import { BuyerHeader } from '@/features/home/components/buyer-header';
@@ -43,7 +41,21 @@ export function HomeScreen() {
   };
 
   return (
-    <Screen
+    <ScreenList
+      data={filteredDeals}
+      empty={
+        <QueryListEmpty
+          empty={
+            <EmptyDeals
+              isFiltering={filters.isFiltering}
+              onReset={withAuth(filters.resetFilters)}
+              radiusLabel={formatRadius(filters.radiusKm)}
+            />
+          }
+          errorMessage={getDealErrorMessage}
+          query={dealsQuery}
+        />
+      }
       header={
         <BuyerHeader
           subtitle={
@@ -53,71 +65,51 @@ export function HomeScreen() {
           title="Trang chủ"
         />
       }
+      keyExtractor={(deal) => deal.id}
+      listHeader={
+        <>
+          <LocationPrompt
+            canAskAgain={location.canAskAgain}
+            onRequest={unlockFilters}
+            status={location.status}
+          />
+
+          <SearchPanel
+            categories={DEAL_CATEGORIES}
+            isLocked={!canFilter}
+            onChangeQuery={filters.setQuery}
+            onChangeRadius={filters.setRadiusKm}
+            onPressLocked={unlockFilters}
+            onSelectCategory={(id) => (canFilter ? filters.setCategoryId(id) : unlockFilters())}
+            query={filters.query}
+            radiusKm={filters.radiusKm}
+            selectedCategoryId={filters.categoryId}
+          />
+
+          <SectionHeader
+            title={filters.isFiltering ? 'Kết quả tìm kiếm' : 'Gợi ý gần bạn'}
+            subtitle={
+              filters.isFiltering
+                ? `${filteredDeals.length} deal phù hợp`
+                : 'Ưu tiên món gần, tiết kiệm và được đánh giá cao'
+            }
+            action={
+              <DealFilterButton
+                isActive={filters.hasAdvancedFilters}
+                isLocked={!canFilter}
+                minDiscount={filters.minDiscount}
+                onChangeDiscount={filters.setMinDiscount}
+                onChangePickup={filters.setPickup}
+                onPressLocked={unlockFilters}
+                pickup={filters.pickup}
+              />
+            }
+          />
+        </>
+      }
       onRefresh={() => void dealsQuery.refetch()}
       refreshing={dealsQuery.isRefetching}
-    >
-      <LocationPrompt
-        canAskAgain={location.canAskAgain}
-        onRequest={unlockFilters}
-        status={location.status}
-      />
-
-      <SearchPanel
-        categories={DEAL_CATEGORIES}
-        isLocked={!canFilter}
-        onChangeQuery={filters.setQuery}
-        onChangeRadius={filters.setRadiusKm}
-        onPressLocked={unlockFilters}
-        onSelectCategory={(id) => (canFilter ? filters.setCategoryId(id) : unlockFilters())}
-        query={filters.query}
-        radiusKm={filters.radiusKm}
-        selectedCategoryId={filters.categoryId}
-      />
-
-      <View style={styles.section}>
-        <SectionHeader
-          title={filters.isFiltering ? 'Kết quả tìm kiếm' : 'Gợi ý gần bạn'}
-          subtitle={
-            filters.isFiltering
-              ? `${filteredDeals.length} deal phù hợp`
-              : 'Ưu tiên món gần, tiết kiệm và được đánh giá cao'
-          }
-          action={
-            <DealFilterButton
-              isActive={filters.hasAdvancedFilters}
-              isLocked={!canFilter}
-              minDiscount={filters.minDiscount}
-              onChangeDiscount={filters.setMinDiscount}
-              onChangePickup={filters.setPickup}
-              onPressLocked={unlockFilters}
-              pickup={filters.pickup}
-            />
-          }
-        />
-
-        <QueryBoundary
-          empty={
-            <EmptyDeals
-              isFiltering={filters.isFiltering}
-              onReset={withAuth(filters.resetFilters)}
-              radiusLabel={formatRadius(filters.radiusKm)}
-            />
-          }
-          errorMessage={getDealErrorMessage}
-          isEmpty={() => filteredDeals.length === 0}
-          query={dealsQuery}
-        >
-          {() =>
-            filteredDeals.map((deal) => (
-              <DealCard key={deal.id} deal={deal} onPress={() => openDeal(deal)} />
-            ))
-          }
-        </QueryBoundary>
-      </View>
-    </Screen>
+      renderItem={(deal) => <DealCard deal={deal} onPress={() => openDeal(deal)} />}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  section: { gap: Spacing.md },
-});
