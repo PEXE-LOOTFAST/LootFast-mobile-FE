@@ -144,7 +144,6 @@ export function HomeScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
-  // Chừa chỗ để thẻ deal cuối không bị nút trợ lý nổi che mất.
   content: { paddingBottom: 96 },
   body: {
     width: '100%',
