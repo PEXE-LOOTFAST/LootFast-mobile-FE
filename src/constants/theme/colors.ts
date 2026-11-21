@@ -15,25 +15,27 @@ export const Colors = {
     accent: '#F3A83B',
     /** Chữ/icon đặt trên nền `accent` (cam nhạt ở cả hai chế độ nên luôn là chữ tối). */
     onAccent: '#3B2400',
-    border: '#E2E7E2',
+    border: '#E6EAE6',
     danger: '#C44636',
     /** Chữ/icon đặt trên nền `danger`. */
     onDanger: '#FFFFFF',
   },
+  // Dark trung tính: nền xám than, các lớp sáng dần để thẻ tách khỏi nền; màu xanh chỉ dùng để
+  // nhấn (nút chính, mục đang chọn, giá) thay vì phủ lên mọi lớp như bản cũ.
   dark: {
-    text: '#F4F7F4',
-    background: '#101713',
-    backgroundElement: '#19231D',
-    backgroundSelected: '#243C2D',
-    textSecondary: '#AAB7AE',
-    primary: '#5BD08B',
-    primarySoft: '#203D2B',
-    // primary/danger bản dark là màu sáng: chữ trắng trên đó chỉ đạt ~2:1, nên dùng chữ tối (~8:1).
-    onPrimary: '#0B1F14',
+    text: '#F2F3F2',
+    background: '#0E0F0F',
+    backgroundElement: '#1A1C1B',
+    backgroundSelected: '#1F3328',
+    textSecondary: '#A3A8A5',
+    primary: '#3DD68C',
+    primarySoft: '#173A27',
+    // primary/danger bản dark là màu sáng: chữ trắng trên đó không đủ tương phản, nên dùng chữ tối.
+    onPrimary: '#04210F',
     accent: '#F2B85E',
     onAccent: '#3B2400',
-    border: '#2A382F',
-    danger: '#FF8A78',
+    border: '#2A2D2B',
+    danger: '#FF7369',
     onDanger: '#2B0B06',
   },
 } as const;
