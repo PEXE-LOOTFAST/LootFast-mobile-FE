@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 
 import { ErrorState } from '@/components/ui/error-state';
-import { IndicatorColor, Spacing } from '@/constants/theme';
+import { IndicatorColor, Spacing, UserLocationColor } from '@/constants/theme';
 import { buildMapHtml } from '@/features/map/components/goong-map-html';
 import type { DealMapProps } from '@/features/map/components/deal-map.types';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -11,7 +11,6 @@ import { useTheme } from '@/hooks/use-theme';
 import { goongStyleUrl } from '@/lib/goong';
 
 const DEFAULT_ZOOM = 13.5;
-const USER_DOT_COLOR = '#2563EB';
 const LOAD_TIMEOUT_MS = 15000;
 
 type PageMessage = { type: 'ready' | 'error' | 'deselect' } | { type: 'select'; id: string };
@@ -82,7 +81,7 @@ export function DealMap({
       center: [center.longitude, center.latitude],
       recenterKey,
       user: showUserLocation ? [center.longitude, center.latitude] : null,
-      colors: { pin: theme.primary, selected: IndicatorColor.off, user: USER_DOT_COLOR },
+      colors: { pin: theme.primary, selected: IndicatorColor.off, user: UserLocationColor },
     };
 
     webViewRef.current?.injectJavaScript(`window.__apply(${JSON.stringify(state)}); true;`);

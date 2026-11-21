@@ -106,6 +106,9 @@ export const IndicatorColor = {
   off: '#F59E0B',
 } as const;
 
+// Chấm vị trí người dùng trên bản đồ: xanh dương như các app bản đồ quen thuộc, tách khỏi ghim deal xanh lá.
+export const UserLocationColor = '#2563EB';
+
 // Sao đánh giá dùng xanh dương để tách khỏi màu giá (xanh lá) và nhãn giảm giá (đỏ).
 export const RatingColor = '#1B9FC9';
 
