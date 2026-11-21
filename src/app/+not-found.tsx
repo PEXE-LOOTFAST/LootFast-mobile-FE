@@ -1,6 +1,7 @@
 import { Link, Stack } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 export default function NotFoundScreen() {
@@ -20,7 +21,7 @@ export default function NotFoundScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
-  title: { fontSize: 18, fontWeight: '600' },
-  link: { fontSize: 14, textDecorationLine: 'underline' },
+  container: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.md },
+  title: { fontSize: FontSize.title, fontWeight: FontWeight.medium },
+  link: { fontSize: FontSize.body, textDecorationLine: 'underline' },
 });
