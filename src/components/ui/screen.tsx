@@ -1,5 +1,7 @@
-import type { ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import {
+  ActivityIndicator,
+  FlatList,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -63,15 +65,7 @@ export function Screen({
     </View>
   );
 
-  const refreshControl = onRefresh ? (
-    <RefreshControl
-      colors={[theme.primary]}
-      onRefresh={onRefresh}
-      refreshing={refreshing}
-      tintColor={theme.primary}
-    />
-  ) : undefined;
-
+  const refreshControl = useRefreshControl(refreshing, onRefresh);
   const ScrollContainer = keyboardAware ? KeyboardAwareScrollView : ScrollView;
 
   return (
@@ -96,9 +90,115 @@ export function Screen({
   );
 }
 
+type ScreenListProps<T> = {
+  header?: ReactNode;
+  footer?: ReactNode;
+  /** Nội dung cuộn cùng danh sách, nằm trên các mục (bộ lọc, tab, tiêu đề mục). */
+  listHeader?: ReactNode;
+  /** Khoảng cách giữa các khối trong `listHeader`. */
+  listHeaderGap?: SpacingToken;
+  data: readonly T[];
+  renderItem: (item: T) => ReactElement;
+  keyExtractor: (item: T) => string;
+  /** Khoảng cách giữa các mục, và giữa `listHeader` với mục đầu tiên. */
+  gap?: SpacingToken;
+  /** Hiện khi `data` rỗng — thường là `QueryListEmpty` để phủ cả lúc đang tải và lỗi. */
+  empty?: ReactElement | null;
+  refreshing?: boolean;
+  onRefresh?: () => void;
+  /** Gọi khi cuộn gần cuối, để tải trang tiếp theo. */
+  onEndReached?: () => void;
+  /** Đang tải trang tiếp theo: hiện vòng xoay dưới mục cuối. */
+  loadingMore?: boolean;
+};
+
+/**
+ * Bản `Screen` cho màn chủ yếu là một danh sách dài: cùng nền, header, lề và bề rộng tối đa,
+ * nhưng dựng trên FlatList để chỉ vẽ các mục đang hiện và tải thêm khi cuộn tới cuối.
+ */
+export function ScreenList<T>({
+  header,
+  footer,
+  listHeader,
+  listHeaderGap = 'xl',
+  data,
+  renderItem,
+  keyExtractor,
+  gap = 'md',
+  empty = null,
+  refreshing = false,
+  onRefresh,
+  onEndReached,
+  loadingMore = false,
+}: ScreenListProps<T>) {
+  const theme = useTheme();
+  const refreshControl = useRefreshControl(refreshing, onRefresh);
+
+  return (
+    <View style={[styles.screen, { backgroundColor: theme.background }]}>
+      {header}
+
+      <FlatList
+        ItemSeparatorComponent={SEPARATORS[gap]}
+        ListEmptyComponent={empty}
+        ListFooterComponent={
+          loadingMore ? (
+            <ActivityIndicator color={theme.primary} style={styles.loadingMore} />
+          ) : null
+        }
+        ListHeaderComponent={
+          listHeader ? (
+            <View style={{ gap: Spacing[listHeaderGap], paddingBottom: Spacing[gap] }}>
+              {listHeader}
+            </View>
+          ) : null
+        }
+        contentContainerStyle={[styles.body, styles.padded, styles.scrollContent]}
+        data={data}
+        keyExtractor={keyExtractor}
+        keyboardShouldPersistTaps="handled"
+        onEndReached={onEndReached}
+        onEndReachedThreshold={0.5}
+        refreshControl={refreshControl}
+        renderItem={({ item }) => renderItem(item)}
+        showsVerticalScrollIndicator={false}
+        style={styles.fill}
+      />
+
+      {footer}
+    </View>
+  );
+}
+
+// FlatList dựng lại separator mỗi khi kiểu component đổi, nên mỗi bậc khoảng cách giữ một
+// component cố định thay vì tạo hàm mới trong lúc render.
+const SEPARATORS = Object.fromEntries(
+  (Object.keys(Spacing) as SpacingToken[]).map((token) => [
+    token,
+    function Separator() {
+      return <View style={{ height: Spacing[token] }} />;
+    },
+  ]),
+) as Record<SpacingToken, () => ReactElement>;
+
+function useRefreshControl(refreshing: boolean, onRefresh?: () => void) {
+  const theme = useTheme();
+  if (!onRefresh) return undefined;
+
+  return (
+    <RefreshControl
+      colors={[theme.primary]}
+      onRefresh={onRefresh}
+      refreshing={refreshing}
+      tintColor={theme.primary}
+    />
+  );
+}
+
 const styles = StyleSheet.create({
   screen: { flex: 1 },
   scrollContent: { paddingBottom: Spacing.xxxl },
+  loadingMore: { paddingVertical: Spacing.lg },
   body: {
     width: '100%',
     maxWidth: MaxContentWidth,

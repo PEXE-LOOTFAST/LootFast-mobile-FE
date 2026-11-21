@@ -13,6 +13,34 @@ type QueryState<T> = {
   refetch: () => unknown;
 };
 
+type QueryListEmptyProps = {
+  query: Omit<QueryState<unknown>, 'data'>;
+  errorMessage: (error: unknown) => string;
+  loadingLabel?: string;
+  /** Tải xong mà không có mục nào. */
+  empty: ReactNode;
+};
+
+/**
+ * `ListEmptyComponent` cho danh sách lấy từ API. FlatList chỉ hiện nó khi chưa có mục nào, nên
+ * một chỗ phủ đủ ba trường hợp: đang tải lần đầu, lỗi (kèm Thử lại) và thật sự rỗng.
+ */
+export function QueryListEmpty({ query, errorMessage, loadingLabel, empty }: QueryListEmptyProps) {
+  if (query.isPending) return <LoadingState label={loadingLabel} />;
+
+  if (query.isError) {
+    return (
+      <ErrorState
+        message={errorMessage(query.error)}
+        onRetry={() => void query.refetch()}
+        retrying={query.isRefetching}
+      />
+    );
+  }
+
+  return <>{empty}</>;
+}
+
 type QueryBoundaryProps<T> = {
   query: QueryState<T>;
   /** Dịch lỗi API sang câu tiếng Việt cho người dùng. */
