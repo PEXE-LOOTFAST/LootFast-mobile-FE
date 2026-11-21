@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { FontSize, FontWeight, Radius, Spacing, StaticColors } from '@/constants/theme';
 import { BrandButton } from '@/components/ui/brand-button';
 import { TextField } from '@/components/ui/text-field';
 import { useKeyboardHeight } from '@/hooks/use-keyboard-height';
@@ -125,29 +126,29 @@ export function RejectApplicationDialog({
 }
 
 const styles = StyleSheet.create({
-  overlay: { flex: 1, justifyContent: 'center', paddingHorizontal: 16 },
-  backdrop: { backgroundColor: 'rgba(10, 20, 14, 0.55)' },
+  overlay: { flex: 1, justifyContent: 'center', paddingHorizontal: Spacing.lg },
+  backdrop: { backgroundColor: StaticColors.backdrop },
   card: {
     width: '100%',
     maxWidth: 420,
     alignSelf: 'center',
     gap: 10,
-    borderRadius: 24,
+    borderRadius: Radius.xxl,
     padding: 22,
   },
-  title: { fontSize: 18, fontWeight: '900', letterSpacing: -0.3 },
-  message: { fontSize: 14, lineHeight: 20 },
-  counter: { alignSelf: 'flex-end', fontSize: 12, fontWeight: '600' },
-  actions: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 4 },
+  title: { fontSize: FontSize.title, fontWeight: FontWeight.heavy, letterSpacing: -0.3 },
+  message: { fontSize: FontSize.body, lineHeight: 20 },
+  counter: { alignSelf: 'flex-end', fontSize: FontSize.footnote, fontWeight: FontWeight.medium },
+  actions: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: Spacing.xs },
   cancel: {
     flex: 1,
     minHeight: 46,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderRadius: 14,
+    borderRadius: Radius.lg,
   },
-  cancelLabel: { fontSize: 14, fontWeight: '800' },
+  cancelLabel: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
   confirm: { flex: 1 },
   pressed: { opacity: 0.85 },
 });

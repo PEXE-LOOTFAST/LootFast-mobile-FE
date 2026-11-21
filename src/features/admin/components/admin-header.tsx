@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/ui/icon';
-import { HeaderColors } from '@/constants/theme';
+import { FontSize, FontWeight, HeaderColors, Radius, Spacing } from '@/constants/theme';
 import { AdminIcons } from '@/features/admin/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
 import { formatFullDate } from '@/lib/format';
@@ -64,9 +64,9 @@ const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
     backgroundColor: HeaderColors.buyer.background,
-    borderBottomLeftRadius: 28,
-    borderBottomRightRadius: 28,
-    paddingHorizontal: 20,
+    borderBottomLeftRadius: Radius.xxl,
+    borderBottomRightRadius: Radius.xxl,
+    paddingHorizontal: Spacing.xl,
     paddingBottom: 22,
   },
   decorationLayer: {
@@ -84,34 +84,42 @@ const styles = StyleSheet.create({
     height: 200,
     top: -40,
     right: -60,
-    borderRadius: 100,
+    borderRadius: Radius.full,
     backgroundColor: HeaderColors.buyer.decoration,
     opacity: 0.5,
   },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
   copy: { flex: 1, gap: 6 },
-  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   title: {
     flexShrink: 1,
     color: HeaderColors.buyer.text,
-    fontSize: 22,
-    fontWeight: '900',
+    fontSize: FontSize.headline,
+    fontWeight: FontWeight.heavy,
     letterSpacing: -0.4,
   },
   roleBadge: {
     backgroundColor: HeaderColors.buyer.control,
-    borderRadius: 999,
+    borderRadius: Radius.full,
     paddingHorizontal: 10,
     paddingVertical: 3,
   },
-  roleLabel: { color: HeaderColors.buyer.text, fontSize: 11, fontWeight: '800' },
-  date: { color: HeaderColors.buyer.textMuted, fontSize: 14, fontWeight: '600' },
+  roleLabel: {
+    color: HeaderColors.buyer.text,
+    fontSize: FontSize.caption,
+    fontWeight: FontWeight.bold,
+  },
+  date: {
+    color: HeaderColors.buyer.textMuted,
+    fontSize: FontSize.body,
+    fontWeight: FontWeight.medium,
+  },
   bellButton: {
     width: 42,
     height: 42,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 21,
+    borderRadius: Radius.full,
     backgroundColor: HeaderColors.buyer.control,
   },
   unreadDot: {
@@ -121,7 +129,7 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderWidth: 2,
-    borderRadius: 5,
+    borderRadius: Radius.full,
   },
   pressed: { opacity: 0.8 },
 });

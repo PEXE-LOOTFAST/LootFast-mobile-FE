@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { Spacing } from '@/constants/theme';
 import { BrandButton } from '@/components/ui/brand-button';
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
@@ -78,6 +79,6 @@ export function AdminLoginForm({ onAuthenticated }: AdminLoginFormProps) {
 }
 
 const styles = StyleSheet.create({
-  container: { gap: 20 },
-  fields: { gap: 16 },
+  container: { gap: Spacing.xl },
+  fields: { gap: Spacing.lg },
 });

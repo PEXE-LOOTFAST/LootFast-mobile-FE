@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Shadow, Spacing } from '@/constants/theme';
 import { Icon } from '@/components/ui/icon';
 import { AdminIcons } from '@/features/admin/constants/icons';
 import type { AdminStat } from '@/features/admin/types';
@@ -45,21 +46,21 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     // 50% trừ nửa khoảng cách 12 giữa hai cột.
     flexBasis: '47%',
-    gap: 12,
+    gap: Spacing.md,
     borderWidth: 1,
-    borderRadius: 22,
-    padding: 16,
-    boxShadow: '0px 4px 14px rgba(23, 33, 27, 0.06)',
+    borderRadius: Radius.xxl,
+    padding: Spacing.lg,
+    boxShadow: Shadow.card,
   },
   iconBadge: {
     width: 36,
     height: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 18,
+    borderRadius: Radius.full,
   },
-  value: { fontSize: 26, fontWeight: '900', letterSpacing: -0.8 },
-  copy: { gap: 2 },
-  label: { fontSize: 14, fontWeight: '800' },
-  caption: { fontSize: 12, fontWeight: '600' },
+  value: { fontSize: FontSize.display, fontWeight: FontWeight.heavy, letterSpacing: -0.8 },
+  copy: { gap: Spacing.xxs },
+  label: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
+  caption: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium },
 });

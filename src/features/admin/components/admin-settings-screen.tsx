@@ -11,7 +11,15 @@ import {
 } from 'react-native';
 
 import { Icon } from '@/components/ui/icon';
-import { MaxContentWidth } from '@/constants/theme';
+import {
+  FontSize,
+  FontWeight,
+  MaxContentWidth,
+  Radius,
+  Shadow,
+  Spacing,
+  StaticColors,
+} from '@/constants/theme';
 import { AdminHeader } from '@/features/admin/components/admin-header';
 import { AdminIcons } from '@/features/admin/constants/icons';
 import { useProfile } from '@/features/profile/api/use-profile';
@@ -46,11 +54,11 @@ function SettingSwitchRow({ label, value, onValueChange }: SettingSwitchRowProps
       <Switch
         accessibilityLabel={label}
         onValueChange={onValueChange}
-        thumbColor="#FFFFFF"
+        thumbColor={StaticColors.white}
         trackColor={{ false: theme.primarySoft, true: theme.primary }}
         value={value}
         // Web tô màu thumb theo activeThumbColor thay vì thumbColor.
-        {...{ activeThumbColor: '#FFFFFF' }}
+        {...{ activeThumbColor: StaticColors.white }}
       />
     </View>
   );
@@ -202,21 +210,21 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: MaxContentWidth,
     alignSelf: 'center',
-    gap: 16,
-    marginTop: 16,
-    paddingHorizontal: 16,
+    gap: Spacing.lg,
+    marginTop: Spacing.lg,
+    paddingHorizontal: Spacing.lg,
   },
   card: {
     overflow: 'hidden',
     borderWidth: 1,
-    borderRadius: 22,
-    boxShadow: '0px 4px 14px rgba(23, 33, 27, 0.06)',
+    borderRadius: Radius.xxl,
+    boxShadow: Shadow.card,
   },
   account: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
-    paddingHorizontal: 16,
+    paddingHorizontal: Spacing.lg,
     paddingVertical: 18,
   },
   avatar: {
@@ -224,38 +232,38 @@ const styles = StyleSheet.create({
     height: 52,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 26,
+    borderRadius: Radius.full,
   },
-  initials: { fontSize: 17, fontWeight: '900' },
+  initials: { fontSize: FontSize.title, fontWeight: FontWeight.heavy },
   accountCopy: { flex: 1, gap: 3 },
-  accountName: { fontSize: 15, fontWeight: '900' },
-  accountEmail: { fontSize: 13, fontWeight: '500' },
+  accountName: { fontSize: FontSize.bodyLg, fontWeight: FontWeight.heavy },
+  accountEmail: { fontSize: FontSize.bodySm, fontWeight: FontWeight.medium },
   roleBadge: {
     alignSelf: 'flex-start',
-    marginTop: 4,
-    borderRadius: 999,
+    marginTop: Spacing.xs,
+    borderRadius: Radius.full,
     paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingVertical: Spacing.xs,
   },
-  roleLabel: { fontSize: 11, fontWeight: '800' },
+  roleLabel: { fontSize: FontSize.caption, fontWeight: FontWeight.bold },
   row: {
     minHeight: 56,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    gap: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
   },
-  rowLabel: { flex: 1, fontSize: 14, fontWeight: '600' },
+  rowLabel: { flex: 1, fontSize: FontSize.body, fontWeight: FontWeight.medium },
   divider: { height: StyleSheet.hairlineWidth },
   signOut: {
     minHeight: 46,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    borderRadius: 16,
+    gap: Spacing.sm,
+    borderRadius: Radius.lg,
   },
-  signOutLabel: { fontSize: 14, fontWeight: '800' },
+  signOutLabel: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
   pressed: { opacity: 0.8 },
 });

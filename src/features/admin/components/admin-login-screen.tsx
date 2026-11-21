@@ -2,6 +2,7 @@ import { Redirect, router } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { FontSize, FontWeight, Radius, Shadow, Spacing } from '@/constants/theme';
 import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
 import { Icon } from '@/components/ui/icon';
 import { AdminLoginForm } from '@/features/admin/components/admin-login-form';
@@ -73,8 +74,8 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     gap: 28,
-    paddingHorizontal: 20,
-    paddingVertical: 32,
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.xxxl,
   },
   header: { alignItems: 'center' },
   logo: {
@@ -82,22 +83,27 @@ const styles = StyleSheet.create({
     height: 76,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 24,
-    boxShadow: '0px 12px 28px rgba(22, 121, 75, 0.32)',
+    borderRadius: Radius.xxl,
+    boxShadow: Shadow.brandStrong,
   },
   brandRow: { marginTop: 18 },
-  brand: { fontSize: 30, fontWeight: '900', letterSpacing: -0.8, textAlign: 'center' },
-  tagline: { marginTop: 8, fontSize: 14, fontWeight: '500' },
+  brand: {
+    fontSize: FontSize.display,
+    fontWeight: FontWeight.heavy,
+    letterSpacing: -0.8,
+    textAlign: 'center',
+  },
+  tagline: { marginTop: Spacing.sm, fontSize: FontSize.body, fontWeight: FontWeight.medium },
   card: {
     width: '100%',
     maxWidth: 460,
     alignSelf: 'center',
     borderWidth: 1,
-    borderRadius: 28,
-    padding: 20,
-    boxShadow: '0px 18px 40px rgba(23, 33, 27, 0.08)',
+    borderRadius: Radius.xxl,
+    padding: Spacing.xl,
+    boxShadow: Shadow.overlay,
   },
   back: { alignSelf: 'center' },
-  backText: { fontSize: 14, fontWeight: '800' },
+  backText: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
   pressed: { opacity: 0.7 },
 });

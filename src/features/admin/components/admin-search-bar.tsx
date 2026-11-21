@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Shadow, Spacing } from '@/constants/theme';
 import { Icon } from '@/components/ui/icon';
 import { AdminIcons } from '@/features/admin/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
@@ -49,10 +50,16 @@ const styles = StyleSheet.create({
     gap: 10,
     minHeight: 48,
     borderWidth: 1,
-    borderRadius: 24,
-    paddingHorizontal: 16,
-    boxShadow: '0px 4px 14px rgba(23, 33, 27, 0.06)',
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.lg,
+    boxShadow: Shadow.card,
   },
   // Trình duyệt tự vẽ viền focus riêng, chồng lên viền của ô tìm kiếm.
-  input: { flex: 1, height: 46, fontSize: 14, fontWeight: '500', outlineWidth: 0 },
+  input: {
+    flex: 1,
+    height: 46,
+    fontSize: FontSize.body,
+    fontWeight: FontWeight.medium,
+    outlineWidth: 0,
+  },
 });

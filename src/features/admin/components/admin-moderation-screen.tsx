@@ -6,7 +6,7 @@ import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-v
 import { BrandButton } from '@/components/ui/brand-button';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { TextField } from '@/components/ui/text-field';
-import { MaxContentWidth } from '@/constants/theme';
+import { FontSize, FontWeight, MaxContentWidth, Radius, Spacing } from '@/constants/theme';
 import { toDealImageErrorMessage } from '@/features/admin/api/admin-error-messages';
 import { MAX_REMOVAL_REASON_LENGTH } from '@/features/admin/api/deal-images';
 import { useRemoveViolatingImage } from '@/features/admin/api/use-deal-images';
@@ -163,12 +163,17 @@ const styles = StyleSheet.create({
     maxWidth: MaxContentWidth,
     alignSelf: 'center',
     gap: 14,
-    marginTop: 16,
-    paddingHorizontal: 16,
+    marginTop: Spacing.lg,
+    paddingHorizontal: Spacing.lg,
   },
-  card: { gap: 12, borderWidth: 1, borderRadius: 20, padding: 16 },
-  title: { fontSize: 16, fontWeight: '900', letterSpacing: -0.2 },
-  description: { fontSize: 13, lineHeight: 19 },
-  counter: { alignSelf: 'flex-end', fontSize: 12, fontWeight: '600', marginTop: -6 },
-  preview: { width: '100%', height: 160, borderRadius: 12 },
+  card: { gap: Spacing.md, borderWidth: 1, borderRadius: Radius.xl, padding: Spacing.lg },
+  title: { fontSize: FontSize.subtitle, fontWeight: FontWeight.heavy, letterSpacing: -0.2 },
+  description: { fontSize: FontSize.bodySm, lineHeight: 19 },
+  counter: {
+    alignSelf: 'flex-end',
+    fontSize: FontSize.footnote,
+    fontWeight: FontWeight.medium,
+    marginTop: -6,
+  },
+  preview: { width: '100%', height: 160, borderRadius: Radius.md },
 });

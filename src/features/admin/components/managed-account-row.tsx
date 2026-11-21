@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import type { ManagedAccount } from '@/features/admin/types';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -60,21 +61,21 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: Spacing.md,
     paddingHorizontal: 14,
-    paddingVertical: 16,
+    paddingVertical: Spacing.lg,
   },
   avatar: {
     width: 38,
     height: 38,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 19,
+    borderRadius: Radius.full,
   },
-  initial: { fontSize: 14, fontWeight: '800' },
+  initial: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
   copy: { flex: 1, gap: 3 },
-  name: { fontSize: 14, fontWeight: '800' },
-  detail: { fontSize: 12, fontWeight: '500' },
-  badge: { borderRadius: 999, paddingHorizontal: 11, paddingVertical: 6 },
-  badgeLabel: { fontSize: 11.5, fontWeight: '800' },
+  name: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
+  detail: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium },
+  badge: { borderRadius: Radius.full, paddingHorizontal: 11, paddingVertical: 6 },
+  badgeLabel: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold },
 });

@@ -1,6 +1,7 @@
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { FontSize, FontWeight, Radius, Spacing, StaticColors } from '@/constants/theme';
 import { BrandButton } from '@/components/ui/brand-button';
 import type { ManagedAccount } from '@/features/admin/types';
 import { useTheme } from '@/hooks/use-theme';
@@ -94,30 +95,30 @@ export function AccountDetailDialog({ account, onClose, onToggleLock }: AccountD
 }
 
 const styles = StyleSheet.create({
-  overlay: { flex: 1, justifyContent: 'center', paddingHorizontal: 16 },
-  backdrop: { backgroundColor: 'rgba(10, 20, 14, 0.55)' },
+  overlay: { flex: 1, justifyContent: 'center', paddingHorizontal: Spacing.lg },
+  backdrop: { backgroundColor: StaticColors.backdrop },
   card: {
     width: '100%',
     maxWidth: 420,
     alignSelf: 'center',
-    gap: 12,
-    borderRadius: 24,
+    gap: Spacing.md,
+    borderRadius: Radius.xxl,
     padding: 22,
   },
-  title: { fontSize: 18, fontWeight: '900', letterSpacing: -0.3 },
-  row: { gap: 2 },
-  label: { fontSize: 12, fontWeight: '600' },
-  value: { fontSize: 14, fontWeight: '700' },
-  actions: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 4 },
+  title: { fontSize: FontSize.title, fontWeight: FontWeight.heavy, letterSpacing: -0.3 },
+  row: { gap: Spacing.xxs },
+  label: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium },
+  value: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
+  actions: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: Spacing.xs },
   close: {
     flex: 1,
     minHeight: 46,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderRadius: 14,
+    borderRadius: Radius.lg,
   },
-  closeLabel: { fontSize: 14, fontWeight: '800' },
+  closeLabel: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
   toggle: { flex: 1 },
   pressed: { opacity: 0.85 },
 });

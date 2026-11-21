@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 
 import { InlineAlert } from '@/components/ui/inline-alert';
-import { MaxContentWidth } from '@/constants/theme';
+import { FontSize, FontWeight, MaxContentWidth, Radius, Spacing } from '@/constants/theme';
 import { toAdminErrorMessage } from '@/features/admin/api/admin-error-messages';
 import {
   REPORT_PERIODS,
@@ -201,18 +201,18 @@ const styles = StyleSheet.create({
     maxWidth: MaxContentWidth,
     alignSelf: 'center',
     gap: 14,
-    marginTop: 16,
-    paddingHorizontal: 16,
+    marginTop: Spacing.lg,
+    paddingHorizontal: Spacing.lg,
   },
-  stats: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  loader: { marginTop: 24 },
+  stats: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.md },
+  loader: { marginTop: Spacing.xxl },
   errorBlock: { gap: 10 },
   retry: {
     alignSelf: 'center',
     borderWidth: 1,
-    borderRadius: 14,
-    paddingHorizontal: 20,
+    borderRadius: Radius.lg,
+    paddingHorizontal: Spacing.xl,
     paddingVertical: 10,
   },
-  retryLabel: { fontSize: 14, fontWeight: '800' },
+  retryLabel: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
 });

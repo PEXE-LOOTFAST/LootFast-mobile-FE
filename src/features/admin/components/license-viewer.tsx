@@ -2,6 +2,7 @@ import { Image } from 'expo-image';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { FontSize, FontWeight, Radius, Spacing, StaticColors } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 type LicenseViewerProps = {
@@ -66,25 +67,25 @@ export function LicenseViewer({ url, onClose }: LicenseViewerProps) {
 }
 
 const styles = StyleSheet.create({
-  overlay: { flex: 1, justifyContent: 'center', paddingHorizontal: 16 },
-  backdrop: { backgroundColor: 'rgba(10, 20, 14, 0.7)' },
+  overlay: { flex: 1, justifyContent: 'center', paddingHorizontal: Spacing.lg },
+  backdrop: { backgroundColor: StaticColors.backdropStrong },
   card: {
     width: '100%',
     maxWidth: 520,
     alignSelf: 'center',
-    gap: 12,
-    borderRadius: 24,
+    gap: Spacing.md,
+    borderRadius: Radius.xxl,
     padding: 18,
   },
-  title: { fontSize: 18, fontWeight: '900', letterSpacing: -0.3 },
-  image: { width: '100%', height: 420, borderRadius: 14 },
+  title: { fontSize: FontSize.title, fontWeight: FontWeight.heavy, letterSpacing: -0.3 },
+  image: { width: '100%', height: 420, borderRadius: Radius.lg },
   close: {
     minHeight: 46,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderRadius: 14,
+    borderRadius: Radius.lg,
   },
-  closeLabel: { fontSize: 14, fontWeight: '800' },
+  closeLabel: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
   pressed: { opacity: 0.85 },
 });

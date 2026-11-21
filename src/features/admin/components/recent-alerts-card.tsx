@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Shadow, Spacing } from '@/constants/theme';
 import { Icon } from '@/components/ui/icon';
 import { AdminIcons } from '@/features/admin/constants/icons';
 import type { AdminAlert } from '@/features/admin/types';
@@ -54,21 +55,21 @@ const styles = StyleSheet.create({
   card: {
     gap: 14,
     borderWidth: 1,
-    borderRadius: 22,
-    padding: 16,
-    boxShadow: '0px 4px 14px rgba(23, 33, 27, 0.06)',
+    borderRadius: Radius.xxl,
+    padding: Spacing.lg,
+    boxShadow: Shadow.card,
   },
-  title: { fontSize: 16, fontWeight: '900', letterSpacing: -0.3 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  title: { fontSize: FontSize.subtitle, fontWeight: FontWeight.heavy, letterSpacing: -0.3 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
   iconBadge: {
     width: 36,
     height: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 18,
+    borderRadius: Radius.full,
   },
-  copy: { flex: 1, gap: 2 },
-  message: { fontSize: 14, fontWeight: '600', lineHeight: 19 },
-  time: { fontSize: 12, fontWeight: '500' },
-  empty: { fontSize: 13, fontWeight: '600' },
+  copy: { flex: 1, gap: Spacing.xxs },
+  message: { fontSize: FontSize.body, fontWeight: FontWeight.medium, lineHeight: 19 },
+  time: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium },
+  empty: { fontSize: FontSize.bodySm, fontWeight: FontWeight.medium },
 });

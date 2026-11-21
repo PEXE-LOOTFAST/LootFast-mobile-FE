@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Shadow, Spacing } from '@/constants/theme';
 import { Icon } from '@/components/ui/icon';
 import { AdminIcons } from '@/features/admin/constants/icons';
 import type { DailyPlatformSales } from '@/features/admin/types';
@@ -97,24 +98,39 @@ export function PlatformSalesChartCard({
 
 const styles = StyleSheet.create({
   card: {
-    gap: 12,
+    gap: Spacing.md,
     borderWidth: 1,
-    borderRadius: 22,
-    padding: 16,
-    boxShadow: '0px 4px 14px rgba(23, 33, 27, 0.06)',
+    borderRadius: Radius.xxl,
+    padding: Spacing.lg,
+    boxShadow: Shadow.card,
   },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  title: { flex: 1, fontSize: 16, fontWeight: '900', letterSpacing: -0.3 },
-  caption: { fontSize: 11, fontWeight: '600', marginTop: -6 },
-  growth: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  growthText: { fontSize: 12, fontWeight: '800' },
-  plot: { height: CHART_HEIGHT, flexDirection: 'row', alignItems: 'flex-end', marginTop: 8 },
+  header: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  title: {
+    flex: 1,
+    fontSize: FontSize.subtitle,
+    fontWeight: FontWeight.heavy,
+    letterSpacing: -0.3,
+  },
+  caption: { fontSize: FontSize.caption, fontWeight: FontWeight.medium, marginTop: -6 },
+  growth: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },
+  growthText: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold },
+  plot: {
+    height: CHART_HEIGHT,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    marginTop: Spacing.sm,
+  },
   barSlot: { flex: 1, alignItems: 'center' },
-  bar: { width: '70%', maxWidth: 22, borderRadius: 6 },
+  bar: { width: '70%', maxWidth: 22, borderRadius: Radius.sm },
   empty: { flex: 1, height: CHART_HEIGHT, alignItems: 'center', justifyContent: 'center' },
-  emptyText: { fontSize: 12, fontWeight: '600', textAlign: 'center' },
+  emptyText: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium, textAlign: 'center' },
   xAxis: { flexDirection: 'row' },
   xSlot: { flex: 1, alignItems: 'center' },
   // Rộng hơn slot để nhãn "dd/mm" không bị xuống dòng khi biểu đồ có nhiều cột.
-  xLabel: { width: 40, fontSize: 11, fontWeight: '600', textAlign: 'center' },
+  xLabel: {
+    width: 40,
+    fontSize: FontSize.caption,
+    fontWeight: FontWeight.medium,
+    textAlign: 'center',
+  },
 });
