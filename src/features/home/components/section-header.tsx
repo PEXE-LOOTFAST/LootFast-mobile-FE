@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 type SectionHeaderProps = {
@@ -28,8 +29,8 @@ export function SectionHeader({ title, subtitle, action }: SectionHeaderProps) {
 }
 
 const styles = StyleSheet.create({
-  container: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  copy: { flex: 1, gap: 2 },
-  title: { fontSize: 20, fontWeight: '800', letterSpacing: -0.3 },
-  subtitle: { fontSize: 13, lineHeight: 18 },
+  container: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  copy: { flex: 1, gap: Spacing.xxs },
+  title: { fontSize: FontSize.titleLg, fontWeight: FontWeight.bold, letterSpacing: -0.3 },
+  subtitle: { fontSize: FontSize.bodySm, lineHeight: 18 },
 });

@@ -1,5 +1,6 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { Chip } from '@/components/ui/chip';
 import { Icon } from '@/components/ui/icon';
 import { HomeIcons } from '@/features/home/constants/icons';
@@ -70,10 +71,10 @@ export function PickupSlotPicker({
 }
 
 const styles = StyleSheet.create({
-  container: { gap: 8 },
+  container: { gap: Spacing.sm },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  title: { fontSize: 14, fontWeight: '800' },
-  chips: { gap: 8 },
-  hint: { fontSize: 12, lineHeight: 17 },
-  empty: { fontSize: 13, lineHeight: 19, fontWeight: '600' },
+  title: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
+  chips: { gap: Spacing.sm },
+  hint: { fontSize: FontSize.footnote, lineHeight: 17 },
+  empty: { fontSize: FontSize.bodySm, lineHeight: 19, fontWeight: FontWeight.medium },
 });

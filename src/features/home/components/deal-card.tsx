@@ -4,14 +4,13 @@ import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/ui/icon';
 import { DealImage } from '@/features/home/components/deal-image';
 import { DealMeta } from '@/features/home/components/deal-meta';
-import { RatingColor } from '@/constants/theme';
+import { FontSize, FontWeight, Radius, RatingColor, Shadow, Spacing } from '@/constants/theme';
 import { LOW_STOCK_THRESHOLD } from '@/features/home/constants/deals';
 import { HomeIcons } from '@/features/home/constants/icons';
 import type { Deal } from '@/features/home/types';
 import { useTheme } from '@/hooks/use-theme';
 import { formatDiscount, formatDistance, formatPrice } from '@/lib/format';
 
-const LOW_STOCK_TEXT = '#3B2400';
 const IMAGE_SIZE = 96;
 
 type DealCardProps = {
@@ -47,8 +46,10 @@ export function DealCard({ deal, onPress }: DealCardProps) {
         {/* Chỉ báo số phần khi sắp hết, nằm sát đáy ảnh để không che món. */}
         {isLowStock ? (
           <View style={[styles.stock, { backgroundColor: theme.accent }]}>
-            <Icon name={HomeIcons.flame} color={LOW_STOCK_TEXT} size={11} />
-            <Text style={styles.stockText}>Còn {deal.remaining} phần</Text>
+            <Icon name={HomeIcons.flame} color={theme.onAccent} size={11} />
+            <Text style={[styles.stockText, { color: theme.onAccent }]}>
+              Còn {deal.remaining} phần
+            </Text>
           </View>
         ) : null}
       </View>
@@ -101,15 +102,15 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: Spacing.md,
     borderWidth: 1,
-    borderRadius: 16,
+    borderRadius: Radius.lg,
     padding: 10,
-    boxShadow: '0px 4px 12px rgba(23, 33, 27, 0.05)',
+    boxShadow: Shadow.card,
   },
   pressed: { transform: [{ scale: 0.985 }] },
   mediaWrap: { width: IMAGE_SIZE, height: IMAGE_SIZE },
-  media: { width: IMAGE_SIZE, height: IMAGE_SIZE, borderRadius: 12 },
+  media: { width: IMAGE_SIZE, height: IMAGE_SIZE, borderRadius: Radius.md },
   discount: { position: 'absolute', top: 6, left: 6 },
   stock: {
     position: 'absolute',
@@ -120,19 +121,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 3,
-    borderBottomLeftRadius: 12,
-    borderBottomRightRadius: 12,
-    paddingVertical: 2,
+    borderBottomLeftRadius: Radius.md,
+    borderBottomRightRadius: Radius.md,
+    paddingVertical: Spacing.xxs,
   },
-  stockText: { color: LOW_STOCK_TEXT, fontSize: 10, fontWeight: '800' },
+  stockText: { fontSize: FontSize.micro, fontWeight: FontWeight.bold },
   body: { flex: 1, minWidth: 0, gap: 3 },
-  storeRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  storeName: { flexShrink: 1, fontSize: 12, fontWeight: '600' },
-  rating: { flexDirection: 'row', alignItems: 'center', gap: 2, marginLeft: 'auto' },
-  ratingText: { fontSize: 12, fontWeight: '800' },
-  name: { fontSize: 15, fontWeight: '800', lineHeight: 20 },
+  storeRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },
+  storeName: { flexShrink: 1, fontSize: FontSize.footnote, fontWeight: FontWeight.medium },
+  rating: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xxs, marginLeft: 'auto' },
+  ratingText: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold },
+  name: { fontSize: FontSize.bodyLg, fontWeight: FontWeight.bold, lineHeight: 20 },
   priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 6 },
-  price: { fontSize: 17, fontWeight: '900' },
-  originalPrice: { fontSize: 12, textDecorationLine: 'line-through' },
-  metaRow: { flexDirection: 'row', flexWrap: 'wrap', columnGap: 12, rowGap: 2 },
+  price: { fontSize: FontSize.title, fontWeight: FontWeight.heavy },
+  originalPrice: { fontSize: FontSize.footnote, textDecorationLine: 'line-through' },
+  metaRow: { flexDirection: 'row', flexWrap: 'wrap', columnGap: Spacing.md, rowGap: Spacing.xxs },
 });

@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { BrandButton } from '@/components/ui/brand-button';
 import { Icon } from '@/components/ui/icon';
 import { HomeIcons } from '@/features/home/constants/icons';
@@ -47,21 +48,21 @@ export function EmptyDeals({ isFiltering, radiusLabel, onReset }: EmptyDealsProp
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    gap: 8,
+    gap: Spacing.sm,
     borderWidth: 1,
     borderStyle: 'dashed',
-    borderRadius: 24,
-    padding: 24,
+    borderRadius: Radius.xxl,
+    padding: Spacing.xxl,
   },
   icon: {
     width: 56,
     height: 56,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 4,
-    borderRadius: 28,
+    marginBottom: Spacing.xs,
+    borderRadius: Radius.full,
   },
-  title: { fontSize: 16, fontWeight: '800', textAlign: 'center' },
-  description: { fontSize: 13, lineHeight: 19, textAlign: 'center' },
-  action: { alignSelf: 'stretch', marginTop: 8 },
+  title: { fontSize: FontSize.subtitle, fontWeight: FontWeight.bold, textAlign: 'center' },
+  description: { fontSize: FontSize.bodySm, lineHeight: 19, textAlign: 'center' },
+  action: { alignSelf: 'stretch', marginTop: Spacing.sm },
 });

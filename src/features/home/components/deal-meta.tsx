@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight } from '@/constants/theme';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -25,6 +26,6 @@ export function DealMeta({ icon, label, compact = false }: DealMetaProps) {
 
 const styles = StyleSheet.create({
   container: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  label: { fontSize: 13, fontWeight: '600' },
-  labelCompact: { fontSize: 12 },
+  label: { fontSize: FontSize.bodySm, fontWeight: FontWeight.medium },
+  labelCompact: { fontSize: FontSize.footnote },
 });

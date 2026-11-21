@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Shadow, Spacing } from '@/constants/theme';
 import { Icon } from '@/components/ui/icon';
 import { CategoryChips } from '@/features/home/components/category-chips';
 import { RadiusMenu } from '@/features/home/components/radius-menu';
@@ -123,22 +124,22 @@ const styles = StyleSheet.create({
   container: {
     gap: 10,
     borderWidth: 1,
-    borderRadius: 22,
+    borderRadius: Radius.xxl,
     paddingVertical: 10,
-    boxShadow: '0px 12px 30px rgba(23, 33, 27, 0.08)',
+    boxShadow: Shadow.overlay,
   },
-  row: { flexDirection: 'row', gap: 8, paddingHorizontal: 10 },
+  row: { flexDirection: 'row', gap: Spacing.sm, paddingHorizontal: 10 },
   radius: {
     height: 38,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 3,
     borderWidth: 1,
-    borderRadius: 19,
+    borderRadius: Radius.full,
     paddingHorizontal: 10,
   },
-  radiusLabel: { fontSize: 13, fontWeight: '700' },
-  radiusValue: { fontSize: 13, fontWeight: '600' },
+  radiusLabel: { fontSize: FontSize.bodySm, fontWeight: FontWeight.bold },
+  radiusValue: { fontSize: FontSize.bodySm, fontWeight: FontWeight.medium },
   search: {
     flex: 1,
     height: 38,
@@ -146,11 +147,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     borderWidth: 1,
-    borderRadius: 19,
+    borderRadius: Radius.full,
     paddingHorizontal: 10,
   },
   inputWrapper: { flex: 1, minWidth: 0 },
   passThrough: { pointerEvents: 'none' },
   // Trình duyệt tự vẽ viền focus riêng, lệch khỏi khung bo tròn của ô tìm kiếm.
-  input: { height: 36, fontSize: 13, outlineWidth: 0 },
+  input: { height: 36, fontSize: FontSize.bodySm, outlineWidth: 0 },
 });

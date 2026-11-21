@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Radius, StaticColors } from '@/constants/theme';
 import { Badge } from '@/components/ui/badge';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { DealImage } from '@/features/home/components/deal-image';
@@ -80,7 +81,7 @@ function HeroButton({ icon, accessibilityLabel, onPress, activeColor }: HeroButt
         pressed && styles.pressed,
       ]}
     >
-      <Icon name={icon} color="#FFFFFF" size={20} />
+      <Icon name={icon} color={StaticColors.white} size={20} />
     </Pressable>
   );
 }
@@ -99,8 +100,8 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 20,
-    backgroundColor: 'rgba(23, 33, 27, 0.4)',
+    borderRadius: Radius.full,
+    backgroundColor: StaticColors.imageScrim,
   },
   pressed: { opacity: 0.8 },
   discount: { position: 'absolute', left: 16, bottom: 14 },

@@ -1,5 +1,6 @@
 import { Platform, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { BrandButton } from '@/components/ui/brand-button';
 import { Icon } from '@/components/ui/icon';
 import { HomeIcons } from '@/features/home/constants/icons';
@@ -63,7 +64,7 @@ export function LocationPrompt({
 }
 
 const styles = StyleSheet.create({
-  card: { gap: 12, borderWidth: 1, borderRadius: 18, padding: 14 },
+  card: { gap: Spacing.md, borderWidth: 1, borderRadius: Radius.xl, padding: 14 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  message: { flex: 1, fontSize: 13, fontWeight: '600', lineHeight: 19 },
+  message: { flex: 1, fontSize: FontSize.bodySm, fontWeight: FontWeight.medium, lineHeight: 19 },
 });

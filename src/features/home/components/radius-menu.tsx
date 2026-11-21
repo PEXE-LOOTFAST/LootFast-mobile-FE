@@ -1,13 +1,16 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Chip } from '@/components/ui/chip';
 import { Popover, type PopoverAnchor } from '@/components/ui/popover';
 import { RADIUS_OPTIONS_KM } from '@/features/home/constants/deals';
 import { useTheme } from '@/hooks/use-theme';
 import { formatRadius } from '@/lib/format';
 
 const MENU_WIDTH = 190;
-const MENU_PADDING = 12;
-const OPTION_GAP = 8;
+// Khớp padding của Popover.
+const MENU_PADDING = Spacing.md;
+const OPTION_GAP = Spacing.sm;
 // Trừ padding hai bên, viền 1px hai bên và khoảng cách giữa hai cột.
 const OPTION_WIDTH = (MENU_WIDTH - MENU_PADDING * 2 - 2 - OPTION_GAP) / 2;
 
@@ -29,31 +32,18 @@ export function RadiusMenu({ anchor, onClose, valueKm, onChange }: RadiusMenuPro
           const isSelected = km === valueKm;
 
           return (
-            <Pressable
+            <Chip
               key={km}
-              accessibilityRole="button"
-              accessibilityState={{ selected: isSelected }}
+              label={formatRadius(km)}
               onPress={() => {
                 onChange(km);
                 onClose();
               }}
-              style={[
-                styles.option,
-                isSelected
-                  ? { backgroundColor: theme.primary, borderColor: theme.primary }
-                  : { backgroundColor: theme.background, borderColor: theme.border },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.optionText,
-                  { color: isSelected ? theme.onPrimary : theme.textSecondary },
-                  isSelected && styles.optionTextSelected,
-                ]}
-              >
-                {formatRadius(km)}
-              </Text>
-            </Pressable>
+              role="radio"
+              selected={isSelected}
+              size="md"
+              style={styles.option}
+            />
           );
         })}
       </View>
@@ -62,16 +52,12 @@ export function RadiusMenu({ anchor, onClose, valueKm, onChange }: RadiusMenuPro
 }
 
 const styles = StyleSheet.create({
-  title: { fontSize: 11, fontWeight: '800', letterSpacing: 0.8, textTransform: 'uppercase' },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: OPTION_GAP },
-  option: {
-    width: OPTION_WIDTH,
-    height: 38,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderRadius: 19,
+  title: {
+    fontSize: FontSize.caption,
+    fontWeight: FontWeight.bold,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
   },
-  optionText: { fontSize: 14, fontWeight: '600' },
-  optionTextSelected: { fontWeight: '800' },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: OPTION_GAP },
+  option: { width: OPTION_WIDTH },
 });

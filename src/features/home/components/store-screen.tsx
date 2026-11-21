@@ -9,7 +9,14 @@ import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { LoadingState } from '@/components/ui/loading-state';
 import { StoreReviewsCard } from '@/features/review/components/store-reviews-card';
-import { MaxContentWidth, RatingColor } from '@/constants/theme';
+import {
+  FontSize,
+  FontWeight,
+  MaxContentWidth,
+  Radius,
+  RatingColor,
+  Spacing,
+} from '@/constants/theme';
 import { toDeal } from '@/features/home/api/deals';
 import { toStoreErrorMessage } from '@/features/home/api/stores';
 import { useStore } from '@/features/home/api/use-store';
@@ -215,31 +222,41 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: Spacing.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
   },
-  headerTitle: { flex: 1, fontSize: 17, fontWeight: '900', letterSpacing: -0.3 },
+  headerTitle: {
+    flex: 1,
+    fontSize: FontSize.title,
+    fontWeight: FontWeight.heavy,
+    letterSpacing: -0.3,
+  },
   content: {
     width: '100%',
     maxWidth: MaxContentWidth,
     alignSelf: 'center',
     gap: 10,
-    padding: 12,
-    paddingBottom: 32,
+    padding: Spacing.md,
+    paddingBottom: Spacing.xxxl,
   },
-  cover: { width: '100%', height: 120, borderRadius: 14 },
-  card: { gap: 8, borderWidth: 1, borderRadius: 16, padding: 14 },
-  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  name: { flexShrink: 1, fontSize: 17, fontWeight: '900', letterSpacing: -0.3 },
+  cover: { width: '100%', height: 120, borderRadius: Radius.lg },
+  card: { gap: Spacing.sm, borderWidth: 1, borderRadius: Radius.lg, padding: 14 },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
+  name: {
+    flexShrink: 1,
+    fontSize: FontSize.title,
+    fontWeight: FontWeight.heavy,
+    letterSpacing: -0.3,
+  },
   ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  infoRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  description: { fontSize: 13, lineHeight: 19 },
-  meta: { flexShrink: 1, fontSize: 13 },
-  section: { fontSize: 14, fontWeight: '900', letterSpacing: -0.2 },
-  hoursBlock: { gap: 4 },
-  hoursValue: { marginLeft: 'auto', fontWeight: '700' },
+  infoRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
+  description: { fontSize: FontSize.bodySm, lineHeight: 19 },
+  meta: { flexShrink: 1, fontSize: FontSize.bodySm },
+  section: { fontSize: FontSize.body, fontWeight: FontWeight.heavy, letterSpacing: -0.2 },
+  hoursBlock: { gap: Spacing.xs },
+  hoursValue: { marginLeft: 'auto', fontWeight: FontWeight.bold },
   hourRow: {
     flexDirection: 'row',
     alignItems: 'center',

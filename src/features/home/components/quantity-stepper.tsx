@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 type QuantityStepperProps = {
@@ -71,10 +72,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderRadius: 17,
+    borderRadius: Radius.full,
   },
-  buttonText: { fontSize: 20, fontWeight: '800', lineHeight: 24 },
-  value: { minWidth: 24, fontSize: 18, fontWeight: '900', textAlign: 'center' },
+  buttonText: { fontSize: FontSize.titleLg, fontWeight: FontWeight.bold, lineHeight: 24 },
+  value: {
+    minWidth: 24,
+    fontSize: FontSize.title,
+    fontWeight: FontWeight.heavy,
+    textAlign: 'center',
+  },
   disabled: { opacity: 0.4 },
   pressed: { opacity: 0.8 },
 });

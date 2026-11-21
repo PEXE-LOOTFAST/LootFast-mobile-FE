@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight } from '@/constants/theme';
 import { useUnreadCount } from '@/api/notifications';
 import { Popover } from '@/components/ui/popover';
 import { TabHeader } from '@/components/ui/tab-header';
@@ -143,6 +144,6 @@ export function BuyerHeader({ title, subtitle, subtitleIcon, onBack }: BuyerHead
 
 const styles = StyleSheet.create({
   note: { gap: 3 },
-  noteTitle: { fontSize: 14, fontWeight: '800' },
-  noteBody: { fontSize: 13, lineHeight: 18 },
+  noteTitle: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
+  noteBody: { fontSize: FontSize.bodySm, lineHeight: 18 },
 });

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Shadow } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 type DetailCardProps = {
@@ -33,10 +34,10 @@ const styles = StyleSheet.create({
   card: {
     gap: 10,
     borderWidth: 1,
-    borderRadius: 16,
+    borderRadius: Radius.lg,
     padding: 14,
-    boxShadow: '0px 4px 12px rgba(23, 33, 27, 0.05)',
+    boxShadow: Shadow.card,
   },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  title: { fontSize: 15, fontWeight: '800' },
+  title: { fontSize: FontSize.bodyLg, fontWeight: FontWeight.bold },
 });

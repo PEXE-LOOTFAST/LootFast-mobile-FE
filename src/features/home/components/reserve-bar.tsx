@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
 
+import { FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { BrandButton } from '@/components/ui/brand-button';
 import type { ReservationStatus } from '@/features/home/hooks/use-reservation';
 import { useTheme } from '@/hooks/use-theme';
@@ -57,13 +58,18 @@ const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: Spacing.lg,
     borderTopWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
   },
-  total: { gap: 2 },
-  totalLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 0.8, textTransform: 'uppercase' },
-  totalValue: { fontSize: 20, fontWeight: '900' },
+  total: { gap: Spacing.xxs },
+  totalLabel: {
+    fontSize: FontSize.caption,
+    fontWeight: FontWeight.bold,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+  },
+  totalValue: { fontSize: FontSize.titleLg, fontWeight: FontWeight.heavy },
   button: { flex: 1, minHeight: 50 },
 });

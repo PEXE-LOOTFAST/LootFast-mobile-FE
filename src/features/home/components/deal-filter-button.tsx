@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius } from '@/constants/theme';
 import { Icon } from '@/components/ui/icon';
 import { Popover } from '@/components/ui/popover';
 import { IconButton } from '@/components/ui/icon-button';
@@ -110,15 +111,20 @@ function FilterSection<T extends string | number>({
 
 const styles = StyleSheet.create({
   section: { gap: 6 },
-  title: { fontSize: 11, fontWeight: '800', letterSpacing: 0.8, textTransform: 'uppercase' },
+  title: {
+    fontSize: FontSize.caption,
+    fontWeight: FontWeight.bold,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+  },
   option: {
     height: 38,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderRadius: 19,
+    borderRadius: Radius.full,
     paddingHorizontal: 14,
   },
-  optionText: { fontSize: 14, fontWeight: '600' },
-  optionTextSelected: { fontWeight: '800' },
+  optionText: { fontSize: FontSize.body, fontWeight: FontWeight.medium },
+  optionTextSelected: { fontWeight: FontWeight.bold },
 });
