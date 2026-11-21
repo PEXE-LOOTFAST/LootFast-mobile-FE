@@ -14,10 +14,13 @@ type DealImageProps = {
 export function DealImage({ uri, emoji, emojiSize = 44, style }: DealImageProps) {
   const theme = useTheme();
   const [hasError, setHasError] = useState(false);
+  // Deal chưa có ảnh trả `uri` rỗng; expo-image trên web không báo lỗi với nguồn rỗng nên phải tự
+  // xét, nếu không thẻ chỉ còn một mảng màu trống.
+  const showFallback = !uri || hasError;
 
   return (
     <View style={[styles.container, { backgroundColor: theme.primarySoft }, style]}>
-      {hasError ? (
+      {showFallback ? (
         <Text style={{ fontSize: emojiSize }}>{emoji}</Text>
       ) : (
         <Image
