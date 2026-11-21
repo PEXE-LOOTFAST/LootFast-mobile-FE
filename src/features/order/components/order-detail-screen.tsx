@@ -136,16 +136,7 @@ export function OrderDetailScreen() {
                 </Text>
               </View>
 
-              <Row label="Số lượng" value={`${order.quantity} phần`} />
-              <Row label="Tổng tiền" value={formatPrice(order.totalAmount)} />
-              <Row
-                label="Giờ bạn hẹn lấy"
-                value={`${formatTime(order.pickupFrom)}–${formatTime(order.pickupTo)}`}
-              />
-              <Row
-                label="Khung giờ deal"
-                value={`${formatTime(order.pickupStart)}–${formatTime(order.pickupEnd)}`}
-              />
+              {/* Ra quầy là mở màn này để đưa mã, nên mã nằm ngay đầu, không phải cuộn tìm. */}
               {order.pickupCode ? (
                 <View style={styles.pickupCodeSection}>
                   <Text accessibilityRole="header" style={[styles.section, { color: theme.text }]}>
@@ -164,6 +155,17 @@ export function OrderDetailScreen() {
                   </Text>
                 </View>
               ) : null}
+
+              <Row label="Số lượng" value={`${order.quantity} phần`} />
+              <Row label="Tổng tiền" value={formatPrice(order.totalAmount)} />
+              <Row
+                label="Giờ bạn hẹn lấy"
+                value={`${formatTime(order.pickupFrom)}–${formatTime(order.pickupTo)}`}
+              />
+              <Row
+                label="Khung giờ deal"
+                value={`${formatTime(order.pickupStart)}–${formatTime(order.pickupEnd)}`}
+              />
               {order.paymentReference ? (
                 <Row label="Mã tham chiếu" value={order.paymentReference} />
               ) : null}
