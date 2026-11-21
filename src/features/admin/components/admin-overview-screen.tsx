@@ -22,7 +22,7 @@ import { AdminHeader } from '@/features/admin/components/admin-header';
 import { AdminStatCard } from '@/features/admin/components/admin-stat-card';
 import { PlatformSalesChartCard } from '@/features/admin/components/platform-sales-chart-card';
 import { RecentAlertsCard } from '@/features/admin/components/recent-alerts-card';
-import { SegmentedTabs } from '@/features/seller/components/segmented-tabs';
+import { SegmentedTabs } from '@/components/ui/segmented-tabs';
 import type { AdminAlert, AdminStat } from '@/features/admin/types';
 import { useLightStatusBar } from '@/hooks/use-light-status-bar';
 import { useTheme } from '@/hooks/use-theme';

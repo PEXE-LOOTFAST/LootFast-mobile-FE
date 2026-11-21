@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { SegmentedTabs } from '@/features/seller/components/segmented-tabs';
+import { SegmentedTabs } from '@/components/ui/segmented-tabs';
 import { SellerOrderRow } from '@/features/seller/components/seller-order-row';
 import {
   PICKUP_EMPTY_MESSAGES,

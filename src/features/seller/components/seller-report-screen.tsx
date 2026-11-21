@@ -9,7 +9,7 @@ import { AdvancedReportCard } from '@/features/seller/components/advanced-report
 import { MetricCard } from '@/features/seller/components/metric-card';
 import { PerformanceChartCard } from '@/features/seller/components/performance-chart-card';
 import { PerformanceSummaryCard } from '@/features/seller/components/performance-summary-card';
-import { SegmentedTabs } from '@/features/seller/components/segmented-tabs';
+import { SegmentedTabs } from '@/components/ui/segmented-tabs';
 import { SellerHeader } from '@/features/seller/components/seller-header';
 import { TopDealsCard } from '@/features/seller/components/top-deals-card';
 import { SellerIcons } from '@/features/seller/constants/icons';

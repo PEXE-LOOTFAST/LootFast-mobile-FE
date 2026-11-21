@@ -16,7 +16,7 @@ import {
 } from '@/features/seller/api/use-merchant-deals';
 import { IncomingOrdersSection } from '@/features/seller/components/incoming-orders-section';
 import { QrScannerModal } from '@/features/seller/components/qr-scanner-modal';
-import { SegmentedTabs } from '@/features/seller/components/segmented-tabs';
+import { SegmentedTabs } from '@/components/ui/segmented-tabs';
 import { SellerDealCard } from '@/features/seller/components/seller-deal-card';
 import { SellerHeaderWithAction } from '@/features/seller/components/seller-header';
 import { SellerIcons } from '@/features/seller/constants/icons';

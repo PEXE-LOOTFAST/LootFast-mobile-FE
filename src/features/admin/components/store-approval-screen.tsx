@@ -18,7 +18,7 @@ import { StoreApplicationCard } from '@/features/admin/components/store-applicat
 import { STORE_APPROVAL_TABS } from '@/features/admin/constants/store-approval-tabs';
 import { useStoreApprovalQueue } from '@/features/admin/hooks/use-store-approval-queue';
 import type { StoreApplicationStatus } from '@/features/admin/types';
-import { SegmentedTabs } from '@/features/seller/components/segmented-tabs';
+import { SegmentedTabs } from '@/components/ui/segmented-tabs';
 import { EmptyCard } from '@/components/ui/empty-card';
 import { useLightStatusBar } from '@/hooks/use-light-status-bar';
 import { useTheme } from '@/hooks/use-theme';

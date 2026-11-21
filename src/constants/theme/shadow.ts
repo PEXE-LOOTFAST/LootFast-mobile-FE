@@ -5,6 +5,8 @@
 export const Shadow = {
   /** Thẻ nằm trên nền màn hình. */
   card: '0px 4px 12px rgba(23, 33, 27, 0.05)',
+  /** Phần tử nổi nhẹ bên trong một khối (vd. tab đang chọn). */
+  raised: '0px 2px 8px rgba(23, 33, 27, 0.1)',
   /** Nút/thẻ nổi trên bản đồ hoặc ảnh. */
   floating: '0px 4px 12px rgba(23, 33, 27, 0.18)',
   /** Dialog, popover, bottom sheet. */

@@ -1,5 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
+import { AppText } from '@/components/ui/app-text';
+import { Radius, Shadow, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 type SegmentedTabsProps<Id extends string> = {
@@ -9,8 +11,8 @@ type SegmentedTabsProps<Id extends string> = {
   size?: 'medium' | 'small';
 };
 
-// Dải tab dạng viên thuốc, mục đang chọn nổi lên nền trắng. Dùng cho cả ba mục lớn
-// của trang và các nhóm đơn bên trong.
+// Dải tab dạng viên thuốc, mục đang chọn nổi lên nền trắng. Dùng cho các mục lớn của trang
+// và các nhóm nhỏ bên trong (đơn hàng, báo cáo, duyệt cửa hàng).
 export function SegmentedTabs<Id extends string>({
   items,
   value,
@@ -21,7 +23,10 @@ export function SegmentedTabs<Id extends string>({
   const isSmall = size === 'small';
 
   return (
-    <View style={[styles.track, { backgroundColor: theme.backgroundSelected }]}>
+    <View
+      accessibilityRole="tablist"
+      style={[styles.track, { backgroundColor: theme.backgroundSelected }]}
+    >
       {items.map((item) => {
         const isActive = item.id === value;
 
@@ -37,17 +42,14 @@ export function SegmentedTabs<Id extends string>({
               isActive && [styles.activeTab, { backgroundColor: theme.backgroundElement }],
             ]}
           >
-            <Text
+            <AppText
               numberOfLines={1}
-              style={[
-                styles.label,
-                isSmall && styles.labelSmall,
-                { color: isActive ? theme.text : theme.textSecondary },
-                isActive && styles.activeLabel,
-              ]}
+              tone={isActive ? 'text' : 'textSecondary'}
+              variant={isSmall ? 'micro' : 'footnote'}
+              weight={isActive ? 'bold' : 'medium'}
             >
               {item.label}
-            </Text>
+            </AppText>
           </Pressable>
         );
       })}
@@ -56,17 +58,16 @@ export function SegmentedTabs<Id extends string>({
 }
 
 const styles = StyleSheet.create({
-  track: { flexDirection: 'row', gap: 4, borderRadius: 18, padding: 4 },
+  track: { flexDirection: 'row', gap: Spacing.xs, borderRadius: Radius.lg, padding: Spacing.xs },
+  // Bo góc trong = bo góc ngoài - padding, để hai lớp đồng tâm.
   tab: {
     flex: 1,
+    minHeight: 34,
     alignItems: 'center',
-    borderRadius: 14,
-    paddingHorizontal: 6,
-    paddingVertical: 9,
+    justifyContent: 'center',
+    borderRadius: Radius.md,
+    paddingHorizontal: Spacing.xs,
   },
-  tabSmall: { paddingHorizontal: 2, paddingVertical: 7 },
-  activeTab: { boxShadow: '0px 2px 8px rgba(23, 33, 27, 0.1)' },
-  label: { fontSize: 12, fontWeight: '700' },
-  labelSmall: { fontSize: 10 },
-  activeLabel: { fontWeight: '800' },
+  tabSmall: { minHeight: 28, paddingHorizontal: Spacing.xxs },
+  activeTab: { boxShadow: Shadow.raised },
 });
