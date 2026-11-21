@@ -1,65 +1,75 @@
 import { router } from 'expo-router';
-import { Alert } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 
+import { AppText } from '@/components/ui/app-text';
 import { BrandButton } from '@/components/ui/brand-button';
-import { PasswordField } from '@/components/ui/password-field';
+import { InlineAlert } from '@/components/ui/inline-alert';
+import { Spacing } from '@/constants/theme';
+import { toPasswordResetErrorMessage } from '@/features/auth/api/auth-error-messages';
+import { useRequestPasswordReset } from '@/features/auth/api/use-password-reset';
+import { ResetPasswordForm } from '@/features/auth/components/reset-password-form';
 import { SellerFormCard } from '@/features/seller/components/seller-form-card';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
-import { validateChangePassword, type ChangePasswordValues } from '@/features/seller/validation';
-import { useForm } from '@/hooks/use-form';
-import { MIN_PASSWORD_LENGTH } from '@/lib/validation';
+import { useAuthSession } from '@/hooks/use-auth-session';
+import { showToast } from '@/lib/toast';
 
-const INITIAL_VALUES: ChangePasswordValues = {
-  currentPassword: '',
-  newPassword: '',
-  confirmPassword: '',
-};
+const goToSettings = () => router.navigate('/seller/settings');
 
+/**
+ * Backend chưa có API đổi mật khẩu bằng mật khẩu cũ, nhưng có luồng đặt lại qua mã gửi email.
+ * Dùng luồng đó cho tài khoản đang đăng nhập: gửi mã tới email của chính họ, rồi nhập mã cùng
+ * mật khẩu mới. Vừa đổi được thật, vừa xác minh đúng chủ tài khoản.
+ */
 export function SellerChangePasswordScreen() {
-  const { values, errors, setField, submit } = useForm<ChangePasswordValues>({
-    initialValues: INITIAL_VALUES,
-    validate: validateChangePassword,
-    // Chưa có API đổi mật khẩu: form kiểm tra đủ quy tắc rồi báo tính năng sắp có.
-    onSubmit: () => Alert.alert('Mật khẩu', 'Tính năng đổi mật khẩu đang được phát triển.'),
-  });
+  const { user } = useAuthSession();
+  const email = user?.email ?? '';
+  const [step, setStep] = useState<'request' | 'confirm'>('request');
+  const request = useRequestPasswordReset(() => setStep('confirm'));
 
   return (
     <SellerPageScaffold
-      onPressBack={() => router.navigate('/seller/settings')}
+      onPressBack={goToSettings}
       subtitle="Đổi mật khẩu đăng nhập của bạn"
       title="Mật khẩu"
     >
       <SellerFormCard>
-        <PasswordField
-          size="compact"
-          autoComplete="current-password"
-          error={errors.currentPassword}
-          label="Mật khẩu hiện tại"
-          onChangeText={(text) => setField('currentPassword', text)}
-          placeholder="Nhập mật khẩu hiện tại"
-          value={values.currentPassword}
-        />
-        <PasswordField
-          size="compact"
-          autoComplete="new-password"
-          error={errors.newPassword}
-          label="Mật khẩu mới"
-          onChangeText={(text) => setField('newPassword', text)}
-          placeholder={`Từ ${MIN_PASSWORD_LENGTH} ký tự, có chữ hoa, chữ thường và số`}
-          value={values.newPassword}
-        />
-        <PasswordField
-          size="compact"
-          autoComplete="new-password"
-          error={errors.confirmPassword}
-          label="Xác nhận mật khẩu mới"
-          onChangeText={(text) => setField('confirmPassword', text)}
-          placeholder="Nhập lại mật khẩu mới"
-          value={values.confirmPassword}
-        />
+        {step === 'request' ? (
+          <View style={styles.request}>
+            <AppText accessibilityRole="header" variant="bodyLg" weight="bold">
+              Xác nhận qua email
+            </AppText>
+            <AppText tone="textSecondary" variant="bodySm">
+              Để chắc chắn là bạn, LootFast sẽ gửi mã 6 chữ số tới {email}. Bước sau bạn nhập mã đó
+              cùng mật khẩu mới.
+            </AppText>
+            {request.error ? (
+              <InlineAlert message={toPasswordResetErrorMessage(request.error)} />
+            ) : null}
+            <BrandButton
+              disabled={!email}
+              loading={request.isPending}
+              onPress={() => request.mutate(email)}
+            >
+              Gửi mã xác nhận
+            </BrandButton>
+          </View>
+        ) : (
+          <ResetPasswordForm
+            backLabel="Chưa nhận được mã? Gửi lại"
+            email={email}
+            onBack={() => setStep('request')}
+            onDone={() => {
+              showToast('Đã đổi mật khẩu', { tone: 'success' });
+              goToSettings();
+            }}
+          />
+        )}
       </SellerFormCard>
-
-      <BrandButton onPress={submit}>Cập nhật mật khẩu</BrandButton>
     </SellerPageScaffold>
   );
 }
+
+const styles = StyleSheet.create({
+  request: { gap: Spacing.md },
+});

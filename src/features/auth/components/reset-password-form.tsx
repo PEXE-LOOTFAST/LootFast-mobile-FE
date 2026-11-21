@@ -18,9 +18,16 @@ type ResetPasswordFormProps = {
   /** Đổi mật khẩu xong — quay về tab đăng nhập với email đã điền sẵn. */
   onDone: () => void;
   onBack: () => void;
+  /** Nhãn link quay lại; mặc định cho luồng quên mật khẩu ở màn đăng nhập. */
+  backLabel?: string;
 };
 
-export function ResetPasswordForm({ email, onDone, onBack }: ResetPasswordFormProps) {
+export function ResetPasswordForm({
+  email,
+  onDone,
+  onBack,
+  backLabel = 'Quay lại đăng nhập',
+}: ResetPasswordFormProps) {
   const theme = useTheme();
   const confirm = useConfirmPasswordReset(onDone);
 
@@ -92,7 +99,7 @@ export function ResetPasswordForm({ email, onDone, onBack }: ResetPasswordFormPr
       </BrandButton>
 
       <Pressable accessibilityRole="button" hitSlop={8} onPress={onBack} style={styles.back}>
-        <Text style={[styles.link, { color: theme.textSecondary }]}>Quay lại đăng nhập</Text>
+        <Text style={[styles.link, { color: theme.textSecondary }]}>{backLabel}</Text>
       </Pressable>
     </View>
   );

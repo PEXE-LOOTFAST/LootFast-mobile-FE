@@ -1,12 +1,9 @@
 import { parseOpenDays } from '@/features/seller/opening-hours';
 import {
   MIN_NAME_LENGTH,
-  MIN_PASSWORD_LENGTH,
   checkEmail,
   checkFullName,
-  checkPasswordMatch,
   checkPhone,
-  checkRequired,
   checkTime,
 } from '@/lib/validation';
 import type { FormErrors } from '@/types/form';
@@ -34,12 +31,6 @@ export type OwnerInfoValues = {
   fullName: string;
   email: string;
   phone: string;
-};
-
-export type ChangePasswordValues = {
-  currentPassword: string;
-  newPassword: string;
-  confirmPassword: string;
 };
 
 export type NewDealValues = {
@@ -132,26 +123,5 @@ export function validateOwnerInfo(values: OwnerInfoValues): FormErrors<OwnerInfo
     email: checkEmail(values.email),
     // Số điện thoại không bắt buộc với chủ quán, nhưng đã nhập thì phải đúng định dạng.
     phone: checkPhone(values.phone, { optional: true }),
-  };
-}
-
-export function validateChangePassword(
-  values: ChangePasswordValues,
-): FormErrors<ChangePasswordValues> {
-  const { currentPassword, newPassword, confirmPassword } = values;
-  const isStrong =
-    newPassword.length >= MIN_PASSWORD_LENGTH &&
-    /[a-z]/.test(newPassword) &&
-    /[A-Z]/.test(newPassword) &&
-    /\d/.test(newPassword);
-
-  return {
-    currentPassword: checkRequired(currentPassword, 'Vui lòng nhập mật khẩu hiện tại'),
-    newPassword: !isStrong
-      ? `Từ ${MIN_PASSWORD_LENGTH} ký tự, có chữ hoa, chữ thường và số`
-      : newPassword === currentPassword
-        ? 'Mật khẩu mới phải khác mật khẩu hiện tại'
-        : undefined,
-    confirmPassword: checkPasswordMatch(confirmPassword, newPassword),
   };
 }
