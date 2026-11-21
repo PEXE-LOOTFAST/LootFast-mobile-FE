@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -82,12 +81,7 @@ export function AdminManageScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
-      {/* Trung tâm thông báo của admin sẽ làm ở nhánh riêng, tạm báo trước. */}
-      <AdminHeader
-        date={today}
-        hasUnread={false}
-        onPressNotifications={() => Alert.alert('Thông báo', 'Trung tâm thông báo sẽ sớm có.')}
-      />
+      <AdminHeader date={today} />
 
       <ScrollView
         contentContainerStyle={styles.content}

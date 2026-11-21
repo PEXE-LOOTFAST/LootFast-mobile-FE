@@ -1,22 +1,19 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Badge } from '@/components/ui/badge';
-import { Icon } from '@/components/ui/icon';
-import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
-import { AdminIcons } from '@/features/admin/constants/icons';
+import { FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { formatFullDate } from '@/lib/format';
 
 type AdminHeaderProps = {
   date: Date;
-  hasUnread: boolean;
-  onPressNotifications: () => void;
 };
 
 // Cùng kiểu header với khu người mua và người bán, thêm nhãn "Quản trị" để admin luôn biết mình
-// đang ở khu vực có quyền cao.
-export function AdminHeader({ date, hasUnread, onPressNotifications }: AdminHeaderProps) {
+// đang ở khu vực có quyền cao. Không có chuông thông báo: backend chưa gửi thông báo nào cho
+// admin, một nút bấm vào chỉ để báo "sắp có" là ngõ cụt.
+export function AdminHeader({ date }: AdminHeaderProps) {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
 
@@ -41,28 +38,6 @@ export function AdminHeader({ date, hasUnread, onPressNotifications }: AdminHead
           </View>
           <Text style={[styles.date, { color: theme.textSecondary }]}>{formatFullDate(date)}</Text>
         </View>
-
-        <Pressable
-          accessibilityLabel={hasUnread ? 'Thông báo, có mục mới' : 'Thông báo'}
-          accessibilityRole="button"
-          hitSlop={4}
-          onPress={onPressNotifications}
-          style={({ pressed }) => [
-            styles.bellButton,
-            { backgroundColor: theme.backgroundElement, borderColor: theme.border },
-            pressed && styles.pressed,
-          ]}
-        >
-          <Icon name={AdminIcons.bell} color={theme.text} size={20} />
-          {hasUnread ? (
-            <View
-              style={[
-                styles.unreadDot,
-                { backgroundColor: theme.danger, borderColor: theme.backgroundElement },
-              ]}
-            />
-          ) : null}
-        </Pressable>
       </View>
     </View>
   );
@@ -83,22 +58,4 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
   },
   date: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium },
-  bellButton: {
-    width: 44,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderRadius: Radius.full,
-  },
-  unreadDot: {
-    position: 'absolute',
-    top: 9,
-    right: 10,
-    width: 10,
-    height: 10,
-    borderWidth: 2,
-    borderRadius: Radius.full,
-  },
-  pressed: { opacity: 0.8 },
 });

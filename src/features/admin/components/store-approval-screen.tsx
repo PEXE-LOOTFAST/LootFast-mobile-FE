@@ -1,13 +1,5 @@
 import { useState } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { FontSize, FontWeight, MaxContentWidth, Radius, Spacing } from '@/constants/theme';
@@ -62,12 +54,7 @@ export function StoreApprovalScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
-      {/* Trung tâm thông báo của admin sẽ làm ở nhánh riêng, tạm báo trước. */}
-      <AdminHeader
-        date={new Date()}
-        hasUnread={queue.pendingCount > 0}
-        onPressNotifications={() => Alert.alert('Thông báo', 'Trung tâm thông báo sẽ sớm có.')}
-      />
+      <AdminHeader date={new Date()} />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.body}>
