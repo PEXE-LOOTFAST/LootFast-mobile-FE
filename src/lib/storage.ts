@@ -64,3 +64,9 @@ export const draftStorage = {
   set: (key: string, value: string) => setItem(toSafeKey(key), value),
   clear: (key: string) => removeItem(toSafeKey(key)),
 };
+
+/** Tuỳ chọn nhỏ của người dùng trên máy này (vd. giao diện sáng/tối), không gắn với tài khoản. */
+export const preferenceStorage = {
+  get: (key: string) => getItem(toSafeKey(`pref.${key}`)),
+  set: (key: string, value: string) => setItem(toSafeKey(`pref.${key}`), value),
+};
