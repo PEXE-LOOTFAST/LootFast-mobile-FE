@@ -120,4 +120,6 @@ export const StaticColors = {
   backdropStrong: 'rgba(10, 20, 14, 0.7)',
   /** Lớp tối đặt trên ảnh để chữ/icon trắng đọc được. */
   imageScrim: 'rgba(23, 33, 27, 0.4)',
+  /** Lớp tối quanh khung quét trên nền camera. */
+  cameraScrim: 'rgba(0, 0, 0, 0.55)',
 } as const;

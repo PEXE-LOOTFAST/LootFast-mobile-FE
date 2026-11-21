@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import type { TopDeal } from '@/features/seller/api/merchant-performance';
 import { useTheme } from '@/hooks/use-theme';
 import { formatPrice } from '@/lib/format';
@@ -48,9 +49,18 @@ export function TopDealsCard({ deals }: { deals: TopDeal[] }) {
 }
 
 const styles = StyleSheet.create({
-  card: { borderWidth: 1, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 14 },
-  title: { fontSize: 16, fontWeight: '900', letterSpacing: -0.3 },
-  subtitle: { fontSize: 12, fontWeight: '600', marginBottom: 4 },
+  card: {
+    borderWidth: 1,
+    borderRadius: Radius.xl,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: 14,
+  },
+  title: { fontSize: FontSize.subtitle, fontWeight: FontWeight.heavy, letterSpacing: -0.3 },
+  subtitle: {
+    fontSize: FontSize.footnote,
+    fontWeight: FontWeight.medium,
+    marginBottom: Spacing.xs,
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -62,12 +72,12 @@ const styles = StyleSheet.create({
     height: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 14,
+    borderRadius: Radius.full,
   },
-  rankText: { fontSize: 13, fontWeight: '900' },
-  info: { flex: 1, gap: 2 },
-  name: { fontSize: 14, fontWeight: '700' },
-  detail: { fontSize: 12, fontWeight: '600' },
-  revenue: { fontSize: 14, fontWeight: '900' },
+  rankText: { fontSize: FontSize.bodySm, fontWeight: FontWeight.heavy },
+  info: { flex: 1, gap: Spacing.xxs },
+  name: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
+  detail: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium },
+  revenue: { fontSize: FontSize.body, fontWeight: FontWeight.heavy },
   divider: { height: StyleSheet.hairlineWidth },
 });

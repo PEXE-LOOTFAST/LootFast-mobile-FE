@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Shadow, Spacing } from '@/constants/theme';
 import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/ui/icon';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
@@ -65,24 +66,24 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 12,
+    gap: Spacing.md,
     borderWidth: 1,
-    borderRadius: 20,
-    padding: 16,
-    boxShadow: '0px 4px 12px rgba(23, 33, 27, 0.05)',
+    borderRadius: Radius.xl,
+    padding: Spacing.lg,
+    boxShadow: Shadow.card,
   },
-  copy: { flex: 1, gap: 8 },
-  title: { fontSize: 15, fontWeight: '900' },
-  description: { fontSize: 13, lineHeight: 19 },
-  eligibility: { fontSize: 12, fontWeight: '700' },
+  copy: { flex: 1, gap: Spacing.sm },
+  title: { fontSize: FontSize.bodyLg, fontWeight: FontWeight.heavy },
+  description: { fontSize: FontSize.bodySm, lineHeight: 19 },
+  eligibility: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold },
   note: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 10,
     borderWidth: 1,
-    borderRadius: 16,
+    borderRadius: Radius.lg,
     padding: 14,
   },
-  noteText: { flex: 1, fontSize: 12, lineHeight: 18 },
-  link: { alignSelf: 'center', padding: 6, fontSize: 14, fontWeight: '800' },
+  noteText: { flex: 1, fontSize: FontSize.footnote, lineHeight: 18 },
+  link: { alignSelf: 'center', padding: 6, fontSize: FontSize.body, fontWeight: FontWeight.bold },
 });

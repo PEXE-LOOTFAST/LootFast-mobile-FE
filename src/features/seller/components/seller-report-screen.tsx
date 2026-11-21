@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 
 import { InlineAlert } from '@/components/ui/inline-alert';
-import { MaxContentWidth } from '@/constants/theme';
+import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { useMerchantPerformance } from '@/features/seller/api/merchant-performance';
 import { AdvancedReportCard } from '@/features/seller/components/advanced-report-card';
 import { MetricCard } from '@/features/seller/components/metric-card';
@@ -114,8 +114,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     gap: 14,
     marginTop: 14,
-    paddingHorizontal: 16,
+    paddingHorizontal: Spacing.lg,
   },
-  metricsRow: { flexDirection: 'row', gap: 12 },
-  loader: { marginTop: 24 },
+  metricsRow: { flexDirection: 'row', gap: Spacing.md },
+  loader: { marginTop: Spacing.xxl },
 });

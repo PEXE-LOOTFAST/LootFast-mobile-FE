@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import type { DailyPerformance } from '@/features/seller/api/merchant-performance';
 import { useTheme } from '@/hooks/use-theme';
 import { formatPrice } from '@/lib/format';
@@ -106,11 +107,11 @@ export function PerformanceChartCard({ daily }: { daily: DailyPerformance[] }) {
 }
 
 const styles = StyleSheet.create({
-  card: { gap: 12, borderWidth: 1, borderRadius: 20, padding: 16 },
-  header: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
-  copy: { flex: 1, gap: 2 },
-  title: { fontSize: 16, fontWeight: '900', letterSpacing: -0.3 },
-  subtitle: { fontSize: 12, fontWeight: '600' },
+  card: { gap: Spacing.md, borderWidth: 1, borderRadius: Radius.xl, padding: Spacing.lg },
+  header: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.md },
+  copy: { flex: 1, gap: Spacing.xxs },
+  title: { fontSize: FontSize.subtitle, fontWeight: FontWeight.heavy, letterSpacing: -0.3 },
+  subtitle: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium },
   plot: { height: CHART_HEIGHT, justifyContent: 'flex-end' },
   grid: {
     position: 'absolute',
@@ -123,16 +124,16 @@ const styles = StyleSheet.create({
   gridLine: { borderTopWidth: 1, borderStyle: 'dashed' },
   bars: { height: CHART_HEIGHT, flexDirection: 'row', alignItems: 'flex-end' },
   barSlot: { flex: 1, alignItems: 'center' },
-  bar: { borderTopLeftRadius: 4, borderTopRightRadius: 4 },
+  bar: { borderTopLeftRadius: Radius.xs, borderTopRightRadius: Radius.xs },
   empty: {
     height: CHART_HEIGHT,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 12,
+    paddingHorizontal: Spacing.md,
   },
-  emptyText: { fontSize: 12, fontWeight: '600', textAlign: 'center' },
+  emptyText: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium, textAlign: 'center' },
   xAxis: { flexDirection: 'row' },
   xSlot: { flex: 1, alignItems: 'center', minHeight: 24 },
-  xLabel: { fontSize: 10, fontWeight: '600' },
-  xDate: { fontSize: 8, fontWeight: '500' },
+  xLabel: { fontSize: FontSize.micro, fontWeight: FontWeight.medium },
+  xDate: { fontSize: FontSize.micro, fontWeight: FontWeight.medium },
 });

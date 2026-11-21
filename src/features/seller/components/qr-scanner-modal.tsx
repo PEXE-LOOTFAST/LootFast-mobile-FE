@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 import { Alert, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { FontSize, FontWeight, Spacing, StaticColors } from '@/constants/theme';
 import { Icon } from '@/components/ui/icon';
 import { BrandButton } from '@/components/ui/brand-button';
 import { HomeIcons } from '@/features/home/constants/icons';
@@ -87,7 +88,7 @@ export function QrScannerModal({ visible, onClose, onScan }: QrScannerModalProps
       statusBarTranslucent
       visible={visible}
     >
-      <View style={[styles.screen, { backgroundColor: '#000' }]}>
+      <View style={[styles.screen, { backgroundColor: StaticColors.black }]}>
         <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
           <Pressable
             accessibilityLabel="Đóng"
@@ -96,7 +97,7 @@ export function QrScannerModal({ visible, onClose, onScan }: QrScannerModalProps
             onPress={handleClose}
             style={styles.headerButton}
           >
-            <Icon name={HomeIcons.close} color="#FFF" size={24} />
+            <Icon name={HomeIcons.close} color={StaticColors.white} size={24} />
           </Pressable>
           <Text style={styles.title}>Quét mã QR lấy hàng</Text>
           <Pressable
@@ -106,7 +107,7 @@ export function QrScannerModal({ visible, onClose, onScan }: QrScannerModalProps
             onPress={handlePickImage}
             style={styles.headerButton}
           >
-            <Icon name={SellerIcons.photoLibrary} color="#FFF" size={24} />
+            <Icon name={SellerIcons.photoLibrary} color={StaticColors.white} size={24} />
           </Pressable>
         </View>
 
@@ -151,8 +152,8 @@ export function QrScannerModal({ visible, onClose, onScan }: QrScannerModalProps
 const SCAN_SIZE = 260;
 const CORNER_SIZE = 28;
 const CORNER_WIDTH = 4;
-const CORNER_COLOR = '#FFFFFF';
-const OVERLAY_COLOR = 'rgba(0,0,0,0.55)';
+const CORNER_COLOR = StaticColors.white;
+const OVERLAY_COLOR = StaticColors.cameraScrim;
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
@@ -160,14 +161,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    paddingBottom: 12,
+    paddingHorizontal: Spacing.md,
+    paddingBottom: Spacing.md,
     zIndex: 10,
   },
   headerButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  title: { color: '#FFF', fontSize: 17, fontWeight: '800' },
-  permissionContainer: { flex: 1, justifyContent: 'center', gap: 20, paddingHorizontal: 32 },
-  permissionText: { color: '#FFF', fontSize: 15, lineHeight: 22, textAlign: 'center' },
+  title: { color: StaticColors.white, fontSize: FontSize.title, fontWeight: FontWeight.bold },
+  permissionContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    gap: Spacing.xl,
+    paddingHorizontal: Spacing.xxxl,
+  },
+  permissionText: {
+    color: StaticColors.white,
+    fontSize: FontSize.bodyLg,
+    lineHeight: 22,
+    textAlign: 'center',
+  },
   cameraContainer: { flex: 1 },
   overlay: { ...StyleSheet.absoluteFill, justifyContent: 'center' } as const,
   overlayTop: { flex: 1, backgroundColor: OVERLAY_COLOR },
@@ -180,7 +191,12 @@ const styles = StyleSheet.create({
     alignItems: 'center' as const,
     paddingTop: 28,
   },
-  hint: { color: '#FFF', fontSize: 14, textAlign: 'center' as const, paddingHorizontal: 32 },
+  hint: {
+    color: StaticColors.white,
+    fontSize: FontSize.body,
+    textAlign: 'center' as const,
+    paddingHorizontal: Spacing.xxxl,
+  },
   corner: { position: 'absolute' as const, width: CORNER_SIZE, height: CORNER_SIZE },
   cornerTL: {
     top: 0,

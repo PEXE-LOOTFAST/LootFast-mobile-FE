@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, Text } from 'react-native';
 import { useUnreadCount } from '@/api/notifications';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { TabHeader } from '@/components/ui/tab-header';
-import { HeaderColors } from '@/constants/theme';
+import { FontSize, FontWeight, HeaderColors, Radius, Spacing } from '@/constants/theme';
 import { IconButton } from '@/components/ui/icon-button';
 import { NotificationSheet } from '@/features/home/components/notification-sheet';
 import { HomeIcons } from '@/features/home/constants/icons';
@@ -98,10 +98,10 @@ const styles = StyleSheet.create({
     backgroundColor: HeaderColors.seller.control,
     borderWidth: 1,
     borderColor: HeaderColors.seller.controlBorder,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    borderRadius: Radius.md,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
   },
-  actionLabel: { fontSize: 13, fontWeight: '800' },
+  actionLabel: { fontSize: FontSize.bodySm, fontWeight: FontWeight.bold },
   pressed: { opacity: 0.8 },
 });

@@ -5,7 +5,7 @@ import { ActivityIndicator, Alert, StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
 import { EmptyCard } from '@/components/ui/empty-card';
 import { InlineAlert } from '@/components/ui/inline-alert';
-import { MaxContentWidth } from '@/constants/theme';
+import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { toMerchantDealErrorMessage } from '@/features/seller/api/merchant-deals';
 import { toMerchantOrderErrorMessage } from '@/features/seller/api/merchant-orders';
 import { useConfirmPickup } from '@/features/seller/api/use-merchant-orders';
@@ -151,9 +151,9 @@ const styles = StyleSheet.create({
     maxWidth: MaxContentWidth,
     alignSelf: 'center',
     gap: 14,
-    marginTop: 16,
-    paddingHorizontal: 16,
+    marginTop: Spacing.lg,
+    paddingHorizontal: Spacing.lg,
   },
-  loader: { marginTop: 24 },
-  deals: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  loader: { marginTop: Spacing.xxl },
+  deals: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.md },
 });

@@ -1,5 +1,6 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { Icon } from '@/components/ui/icon';
 import type { MerchantOrderDto } from '@/features/seller/api/merchant-orders';
 import { SellerIcons } from '@/features/seller/constants/icons';
@@ -106,24 +107,30 @@ export function SellerOrderRow({
 }
 
 const styles = StyleSheet.create({
-  row: { gap: 8, borderWidth: 1, borderRadius: 16, padding: 10 },
+  row: { gap: Spacing.sm, borderWidth: 1, borderRadius: Radius.lg, padding: 10 },
   top: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  icon: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 17 },
-  copy: { flex: 1, gap: 2 },
-  title: { fontSize: 14, fontWeight: '800' },
-  meta: { fontSize: 12, fontWeight: '600' },
-  total: { fontSize: 14, fontWeight: '900' },
-  payment: { fontSize: 12, fontWeight: '700' },
-  actions: { flexDirection: 'row', gap: 8 },
+  icon: {
+    width: 34,
+    height: 34,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: Radius.full,
+  },
+  copy: { flex: 1, gap: Spacing.xxs },
+  title: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
+  meta: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium },
+  total: { fontSize: FontSize.body, fontWeight: FontWeight.heavy },
+  payment: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold },
+  actions: { flexDirection: 'row', gap: Spacing.sm },
   action: {
     flex: 1,
     minHeight: 40,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: Radius.md,
     paddingHorizontal: 10,
   },
-  actionLabel: { fontSize: 13, fontWeight: '800' },
+  actionLabel: { fontSize: FontSize.bodySm, fontWeight: FontWeight.bold },
   pressed: { opacity: 0.85 },
 });

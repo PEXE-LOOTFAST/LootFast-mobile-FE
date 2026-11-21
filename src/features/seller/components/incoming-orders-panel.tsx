@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { SegmentedTabs } from '@/components/ui/segmented-tabs';
 import { SellerOrderRow } from '@/features/seller/components/seller-order-row';
 import {
@@ -64,13 +65,13 @@ export function IncomingOrdersPanel({
 }
 
 const styles = StyleSheet.create({
-  card: { gap: 14, borderWidth: 1, borderRadius: 20, padding: 10 },
+  card: { gap: 14, borderWidth: 1, borderRadius: Radius.xl, padding: 10 },
   list: { gap: 10 },
   empty: {
-    paddingHorizontal: 20,
+    paddingHorizontal: Spacing.xl,
     paddingVertical: 34,
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: FontSize.body,
+    fontWeight: FontWeight.bold,
     lineHeight: 21,
     textAlign: 'center',
   },

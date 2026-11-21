@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import {
   PICKUP_CODE_PREFIX,
@@ -161,6 +162,6 @@ export function IncomingOrdersSection() {
 
 const styles = StyleSheet.create({
   container: { gap: 14 },
-  success: { fontSize: 13, fontWeight: '800', textAlign: 'center' },
-  loader: { marginTop: 24 },
+  success: { fontSize: FontSize.bodySm, fontWeight: FontWeight.bold, textAlign: 'center' },
+  loader: { marginTop: Spacing.xxl },
 });

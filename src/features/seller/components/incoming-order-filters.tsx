@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { Icon } from '@/components/ui/icon';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { PICKUP_CODE_PREFIX } from '@/features/seller/api/merchant-orders';
@@ -165,26 +166,26 @@ export function IncomingOrderFilters({
 
 const styles = StyleSheet.create({
   container: { gap: 10 },
-  dateRow: { flexDirection: 'row', gap: 8 },
+  dateRow: { flexDirection: 'row', gap: Spacing.sm },
   dateButton: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: Spacing.sm,
     minHeight: 44,
     borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: 12,
+    borderRadius: Radius.md,
+    paddingHorizontal: Spacing.md,
   },
-  dateText: { flex: 1, fontSize: 14, fontWeight: '700' },
+  dateText: { flex: 1, fontSize: FontSize.body, fontWeight: FontWeight.bold },
   todayButton: {
     minHeight: 44,
     justifyContent: 'center',
-    borderRadius: 12,
-    paddingHorizontal: 16,
+    borderRadius: Radius.md,
+    paddingHorizontal: Spacing.lg,
   },
-  todayLabel: { fontSize: 13, fontWeight: '800' },
-  inputRow: { flexDirection: 'row', gap: 8 },
+  todayLabel: { fontSize: FontSize.bodySm, fontWeight: FontWeight.bold },
+  inputRow: { flexDirection: 'row', gap: Spacing.sm },
   searchInput: {
     flex: 1,
     flexDirection: 'row',
@@ -192,7 +193,7 @@ const styles = StyleSheet.create({
     gap: 6,
     minHeight: 42,
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: Radius.md,
     paddingHorizontal: 10,
   },
   codeInput: {
@@ -202,16 +203,22 @@ const styles = StyleSheet.create({
     gap: 6,
     minHeight: 42,
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: Radius.md,
     paddingHorizontal: 10,
   },
-  input: { flex: 1, fontSize: 13, fontWeight: '600', paddingVertical: 0, outlineWidth: 0 },
+  input: {
+    flex: 1,
+    fontSize: FontSize.bodySm,
+    fontWeight: FontWeight.medium,
+    paddingVertical: 0,
+    outlineWidth: 0,
+  },
   deliverBadge: {
     width: 28,
     height: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 8,
+    borderRadius: Radius.sm,
   },
   pressed: { opacity: 0.85 },
 });

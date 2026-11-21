@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { Icon } from '@/components/ui/icon';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
@@ -42,25 +43,25 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 12,
+    gap: Spacing.md,
     borderWidth: 1,
     borderStyle: 'dashed',
-    borderRadius: 20,
-    padding: 16,
+    borderRadius: Radius.xl,
+    padding: Spacing.lg,
   },
-  copy: { flex: 1, gap: 8 },
-  title: { fontSize: 15, fontWeight: '900', letterSpacing: -0.2 },
-  description: { fontSize: 12.5, lineHeight: 19 },
+  copy: { flex: 1, gap: Spacing.sm },
+  title: { fontSize: FontSize.bodyLg, fontWeight: FontWeight.heavy, letterSpacing: -0.2 },
+  description: { fontSize: FontSize.bodySm, lineHeight: 19 },
   button: {
     alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 7,
-    marginTop: 4,
-    borderRadius: 12,
+    marginTop: Spacing.xs,
+    borderRadius: Radius.md,
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
-  buttonLabel: { fontSize: 13, fontWeight: '800' },
+  buttonLabel: { fontSize: FontSize.bodySm, fontWeight: FontWeight.bold },
   pressed: { opacity: 0.85 },
 });

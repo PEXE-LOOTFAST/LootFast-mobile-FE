@@ -1,5 +1,6 @@
 import { Alert, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Shadow, Spacing } from '@/constants/theme';
 import { Badge } from '@/components/ui/badge';
 import { ApiPendingCard } from '@/components/ui/api-pending-card';
 import { BrandButton } from '@/components/ui/brand-button';
@@ -83,41 +84,41 @@ export function SellerPlanScreen({ onBack }: { onBack: () => void }) {
 }
 
 const styles = StyleSheet.create({
-  upgrade: { minHeight: 46, borderRadius: 12 },
+  upgrade: { minHeight: 46, borderRadius: Radius.md },
   featureCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 12,
+    gap: Spacing.md,
     borderWidth: 1,
-    borderRadius: 20,
-    padding: 16,
-    boxShadow: '0px 4px 12px rgba(23, 33, 27, 0.05)',
+    borderRadius: Radius.xl,
+    padding: Spacing.lg,
+    boxShadow: Shadow.card,
   },
   featureIcon: {
     width: 36,
     height: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 18,
+    borderRadius: Radius.full,
   },
-  featureCopy: { flex: 1, gap: 8 },
+  featureCopy: { flex: 1, gap: Spacing.sm },
   featureTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: Spacing.sm,
   },
   stacked: { flexDirection: 'column', alignItems: 'flex-start' },
-  featureTitle: { flexShrink: 1, fontSize: 15, fontWeight: '800' },
-  featureDescription: { fontSize: 12.5, lineHeight: 19 },
+  featureTitle: { flexShrink: 1, fontSize: FontSize.bodyLg, fontWeight: FontWeight.bold },
+  featureDescription: { fontSize: FontSize.bodySm, lineHeight: 19 },
   policyCard: {
-    gap: 8,
+    gap: Spacing.sm,
     borderWidth: 1,
     borderStyle: 'dashed',
-    borderRadius: 20,
-    padding: 16,
+    borderRadius: Radius.xl,
+    padding: Spacing.lg,
   },
-  policyTitle: { fontSize: 14, fontWeight: '900', marginBottom: 2 },
-  policyItem: { fontSize: 12.5, lineHeight: 19 },
+  policyTitle: { fontSize: FontSize.body, fontWeight: FontWeight.heavy, marginBottom: Spacing.xxs },
+  policyItem: { fontSize: FontSize.bodySm, lineHeight: 19 },
 });

@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import type { MerchantPerformanceDto } from '@/features/seller/api/merchant-performance';
 import { useTheme } from '@/hooks/use-theme';
 import { formatPrice } from '@/lib/format';
@@ -61,28 +62,33 @@ export function PerformanceSummaryCard({ data }: Props) {
 }
 
 const styles = StyleSheet.create({
-  card: { borderWidth: 1, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 14 },
-  title: { fontSize: 16, fontWeight: '900', letterSpacing: -0.3 },
-  period: { fontSize: 12, fontWeight: '600', marginBottom: 6 },
+  card: {
+    borderWidth: 1,
+    borderRadius: Radius.xl,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: 14,
+  },
+  title: { fontSize: FontSize.subtitle, fontWeight: FontWeight.heavy, letterSpacing: -0.3 },
+  period: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium, marginBottom: 6 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 12,
+    gap: Spacing.md,
     paddingVertical: 10,
   },
-  rowLabel: { flexShrink: 1, fontSize: 13, fontWeight: '600' },
-  rowValue: { fontSize: 15, fontWeight: '800' },
+  rowLabel: { flexShrink: 1, fontSize: FontSize.bodySm, fontWeight: FontWeight.medium },
+  rowValue: { fontSize: FontSize.bodyLg, fontWeight: FontWeight.bold },
   divider: { height: StyleSheet.hairlineWidth },
-  sectionDivider: { height: 1, marginVertical: 8 },
-  sectionTitle: { fontSize: 14, fontWeight: '800', marginBottom: 4 },
+  sectionDivider: { height: 1, marginVertical: Spacing.sm },
+  sectionTitle: { fontSize: FontSize.body, fontWeight: FontWeight.bold, marginBottom: Spacing.xs },
   statusRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: Spacing.sm,
     paddingVertical: 6,
   },
-  statusDot: { width: 8, height: 8, borderRadius: 4 },
-  statusLabel: { flex: 1, fontSize: 13, fontWeight: '600' },
-  statusValue: { fontSize: 14, fontWeight: '800' },
+  statusDot: { width: 8, height: 8, borderRadius: Radius.full },
+  statusLabel: { flex: 1, fontSize: FontSize.bodySm, fontWeight: FontWeight.medium },
+  statusValue: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
 });

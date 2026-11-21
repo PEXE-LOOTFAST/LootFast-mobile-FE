@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { FontSize, FontWeight, Radius, Spacing, StaticColors } from '@/constants/theme';
 import { useKeyboardHeight } from '@/hooks/use-keyboard-height';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -121,25 +122,25 @@ export function RejectPaymentModal({
 }
 
 const styles = StyleSheet.create({
-  overlay: { flex: 1, justifyContent: 'center', paddingHorizontal: 16 },
-  backdrop: { backgroundColor: 'rgba(10, 20, 14, 0.55)' },
+  overlay: { flex: 1, justifyContent: 'center', paddingHorizontal: Spacing.lg },
+  backdrop: { backgroundColor: StaticColors.backdrop },
   card: {
     width: '100%',
     maxWidth: 420,
     alignSelf: 'center',
-    gap: 8,
-    borderRadius: 24,
+    gap: Spacing.sm,
+    borderRadius: Radius.xxl,
     padding: 22,
   },
-  title: { fontSize: 18, fontWeight: '900', letterSpacing: -0.3 },
-  message: { fontSize: 14, lineHeight: 20 },
+  title: { fontSize: FontSize.title, fontWeight: FontWeight.heavy, letterSpacing: -0.3 },
+  message: { fontSize: FontSize.body, lineHeight: 20 },
   input: {
     minHeight: 84,
     borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: 12,
+    borderRadius: Radius.md,
+    paddingHorizontal: Spacing.md,
     paddingVertical: 10,
-    fontSize: 14,
+    fontSize: FontSize.body,
     textAlignVertical: 'top',
     outlineWidth: 0,
   },
@@ -150,9 +151,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderRadius: 14,
-    paddingHorizontal: 12,
+    borderRadius: Radius.lg,
+    paddingHorizontal: Spacing.md,
   },
-  buttonLabel: { fontSize: 14, fontWeight: '800' },
+  buttonLabel: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
   pressed: { opacity: 0.85 },
 });

@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { Popover } from '@/components/ui/popover';
 import { SellerIcons } from '@/features/seller/constants/icons';
@@ -77,30 +78,30 @@ const styles = StyleSheet.create({
     flexBasis: '47%',
     gap: 6,
     borderWidth: 1,
-    borderRadius: 20,
+    borderRadius: Radius.xl,
     padding: 14,
   },
   topRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 6 },
-  label: { flex: 1, fontSize: 13, fontWeight: '700', lineHeight: 18 },
+  label: { flex: 1, fontSize: FontSize.bodySm, fontWeight: FontWeight.bold, lineHeight: 18 },
   help: {
     width: 18,
     height: 18,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderRadius: 9,
-    marginTop: 2,
+    borderRadius: Radius.full,
+    marginTop: Spacing.xxs,
   },
   iconBadge: {
     width: 30,
     height: 30,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 15,
+    borderRadius: Radius.full,
   },
-  value: { fontSize: 28, fontWeight: '900', letterSpacing: -0.8 },
-  caption: { fontSize: 12, fontWeight: '600', lineHeight: 16 },
-  hintTitle: { fontSize: 13, fontWeight: '800' },
-  hintBody: { fontSize: 12, lineHeight: 17 },
+  value: { fontSize: FontSize.display, fontWeight: FontWeight.heavy, letterSpacing: -0.8 },
+  caption: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium, lineHeight: 16 },
+  hintTitle: { fontSize: FontSize.bodySm, fontWeight: FontWeight.bold },
+  hintBody: { fontSize: FontSize.footnote, lineHeight: 17 },
   pressed: { opacity: 0.6 },
 });
