@@ -20,13 +20,14 @@ export const FontSize = {
 export type FontSizeToken = keyof typeof FontSize;
 
 /**
- * Độ đậm. App dùng chữ khá đậm: nội dung thường `medium`, nhãn/tiêu đề `bold`, số liệu nổi bật `heavy`.
+ * Độ đậm: nội dung thường `regular`/`medium`, nhãn và tiêu đề `bold`, số liệu nổi bật `heavy`.
+ * Giữ ở 700/800 thay vì 800/900: chữ quá đậm ở khắp nơi làm màn hình nặng và khó biết đâu là chỗ chính.
  */
 export const FontWeight = {
   regular: '400',
   medium: '600',
-  bold: '800',
-  heavy: '900',
+  bold: '700',
+  heavy: '800',
 } as const;
 
 export type FontWeightToken = keyof typeof FontWeight;

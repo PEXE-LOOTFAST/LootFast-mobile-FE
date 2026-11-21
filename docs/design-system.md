@@ -11,7 +11,7 @@ ESLint (`eslint.config.js`) chặn mã hex, `rgb()`/`rgba()`, và `fontSize`/`fo
 | `Spacing`    | `none xxs xs sm md lg xl xxl xxxl huge`                                                  | 0 2 4 8 12 16 20 24 32 48           |
 | `Radius`     | `none xs sm md lg xl xxl full`                                                           | 0 4 8 12 16 20 24 999               |
 | `FontSize`   | `micro caption footnote bodySm body bodyLg subtitle title titleLg headline display hero` | 10 11 12 13 14 15 16 18 20 22 28 34 |
-| `FontWeight` | `regular medium bold heavy`                                                              | 400 600 800 900                     |
+| `FontWeight` | `regular medium bold heavy`                                                              | 400 600 700 800                     |
 | `Shadow`     | `card raised floating overlay tabBar brand brandStrong`                                  | chuỗi `boxShadow`                   |
 
 `ScreenGutter` (lề trái/phải của màn, bằng `Spacing.lg`) và `MaxContentWidth` (800, bề rộng tối đa trên tablet/web) cũng lấy từ đây.
