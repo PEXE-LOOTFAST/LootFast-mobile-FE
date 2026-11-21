@@ -1,6 +1,7 @@
 import { Image } from 'expo-image';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { Icon } from '@/components/ui/icon';
 import { MAX_DEAL_IMAGES } from '@/features/seller/api/merchant-deals';
 import { SellerIcons } from '@/features/seller/constants/icons';
@@ -97,24 +98,24 @@ export function DealImagePicker({
 }
 
 const styles = StyleSheet.create({
-  container: { gap: 8 },
-  label: { fontSize: 13, fontWeight: '700' },
+  container: { gap: Spacing.sm },
+  label: { fontSize: FontSize.bodySm, fontWeight: FontWeight.bold },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   tile: {
     width: 96,
     height: 96,
     overflow: 'hidden',
     borderWidth: 2,
-    borderRadius: 14,
+    borderRadius: Radius.lg,
   },
   addTile: {
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 4,
+    gap: Spacing.xs,
     borderStyle: 'dashed',
     borderWidth: 1,
   },
-  addLabel: { fontSize: 11, fontWeight: '700' },
+  addLabel: { fontSize: FontSize.caption, fontWeight: FontWeight.bold },
   photo: { width: '100%', height: '100%' },
   primaryBadge: {
     position: 'absolute',
@@ -123,7 +124,7 @@ const styles = StyleSheet.create({
     right: 0,
     paddingVertical: 3,
   },
-  primaryLabel: { fontSize: 10, fontWeight: '800', textAlign: 'center' },
+  primaryLabel: { fontSize: FontSize.micro, fontWeight: FontWeight.bold, textAlign: 'center' },
   removeButton: {
     position: 'absolute',
     top: 4,
@@ -132,8 +133,8 @@ const styles = StyleSheet.create({
     height: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 11,
+    borderRadius: Radius.full,
   },
-  hint: { fontSize: 12, lineHeight: 17 },
+  hint: { fontSize: FontSize.footnote, lineHeight: 17 },
   pressed: { opacity: 0.7 },
 });

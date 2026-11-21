@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Shadow, Spacing } from '@/constants/theme';
 import { Icon } from '@/components/ui/icon';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import { SellerIcons } from '@/features/seller/constants/icons';
@@ -43,21 +44,21 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: Spacing.md,
     borderWidth: 1,
-    borderRadius: 18,
-    paddingHorizontal: 16,
+    borderRadius: Radius.xl,
+    paddingHorizontal: Spacing.lg,
     paddingVertical: 14,
-    boxShadow: '0px 4px 12px rgba(23, 33, 27, 0.05)',
+    boxShadow: Shadow.card,
   },
   copy: { flex: 1, gap: 3 },
-  title: { fontSize: 15, fontWeight: '800' },
-  subtitle: { fontSize: 12 },
+  title: { fontSize: FontSize.bodyLg, fontWeight: FontWeight.bold },
+  subtitle: { fontSize: FontSize.footnote },
   check: {
     width: 26,
     height: 26,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 13,
+    borderRadius: Radius.full,
   },
 });

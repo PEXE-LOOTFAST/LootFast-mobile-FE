@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
 import { TabHeader } from '@/components/ui/tab-header';
-import { MaxContentWidth } from '@/constants/theme';
+import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 type SellerPageScaffoldProps = {
@@ -45,6 +45,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     gap: 14,
     marginTop: 14,
-    paddingHorizontal: 16,
+    paddingHorizontal: Spacing.lg,
   },
 });

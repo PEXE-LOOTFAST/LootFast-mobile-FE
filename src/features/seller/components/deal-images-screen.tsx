@@ -2,6 +2,7 @@ import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { BrandButton } from '@/components/ui/brand-button';
 import { EmptyCard } from '@/components/ui/empty-card';
 import { Icon } from '@/components/ui/icon';
@@ -203,28 +204,33 @@ export function DealImagesScreen() {
 }
 
 const styles = StyleSheet.create({
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  tile: { width: '47%', overflow: 'hidden', borderWidth: 2, borderRadius: 16 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.md },
+  tile: { width: '47%', overflow: 'hidden', borderWidth: 2, borderRadius: Radius.lg },
   photo: { width: '100%', height: 120 },
   primaryBadge: {
     position: 'absolute',
     top: 8,
     left: 8,
-    borderRadius: 999,
-    paddingHorizontal: 8,
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.sm,
     paddingVertical: 3,
   },
-  primaryLabel: { fontSize: 10, fontWeight: '800' },
+  primaryLabel: { fontSize: FontSize.micro, fontWeight: FontWeight.bold },
   tileActions: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 8,
+    gap: Spacing.sm,
     paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingVertical: Spacing.sm,
   },
-  tileAction: { fontSize: 12, fontWeight: '800' },
-  hint: { fontSize: 12, lineHeight: 18 },
-  liveRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
-  liveLabel: { fontSize: 13, fontWeight: '600' },
+  tileAction: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold },
+  hint: { fontSize: FontSize.footnote, lineHeight: 18 },
+  liveRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+  },
+  liveLabel: { fontSize: FontSize.bodySm, fontWeight: FontWeight.medium },
 });

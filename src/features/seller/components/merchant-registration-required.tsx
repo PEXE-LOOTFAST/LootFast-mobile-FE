@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { BrandButton } from '@/components/ui/brand-button';
 import { Icon } from '@/components/ui/icon';
 import type { MerchantApplicationStatusDto } from '@/features/seller/api/merchant-application';
@@ -106,8 +107,13 @@ export function MerchantRegistrationRequired() {
 }
 
 const styles = StyleSheet.create({
-  card: { gap: 12, borderWidth: 1, borderRadius: 20, padding: 16 },
+  card: { gap: Spacing.md, borderWidth: 1, borderRadius: Radius.xl, padding: Spacing.lg },
   header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  title: { flex: 1, fontSize: 16, fontWeight: '900', letterSpacing: -0.2 },
-  body: { fontSize: 13, lineHeight: 20 },
+  title: {
+    flex: 1,
+    fontSize: FontSize.subtitle,
+    fontWeight: FontWeight.heavy,
+    letterSpacing: -0.2,
+  },
+  body: { fontSize: FontSize.bodySm, lineHeight: 20 },
 });

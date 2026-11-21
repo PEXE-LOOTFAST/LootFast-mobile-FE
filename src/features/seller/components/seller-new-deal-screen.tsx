@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { BrandButton } from '@/components/ui/brand-button';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { TextField } from '@/components/ui/text-field';
@@ -291,8 +292,8 @@ function NewDealForm({
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', gap: 12 },
+  row: { flexDirection: 'row', gap: Spacing.md },
   cell: { flex: 1 },
-  hint: { fontSize: 12, fontWeight: '600' },
-  note: { fontSize: 12, lineHeight: 18, textAlign: 'center' },
+  hint: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium },
+  note: { fontSize: FontSize.footnote, lineHeight: 18, textAlign: 'center' },
 });

@@ -2,6 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { BrandButton } from '@/components/ui/brand-button';
 import { EmptyCard } from '@/components/ui/empty-card';
 import { InlineAlert } from '@/components/ui/inline-alert';
@@ -209,7 +210,7 @@ function EditDealForm({
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', gap: 12 },
+  row: { flexDirection: 'row', gap: Spacing.md },
   cell: { flex: 1 },
-  hint: { fontSize: 12, fontWeight: '600' },
+  hint: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium },
 });

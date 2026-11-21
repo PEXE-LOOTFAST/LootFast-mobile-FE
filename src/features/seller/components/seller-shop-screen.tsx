@@ -3,7 +3,7 @@ import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'r
 
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
-import { MaxContentWidth } from '@/constants/theme';
+import { FontSize, FontWeight, MaxContentWidth, Radius, Shadow, Spacing } from '@/constants/theme';
 import { MenuSection, type MenuItem } from '@/components/ui/menu-section';
 import { MerchantRegistrationRequired } from '@/features/seller/components/merchant-registration-required';
 import { ShopSetupCard, getShopSetupSteps } from '@/features/seller/components/shop-setup-card';
@@ -142,28 +142,28 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     gap: 14,
     marginTop: 34,
-    paddingHorizontal: 16,
+    paddingHorizontal: Spacing.lg,
   },
   switchButton: {
     minHeight: 48,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: Spacing.sm,
     borderWidth: 1,
-    borderRadius: 22,
-    boxShadow: '0px 4px 10px rgba(23, 33, 27, 0.06)',
+    borderRadius: Radius.xxl,
+    boxShadow: Shadow.card,
   },
-  switchLabel: { fontSize: 14, fontWeight: '800' },
+  switchLabel: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
   signOut: {
     minHeight: 48,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: Spacing.sm,
     borderWidth: 1,
-    borderRadius: 22,
+    borderRadius: Radius.xxl,
   },
-  signOutLabel: { fontSize: 14, fontWeight: '800' },
+  signOutLabel: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
   pressed: { opacity: 0.8 },
 });

@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text } from 'react-native';
 
+import { FontSize } from '@/constants/theme';
 import { BrandButton } from '@/components/ui/brand-button';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { TextField } from '@/components/ui/text-field';
@@ -150,5 +151,5 @@ function BankAccountForm({ account }: { account?: MerchantBankAccountDto }) {
 }
 
 const styles = StyleSheet.create({
-  note: { fontSize: 13, lineHeight: 19 },
+  note: { fontSize: FontSize.bodySm, lineHeight: 19 },
 });

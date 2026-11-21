@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Icon } from '@/components/ui/icon';
-import { MaxContentWidth } from '@/constants/theme';
+import { FontSize, FontWeight, MaxContentWidth, Radius, Shadow, Spacing } from '@/constants/theme';
 import { MenuSection, type MenuItem } from '@/components/ui/menu-section';
 import { SellerHeader } from '@/features/seller/components/seller-header';
 import { SellerIcons } from '@/features/seller/constants/icons';
@@ -95,28 +95,28 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     gap: 14,
     marginTop: 14,
-    paddingHorizontal: 16,
+    paddingHorizontal: Spacing.lg,
   },
   switchButton: {
     minHeight: 48,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: Spacing.sm,
     borderWidth: 1,
-    borderRadius: 22,
-    boxShadow: '0px 4px 10px rgba(23, 33, 27, 0.06)',
+    borderRadius: Radius.xxl,
+    boxShadow: Shadow.card,
   },
-  switchLabel: { fontSize: 14, fontWeight: '800' },
+  switchLabel: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
   signOut: {
     minHeight: 48,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: Spacing.sm,
     borderWidth: 1,
-    borderRadius: 22,
+    borderRadius: Radius.xxl,
   },
-  signOutLabel: { fontSize: 14, fontWeight: '800' },
+  signOutLabel: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
   pressed: { opacity: 0.8 },
 });

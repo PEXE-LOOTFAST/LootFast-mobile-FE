@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { DealImage } from '@/features/home/components/deal-image';
 import { SellerIcons } from '@/features/seller/constants/icons';
@@ -73,7 +74,10 @@ export function SellerDealCard({
           <Text
             style={[
               styles.meta,
-              { color: isRunning ? theme.primary : theme.textSecondary, fontWeight: '700' },
+              {
+                color: isRunning ? theme.primary : theme.textSecondary,
+                fontWeight: FontWeight.bold,
+              },
             ]}
           >
             {isRunning ? `Nhận đặt đến ${deal.saleEndsLabel}` : `Đã đóng từ ${deal.saleEndsLabel}`}
@@ -168,42 +172,62 @@ const styles = StyleSheet.create({
     flexBasis: '47%',
     overflow: 'hidden',
     borderWidth: 1,
-    borderRadius: 20,
+    borderRadius: Radius.xl,
   },
   image: { height: 118, width: '100%' },
-  body: { gap: 5, padding: 12 },
+  body: { gap: 5, padding: Spacing.md },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  name: { flexShrink: 1, fontSize: 14, fontWeight: '900', letterSpacing: -0.2 },
-  badge: { borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
-  badgeLabel: { fontSize: 10.5, fontWeight: '800' },
-  meta: { fontSize: 12, fontWeight: '600', lineHeight: 17 },
+  name: {
+    flexShrink: 1,
+    fontSize: FontSize.body,
+    fontWeight: FontWeight.heavy,
+    letterSpacing: -0.2,
+  },
+  badge: { borderRadius: Radius.full, paddingHorizontal: Spacing.sm, paddingVertical: 3 },
+  badgeLabel: { fontSize: FontSize.caption, fontWeight: FontWeight.bold },
+  meta: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium, lineHeight: 17 },
   stepper: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginTop: 4,
-    borderRadius: 14,
-    padding: 8,
+    marginTop: Spacing.xs,
+    borderRadius: Radius.lg,
+    padding: Spacing.sm,
   },
-  stepperLabel: { flex: 1, fontSize: 11.5, fontWeight: '700', lineHeight: 15 },
+  stepperLabel: {
+    flex: 1,
+    fontSize: FontSize.footnote,
+    fontWeight: FontWeight.bold,
+    lineHeight: 15,
+  },
   stepperButton: {
     width: 28,
     height: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 14,
+    borderRadius: Radius.full,
   },
-  stepperValue: { minWidth: 20, fontSize: 15, fontWeight: '900', textAlign: 'center' },
+  stepperValue: {
+    minWidth: 20,
+    fontSize: FontSize.bodyLg,
+    fontWeight: FontWeight.heavy,
+    textAlign: 'center',
+  },
   footer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 8,
+    gap: Spacing.sm,
     marginTop: 6,
   },
-  detailButton: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 },
-  detailLabel: { fontSize: 12.5, fontWeight: '800' },
-  pauseLabel: { fontSize: 12.5, fontWeight: '800' },
+  detailButton: {
+    borderWidth: 1,
+    borderRadius: Radius.full,
+    paddingHorizontal: 14,
+    paddingVertical: Spacing.sm,
+  },
+  detailLabel: { fontSize: FontSize.bodySm, fontWeight: FontWeight.bold },
+  pauseLabel: { fontSize: FontSize.bodySm, fontWeight: FontWeight.bold },
   disabled: { opacity: 0.4 },
   pressed: { opacity: 0.85 },
 });

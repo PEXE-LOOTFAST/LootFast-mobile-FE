@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { Fragment } from 'react';
 import { StyleSheet, Switch, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Shadow, Spacing, StaticColors } from '@/constants/theme';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import { updateSellerNotifications } from '@/features/seller/data/seller-profile-store';
 import { useSellerProfile } from '@/features/seller/hooks/use-seller-profile';
@@ -52,11 +53,11 @@ export function SellerNotificationSettingsScreen() {
               <Switch
                 accessibilityLabel={option.title}
                 onValueChange={(value) => updateSellerNotifications({ [option.key]: value })}
-                thumbColor="#FFFFFF"
+                thumbColor={StaticColors.white}
                 trackColor={{ false: theme.border, true: theme.primary }}
                 value={notifications[option.key]}
                 // Web tô màu thumb theo activeThumbColor thay vì thumbColor.
-                {...{ activeThumbColor: '#FFFFFF' }}
+                {...{ activeThumbColor: StaticColors.white }}
               />
             </View>
           </Fragment>
@@ -70,12 +71,12 @@ const styles = StyleSheet.create({
   card: {
     overflow: 'hidden',
     borderWidth: 1,
-    borderRadius: 18,
-    boxShadow: '0px 4px 12px rgba(23, 33, 27, 0.05)',
+    borderRadius: Radius.xl,
+    boxShadow: Shadow.card,
   },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, padding: Spacing.lg },
   copy: { flex: 1, gap: 3 },
-  title: { fontSize: 14, fontWeight: '800' },
-  description: { fontSize: 12, lineHeight: 17 },
+  title: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
+  description: { fontSize: FontSize.footnote, lineHeight: 17 },
   divider: { height: 1 },
 });

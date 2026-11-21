@@ -1,5 +1,6 @@
 import { Text } from 'react-native';
 
+import { FontWeight } from '@/constants/theme';
 import { TextField } from '@/components/ui/text-field';
 import { useTheme } from '@/hooks/use-theme';
 import { formatThousands } from '@/lib/format';
@@ -26,7 +27,7 @@ export function PriceField({ label, value, error, placeholder, onChange }: Price
       label={label}
       onChangeText={(text) => onChange(text.replace(/\D/g, '').slice(0, MAX_PRICE_DIGITS))}
       placeholder={placeholder ? formatThousands(placeholder) : undefined}
-      trailing={<Text style={{ color: theme.textSecondary, fontWeight: '700' }}>đ</Text>}
+      trailing={<Text style={{ color: theme.textSecondary, fontWeight: FontWeight.bold }}>đ</Text>}
       value={formatThousands(value)}
     />
   );

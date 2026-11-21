@@ -1,5 +1,6 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { Chip } from '@/components/ui/chip';
 import { SellerFormCard } from '@/features/seller/components/seller-form-card';
 import { TimeInputField } from '@/features/seller/components/time-input-field';
@@ -162,16 +163,16 @@ function ShortcutButton({ label, onPress }: { label: string; onPress: () => void
 }
 
 const styles = StyleSheet.create({
-  group: { gap: 8 },
-  groupLabel: { fontSize: 12, fontWeight: '800' },
-  chips: { gap: 8 },
+  group: { gap: Spacing.sm },
+  groupLabel: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold },
+  chips: { gap: Spacing.sm },
   row: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   rowItem: { flex: 1 },
-  dash: { marginTop: 32, fontSize: 16, fontWeight: '700' },
-  summary: { fontSize: 12, fontWeight: '700' },
+  dash: { marginTop: Spacing.xxxl, fontSize: FontSize.subtitle, fontWeight: FontWeight.bold },
+  summary: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold },
   dayHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   shortcuts: { flexDirection: 'row', gap: 14 },
-  shortcut: { fontSize: 12, fontWeight: '800' },
+  shortcut: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold },
   days: { flexDirection: 'row', gap: 6 },
   day: {
     flex: 1,
@@ -179,10 +180,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: Radius.md,
   },
-  dayLabel: { fontSize: 12, fontWeight: '800' },
-  error: { fontSize: 12, fontWeight: '600' },
-  hint: { fontSize: 12, lineHeight: 17 },
+  dayLabel: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold },
+  error: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium },
+  hint: { fontSize: FontSize.footnote, lineHeight: 17 },
   pressed: { opacity: 0.8 },
 });

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { Chip } from '@/components/ui/chip';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { SelectField } from '@/components/ui/select-field';
@@ -324,10 +325,10 @@ function SectionTitle({ icon, label }: { icon: IconName; label: string }) {
 }
 
 const styles = StyleSheet.create({
-  sectionTitle: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
-  sectionLabel: { fontSize: 13, fontWeight: '900' },
+  sectionTitle: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: Spacing.xxs },
+  sectionLabel: { fontSize: FontSize.bodySm, fontWeight: FontWeight.heavy },
   multiline: { minHeight: 64, textAlignVertical: 'top' },
-  group: { gap: 8 },
+  group: { gap: Spacing.sm },
   rowWide: { flex: 1.4 },
   mapColumn: { flex: 1, gap: 7 },
   mapButton: {
@@ -337,16 +338,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     borderWidth: 1,
-    borderRadius: 14,
-    paddingHorizontal: 8,
+    borderRadius: Radius.lg,
+    paddingHorizontal: Spacing.sm,
   },
-  mapButtonLabel: { fontSize: 13, fontWeight: '800' },
-  groupLabel: { fontSize: 12, fontWeight: '800' },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  error: { fontSize: 12, fontWeight: '600' },
+  mapButtonLabel: { fontSize: FontSize.bodySm, fontWeight: FontWeight.bold },
+  groupLabel: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
+  error: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium },
   row: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   rowItem: { flex: 1 },
   stack: { gap: 10 },
-  hint: { fontSize: 12, lineHeight: 17 },
+  hint: { fontSize: FontSize.footnote, lineHeight: 17 },
   pressed: { opacity: 0.8 },
 });

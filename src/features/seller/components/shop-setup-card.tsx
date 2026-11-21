@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { Icon } from '@/components/ui/icon';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import type {
@@ -102,21 +103,21 @@ export function ShopSetupCard(props: ShopSetupCardProps) {
 }
 
 const styles = StyleSheet.create({
-  card: { gap: 12, borderWidth: 1.5, borderRadius: 20, padding: 16 },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  card: { gap: Spacing.md, borderWidth: 1.5, borderRadius: Radius.xl, padding: Spacing.lg },
+  header: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
   icon: {
     width: 40,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 20,
+    borderRadius: Radius.full,
   },
-  copy: { flex: 1, gap: 2 },
-  title: { fontSize: 15, fontWeight: '900' },
-  subtitle: { fontSize: 12, lineHeight: 17 },
-  steps: { gap: 8, paddingLeft: 4 },
-  step: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  stepLabel: { fontSize: 13, fontWeight: '700' },
-  stepDone: { textDecorationLine: 'line-through', fontWeight: '500' },
+  copy: { flex: 1, gap: Spacing.xxs },
+  title: { fontSize: FontSize.bodyLg, fontWeight: FontWeight.heavy },
+  subtitle: { fontSize: FontSize.footnote, lineHeight: 17 },
+  steps: { gap: Spacing.sm, paddingLeft: Spacing.xs },
+  step: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
+  stepLabel: { fontSize: FontSize.bodySm, fontWeight: FontWeight.bold },
+  stepDone: { textDecorationLine: 'line-through', fontWeight: FontWeight.medium },
   pressed: { opacity: 0.85 },
 });

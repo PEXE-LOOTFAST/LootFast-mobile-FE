@@ -4,7 +4,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
 import { BrandButton } from '@/components/ui/brand-button';
 import { InlineAlert } from '@/components/ui/inline-alert';
-import { MaxContentWidth } from '@/constants/theme';
+import { FontSize, MaxContentWidth, Spacing } from '@/constants/theme';
 import {
   saveShopInfo,
   toShopErrorMessage,
@@ -107,7 +107,9 @@ function ShopInfoGate({ shop }: { shop: MerchantShop }) {
       <>
         <ActivityIndicator color={theme.primary} />
         {phase === 'applying' ? (
-          <Text style={{ color: theme.textSecondary, fontSize: 13, textAlign: 'center' }}>
+          <Text
+            style={{ color: theme.textSecondary, fontSize: FontSize.bodySm, textAlign: 'center' }}
+          >
             Đang lưu thông tin quán bạn đã nhập khi đăng ký…
           </Text>
         ) : null}
@@ -194,7 +196,7 @@ const styles = StyleSheet.create({
     maxWidth: MaxContentWidth,
     alignSelf: 'center',
     gap: 10,
-    marginTop: 12,
-    paddingHorizontal: 16,
+    marginTop: Spacing.md,
+    paddingHorizontal: Spacing.lg,
   },
 });

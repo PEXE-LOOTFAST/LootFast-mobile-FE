@@ -2,6 +2,7 @@ import DateTimePicker, { type DateTimePickerEvent } from '@react-native-communit
 import { useState } from 'react';
 import { Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing, StaticColors } from '@/constants/theme';
 import { Icon } from '@/components/ui/icon';
 import { TextField } from '@/components/ui/text-field';
 import { SellerIcons } from '@/features/seller/constants/icons';
@@ -126,16 +127,16 @@ export function TimeInputField({
 const styles = StyleSheet.create({
   pickerButton: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center' },
   pressed: { opacity: 0.8 },
-  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.35)' },
+  backdrop: { flex: 1, backgroundColor: StaticColors.backdrop },
   sheet: {
     alignItems: 'center',
-    gap: 4,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingTop: 16,
+    gap: Spacing.xs,
+    borderTopLeftRadius: Radius.xl,
+    borderTopRightRadius: Radius.xl,
+    paddingTop: Spacing.lg,
     paddingBottom: 28,
   },
-  sheetTitle: { fontSize: 14, fontWeight: '800' },
-  sheetDone: { paddingHorizontal: 24, paddingVertical: 8 },
-  sheetDoneLabel: { fontSize: 15, fontWeight: '800' },
+  sheetTitle: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
+  sheetDone: { paddingHorizontal: Spacing.xxl, paddingVertical: Spacing.sm },
+  sheetDoneLabel: { fontSize: FontSize.bodyLg, fontWeight: FontWeight.bold },
 });

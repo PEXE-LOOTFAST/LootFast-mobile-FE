@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius } from '@/constants/theme';
 import {
   getSuggestedPlace,
   suggestAddresses,
@@ -69,7 +70,7 @@ export function AddressSuggestions({ query, onSelect }: AddressSuggestionsProps)
 }
 
 const styles = StyleSheet.create({
-  list: { borderWidth: 1, borderRadius: 14, overflow: 'hidden' },
+  list: { borderWidth: 1, borderRadius: Radius.lg, overflow: 'hidden' },
   item: { paddingHorizontal: 14, paddingVertical: 10 },
-  text: { fontSize: 13, fontWeight: '600' },
+  text: { fontSize: FontSize.bodySm, fontWeight: FontWeight.medium },
 });

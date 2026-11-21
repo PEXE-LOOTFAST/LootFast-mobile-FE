@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { DEAL_CATEGORIES } from '@/features/home/constants/deal-categories';
 import type { DealStatusDto, MerchantDealDto } from '@/features/seller/api/merchant-deals';
 import { toTimeInput, vietnamDateKey } from '@/features/seller/deal-schedule';
@@ -63,9 +64,14 @@ export function DealInfoCard({ deal }: { deal: MerchantDealDto }) {
 }
 
 const styles = StyleSheet.create({
-  card: { gap: 10, borderWidth: 1, borderRadius: 16, padding: 16 },
-  name: { fontSize: 16, fontWeight: '800' },
-  row: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
-  label: { fontSize: 13, fontWeight: '600' },
-  value: { flexShrink: 1, fontSize: 13, fontWeight: '700', textAlign: 'right' },
+  card: { gap: 10, borderWidth: 1, borderRadius: Radius.lg, padding: Spacing.lg },
+  name: { fontSize: FontSize.subtitle, fontWeight: FontWeight.bold },
+  row: { flexDirection: 'row', justifyContent: 'space-between', gap: Spacing.md },
+  label: { fontSize: FontSize.bodySm, fontWeight: FontWeight.medium },
+  value: {
+    flexShrink: 1,
+    fontSize: FontSize.bodySm,
+    fontWeight: FontWeight.bold,
+    textAlign: 'right',
+  },
 });

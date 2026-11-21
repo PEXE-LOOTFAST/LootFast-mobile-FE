@@ -2,6 +2,7 @@ import { Image } from 'expo-image';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { BrandButton } from '@/components/ui/brand-button';
 import { EmptyCard } from '@/components/ui/empty-card';
 import { Icon } from '@/components/ui/icon';
@@ -259,24 +260,29 @@ function SubmitApplicationForm() {
 }
 
 const styles = StyleSheet.create({
-  intro: { fontSize: 13, lineHeight: 20 },
-  sectionTitle: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
-  sectionLabel: { fontSize: 13, fontWeight: '900' },
-  card: { gap: 12, borderWidth: 1, borderRadius: 20, padding: 16 },
+  intro: { fontSize: FontSize.bodySm, lineHeight: 20 },
+  sectionTitle: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: Spacing.xs },
+  sectionLabel: { fontSize: FontSize.bodySm, fontWeight: FontWeight.heavy },
+  card: { gap: Spacing.md, borderWidth: 1, borderRadius: Radius.xl, padding: Spacing.lg },
   cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  cardTitle: { flex: 1, fontSize: 16, fontWeight: '900', letterSpacing: -0.2 },
-  cardBody: { fontSize: 13, lineHeight: 20 },
-  facts: { gap: 4 },
-  fact: { fontSize: 13, fontWeight: '500' },
+  cardTitle: {
+    flex: 1,
+    fontSize: FontSize.subtitle,
+    fontWeight: FontWeight.heavy,
+    letterSpacing: -0.2,
+  },
+  cardBody: { fontSize: FontSize.bodySm, lineHeight: 20 },
+  facts: { gap: Spacing.xs },
+  fact: { fontSize: FontSize.bodySm, fontWeight: FontWeight.medium },
   picker: {
     overflow: 'hidden',
     borderWidth: 1,
-    borderRadius: 16,
+    borderRadius: Radius.lg,
     borderStyle: 'dashed',
   },
-  pickerEmpty: { alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 28 },
-  pickerLabel: { fontSize: 14, fontWeight: '800' },
-  pickerHint: { fontSize: 12 },
+  pickerEmpty: { alignItems: 'center', gap: 6, paddingHorizontal: Spacing.lg, paddingVertical: 28 },
+  pickerLabel: { fontSize: FontSize.body, fontWeight: FontWeight.bold },
+  pickerHint: { fontSize: FontSize.footnote },
   preview: { width: '100%', height: 200 },
   pressed: { opacity: 0.85 },
 });
