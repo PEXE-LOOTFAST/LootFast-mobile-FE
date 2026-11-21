@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { Chip } from '@/components/ui/chip';
 import { BrandButton } from '@/components/ui/brand-button';
 import { EmptyCard } from '@/components/ui/empty-card';
 import { ErrorState } from '@/components/ui/error-state';
@@ -44,24 +45,17 @@ export function OrderListScreen() {
             {STATUS_TABS.map((tab) => {
               const active = tab.value === status;
               return (
-                <Pressable
+                <Chip
                   key={tab.value}
-                  accessibilityRole="tab"
-                  accessibilityState={{ selected: active }}
+                  label={tab.label}
                   onPress={() => {
                     setStatus(tab.value);
                     setPage(0);
                   }}
-                  style={[
-                    styles.tab,
-                    {
-                      backgroundColor: active ? theme.primary : theme.backgroundElement,
-                      borderColor: active ? theme.primary : theme.border,
-                    },
-                  ]}
-                >
-                  <Text style={{ color: active ? theme.onPrimary : theme.text }}>{tab.label}</Text>
-                </Pressable>
+                  role="tab"
+                  selected={active}
+                  size="md"
+                />
               );
             })}
           </ScrollView>
@@ -164,7 +158,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   tabs: { gap: 8, paddingRight: 16 },
-  tab: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 10 },
   card: { gap: 8, borderWidth: 1, borderRadius: 18, padding: 16 },
   pressed: { opacity: 0.8 },
   cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 12 },

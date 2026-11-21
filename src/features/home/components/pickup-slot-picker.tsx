@@ -1,5 +1,6 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { Chip } from '@/components/ui/chip';
 import { Icon } from '@/components/ui/icon';
 import { HomeIcons } from '@/features/home/constants/icons';
 import type { PickupSlot } from '@/features/home/pickup-slots';
@@ -46,31 +47,15 @@ export function PickupSlotPicker({
               const isSelected = slot.from === selected?.from && slot.to === selected?.to;
 
               return (
-                <Pressable
+                <Chip
                   key={`${slot.from}-${slot.to}`}
                   accessibilityLabel={`Đến lấy lúc ${slot.label}`}
-                  accessibilityRole="radio"
-                  accessibilityState={{ selected: isSelected, disabled }}
                   disabled={disabled}
+                  label={slot.label}
                   onPress={() => onSelect(slot)}
-                  style={({ pressed }) => [
-                    styles.chip,
-                    isSelected
-                      ? { backgroundColor: theme.primary, borderColor: theme.primary }
-                      : { backgroundColor: theme.background, borderColor: theme.border },
-                    (pressed || disabled) && styles.pressed,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.chipLabel,
-                      { color: isSelected ? theme.onPrimary : theme.text },
-                      isSelected && styles.chipLabelSelected,
-                    ]}
-                  >
-                    {slot.label}
-                  </Text>
-                </Pressable>
+                  role="radio"
+                  selected={isSelected}
+                />
               );
             })}
           </ScrollView>
@@ -89,10 +74,6 @@ const styles = StyleSheet.create({
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   title: { fontSize: 14, fontWeight: '800' },
   chips: { gap: 8 },
-  chip: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7 },
-  chipLabel: { fontSize: 12, fontWeight: '600' },
-  chipLabelSelected: { fontWeight: '800' },
   hint: { fontSize: 12, lineHeight: 17 },
   empty: { fontSize: 13, lineHeight: 19, fontWeight: '600' },
-  pressed: { opacity: 0.8 },
 });

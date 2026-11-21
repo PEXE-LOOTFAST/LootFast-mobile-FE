@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { Chip } from '@/components/ui/chip';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { SelectField } from '@/components/ui/select-field';
 import { TextField } from '@/components/ui/text-field';
@@ -98,29 +99,13 @@ export function ShopInfoFields({
               const isSelected = values.businessCategory === category.code;
 
               return (
-                <Pressable
+                <Chip
                   key={category.code}
-                  accessibilityRole="radio"
-                  accessibilityState={{ selected: isSelected }}
+                  label={category.name}
                   onPress={() => onChange('businessCategory', category.code)}
-                  style={({ pressed }) => [
-                    styles.chip,
-                    isSelected
-                      ? { backgroundColor: theme.primary, borderColor: theme.primary }
-                      : { backgroundColor: theme.background, borderColor: theme.border },
-                    pressed && styles.pressed,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.chipLabel,
-                      { color: isSelected ? theme.onPrimary : theme.text },
-                      isSelected && styles.chipLabelSelected,
-                    ]}
-                  >
-                    {category.name}
-                  </Text>
-                </Pressable>
+                  role="radio"
+                  selected={isSelected}
+                />
               );
             })}
           </View>
@@ -358,9 +343,6 @@ const styles = StyleSheet.create({
   mapButtonLabel: { fontSize: 13, fontWeight: '800' },
   groupLabel: { fontSize: 12, fontWeight: '800' },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 9 },
-  chipLabel: { fontSize: 12, fontWeight: '600' },
-  chipLabelSelected: { fontWeight: '800' },
   error: { fontSize: 12, fontWeight: '600' },
   row: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   rowItem: { flex: 1 },

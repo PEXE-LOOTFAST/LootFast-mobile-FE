@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { Chip } from '@/components/ui/chip';
 import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
 import { BrandButton } from '@/components/ui/brand-button';
 import { EmptyCard } from '@/components/ui/empty-card';
@@ -305,29 +306,13 @@ export function ProfileInfoScreen() {
                       const isSelected = values.categories.includes(category.code);
 
                       return (
-                        <Pressable
+                        <Chip
                           key={category.code}
-                          accessibilityRole="checkbox"
-                          accessibilityState={{ checked: isSelected }}
+                          label={category.name}
                           onPress={() => toggleCategory(category.code)}
-                          style={({ pressed }) => [
-                            styles.chip,
-                            isSelected
-                              ? { backgroundColor: theme.primary, borderColor: theme.primary }
-                              : { backgroundColor: theme.background, borderColor: theme.border },
-                            pressed && styles.pressed,
-                          ]}
-                        >
-                          <Text
-                            style={[
-                              styles.chipLabel,
-                              { color: isSelected ? theme.onPrimary : theme.text },
-                              isSelected && styles.chipLabelSelected,
-                            ]}
-                          >
-                            {category.name}
-                          </Text>
-                        </Pressable>
+                          role="checkbox"
+                          selected={isSelected}
+                        />
                       );
                     })}
                   </View>
@@ -414,9 +399,6 @@ const styles = StyleSheet.create({
   groupLabel: { fontSize: 12, fontWeight: '800' },
   count: { fontSize: 12 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  chip: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7 },
-  chipLabel: { fontSize: 12, fontWeight: '600' },
-  chipLabelSelected: { fontWeight: '800' },
   errorText: { fontSize: 12, fontWeight: '600' },
   pressed: { opacity: 0.8 },
   saveBar: {

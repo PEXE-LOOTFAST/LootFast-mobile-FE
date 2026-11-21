@@ -1,5 +1,6 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { Chip } from '@/components/ui/chip';
 import { SellerFormCard } from '@/features/seller/components/seller-form-card';
 import { TimeInputField } from '@/features/seller/components/time-input-field';
 import {
@@ -53,33 +54,17 @@ export function OpeningHoursFields({ values, errors, onChange }: OpeningHoursFie
           const isSelected = values.open === preset.open && values.close === preset.close;
 
           return (
-            <Pressable
+            <Chip
               key={preset.label}
               accessibilityLabel={`${preset.label}, ${preset.open} đến ${preset.close}`}
-              accessibilityRole="button"
-              accessibilityState={{ selected: isSelected }}
+              label={`${preset.label} · ${preset.open}–${preset.close}`}
               onPress={() => {
                 onChange('open', preset.open);
                 onChange('close', preset.close);
               }}
-              style={({ pressed }) => [
-                styles.chip,
-                isSelected
-                  ? { backgroundColor: theme.primary, borderColor: theme.primary }
-                  : { backgroundColor: theme.background, borderColor: theme.border },
-                pressed && styles.pressed,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.chipLabel,
-                  { color: isSelected ? theme.onPrimary : theme.text },
-                  isSelected && styles.chipLabelSelected,
-                ]}
-              >
-                {preset.label} · {preset.open}–{preset.close}
-              </Text>
-            </Pressable>
+              role="radio"
+              selected={isSelected}
+            />
           );
         })}
       </ScrollView>
@@ -180,9 +165,6 @@ const styles = StyleSheet.create({
   group: { gap: 8 },
   groupLabel: { fontSize: 12, fontWeight: '800' },
   chips: { gap: 8 },
-  chip: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7 },
-  chipLabel: { fontSize: 12, fontWeight: '600' },
-  chipLabelSelected: { fontWeight: '800' },
   row: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   rowItem: { flex: 1 },
   dash: { marginTop: 32, fontSize: 16, fontWeight: '700' },
