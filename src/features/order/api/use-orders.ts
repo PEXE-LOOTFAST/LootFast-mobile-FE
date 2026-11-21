@@ -25,7 +25,8 @@ export function useOrders(status: OrderListStatusDto) {
 
 /**
  * Đặt giữ deal. Đặt xong phải làm mới feed deal: số suất còn lại vừa giảm ở server, để nguyên
- * thì trang chủ và màn chi tiết vẫn hiện số cũ.
+ * thì trang chủ và màn chi tiết vẫn hiện số cũ. Tab Đơn hàng luôn được giữ trong bộ nhớ nên cũng
+ * phải làm mới danh sách đơn, không thì đơn vừa đặt chỉ hiện sau khi khách kéo để tải lại.
  */
 export function useCreateOrder() {
   const queryClient = useQueryClient();
@@ -33,6 +34,7 @@ export function useCreateOrder() {
   return useMutation({
     mutationFn: (payload: CreateOrderPayload) => createOrder(payload),
     onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEY });
       void queryClient.invalidateQueries({ queryKey: ['deals'] });
       void queryClient.invalidateQueries({ queryKey: ['deal'] });
     },
