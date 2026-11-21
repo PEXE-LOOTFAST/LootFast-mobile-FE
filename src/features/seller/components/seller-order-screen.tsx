@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
 import { EmptyCard } from '@/components/ui/empty-card';
@@ -11,7 +11,9 @@ import { toMerchantOrderErrorMessage } from '@/features/seller/api/merchant-orde
 import { useConfirmPickup } from '@/features/seller/api/use-merchant-orders';
 import {
   toSellerDeal,
+  useHideDeal,
   useMerchantDeals,
+  useRestoreDeal,
   useUpdateDealQuantity,
 } from '@/features/seller/api/use-merchant-deals';
 import { IncomingOrdersSection } from '@/features/seller/components/incoming-orders-section';
@@ -21,8 +23,9 @@ import { SellerDealCard } from '@/features/seller/components/seller-deal-card';
 import { SellerHeaderWithAction } from '@/features/seller/components/seller-header';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { SELLER_ORDER_TABS } from '@/features/seller/constants/seller-order-tabs';
-import type { SellerOrderTab } from '@/features/seller/types';
+import type { SellerDeal, SellerOrderTab } from '@/features/seller/types';
 import { useTheme } from '@/hooks/use-theme';
+import { confirmAction } from '@/lib/confirm';
 import { showToast } from '@/lib/toast';
 
 /**
@@ -37,6 +40,8 @@ export function SellerOrderScreen() {
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const dealsQuery = useMerchantDeals();
   const updateQuantity = useUpdateDealQuantity();
+  const hideDeal = useHideDeal();
+  const restoreDeal = useRestoreDeal();
   const confirmPickup = useConfirmPickup();
 
   const dealDtos = dealsQuery.data?.items ?? [];
@@ -58,6 +63,26 @@ export function SellerOrderScreen() {
     });
   };
 
+  // Tạm dừng = ẩn khỏi người mua; đơn khách đã đặt vẫn giữ nguyên nên quán vẫn phải giao.
+  const pauseDeal = (deal: SellerDeal) =>
+    confirmAction({
+      title: 'Tạm dừng deal này?',
+      message: `Khách sẽ không thấy “${deal.name}” nữa. Đơn đã đặt vẫn giữ, quán vẫn giao như bình thường. Bạn mở bán lại được trong giờ bán.`,
+      confirmLabel: 'Tạm dừng',
+      isDestructive: true,
+      onConfirm: () =>
+        hideDeal.mutate(deal.id, {
+          onSuccess: () => showToast('Đã tạm dừng deal', { tone: 'success' }),
+          onError: (error) => showToast(toMerchantDealErrorMessage(error), { tone: 'error' }),
+        }),
+    });
+
+  const resumeDeal = (deal: SellerDeal) =>
+    restoreDeal.mutate(deal.id, {
+      onSuccess: () => showToast('Deal đã mở bán lại', { tone: 'success' }),
+      onError: (error) => showToast(toMerchantDealErrorMessage(error), { tone: 'error' }),
+    });
+
   const renderDeals = (list: typeof deals, empty: { title: string; description: string }) => {
     if (dealsQuery.isLoading) {
       return <ActivityIndicator color={theme.primary} size="large" style={styles.loader} />;
@@ -77,9 +102,8 @@ export function SellerOrderScreen() {
             onPressDetail={() =>
               router.navigate({ pathname: '/seller/deal-images', params: { dealId: deal.id } })
             }
-            onPressPause={() =>
-              Alert.alert('Tạm dừng deal', 'Backend chưa có API ẩn hoặc tạm dừng deal.')
-            }
+            onPressPause={() => pauseDeal(deal)}
+            onPressResume={() => resumeDeal(deal)}
             portionsLeft={Math.max(deal.portionsTotal - deal.portionsSold, 0)}
           />
         ))}
@@ -119,8 +143,8 @@ export function SellerOrderScreen() {
 
           {tab === 'ended'
             ? renderDeals(endedDeals, {
-                title: 'Chưa có deal đã kết thúc',
-                description: 'Deal hết hàng hoặc hết hạn sẽ xuất hiện tại đây.',
+                title: 'Chưa có deal nào dừng bán',
+                description: 'Deal hết hàng, hết giờ hoặc bạn tạm dừng sẽ nằm ở đây.',
               })
             : null}
         </View>

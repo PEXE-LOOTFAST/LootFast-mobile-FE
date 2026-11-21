@@ -3,10 +3,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createMerchantDeal,
   getMerchantDeal,
+  hideMerchantDeal,
   listMerchantDeals,
   publishMerchantDeal,
   removeDealImage,
   reorderDealImages,
+  restoreMerchantDeal,
   updateMerchantDeal,
   updateMerchantDealQuantity,
   uploadDealImage,
@@ -31,7 +33,7 @@ export function toSellerDeal(deal: MerchantDealDto): SellerDeal {
   const isOpen = Date.now() < new Date(deal.saleEndsAt).getTime();
   const isRunning = deal.status === 'DRAFT' || (deal.status === 'ACTIVE' && isOpen);
   const endedReason: SellerDeal['endedReason'] =
-    deal.status === 'SOLD_OUT' ? 'sold-out' : 'expired';
+    deal.status === 'SOLD_OUT' ? 'sold-out' : deal.status === 'HIDDEN' ? 'paused' : 'expired';
 
   return {
     id: deal.dealId,
@@ -53,6 +55,10 @@ export function toSellerDeal(deal: MerchantDealDto): SellerDeal {
       .split('-')
       .reverse()
       .join('/')}`,
+    // Nháp chưa lên trang người mua nên không có gì để tạm dừng; deal ẩn chỉ mở lại được khi còn
+    // trong giờ bán.
+    canPause: deal.status === 'ACTIVE' && isOpen,
+    canResume: deal.status === 'HIDDEN' && isOpen,
     ...(isRunning ? {} : { endedReason }),
   };
 }
@@ -124,6 +130,14 @@ export function useUpdateMerchantDeal() {
     ({ dealId, payload }: { dealId: string; payload: CreateMerchantDealPayload }) =>
       updateMerchantDeal(dealId, payload),
   );
+}
+
+export function useHideDeal() {
+  return useDealMutation(hideMerchantDeal);
+}
+
+export function useRestoreDeal() {
+  return useDealMutation(restoreMerchantDeal);
 }
 
 export function useUpdateDealQuantity() {

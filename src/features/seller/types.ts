@@ -17,7 +17,11 @@ export type SellerDeal = {
   /** Mốc khách còn đặt được, dạng "19:35 · 11/10" (giờ VN); sau mốc này deal ẩn khỏi người mua. */
   saleEndsLabel: string;
   /** Vì sao deal dừng bán — chỉ có ở deal đã kết thúc. */
-  endedReason?: 'sold-out' | 'expired';
+  endedReason?: 'sold-out' | 'expired' | 'paused';
+  /** Deal đang hiện với người mua, tạm dừng được. */
+  canPause: boolean;
+  /** Deal đã tạm dừng mà vẫn còn trong giờ bán, mở lại được. */
+  canResume: boolean;
 };
 
 /** 'no-show': khách đã đặt nhưng hết khung nhận vẫn không tới lấy, khác với đơn bị huỷ. */

@@ -80,6 +80,16 @@ export function publishMerchantDeal(dealId: string) {
   return apiRequest<MerchantDealDto>(`${BASE_PATH}/${dealId}/publish`, { method: 'POST' });
 }
 
+/** Ẩn deal khỏi người mua; đơn đã đặt vẫn giữ. Chỉ deal ACTIVE hoặc SOLD_OUT ẩn được. */
+export function hideMerchantDeal(dealId: string) {
+  return apiRequest<MerchantDealDto>(`${BASE_PATH}/${dealId}/hide`, { method: 'POST' });
+}
+
+/** Mở bán lại deal đã ẩn; backend kiểm lại giờ mở cửa và khung giờ như lúc đăng. */
+export function restoreMerchantDeal(dealId: string) {
+  return apiRequest<MerchantDealDto>(`${BASE_PATH}/${dealId}/restore`, { method: 'POST' });
+}
+
 export function updateMerchantDealQuantity(
   dealId: string,
   totalQuantity: number,
@@ -137,11 +147,13 @@ const MESSAGES: Record<string, string> = {
   INVALID_DEAL_IMAGE: 'Ảnh không hợp lệ. Chỉ nhận JPEG hoặc PNG.',
   DEAL_IMAGE_TOO_LARGE: 'Ảnh vượt quá dung lượng cho phép. Chọn ảnh nhỏ hơn.',
   DEAL_IMAGE_UPLOAD_FAILED: 'Không tải được ảnh lên. Vui lòng thử lại.',
+  DEAL_NOT_HIDEABLE: 'Chỉ tạm dừng được deal đang bán hoặc đã hết suất.',
+  DEAL_NOT_RESTORABLE: 'Deal này không ở trạng thái tạm dừng nên không mở bán lại được.',
 };
 
 export function toMerchantDealErrorMessage(error: unknown): string {
   if (error instanceof ApiException) {
-    return MESSAGES[error.code] ?? `Thao tác không thành công (${error.code}). Vui lòng thử lại.`;
+    return MESSAGES[error.code] ?? 'Thao tác không thành công. Vui lòng thử lại.';
   }
 
   // Không phải lỗi từ backend: mất mạng, sai EXPO_PUBLIC_API_URL, server chưa chạy...

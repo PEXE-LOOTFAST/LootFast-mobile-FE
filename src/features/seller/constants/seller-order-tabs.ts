@@ -3,7 +3,7 @@ import type { SellerOrderTab, SellerPickupBucket } from '@/features/seller/types
 export const SELLER_ORDER_TABS: { id: SellerOrderTab; label: string }[] = [
   { id: 'incoming', label: 'Đơn hàng đến' },
   { id: 'running', label: 'Deal đang chạy' },
-  { id: 'ended', label: 'Đã kết thúc' },
+  { id: 'ended', label: 'Đã dừng bán' },
 ];
 
 export const SELLER_PICKUP_BUCKETS: { id: SellerPickupBucket; label: string }[] = [

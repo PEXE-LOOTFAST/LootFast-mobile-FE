@@ -15,9 +15,14 @@ type SellerDealCardProps = {
   onChangePortionsLeft: (portionsLeft: number) => void;
   onPressDetail: () => void;
   onPressPause: () => void;
+  onPressResume: () => void;
 };
 
-const ENDED_REASON_LABELS = { 'sold-out': 'Hết hàng', expired: 'Hết hạn' } as const;
+const ENDED_REASON_LABELS = {
+  'sold-out': 'Hết hàng',
+  expired: 'Hết hạn',
+  paused: 'Tạm dừng',
+} as const;
 
 // Thẻ deal nửa chiều ngang: ảnh món, giá deal, số suất còn lại chỉnh nhanh bằng nút +/-.
 export function SellerDealCard({
@@ -26,6 +31,7 @@ export function SellerDealCard({
   onChangePortionsLeft,
   onPressDetail,
   onPressPause,
+  onPressResume,
 }: SellerDealCardProps) {
   const theme = useTheme();
   const isRunning = deal.status === 'running';
@@ -118,15 +124,26 @@ export function SellerDealCard({
             <Text style={[styles.detailLabel, { color: theme.text }]}>Chi tiết</Text>
           </Pressable>
 
-          {isRunning ? (
+          {deal.canPause ? (
             <Pressable
               accessibilityLabel={`Tạm dừng ${deal.name}`}
               accessibilityRole="button"
-              hitSlop={6}
+              hitSlop={Spacing.sm}
               onPress={onPressPause}
               style={({ pressed }) => [pressed && styles.pressed]}
             >
               <Text style={[styles.pauseLabel, { color: theme.danger }]}>Tạm dừng</Text>
+            </Pressable>
+          ) : null}
+          {deal.canResume ? (
+            <Pressable
+              accessibilityLabel={`Mở bán lại ${deal.name}`}
+              accessibilityRole="button"
+              hitSlop={Spacing.sm}
+              onPress={onPressResume}
+              style={({ pressed }) => [pressed && styles.pressed]}
+            >
+              <Text style={[styles.pauseLabel, { color: theme.primary }]}>Mở bán lại</Text>
             </Pressable>
           ) : null}
         </View>
