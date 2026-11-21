@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
   cancelOrder,
@@ -11,10 +11,15 @@ import {
 
 export const ORDER_QUERY_KEY = ['orders'];
 
-export function useOrders(status: OrderListStatusDto, page: number) {
-  return useQuery({
-    queryKey: [...ORDER_QUERY_KEY, status, page],
-    queryFn: () => getOrders(status, page),
+/** Đơn theo trạng thái, tải thêm từng trang khi người dùng cuộn tới cuối danh sách. */
+export function useOrders(status: OrderListStatusDto) {
+  return useInfiniteQuery({
+    // Có đoạn 'list' để không trùng khoá với useOrder (['orders', orderId]).
+    queryKey: [...ORDER_QUERY_KEY, 'list', status],
+    queryFn: ({ pageParam }) => getOrders(status, pageParam),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) =>
+      lastPage.page + 1 < lastPage.totalPages ? lastPage.page + 1 : undefined,
   });
 }
 
