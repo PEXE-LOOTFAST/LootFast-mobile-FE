@@ -49,7 +49,8 @@ export function TabBar({
         const icon = icons[route.name];
         if (!icon) return null;
 
-        const color = isFocused || isCenter ? theme.primary : theme.text;
+        // Mục chưa chọn dùng màu chữ phụ để mục đang chọn nổi rõ mà không cần đọc nhãn.
+        const color = isFocused || isCenter ? theme.primary : theme.textSecondary;
 
         // Phát tabPress trước để listener ở _layout (vd. chặn khách) có cơ hội gọi preventDefault.
         const handlePress = () => {
@@ -99,13 +100,16 @@ const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopLeftRadius: Radius.xxl,
-    borderTopRightRadius: Radius.xxl,
     paddingTop: Spacing.sm,
     paddingHorizontal: Spacing.sm,
-    boxShadow: Shadow.tabBar,
   },
-  item: { flex: 1, alignItems: 'center', gap: Spacing.xs, paddingVertical: Spacing.xxs },
+  item: {
+    flex: 1,
+    minHeight: 52,
+    alignItems: 'center',
+    gap: Spacing.xs,
+    paddingVertical: Spacing.xxs,
+  },
   indicator: {
     width: 60,
     height: 34,
