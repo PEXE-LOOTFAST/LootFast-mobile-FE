@@ -29,7 +29,11 @@ export default function TabsLayout() {
       <Tabs.Screen name="index" options={{ title: 'Trang chủ' }} />
       <Tabs.Screen name="orders" listeners={guardTab('/orders')} options={{ title: 'Đơn hàng' }} />
       <Tabs.Screen name="map" options={{ title: 'Bản đồ' }} />
-      <Tabs.Screen name="profile" listeners={guardTab('/profile')} options={{ title: 'Cài đặt' }} />
+      <Tabs.Screen
+        name="profile"
+        listeners={guardTab('/profile')}
+        options={{ title: 'Tài khoản' }}
+      />
       <Tabs.Screen name="deal/[id]" options={{ href: null }} />
       <Tabs.Screen name="premium" options={{ href: null }} />
       <Tabs.Screen name="profile-info" options={{ href: null }} />

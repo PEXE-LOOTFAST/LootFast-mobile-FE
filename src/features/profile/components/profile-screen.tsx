@@ -4,6 +4,7 @@ import { Image } from 'expo-image';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { AppearanceSection } from '@/components/settings/appearance-section';
+import { AppText } from '@/components/ui/app-text';
 import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { MenuSection, type MenuItem } from '@/components/ui/menu-section';
 import { Screen } from '@/components/ui/screen';
@@ -76,7 +77,7 @@ export function ProfileScreen() {
   return (
     <Screen
       gap="md"
-      header={<BuyerHeader subtitle="Quản lý tài khoản và hoạt động của bạn" title="Cài đặt" />}
+      header={<BuyerHeader subtitle="Hồ sơ, đơn hàng, giao diện và hỗ trợ" title="Tài khoản" />}
     >
       <View
         style={[
@@ -84,43 +85,65 @@ export function ProfileScreen() {
           { backgroundColor: theme.backgroundElement, borderColor: theme.border },
         ]}
       >
-        <View style={[styles.avatar, { backgroundColor: theme.primarySoft }]}>
-          {profileImage ? (
-            <Image contentFit="cover" source={{ uri: profileImage }} style={styles.avatarImage} />
-          ) : (
-            <Text style={[styles.avatarText, { color: theme.primary }]}>{initials}</Text>
-          )}
+        <View>
+          <View style={[styles.avatar, { backgroundColor: theme.primarySoft }]}>
+            {profileImage ? (
+              <Image contentFit="cover" source={{ uri: profileImage }} style={styles.avatarImage} />
+            ) : (
+              <AppText tone="primary" variant="title" weight="heavy">
+                {initials}
+              </AppText>
+            )}
+          </View>
+          <Pressable
+            accessibilityLabel="Đổi ảnh đại diện"
+            accessibilityRole="button"
+            disabled={!user || avatar.isUploading}
+            hitSlop={Spacing.sm}
+            onPress={() => void avatar.pickAndUpload()}
+            style={({ pressed }) => [
+              styles.camera,
+              { backgroundColor: theme.primary, borderColor: theme.backgroundElement },
+              pressed && styles.pressed,
+            ]}
+          >
+            {avatar.isUploading ? (
+              <ActivityIndicator color={theme.onPrimary} size="small" />
+            ) : (
+              <Icon name={ProfileIcons.camera} color={theme.onPrimary} size={14} />
+            )}
+          </Pressable>
         </View>
+
         <View style={styles.accountCopy}>
           {profileQuery.isLoading ? (
             <ActivityIndicator color={theme.primary} size="small" />
           ) : (
             <>
-              <Text style={[styles.name, { color: theme.text }]}>{displayName}</Text>
-              <Text style={[styles.email, { color: theme.textSecondary }]}>{email}</Text>
-              <Text style={[styles.phone, { color: theme.textSecondary }]}>
-                {phoneNumber || 'Chưa cập nhật số điện thoại'}
-              </Text>
+              <AppText numberOfLines={1} variant="subtitle" weight="heavy">
+                {displayName || 'Bạn'}
+              </AppText>
+              <AppText numberOfLines={1} tone="textSecondary" variant="bodySm">
+                {email}
+              </AppText>
+              {phoneNumber ? (
+                <AppText tone="textSecondary" variant="bodySm">
+                  {phoneNumber}
+                </AppText>
+              ) : (
+                <Pressable
+                  accessibilityRole="link"
+                  hitSlop={Spacing.sm}
+                  onPress={() => router.navigate('/profile-info')}
+                >
+                  <AppText tone="primary" variant="bodySm" weight="bold">
+                    + Thêm số điện thoại
+                  </AppText>
+                </Pressable>
+              )}
             </>
           )}
         </View>
-        <Pressable
-          accessibilityLabel="Đổi ảnh đại diện"
-          accessibilityRole="button"
-          disabled={!user || avatar.isUploading}
-          onPress={() => void avatar.pickAndUpload()}
-          style={({ pressed }) => [
-            styles.camera,
-            { backgroundColor: theme.backgroundElement, borderColor: theme.primary },
-            pressed && styles.pressed,
-          ]}
-        >
-          {avatar.isUploading ? (
-            <ActivityIndicator color={theme.primary} size="small" />
-          ) : (
-            <Icon name={ProfileIcons.camera} color={theme.primary} size={15} />
-          )}
-        </Pressable>
       </View>
       {profileQuery.isError ? (
         <View
@@ -183,24 +206,24 @@ const styles = StyleSheet.create({
   avatar: {
     alignItems: 'center',
     borderRadius: Radius.full,
-    height: 58,
+    height: 68,
     justifyContent: 'center',
-    width: 58,
+    overflow: 'hidden',
+    width: 68,
   },
-  avatarText: { fontSize: FontSize.subtitle, fontWeight: FontWeight.heavy },
-  accountCopy: { flex: 1, gap: Spacing.xs, marginLeft: Spacing.md },
-  name: { fontSize: FontSize.subtitle, fontWeight: FontWeight.heavy },
-  email: { fontSize: FontSize.bodySm },
-  phone: { fontSize: FontSize.bodySm },
+  accountCopy: { flex: 1, gap: Spacing.xxs, marginLeft: Spacing.lg },
+  // Nút máy ảnh nhỏ gắn góc ảnh đại diện; hitSlop nới vùng chạm cho đủ ngón tay.
   camera: {
+    position: 'absolute',
+    right: -Spacing.xxs,
+    bottom: -Spacing.xxs,
     alignItems: 'center',
     borderRadius: Radius.full,
-    borderWidth: 1,
+    borderWidth: 2,
     height: 28,
     justifyContent: 'center',
     width: 28,
   },
-  cameraText: { fontSize: FontSize.bodyLg, fontWeight: FontWeight.heavy },
   pressed: { opacity: 0.7 },
   sellerButton: {
     alignItems: 'center',
