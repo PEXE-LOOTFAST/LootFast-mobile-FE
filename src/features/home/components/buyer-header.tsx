@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useUnreadCount } from '@/api/notifications';
 import { Popover } from '@/components/ui/popover';
 import { TabHeader } from '@/components/ui/tab-header';
-import { IconButton } from '@/features/home/components/icon-button';
+import { IconButton } from '@/components/ui/icon-button';
 import { NotificationSheet } from '@/features/home/components/notification-sheet';
 import { HomeIcons } from '@/features/home/constants/icons';
 import { useAnchor } from '@/hooks/use-anchor';

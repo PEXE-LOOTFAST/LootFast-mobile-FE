@@ -5,7 +5,7 @@ import { useUnreadCount } from '@/api/notifications';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { TabHeader } from '@/components/ui/tab-header';
 import { HeaderColors } from '@/constants/theme';
-import { IconButton } from '@/features/home/components/icon-button';
+import { IconButton } from '@/components/ui/icon-button';
 import { NotificationSheet } from '@/features/home/components/notification-sheet';
 import { HomeIcons } from '@/features/home/constants/icons';
 
@@ -35,6 +35,7 @@ export function SellerHeader({ title, subtitle, subtitleIcon, onBack }: SellerHe
           <IconButton
             accessibilityLabel="Thông báo"
             badgeCount={unreadCount}
+            headerVariant="seller"
             icon={HomeIcons.bell}
             onPress={() => setIsNotificationsOpen(true)}
             tone="header"

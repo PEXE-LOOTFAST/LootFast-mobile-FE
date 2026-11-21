@@ -1,15 +1,29 @@
 import type { Ref } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
+import { AppText } from '@/components/ui/app-text';
 import { Icon, type IconName } from '@/components/ui/icon';
-import { HeaderColors, IndicatorColor } from '@/constants/theme';
+import {
+  HeaderColors,
+  IndicatorColor,
+  Radius,
+  Spacing,
+  type HeaderVariant,
+} from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+
+const BUTTON_SIZE = 44;
+const DOT_SIZE = 12;
+const BADGE_SIZE = 20;
 
 type IconButtonProps = {
   icon: IconName;
   accessibilityLabel: string;
   onPress?: () => void;
+  /** `header`: nút trong suốt đặt trên header xanh đậm; `surface`: nút có nền trên thẻ/màn sáng. */
   tone?: 'header' | 'surface';
+  /** Header nào đang chứa nút, để viền badge/chấm trùng màu nền header. */
+  headerVariant?: HeaderVariant;
   badgeCount?: number;
   /** Tô nổi nút khi tính năng nó điều khiển đang bật (vd. bộ lọc đang áp dụng). */
   isActive?: boolean;
@@ -23,6 +37,7 @@ export function IconButton({
   accessibilityLabel,
   onPress,
   tone = 'surface',
+  headerVariant = 'buyer',
   badgeCount = 0,
   isActive = false,
   indicator,
@@ -30,7 +45,10 @@ export function IconButton({
 }: IconButtonProps) {
   const theme = useTheme();
   const onHeader = tone === 'header';
-  const iconColor = onHeader ? HeaderColors.buyer.text : isActive ? theme.primary : theme.text;
+  const header = HeaderColors[headerVariant];
+  const iconColor = onHeader ? header.text : isActive ? theme.primary : theme.text;
+  // Viền badge/chấm cùng màu nền phía sau để chúng trông như khoét vào nút.
+  const ringColor = onHeader ? header.background : theme.backgroundElement;
   const surface = isActive
     ? { backgroundColor: theme.primarySoft, borderColor: theme.primary }
     : { backgroundColor: theme.backgroundElement, borderColor: theme.border };
@@ -43,7 +61,7 @@ export function IconButton({
       }
       accessibilityRole="button"
       accessibilityState={{ selected: isActive }}
-      hitSlop={4}
+      hitSlop={Spacing.xs}
       onPress={onPress}
       style={({ pressed }) => [
         styles.button,
@@ -59,25 +77,17 @@ export function IconButton({
             styles.dot,
             {
               backgroundColor: indicator === 'on' ? IndicatorColor.on : IndicatorColor.off,
-              borderColor: onHeader ? HeaderColors.buyer.background : theme.backgroundElement,
+              borderColor: ringColor,
             },
           ]}
         />
       ) : null}
 
       {badgeCount > 0 ? (
-        <View
-          style={[
-            styles.badge,
-            {
-              backgroundColor: theme.danger,
-              borderColor: onHeader ? HeaderColors.buyer.background : theme.backgroundElement,
-            },
-          ]}
-        >
-          <Text style={[styles.badgeText, { color: theme.onDanger }]}>
+        <View style={[styles.badge, { backgroundColor: theme.danger, borderColor: ringColor }]}>
+          <AppText tone="onDanger" variant="micro" weight="heavy">
             {badgeCount > 9 ? '9+' : badgeCount}
-          </Text>
+          </AppText>
         </View>
       ) : null}
     </Pressable>
@@ -86,12 +96,12 @@ export function IconButton({
 
 const styles = StyleSheet.create({
   button: {
-    width: 44,
-    height: 44,
+    width: BUTTON_SIZE,
+    height: BUTTON_SIZE,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderRadius: 14,
+    borderRadius: Radius.md,
   },
   headerButton: { backgroundColor: 'transparent', borderColor: 'transparent' },
   pressed: { opacity: 0.8 },
@@ -99,22 +109,21 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 6,
     right: 6,
-    width: 12,
-    height: 12,
+    width: DOT_SIZE,
+    height: DOT_SIZE,
     borderWidth: 2,
-    borderRadius: 6,
+    borderRadius: DOT_SIZE / 2,
   },
   badge: {
     position: 'absolute',
-    top: 2,
-    right: 2,
-    minWidth: 20,
-    height: 20,
+    top: Spacing.xxs,
+    right: Spacing.xxs,
+    minWidth: BADGE_SIZE,
+    height: BADGE_SIZE,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderRadius: 10,
-    paddingHorizontal: 4,
+    borderRadius: BADGE_SIZE / 2,
+    paddingHorizontal: Spacing.xs,
   },
-  badgeText: { fontSize: 10, fontWeight: '900' },
 });

@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Icon } from '@/components/ui/icon';
 import { Popover } from '@/components/ui/popover';
-import { IconButton } from '@/features/home/components/icon-button';
+import { IconButton } from '@/components/ui/icon-button';
 import { DISCOUNT_OPTIONS, PICKUP_OPTIONS } from '@/features/home/constants/deals';
 import { HomeIcons } from '@/features/home/constants/icons';
 import type { DiscountFilter, PickupFilter } from '@/features/home/types';
