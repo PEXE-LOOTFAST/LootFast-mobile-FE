@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { Radius, Shadow, Spacing } from '@/constants/theme';
 import { EmptyCard } from '@/components/ui/empty-card';
 import { ErrorState } from '@/components/ui/error-state';
 import { Icon } from '@/components/ui/icon';
@@ -198,27 +199,27 @@ export function MapScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1 },
   mapArea: { flex: 1 },
-  setup: { flex: 1, padding: 16 },
+  setup: { flex: 1, padding: Spacing.lg },
   // Lớp phủ để các nút cạnh bản đồ nhận chạm, còn vùng trống bên dưới vẫn kéo/chạm được bản đồ.
   layer: {
     position: 'absolute',
     right: 0,
     left: 0,
     gap: 10,
-    padding: 12,
+    padding: Spacing.md,
     pointerEvents: 'box-none',
   },
   top: { top: 0 },
   bottom: { bottom: 0, alignItems: 'flex-end' },
-  panel: { borderRadius: 18, padding: 12 },
+  panel: { borderRadius: Radius.xl, padding: Spacing.md },
   recenter: {
     width: 48,
     height: 48,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 24,
+    borderRadius: Radius.full,
     borderWidth: 1,
-    boxShadow: '0px 6px 16px rgba(23, 33, 27, 0.2)',
+    boxShadow: Shadow.floating,
   },
   pressed: { opacity: 0.8 },
 });

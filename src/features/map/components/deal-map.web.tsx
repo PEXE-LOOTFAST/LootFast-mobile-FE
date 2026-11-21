@@ -1,5 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 
+import { Spacing } from '@/constants/theme';
 import { EmptyCard } from '@/components/ui/empty-card';
 
 // MapLibre chỉ có bản native, nên trên web chỉ hiện thông báo thay vì làm sập cả bundle web.
@@ -15,5 +16,5 @@ export function DealMap() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
+  container: { flex: 1, padding: Spacing.lg },
 });

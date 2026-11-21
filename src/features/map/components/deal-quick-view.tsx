@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FontSize, FontWeight, Radius, Shadow, Spacing } from '@/constants/theme';
 import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/ui/icon';
 import { DealImage } from '@/features/home/components/deal-image';
@@ -82,20 +83,20 @@ const styles = StyleSheet.create({
   card: {
     alignSelf: 'stretch',
     borderWidth: 1,
-    borderRadius: 20,
-    boxShadow: '0px 10px 24px rgba(23, 33, 27, 0.18)',
+    borderRadius: Radius.xl,
+    boxShadow: Shadow.overlay,
   },
-  content: { flexDirection: 'row', gap: 12, padding: 12 },
+  content: { flexDirection: 'row', gap: Spacing.md, padding: Spacing.md },
   pressed: { opacity: 0.85 },
-  image: { width: 92, height: 92, borderRadius: 14 },
+  image: { width: 92, height: 92, borderRadius: Radius.lg },
   copy: { flex: 1, minWidth: 0, gap: 3, paddingRight: 18 },
-  store: { fontSize: 12, fontWeight: '600' },
-  name: { fontSize: 15, fontWeight: '800', lineHeight: 20 },
+  store: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium },
+  name: { fontSize: FontSize.bodyLg, fontWeight: FontWeight.bold, lineHeight: 20 },
   priceRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6 },
-  price: { fontSize: 16, fontWeight: '900' },
-  originalPrice: { fontSize: 12, textDecorationLine: 'line-through' },
-  meta: { flexDirection: 'row', gap: 12 },
-  stock: { fontSize: 12, fontWeight: '800' },
-  address: { fontSize: 11 },
-  close: { position: 'absolute', top: 10, right: 10, padding: 4 },
+  price: { fontSize: FontSize.subtitle, fontWeight: FontWeight.heavy },
+  originalPrice: { fontSize: FontSize.footnote, textDecorationLine: 'line-through' },
+  meta: { flexDirection: 'row', gap: Spacing.md },
+  stock: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold },
+  address: { fontSize: FontSize.caption },
+  close: { position: 'absolute', top: 10, right: 10, padding: Spacing.xs },
 });

@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 
 import { ErrorState } from '@/components/ui/error-state';
-import { IndicatorColor } from '@/constants/theme';
+import { IndicatorColor, Spacing } from '@/constants/theme';
 import { buildMapHtml } from '@/features/map/components/goong-map-html';
 import type { DealMapProps } from '@/features/map/components/deal-map.types';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -151,6 +151,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     justifyContent: 'center',
-    padding: 24,
+    padding: Spacing.xxl,
   },
 });

@@ -1,5 +1,6 @@
 import { Modal, StyleSheet, View } from 'react-native';
 
+import { Radius, Spacing, StaticColors } from '@/constants/theme';
 import { BrandButton } from '@/components/ui/brand-button';
 import { EmptyCard } from '@/components/ui/empty-card';
 import type { LocationPickerModalProps } from '@/features/map/components/location-picker.types';
@@ -31,8 +32,14 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    padding: 24,
+    backgroundColor: StaticColors.backdrop,
+    padding: Spacing.xxl,
   },
-  card: { width: '100%', maxWidth: 420, gap: 12, borderRadius: 24, padding: 16 },
+  card: {
+    width: '100%',
+    maxWidth: 420,
+    gap: Spacing.md,
+    borderRadius: Radius.xxl,
+    padding: Spacing.lg,
+  },
 });
