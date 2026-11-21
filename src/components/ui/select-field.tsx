@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { Keyboard, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Keyboard, Pressable, StyleSheet, View } from 'react-native';
 
+import { AppText } from '@/components/ui/app-text';
 import { TextField } from '@/components/ui/text-field';
+import { Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 export type SelectOption = { value: string; label: string };
@@ -86,23 +88,22 @@ export function SelectField({
                 pressed && { backgroundColor: theme.primarySoft },
               ]}
             >
-              <Text
-                style={[
-                  styles.optionText,
-                  { color: theme.text },
-                  option.label === value && { color: theme.primary, fontWeight: '800' },
-                ]}
+              <AppText
+                tone={option.label === value ? 'primary' : 'text'}
+                weight={option.label === value ? 'bold' : 'medium'}
               >
                 {option.label}
-              </Text>
+              </AppText>
             </Pressable>
           ))}
           {!matches.length ? (
-            <Text style={[styles.empty, { color: theme.textSecondary }]}>Không có kết quả</Text>
+            <AppText style={styles.empty} tone="textSecondary" variant="footnote">
+              Không có kết quả
+            </AppText>
           ) : matches.length > MAX_VISIBLE ? (
-            <Text style={[styles.empty, { color: theme.textSecondary }]}>
+            <AppText style={styles.empty} tone="textSecondary" variant="footnote">
               Gõ thêm để thu hẹp {matches.length - MAX_VISIBLE} kết quả còn lại
-            </Text>
+            </AppText>
           ) : null}
         </View>
       ) : null}
@@ -111,10 +112,9 @@ export function SelectField({
 }
 
 const styles = StyleSheet.create({
-  container: { gap: 6 },
+  container: { gap: Spacing.sm },
   disabled: { opacity: 0.5 },
-  list: { borderWidth: 1, borderRadius: 14, overflow: 'hidden' },
-  option: { paddingHorizontal: 14, paddingVertical: 11 },
-  optionText: { fontSize: 14, fontWeight: '600' },
-  empty: { paddingHorizontal: 14, paddingVertical: 10, fontSize: 12 },
+  list: { borderWidth: 1, borderRadius: Radius.md, overflow: 'hidden' },
+  option: { minHeight: 44, justifyContent: 'center', paddingHorizontal: Spacing.md },
+  empty: { paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm },
 });

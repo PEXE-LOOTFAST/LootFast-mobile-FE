@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Modal, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 
+import { Radius, Shadow, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 export type PopoverAnchor = { x: number; y: number; width: number; height: number };
@@ -14,8 +15,8 @@ type PopoverProps = {
   children: ReactNode;
 };
 
-const ANCHOR_GAP = 8;
-const SCREEN_EDGE = 12;
+const ANCHOR_GAP = Spacing.sm;
+const SCREEN_EDGE = Spacing.md;
 
 export function Popover({ anchor, onClose, width, align = 'left', children }: PopoverProps) {
   const theme = useTheme();
@@ -68,10 +69,10 @@ export function Popover({ anchor, onClose, width, align = 'left', children }: Po
 const styles = StyleSheet.create({
   card: {
     position: 'absolute',
-    gap: 10,
+    gap: Spacing.sm,
     borderWidth: 1,
-    borderRadius: 18,
-    padding: 12,
-    boxShadow: '0px 16px 36px rgba(23, 33, 27, 0.18)',
+    borderRadius: Radius.lg,
+    padding: Spacing.md,
+    boxShadow: Shadow.overlay,
   },
 });

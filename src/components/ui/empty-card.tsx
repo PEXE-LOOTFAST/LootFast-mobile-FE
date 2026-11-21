@@ -1,6 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 
-import { useTheme } from '@/hooks/use-theme';
+import { AppText } from '@/components/ui/app-text';
+import { Card } from '@/components/ui/card';
+import { Spacing } from '@/constants/theme';
 
 type EmptyCardProps = {
   title: string;
@@ -9,29 +11,26 @@ type EmptyCardProps = {
 
 // Thẻ trống dùng chung: mục chưa có dữ liệu, bộ lọc không ra kết quả, hoặc danh sách rỗng.
 export function EmptyCard({ title, description }: EmptyCardProps) {
-  const theme = useTheme();
-
   return (
-    <View
-      style={[styles.card, { backgroundColor: theme.backgroundElement, borderColor: theme.border }]}
-    >
-      <Text accessibilityRole="header" style={[styles.title, { color: theme.text }]}>
+    <Card gap="xs" padding="xl" style={styles.card}>
+      <AppText
+        accessibilityRole="header"
+        align="center"
+        style={styles.title}
+        variant="bodyLg"
+        weight="heavy"
+      >
         {title}
-      </Text>
-      <Text style={[styles.description, { color: theme.textSecondary }]}>{description}</Text>
-    </View>
+      </AppText>
+      <AppText align="center" style={styles.description} tone="textSecondary" variant="bodySm">
+        {description}
+      </AppText>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    alignItems: 'center',
-    gap: 6,
-    borderWidth: 1,
-    borderRadius: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 24,
-  },
-  title: { fontSize: 15, fontWeight: '900', letterSpacing: -0.2, textAlign: 'center' },
-  description: { fontSize: 13, lineHeight: 19, textAlign: 'center' },
+  card: { alignItems: 'center', paddingVertical: Spacing.xxl },
+  title: { letterSpacing: -0.2 },
+  description: { lineHeight: 19 },
 });

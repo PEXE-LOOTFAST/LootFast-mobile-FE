@@ -2,6 +2,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { BrandButton } from '@/components/ui/brand-button';
 import { InlineAlert } from '@/components/ui/inline-alert';
+import { Spacing } from '@/constants/theme';
 
 type ErrorStateProps = {
   message: string;
@@ -26,6 +27,6 @@ export function ErrorState({ message, onRetry, retrying = false, fill = false }:
 }
 
 const styles = StyleSheet.create({
-  container: { gap: 12 },
-  fill: { flex: 1, justifyContent: 'center', paddingHorizontal: 24 },
+  container: { gap: Spacing.md },
+  fill: { flex: 1, justifyContent: 'center', paddingHorizontal: Spacing.xxl },
 });

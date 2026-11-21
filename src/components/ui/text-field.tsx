@@ -1,7 +1,9 @@
 import { useState, type ReactNode } from 'react';
-import { StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
+import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
 
+import { AppText } from '@/components/ui/app-text';
 import { useScrollFocusedIntoView } from '@/components/ui/keyboard-aware-scroll-view';
+import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 /**
@@ -38,7 +40,11 @@ export function TextField({
 
   return (
     <View style={variant.container}>
-      {label ? <Text style={[variant.label, { color: theme.text }]}>{label}</Text> : null}
+      {label ? (
+        <AppText style={variant.label} variant="footnote" weight="bold">
+          {label}
+        </AppText>
+      ) : null}
 
       <View
         style={[
@@ -67,44 +73,58 @@ export function TextField({
         {trailing}
       </View>
 
-      {error ? <Text style={[styles.error, { color: theme.danger }]}>{error}</Text> : null}
+      {error ? (
+        <AppText tone="danger" variant="footnote" weight="medium">
+          {error}
+        </AppText>
+      ) : null}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  error: { fontSize: 12, fontWeight: '600' },
-});
-
 const comfortable = StyleSheet.create({
-  container: { gap: 8 },
-  label: { fontSize: 12, fontWeight: '800', letterSpacing: 1, textTransform: 'uppercase' },
+  container: { gap: Spacing.sm },
+  label: { letterSpacing: 1, textTransform: 'uppercase' },
   field: {
     minHeight: 56,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: Spacing.sm,
     borderWidth: 1,
-    borderRadius: 18,
-    paddingLeft: 16,
-    paddingRight: 8,
+    borderRadius: Radius.lg,
+    paddingLeft: Spacing.lg,
+    paddingRight: Spacing.sm,
   },
   // Trình duyệt tự vẽ viền focus riêng, chồng lên viền focus của field.
-  input: { flex: 1, minWidth: 0, minHeight: 54, fontSize: 15, outlineWidth: 0 },
+  input: {
+    flex: 1,
+    minWidth: 0,
+    minHeight: 54,
+    fontSize: FontSize.bodyLg,
+    fontWeight: FontWeight.regular,
+    outlineWidth: 0,
+  },
 });
 
 const compact = StyleSheet.create({
-  container: { gap: 7 },
-  label: { fontSize: 12, fontWeight: '800' },
+  container: { gap: Spacing.sm },
+  label: { textTransform: 'none' },
   field: {
     minHeight: 44,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: Spacing.sm,
     borderWidth: 1,
-    borderRadius: 14,
-    paddingLeft: 14,
-    paddingRight: 8,
+    borderRadius: Radius.md,
+    paddingLeft: Spacing.md,
+    paddingRight: Spacing.sm,
   },
-  input: { flex: 1, minWidth: 0, minHeight: 42, fontSize: 15, outlineWidth: 0 },
+  input: {
+    flex: 1,
+    minWidth: 0,
+    minHeight: 42,
+    fontSize: FontSize.bodyLg,
+    fontWeight: FontWeight.regular,
+    outlineWidth: 0,
+  },
 });

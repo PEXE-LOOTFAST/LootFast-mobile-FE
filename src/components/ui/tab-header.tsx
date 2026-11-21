@@ -1,12 +1,13 @@
 import { useFocusEffect } from 'expo-router';
 import { setStatusBarStyle } from 'expo-status-bar';
 import { useCallback, type ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AppText } from '@/components/ui/app-text';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { UiIcons } from '@/constants/icons';
-import { HeaderColors, type HeaderVariant } from '@/constants/theme';
+import { HeaderColors, Radius, Spacing, type HeaderVariant } from '@/constants/theme';
 
 type TabHeaderProps = {
   title: string;
@@ -46,7 +47,10 @@ export function TabHeader({
 
   return (
     <View
-      style={[styles.container, { paddingTop: insets.top + 8, backgroundColor: colors.background }]}
+      style={[
+        styles.container,
+        { paddingTop: insets.top + Spacing.sm, backgroundColor: colors.background },
+      ]}
     >
       <View style={styles.decorationLayer}>
         <View style={[styles.decoration, { backgroundColor: colors.decoration }]} />
@@ -57,7 +61,7 @@ export function TabHeader({
           <Pressable
             accessibilityLabel="Quay lại"
             accessibilityRole="button"
-            hitSlop={4}
+            hitSlop={Spacing.xs}
             onPress={onBack}
             style={({ pressed }) => [
               styles.backButton,
@@ -70,23 +74,32 @@ export function TabHeader({
         ) : null}
 
         <View style={styles.copy}>
-          <Text
+          <AppText
             accessibilityRole="header"
             adjustsFontSizeToFit
+            color={colors.text}
             minimumFontScale={0.8}
             numberOfLines={1}
-            style={[styles.title, { color: colors.text }]}
+            style={styles.title}
+            variant="titleLg"
+            weight="heavy"
           >
             {title}
-          </Text>
+          </AppText>
           {subtitle ? (
             <View style={styles.subtitleRow}>
               {subtitleIcon ? (
                 <Icon name={subtitleIcon} color={colors.textMuted} size={13} />
               ) : null}
-              <Text numberOfLines={1} style={[styles.subtitle, { color: colors.textMuted }]}>
+              <AppText
+                color={colors.textMuted}
+                numberOfLines={1}
+                style={styles.subtitle}
+                variant="footnote"
+                weight="medium"
+              >
                 {subtitle}
-              </Text>
+              </AppText>
             </View>
           ) : null}
         </View>
@@ -100,10 +113,10 @@ export function TabHeader({
 const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-    paddingHorizontal: 16,
-    paddingBottom: 12,
+    borderBottomLeftRadius: Radius.xl,
+    borderBottomRightRadius: Radius.xl,
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.md,
   },
   decorationLayer: {
     position: 'absolute',
@@ -120,21 +133,21 @@ const styles = StyleSheet.create({
     height: 150,
     top: -50,
     right: -50,
-    borderRadius: 75,
+    borderRadius: Radius.full,
     opacity: 0.5,
   },
-  row: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 10 },
+  row: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   backButton: {
     width: 36,
     height: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 12,
+    borderRadius: Radius.md,
   },
   pressed: { opacity: 0.8 },
-  trailing: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  copy: { flex: 1, minWidth: 0, gap: 1 },
-  title: { fontSize: 20, fontWeight: '900', letterSpacing: -0.3 },
-  subtitleRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  subtitle: { flexShrink: 1, fontSize: 12, fontWeight: '600' },
+  trailing: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },
+  copy: { flex: 1, minWidth: 0, gap: Spacing.xxs },
+  title: { letterSpacing: -0.3 },
+  subtitleRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },
+  subtitle: { flexShrink: 1 },
 });

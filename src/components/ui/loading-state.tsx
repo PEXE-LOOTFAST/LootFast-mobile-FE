@@ -1,5 +1,7 @@
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
+import { AppText } from '@/components/ui/app-text';
+import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 type LoadingStateProps = {
@@ -21,13 +23,21 @@ export function LoadingState({ label, size = 'large', fill = false }: LoadingSta
       style={[styles.container, fill && styles.fill]}
     >
       <ActivityIndicator color={theme.primary} size={size} />
-      {label ? <Text style={[styles.label, { color: theme.textSecondary }]}>{label}</Text> : null}
+      {label ? (
+        <AppText align="center" tone="textSecondary" variant="bodySm">
+          {label}
+        </AppText>
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { alignItems: 'center', justifyContent: 'center', gap: 12, paddingVertical: 24 },
-  fill: { flex: 1, paddingHorizontal: 24 },
-  label: { fontSize: 13, textAlign: 'center' },
+  container: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.md,
+    paddingVertical: Spacing.xxl,
+  },
+  fill: { flex: 1, paddingHorizontal: Spacing.xxl },
 });

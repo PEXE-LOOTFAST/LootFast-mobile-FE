@@ -3,11 +3,12 @@ import {
   ActivityIndicator,
   Pressable,
   StyleSheet,
-  Text,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
 
+import { AppText } from '@/components/ui/app-text';
+import { Radius, Shadow, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 type BrandButtonProps = {
@@ -54,7 +55,9 @@ export function BrandButton({
       {loading ? (
         <ActivityIndicator color={palette.label} />
       ) : (
-        <Text style={[styles.label, { color: palette.label }]}>{children}</Text>
+        <AppText color={palette.label} variant="subtitle" weight="bold">
+          {children}
+        </AppText>
       )}
     </Pressable>
   );
@@ -66,11 +69,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderRadius: 16,
-    paddingHorizontal: 20,
+    borderRadius: Radius.lg,
+    paddingHorizontal: Spacing.xl,
   },
-  elevated: { boxShadow: '0px 8px 18px rgba(22, 121, 75, 0.25)' },
+  elevated: { boxShadow: Shadow.brand },
   pressed: { opacity: 0.85, transform: [{ scale: 0.99 }] },
   disabled: { opacity: 0.5 },
-  label: { fontSize: 16, fontWeight: '800' },
 });

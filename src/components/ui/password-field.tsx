@@ -4,6 +4,7 @@ import { Pressable, StyleSheet } from 'react-native';
 import { Icon } from '@/components/ui/icon';
 import { TextField, type TextFieldProps } from '@/components/ui/text-field';
 import { UiIcons } from '@/constants/icons';
+import { Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 type PasswordFieldProps = Omit<TextFieldProps, 'secureTextEntry' | 'trailing'>;
@@ -27,7 +28,7 @@ export function PasswordField({ size = 'default', leading, ...props }: PasswordF
         <Pressable
           accessibilityLabel={isVisible ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
           accessibilityRole="button"
-          hitSlop={6}
+          hitSlop={Spacing.xs}
           onPress={() => setIsVisible((visible) => !visible)}
           style={
             isCompact
@@ -48,7 +49,7 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 20,
+    borderRadius: Radius.full,
   },
   compactToggle: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
 });

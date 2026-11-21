@@ -1,7 +1,9 @@
 import type { BottomTabBarProps } from 'expo-router/js-tabs';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
+import { AppText } from '@/components/ui/app-text';
 import { Icon, type IconMap } from '@/components/ui/icon';
+import { Radius, Shadow, Spacing, type FontSizeToken } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 type TabBarProps = BottomTabBarProps & {
@@ -10,7 +12,7 @@ type TabBarProps = BottomTabBarProps & {
   /** Tên route được vẽ thành nút tròn nổi lên trên thay vì một mục thường. */
   centerRoute?: string;
   iconSize?: number;
-  labelSize?: number;
+  labelVariant?: FontSizeToken;
 };
 
 // Thanh tab dùng chung cho cả ba khu vực (người mua, người bán, quản trị): cùng bố cục,
@@ -23,7 +25,7 @@ export function TabBar({
   icons,
   centerRoute,
   iconSize = 24,
-  labelSize = 12,
+  labelVariant = 'footnote',
 }: TabBarProps) {
   const theme = useTheme();
   const focusedKey = state.routes[state.index]?.key;
@@ -36,7 +38,7 @@ export function TabBar({
         {
           backgroundColor: theme.backgroundElement,
           borderColor: theme.border,
-          paddingBottom: Math.max(insets.bottom, 10),
+          paddingBottom: Math.max(insets.bottom, Spacing.sm),
         },
       ]}
     >
@@ -78,16 +80,14 @@ export function TabBar({
               </View>
             )}
 
-            <Text
+            <AppText
+              color={color}
               numberOfLines={1}
-              style={[
-                styles.label,
-                { color, fontSize: labelSize },
-                (isFocused || isCenter) && styles.labelActive,
-              ]}
+              variant={labelVariant}
+              weight={isFocused || isCenter ? 'bold' : 'medium'}
             >
               {label}
-            </Text>
+            </AppText>
           </Pressable>
         );
       })}
@@ -99,19 +99,19 @@ const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingTop: 8,
-    paddingHorizontal: 8,
-    boxShadow: '0px -6px 20px rgba(23, 33, 27, 0.06)',
+    borderTopLeftRadius: Radius.xxl,
+    borderTopRightRadius: Radius.xxl,
+    paddingTop: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+    boxShadow: Shadow.tabBar,
   },
-  item: { flex: 1, alignItems: 'center', gap: 4, paddingVertical: 2 },
+  item: { flex: 1, alignItems: 'center', gap: Spacing.xs, paddingVertical: Spacing.xxs },
   indicator: {
     width: 60,
     height: 34,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 17,
+    borderRadius: Radius.full,
   },
   // Nhô lên khỏi thanh tab: marginTop âm bù lại chiều cao dư để nhãn vẫn thẳng hàng.
   centerButton: {
@@ -119,12 +119,10 @@ const styles = StyleSheet.create({
     height: 52,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 26,
+    borderRadius: Radius.full,
     marginTop: -24,
-    marginBottom: 2,
-    boxShadow: '0px 8px 18px rgba(22, 121, 75, 0.35)',
+    marginBottom: Spacing.xxs,
+    boxShadow: Shadow.brand,
   },
-  label: { fontWeight: '600' },
-  labelActive: { fontWeight: '800' },
   pressed: { opacity: 0.7 },
 });

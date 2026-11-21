@@ -1,7 +1,9 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
+import { AppText } from '@/components/ui/app-text';
 import { Icon } from '@/components/ui/icon';
 import { UiIcons } from '@/constants/icons';
+import { Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 type InlineAlertProps = {
@@ -27,21 +29,25 @@ export function InlineAlert({ message, tone = 'danger' }: InlineAlertProps) {
         name={isDanger ? UiIcons.warning : UiIcons.success}
         color={isDanger ? theme.danger : theme.primary}
       />
-      <Text
-        style={[
-          styles.message,
-          { color: isDanger ? theme.danger : theme.text },
-          isDanger && styles.strong,
-        ]}
+      <AppText
+        style={styles.message}
+        tone={isDanger ? 'danger' : 'text'}
+        variant="bodySm"
+        weight={isDanger ? 'bold' : 'medium'}
       >
         {message}
-      </Text>
+      </AppText>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 14, padding: 12 },
-  message: { flex: 1, fontSize: 13, fontWeight: '600', lineHeight: 19 },
-  strong: { fontWeight: '700' },
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    borderRadius: Radius.md,
+    padding: Spacing.md,
+  },
+  message: { flex: 1, lineHeight: 19 },
 });

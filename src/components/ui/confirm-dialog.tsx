@@ -1,7 +1,9 @@
 import { useSyncExternalStore } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AppText } from '@/components/ui/app-text';
+import { Radius, Spacing, StaticColors } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { acceptConfirm, dismissConfirm, getConfirmRequest, subscribeConfirm } from '@/lib/confirm';
 
@@ -27,7 +29,10 @@ export function ConfirmDialog() {
       visible={request !== null}
     >
       <View
-        style={[styles.overlay, { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 16 }]}
+        style={[
+          styles.overlay,
+          { paddingTop: insets.top + Spacing.lg, paddingBottom: insets.bottom + Spacing.lg },
+        ]}
       >
         <Pressable
           accessibilityLabel="Đóng"
@@ -38,10 +43,12 @@ export function ConfirmDialog() {
 
         {request ? (
           <View style={[styles.card, { backgroundColor: theme.backgroundElement }]}>
-            <Text accessibilityRole="header" style={[styles.title, { color: theme.text }]}>
+            <AppText accessibilityRole="header" style={styles.title} variant="title" weight="heavy">
               {request.title}
-            </Text>
-            <Text style={[styles.message, { color: theme.textSecondary }]}>{request.message}</Text>
+            </AppText>
+            <AppText style={styles.message} tone="textSecondary">
+              {request.message}
+            </AppText>
 
             <View style={styles.actions}>
               <Pressable
@@ -53,9 +60,7 @@ export function ConfirmDialog() {
                   pressed && styles.pressed,
                 ]}
               >
-                <Text style={[styles.buttonLabel, { color: theme.text }]}>
-                  {request.cancelLabel}
-                </Text>
+                <AppText weight="bold">{request.cancelLabel}</AppText>
               </Pressable>
 
               <Pressable
@@ -67,9 +72,9 @@ export function ConfirmDialog() {
                   pressed && styles.pressed,
                 ]}
               >
-                <Text style={[styles.buttonLabel, { color: confirmLabelColor }]}>
+                <AppText color={confirmLabelColor} weight="bold">
                   {request.confirmLabel}
-                </Text>
+                </AppText>
               </Pressable>
             </View>
           </View>
@@ -80,28 +85,27 @@ export function ConfirmDialog() {
 }
 
 const styles = StyleSheet.create({
-  overlay: { flex: 1, justifyContent: 'center', paddingHorizontal: 16 },
-  backdrop: { backgroundColor: 'rgba(10, 20, 14, 0.55)' },
+  overlay: { flex: 1, justifyContent: 'center', paddingHorizontal: Spacing.lg },
+  backdrop: { backgroundColor: StaticColors.backdrop },
   card: {
     width: '100%',
     maxWidth: 420,
     alignSelf: 'center',
-    gap: 8,
-    borderRadius: 24,
-    padding: 22,
+    gap: Spacing.sm,
+    borderRadius: Radius.xxl,
+    padding: Spacing.xl,
   },
-  title: { fontSize: 18, fontWeight: '900', letterSpacing: -0.3 },
-  message: { fontSize: 14, lineHeight: 20 },
-  actions: { flexDirection: 'row', gap: 10, marginTop: 10 },
+  title: { letterSpacing: -0.3 },
+  message: { lineHeight: 20 },
+  actions: { flexDirection: 'row', gap: Spacing.sm, marginTop: Spacing.sm },
   button: {
     flex: 1,
     minHeight: 46,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderRadius: 14,
-    paddingHorizontal: 12,
+    borderRadius: Radius.md,
+    paddingHorizontal: Spacing.md,
   },
-  buttonLabel: { fontSize: 14, fontWeight: '800' },
   pressed: { opacity: 0.85 },
 });
