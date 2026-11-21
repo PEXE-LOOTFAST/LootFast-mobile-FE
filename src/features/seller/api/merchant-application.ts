@@ -50,13 +50,13 @@ const MESSAGES: Record<string, string> = {
 export function toMerchantApplicationErrorMessage(error: unknown): string {
   if (error instanceof ApiException) {
     if (error.code === 'NETWORK_ERROR') {
-      return `Không gửi được ảnh giấy phép tới máy chủ (${error.message}). Kiểm tra mạng, hoặc chọn ảnh khác nhỏ hơn.`;
+      return 'Không gửi được ảnh giấy phép. Kiểm tra mạng, hoặc chọn ảnh khác nhỏ hơn.';
     }
     if (error.code === 'INVALID_RESPONSE') {
-      return `Máy chủ phản hồi lỗi (HTTP ${error.status}). Thử lại với ảnh nhỏ hơn hoặc báo đội BE.`;
+      return 'Máy chủ đang gặp sự cố. Thử lại sau ít phút, hoặc chọn ảnh nhỏ hơn.';
     }
 
-    return MESSAGES[error.code] ?? `Gửi hồ sơ không thành công (${error.code}). Vui lòng thử lại.`;
+    return MESSAGES[error.code] ?? 'Gửi hồ sơ không thành công. Vui lòng thử lại.';
   }
 
   // Không phải lỗi từ backend: mất mạng, sai EXPO_PUBLIC_API_URL, server chưa chạy...

@@ -192,9 +192,10 @@ export async function getSuggestedPlace(
 export function toGeocodeErrorMessage(error: unknown): string {
   if (error instanceof GeocodeError) {
     const messages: Record<GeocodeErrorCode, string> = {
-      NOT_CONFIGURED: 'Chưa cấu hình khoá Goong API.',
+      // Lỗi cấu hình không phải lỗi của người dùng: chỉ bảo họ nhập tay để không bị kẹt.
+      NOT_CONFIGURED: 'Tạm thời chưa tra được địa chỉ tự động. Hãy nhập địa chỉ bằng tay.',
       NETWORK: 'Không lấy được địa chỉ. Kiểm tra mạng rồi chọn lại vị trí.',
-      DENIED: 'Khoá Goong API bị từ chối. Kiểm tra khoá và giới hạn của khoá.',
+      DENIED: 'Tạm thời chưa tra được địa chỉ tự động. Hãy nhập địa chỉ bằng tay.',
       QUOTA: 'Đã hết lượt tra địa chỉ hôm nay. Hãy nhập địa chỉ bằng tay.',
       NOT_FOUND: 'Chưa tìm thấy địa chỉ phù hợp. Hãy nhập địa chỉ bằng tay.',
     };
