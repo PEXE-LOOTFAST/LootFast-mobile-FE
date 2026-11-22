@@ -2,61 +2,60 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import type { MerchantPerformanceDto } from '@/features/seller/api/merchant-performance';
+import {
+  ORDER_STATUS_LABELS,
+  countByStatus,
+  formatReportPeriod,
+} from '@/features/seller/report-metrics';
 import { useTheme } from '@/hooks/use-theme';
-import { formatPrice } from '@/lib/format';
 
 type Props = {
   data: MerchantPerformanceDto;
 };
 
+// Thứ tự cố định theo vòng đời đơn, để các khoảng thời gian dễ so với nhau.
+const STATUS_ORDER = ['RESERVED', 'COMPLETED', 'NO_SHOW', 'CANCELLED', 'MERCHANT_CANCELLED'];
+
+/**
+ * Chia đơn theo trạng thái. Bốn con số tổng (doanh thu, đơn, phần, tiết kiệm) đã ở các ô phía
+ * trên nên không lặp lại ở đây.
+ */
 export function PerformanceSummaryCard({ data }: Props) {
   const theme = useTheme();
 
-  const statusEntries = Object.entries(data.ordersByStatus).filter(([, count]) => count > 0);
-
-  const rows = [
-    { label: 'Tổng đơn đặt', value: `${data.placedOrders}` },
-    { label: 'Doanh thu hoàn tất', value: formatPrice(data.completedRevenue) },
-    { label: 'Số phần giảm giá', value: `${data.discountedPortions}` },
-    { label: 'Tiết kiệm cho khách', value: formatPrice(data.customerSavings) },
-  ];
+  const dotColor: Record<string, string> = {
+    RESERVED: theme.accent,
+    COMPLETED: theme.primary,
+    NO_SHOW: theme.danger,
+    CANCELLED: theme.textSecondary,
+    MERCHANT_CANCELLED: theme.textSecondary,
+  };
+  const entries = STATUS_ORDER.map(
+    (status) => [status, countByStatus(data, status)] as const,
+  ).filter(([, count]) => count > 0);
 
   return (
     <View
       style={[styles.card, { backgroundColor: theme.backgroundElement, borderColor: theme.border }]}
     >
       <Text accessibilityRole="header" style={[styles.title, { color: theme.text }]}>
-        Tổng quan
+        Đơn theo trạng thái
       </Text>
       <Text style={[styles.period, { color: theme.textSecondary }]}>
-        {data.from} → {data.to}
+        {formatReportPeriod(data.from, data.to)} · {data.placedOrders} đơn
       </Text>
 
-      {rows.map((row, index) => (
-        <View key={row.label}>
-          <View style={styles.row}>
-            <Text style={[styles.rowLabel, { color: theme.textSecondary }]}>{row.label}</Text>
-            <Text style={[styles.rowValue, { color: theme.text }]}>{row.value}</Text>
-          </View>
-          {index < rows.length - 1 ? (
-            <View style={[styles.divider, { backgroundColor: theme.border }]} />
-          ) : null}
+      {entries.map(([status, count]) => (
+        <View key={status} style={styles.statusRow}>
+          <View
+            style={[styles.statusDot, { backgroundColor: dotColor[status] ?? theme.primary }]}
+          />
+          <Text style={[styles.statusLabel, { color: theme.textSecondary }]}>
+            {ORDER_STATUS_LABELS[status] ?? status}
+          </Text>
+          <Text style={[styles.statusValue, { color: theme.text }]}>{count}</Text>
         </View>
       ))}
-
-      {statusEntries.length > 0 ? (
-        <>
-          <View style={[styles.sectionDivider, { backgroundColor: theme.border }]} />
-          <Text style={[styles.sectionTitle, { color: theme.text }]}>Đơn theo trạng thái</Text>
-          {statusEntries.map(([status, count]) => (
-            <View key={status} style={styles.statusRow}>
-              <View style={[styles.statusDot, { backgroundColor: theme.primary }]} />
-              <Text style={[styles.statusLabel, { color: theme.textSecondary }]}>{status}</Text>
-              <Text style={[styles.statusValue, { color: theme.text }]}>{count}</Text>
-            </View>
-          ))}
-        </>
-      ) : null}
     </View>
   );
 }
@@ -70,18 +69,6 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: FontSize.subtitle, fontWeight: FontWeight.heavy, letterSpacing: -0.3 },
   period: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium, marginBottom: 6 },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: Spacing.md,
-    paddingVertical: 10,
-  },
-  rowLabel: { flexShrink: 1, fontSize: FontSize.bodySm, fontWeight: FontWeight.medium },
-  rowValue: { fontSize: FontSize.bodyLg, fontWeight: FontWeight.bold },
-  divider: { height: StyleSheet.hairlineWidth },
-  sectionDivider: { height: 1, marginVertical: Spacing.sm },
-  sectionTitle: { fontSize: FontSize.body, fontWeight: FontWeight.bold, marginBottom: Spacing.xs },
   statusRow: {
     flexDirection: 'row',
     alignItems: 'center',

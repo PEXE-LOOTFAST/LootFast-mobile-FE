@@ -1,10 +1,17 @@
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { InlineAlert } from '@/components/ui/inline-alert';
+import { Card } from '@/components/ui/card';
+import { EmptyCard } from '@/components/ui/empty-card';
+import { ErrorState } from '@/components/ui/error-state';
+import { Skeleton } from '@/components/ui/skeleton';
+import { SlowLoadingHint } from '@/components/ui/slow-loading-hint';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
-import { useMerchantPerformance } from '@/features/seller/api/merchant-performance';
+import {
+  useMerchantPerformance,
+  type MerchantPerformanceDto,
+} from '@/features/seller/api/merchant-performance';
 import { AdvancedReportCard } from '@/features/seller/components/advanced-report-card';
 import { MetricCard } from '@/features/seller/components/metric-card';
 import { PerformanceChartCard } from '@/features/seller/components/performance-chart-card';
@@ -13,6 +20,7 @@ import { SegmentedTabs } from '@/components/ui/segmented-tabs';
 import { SellerHeader } from '@/features/seller/components/seller-header';
 import { TopDealsCard } from '@/features/seller/components/top-deals-card';
 import { SellerIcons } from '@/features/seller/constants/icons';
+import { countByStatus, pickupRate } from '@/features/seller/report-metrics';
 import { useTheme } from '@/hooks/use-theme';
 import { formatPrice } from '@/lib/format';
 
@@ -25,6 +33,12 @@ const RANGE_TABS: { id: RangeId; label: string }[] = [
 ];
 
 const RANGE_DAYS: Record<RangeId, number> = { today: 0, '7d': 6, '30d': 29 };
+
+const RANGE_EMPTY_LABEL: Record<RangeId, string> = {
+  today: 'hôm nay',
+  '7d': 'trong 7 ngày qua',
+  '30d': 'trong 30 ngày qua',
+};
 
 export function SellerReportScreen() {
   const theme = useTheme();
@@ -48,42 +62,55 @@ export function SellerReportScreen() {
         <View style={styles.body}>
           <SegmentedTabs items={RANGE_TABS} onChange={setRange} value={range} />
 
-          {query.isLoading ? (
-            <ActivityIndicator color={theme.primary} size="large" style={styles.loader} />
+          {query.isLoading ? <ReportSkeleton /> : null}
+
+          {query.isError ? (
+            <ErrorState
+              message="Không tải được số liệu báo cáo. Kiểm tra mạng rồi thử lại."
+              onRetry={() => void query.refetch()}
+              retrying={query.isRefetching}
+            />
           ) : null}
 
-          {query.isError ? <InlineAlert message="Không tải được dữ liệu báo cáo." /> : null}
+          {data && data.placedOrders === 0 ? (
+            <EmptyCard
+              description="Số liệu sẽ hiện ở đây khi khách đặt deal của quán. Đăng deal cuối ngày để khách quanh đây thấy bạn."
+              title={`Chưa có đơn nào ${RANGE_EMPTY_LABEL[range]}`}
+            />
+          ) : null}
 
-          {data ? (
+          {data && data.placedOrders > 0 ? (
             <>
               <View style={styles.metricsRow}>
                 <MetricCard
+                  caption={`Từ ${countByStatus(data, 'COMPLETED')} đơn đã giao`}
+                  hint="Tổng tiền của các đơn khách đã nhận món. Đơn còn chờ lấy chưa được tính."
                   icon={SellerIcons.revenue}
                   label="Doanh thu"
                   value={formatPrice(data.completedRevenue)}
-                  hint="Doanh thu từ đơn hoàn tất."
                 />
                 <MetricCard
+                  caption={
+                    countByStatus(data, 'RESERVED') > 0
+                      ? `${countByStatus(data, 'RESERVED')} đơn đang chờ lấy`
+                      : 'Không còn đơn chờ lấy'
+                  }
+                  hint="Số đơn khách đã đặt trong khoảng thời gian này, kể cả đơn chưa lấy hoặc đã huỷ."
                   icon={SellerIcons.bag}
-                  label="Tổng đơn"
+                  label="Đơn đặt"
                   value={`${data.placedOrders}`}
-                  hint="Số đơn đặt trong khoảng thời gian."
                 />
               </View>
 
               <View style={styles.metricsRow}>
                 <MetricCard
+                  caption={`Khách tiết kiệm ${formatPrice(data.customerSavings)}`}
+                  hint="Số phần ăn khách đã nhận qua deal, thay vì phải bỏ đi cuối ngày."
                   icon={SellerIcons.tag}
                   label="Phần đã bán"
                   value={`${data.discountedPortions}`}
-                  hint="Số phần ăn bán qua deal giảm giá."
                 />
-                <MetricCard
-                  icon={SellerIcons.trend}
-                  label="Tiết kiệm cho khách"
-                  value={formatPrice(data.customerSavings)}
-                  hint="Tiền khách tiết kiệm so với giá gốc."
-                />
+                <PickupRateCard data={data} />
               </View>
 
               {data.daily.length > 1 ? <PerformanceChartCard daily={data.daily} /> : null}
@@ -105,6 +132,51 @@ export function SellerReportScreen() {
   );
 }
 
+function PickupRateCard({ data }: { data: MerchantPerformanceDto }) {
+  const rate = pickupRate(data);
+  const noShow = countByStatus(data, 'NO_SHOW');
+
+  return (
+    <MetricCard
+      caption={
+        rate === null
+          ? 'Chưa có đơn tới giờ lấy'
+          : noShow > 0
+            ? `${noShow} đơn khách không đến`
+            : 'Khách đến lấy đủ'
+      }
+      hint="Trong các đơn đã tới giờ lấy, bao nhiêu phần trăm khách đến nhận. Đơn còn chờ và đơn huỷ không tính."
+      icon={SellerIcons.trend}
+      label="Khách đến lấy"
+      value={rate === null ? '—' : `${rate}%`}
+    />
+  );
+}
+
+// Bốn ô số liệu giữ chỗ cùng bố cục 2×2, để lần mở đầu thấy ngay khung báo cáo.
+function ReportSkeleton() {
+  return (
+    <View
+      accessibilityLabel="Đang tải báo cáo"
+      accessibilityRole="progressbar"
+      style={styles.skeleton}
+    >
+      {[0, 1].map((row) => (
+        <View key={row} style={styles.metricsRow}>
+          {[0, 1].map((col) => (
+            <Card key={col} gap="sm" padding="md" style={styles.skeletonTile}>
+              <Skeleton height={14} width="60%" />
+              <Skeleton height={28} width="80%" />
+              <Skeleton height={12} width="70%" />
+            </Card>
+          ))}
+        </View>
+      ))}
+      <SlowLoadingHint />
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   screen: { flex: 1 },
   content: { paddingBottom: 120 },
@@ -117,5 +189,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
   },
   metricsRow: { flexDirection: 'row', gap: Spacing.md },
-  loader: { marginTop: Spacing.xxl },
+  skeleton: { gap: Spacing.md },
+  skeletonTile: { flex: 1 },
 });

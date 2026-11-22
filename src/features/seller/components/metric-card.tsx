@@ -36,7 +36,8 @@ export function MetricCard({ label, value, caption, icon, hint }: MetricCardProp
           ref={ref}
           accessibilityLabel={`Giải thích ${label}`}
           accessibilityRole="button"
-          hitSlop={8}
+          // Nút "?" nhỏ 18px; nới vùng chạm cho đủ 44px.
+          hitSlop={13}
           onPress={open}
           style={({ pressed }) => [
             styles.help,
