@@ -1,8 +1,11 @@
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
-import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
+import { AppText } from '@/components/ui/app-text';
+import { BrandButton } from '@/components/ui/brand-button';
+import { Card } from '@/components/ui/card';
 import { Icon } from '@/components/ui/icon';
+import { Radius, Spacing } from '@/constants/theme';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import type {
   MerchantLocationDto,
@@ -26,6 +29,7 @@ export function getShopSetupSteps({ profile, location, openingHours }: ShopSetup
     {
       key: 'profile',
       label: 'Thông tin cửa hàng',
+      description: 'Tên quán, nhóm món, email và số điện thoại',
       done: Boolean(
         profile?.storeName &&
         profile.businessCategory &&
@@ -36,6 +40,7 @@ export function getShopSetupSteps({ profile, location, openingHours }: ShopSetup
     {
       key: 'location',
       label: 'Địa chỉ quán',
+      description: 'Địa chỉ và vị trí trên bản đồ để khách tìm tới',
       done: Boolean(
         location?.addressLine &&
         location.city &&
@@ -43,81 +48,165 @@ export function getShopSetupSteps({ profile, location, openingHours }: ShopSetup
         location.longitude != null,
       ),
     },
-    { key: 'hours', label: 'Giờ mở cửa', done: (openingHours?.slots.length ?? 0) > 0 },
+    {
+      key: 'hours',
+      label: 'Giờ mở cửa',
+      description: 'Những ngày và khung giờ quán đón khách',
+      done: (openingHours?.slots.length ?? 0) > 0,
+    },
   ];
 }
 
+const openShopInfo = () => router.navigate('/seller/shop-info');
+
+/**
+ * Danh sách việc cần làm trước khi đăng deal: thanh tiến độ cho biết còn bao xa, từng bước bấm
+ * được để người bán mới biết chính xác phải điền gì thay vì chỉ thấy "0/3".
+ */
 export function ShopSetupCard(props: ShopSetupCardProps) {
   const theme = useTheme();
   const steps = getShopSetupSteps(props);
   const doneCount = steps.filter((step) => step.done).length;
+  const remaining = steps.length - doneCount;
 
-  if (doneCount === steps.length) return null;
+  if (remaining === 0) return null;
 
   return (
-    <Pressable
-      accessibilityLabel="Hoàn tất thông tin quán"
-      accessibilityRole="button"
-      onPress={() => router.navigate('/seller/shop-info')}
-      style={({ pressed }) => [
-        styles.card,
-        { backgroundColor: theme.backgroundElement, borderColor: theme.primary },
-        pressed && styles.pressed,
-      ]}
-    >
+    <Card elevated gap="md">
       <View style={styles.header}>
-        <View style={[styles.icon, { backgroundColor: theme.primarySoft }]}>
-          <Icon name={SellerIcons.store} color={theme.primary} size={20} />
+        <View style={[styles.headerIcon, { backgroundColor: theme.primarySoft }]}>
+          <Icon name={SellerIcons.store} color={theme.primary} size={22} />
         </View>
-        <View style={styles.copy}>
-          <Text style={[styles.title, { color: theme.text }]}>Hoàn tất hồ sơ quán</Text>
-          <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-            Cần đủ thông tin mới đăng được deal · {doneCount}/{steps.length} bước
-          </Text>
+        <View style={styles.headerCopy}>
+          <AppText accessibilityRole="header" variant="subtitle" weight="heavy">
+            Hoàn tất hồ sơ quán
+          </AppText>
+          <AppText tone="textSecondary" variant="footnote">
+            {doneCount === 0
+              ? `${steps.length} bước ngắn là đăng được deal đầu tiên`
+              : `Còn ${remaining} bước nữa là đăng được deal`}
+          </AppText>
         </View>
-        <Icon name={SellerIcons.chevronRight} color={theme.textSecondary} size={17} />
       </View>
 
-      <View style={styles.steps}>
-        {steps.map((step) => (
-          <View key={step.key} style={styles.step}>
-            <Icon
-              name={step.done ? SellerIcons.check : SellerIcons.plus}
-              color={step.done ? theme.primary : theme.textSecondary}
-              size={14}
-            />
-            <Text
+      <View
+        accessibilityLabel={`Đã xong ${doneCount} trên ${steps.length} bước`}
+        accessibilityRole="progressbar"
+        style={styles.progressRow}
+      >
+        <View style={[styles.track, { backgroundColor: theme.backgroundSelected }]}>
+          <View
+            style={[
+              styles.fill,
+              {
+                backgroundColor: theme.primary,
+                // Chưa xong bước nào vẫn để một vạch nhỏ, để thanh đọc ra là "tiến độ" chứ không phải ô trống.
+                width: `${Math.max((doneCount / steps.length) * 100, 4)}%`,
+              },
+            ]}
+          />
+        </View>
+        <AppText tone="primary" variant="footnote" weight="heavy">
+          {doneCount}/{steps.length}
+        </AppText>
+      </View>
+
+      <View style={[styles.steps, { borderColor: theme.border }]}>
+        {steps.map((step, index) => (
+          <Pressable
+            key={step.key}
+            accessibilityHint={step.done ? undefined : 'Mở trang Cửa hàng để điền'}
+            accessibilityLabel={`${step.label}, ${step.done ? 'đã xong' : 'chưa xong'}`}
+            accessibilityRole="button"
+            onPress={openShopInfo}
+            style={({ pressed }) => [
+              styles.step,
+              index > 0 && {
+                borderTopColor: theme.border,
+                borderTopWidth: StyleSheet.hairlineWidth,
+              },
+              pressed && { backgroundColor: theme.backgroundSelected },
+            ]}
+          >
+            <View
               style={[
-                styles.stepLabel,
-                { color: step.done ? theme.textSecondary : theme.text },
-                step.done && styles.stepDone,
+                styles.stepMarker,
+                step.done
+                  ? { backgroundColor: theme.primary, borderColor: theme.primary }
+                  : { borderColor: theme.border },
               ]}
             >
-              {step.label}
-            </Text>
-          </View>
+              {step.done ? (
+                <Icon name={SellerIcons.check} color={theme.onPrimary} size={14} />
+              ) : (
+                <AppText tone="textSecondary" variant="footnote" weight="heavy">
+                  {index + 1}
+                </AppText>
+              )}
+            </View>
+
+            <View style={styles.stepCopy}>
+              <AppText
+                tone={step.done ? 'textSecondary' : 'text'}
+                variant="body"
+                weight={step.done ? 'medium' : 'bold'}
+              >
+                {step.label}
+              </AppText>
+              {step.done ? null : (
+                <AppText tone="textSecondary" variant="footnote">
+                  {step.description}
+                </AppText>
+              )}
+            </View>
+
+            {step.done ? (
+              <AppText tone="primary" variant="footnote" weight="bold">
+                Đã xong
+              </AppText>
+            ) : (
+              <Icon name={SellerIcons.chevronRight} color={theme.textSecondary} size={18} />
+            )}
+          </Pressable>
         ))}
       </View>
-    </Pressable>
+
+      <BrandButton onPress={openShopInfo}>
+        {doneCount === 0 ? 'Bắt đầu điền thông tin quán' : 'Điền tiếp thông tin quán'}
+      </BrandButton>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { gap: Spacing.md, borderWidth: 1.5, borderRadius: Radius.xl, padding: Spacing.lg },
   header: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  icon: {
-    width: 40,
-    height: 40,
+  headerIcon: {
+    width: 44,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: Radius.full,
   },
-  copy: { flex: 1, gap: Spacing.xxs },
-  title: { fontSize: FontSize.bodyLg, fontWeight: FontWeight.heavy },
-  subtitle: { fontSize: FontSize.footnote, lineHeight: 17 },
-  steps: { gap: Spacing.sm, paddingLeft: Spacing.xs },
-  step: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
-  stepLabel: { fontSize: FontSize.bodySm, fontWeight: FontWeight.bold },
-  stepDone: { textDecorationLine: 'line-through', fontWeight: FontWeight.medium },
-  pressed: { opacity: 0.85 },
+  headerCopy: { flex: 1, gap: Spacing.xxs },
+  progressRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  track: { flex: 1, height: 8, overflow: 'hidden', borderRadius: Radius.full },
+  fill: { height: '100%', borderRadius: Radius.full },
+  steps: { overflow: 'hidden', borderWidth: 1, borderRadius: Radius.lg },
+  step: {
+    minHeight: 56,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.md,
+  },
+  stepMarker: {
+    width: 28,
+    height: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderRadius: Radius.full,
+  },
+  stepCopy: { flex: 1, gap: Spacing.xxs },
 });

@@ -19,6 +19,7 @@ import {
 } from '@/features/seller/api/merchant-deals';
 import { MERCHANT_DEALS_QUERY_KEY } from '@/features/seller/api/use-merchant-deals';
 import { MerchantRegistrationRequired } from '@/features/seller/components/merchant-registration-required';
+import { DealHowItWorks } from '@/features/seller/components/deal-how-it-works';
 import { DealImagePicker } from '@/features/seller/components/deal-image-picker';
 import { PriceField } from '@/features/seller/components/deal-input-fields';
 import { FormSteps } from '@/features/seller/components/form-steps';
@@ -70,11 +71,17 @@ export function SellerNewDealScreen() {
   // Hồ sơ quán phải đủ tên, địa chỉ, tọa độ thì backend mới cho đăng (MERCHANT_PROFILE_INCOMPLETE);
   // chặn từ đầu để người bán không nhập cả form rồi mới bị từ chối ở bước đăng.
   const isSetupDone = getShopSetupSteps(shop).every((step) => step.done);
+  const canPost = !isLoading && !shop.isError && !shop.profileMissing && isSetupDone;
 
   return (
     <SellerPageScaffold
-      onPressBack={() => router.navigate('/seller')}
-      subtitle="Bốn bước ngắn, xem trước rồi mới đăng"
+      subtitle={
+        isLoading
+          ? 'Đang kiểm tra hồ sơ quán…'
+          : canPost
+            ? 'Bốn bước ngắn, xem trước rồi mới đăng'
+            : 'Cần hồ sơ quán đầy đủ trước khi đăng'
+      }
       title="Đăng deal mới"
     >
       {isLoading ? <ActivityIndicator color={theme.primary} /> : null}
@@ -87,15 +94,20 @@ export function SellerNewDealScreen() {
       {shop.profileMissing ? <MerchantRegistrationRequired /> : null}
 
       {!isLoading && !shop.isError && !shop.profileMissing && !isSetupDone ? (
-        <ShopSetupCard
-          location={shop.location}
-          openingHours={shop.openingHours}
-          profile={shop.profile}
-        />
+        <>
+          <ShopSetupCard
+            location={shop.location}
+            openingHours={shop.openingHours}
+            profile={shop.profile}
+          />
+          <DealHowItWorks />
+        </>
       ) : null}
 
+      {shop.profileMissing ? <DealHowItWorks /> : null}
+
       {/* Chờ có đủ dữ liệu quán: useForm chốt giá trị ban đầu ở lần render đầu. */}
-      {!isLoading && !shop.isError && !shop.profileMissing && isSetupDone && shop.profile ? (
+      {canPost && shop.profile ? (
         <NewDealForm openingHours={shop.openingHours} profile={shop.profile} />
       ) : null}
     </SellerPageScaffold>
