@@ -279,7 +279,7 @@ function NewDealForm({
       {step === 0 ? (
         <SellerFormCard>
           <StepTitle
-            description="Ảnh đầu tiên là ảnh khách thấy trên thẻ deal, nên chọn ảnh rõ món nhất."
+            description="Đặt tên dễ hiểu và chọn ảnh thật của món, khách chọn deal chủ yếu qua ảnh."
             title="Bán món gì?"
           />
           <TextField
