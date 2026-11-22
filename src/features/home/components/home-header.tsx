@@ -1,15 +1,13 @@
-import { Image } from 'expo-image';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import logoMark from '@/assets/images/logo-mark.png';
 import { useUnreadCount } from '@/api/notifications';
 import { AppText } from '@/components/ui/app-text';
-import { FocusedStatusBar } from '@/components/ui/focused-status-bar';
+import { BrandMark } from '@/components/ui/brand-mark';
+import { HeroBand } from '@/components/ui/hero-band';
 import { Icon } from '@/components/ui/icon';
 import { IconButton } from '@/components/ui/icon-button';
-import { MaxContentWidth, Radius, Spacing } from '@/constants/theme';
+import { Radius, Spacing } from '@/constants/theme';
 import { NotificationSheet } from '@/features/home/components/notification-sheet';
 import { HomeIcons } from '@/features/home/constants/icons';
 import { useGpsNote } from '@/features/home/hooks/use-gps-note';
@@ -34,7 +32,6 @@ type HomeHeaderProps = {
  */
 export function HomeHeader({ dealCount }: HomeHeaderProps) {
   const theme = useTheme();
-  const insets = useSafeAreaInsets();
   const now = useNow(5 * 60_000);
   const { isAuthenticated } = useAuthSession();
   const { data: unreadData } = useUnreadCount(isAuthenticated);
@@ -51,20 +48,9 @@ export function HomeHeader({ dealCount }: HomeHeaderProps) {
 
   return (
     <>
-      <FocusedStatusBar style="light" />
-
-      <View
-        style={[styles.band, { backgroundColor: theme.hero, paddingTop: insets.top + Spacing.md }]}
-      >
-        <View style={[styles.decor, { backgroundColor: theme.heroDecor }]} />
-
+      <HeroBand>
         <View style={styles.row}>
-          <Image
-            accessibilityIgnoresInvertColors
-            accessible={false}
-            source={logoMark}
-            style={[styles.logo, { borderColor: theme.onHero }]}
-          />
+          <BrandMark size={LOGO_SIZE} />
 
           <View style={styles.copy}>
             <AppText
@@ -130,7 +116,7 @@ export function HomeHeader({ dealCount }: HomeHeaderProps) {
             </Pressable>
           )}
         </View>
-      </View>
+      </HeroBand>
 
       {gpsPopover}
 
@@ -169,39 +155,9 @@ function locationLine(status: LocationStatus, dealCount?: number) {
 }
 
 const LOGO_SIZE = 48;
-const DECOR_SIZE = 220;
 
 const styles = StyleSheet.create({
-  band: {
-    overflow: 'hidden',
-    borderBottomLeftRadius: Radius.xxl,
-    borderBottomRightRadius: Radius.xxl,
-    paddingBottom: Spacing.lg,
-  },
-  // Vòng tròn sáng hơn nền ở góc phải, lặp lại hình tròn trong icon app.
-  decor: {
-    position: 'absolute',
-    top: -DECOR_SIZE / 2,
-    right: -DECOR_SIZE / 4,
-    width: DECOR_SIZE,
-    height: DECOR_SIZE,
-    borderRadius: Radius.full,
-  },
-  row: {
-    width: '100%',
-    maxWidth: MaxContentWidth,
-    alignSelf: 'center',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-    paddingHorizontal: Spacing.lg,
-  },
-  logo: {
-    width: LOGO_SIZE,
-    height: LOGO_SIZE,
-    borderWidth: 2,
-    borderRadius: Radius.lg,
-  },
+  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
   copy: { flex: 1, minWidth: 0, gap: Spacing.xxs },
   greeting: { letterSpacing: -0.3 },
   location: {

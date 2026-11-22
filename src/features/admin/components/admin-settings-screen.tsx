@@ -52,7 +52,7 @@ export function AdminSettingsScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
-      <AdminHeader date={today} />
+      <AdminHeader title="Cài đặt" date={today} />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.body}>

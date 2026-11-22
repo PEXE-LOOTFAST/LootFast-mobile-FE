@@ -1,61 +1,15 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-import { Badge } from '@/components/ui/badge';
-import { FontSize, FontWeight, Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
+import { TabHeader } from '@/components/ui/tab-header';
 import { formatFullDate } from '@/lib/format';
 
 type AdminHeaderProps = {
+  /** Tên tab đang mở, để admin biết mình đang ở đâu thay vì chỉ thấy "LootFast Admin". */
+  title: string;
   date: Date;
 };
 
-// Cùng kiểu header với khu người mua và người bán, thêm nhãn "Quản trị" để admin luôn biết mình
-// đang ở khu vực có quyền cao. Không có chuông thông báo: backend chưa gửi thông báo nào cho
-// admin, một nút bấm vào chỉ để báo "sắp có" là ngõ cụt.
-export function AdminHeader({ date }: AdminHeaderProps) {
-  const insets = useSafeAreaInsets();
-  const theme = useTheme();
-
-  return (
-    <View
-      style={[
-        styles.container,
-        { paddingTop: insets.top + Spacing.sm, backgroundColor: theme.background },
-      ]}
-    >
-      <View style={styles.row}>
-        <View style={styles.copy}>
-          <View style={styles.titleRow}>
-            <Text
-              accessibilityRole="header"
-              numberOfLines={1}
-              style={[styles.title, { color: theme.text }]}
-            >
-              LootFast Admin
-            </Text>
-            <Badge label="Quản trị" size="sm" tone="primarySoft" />
-          </View>
-          <Text style={[styles.date, { color: theme.textSecondary }]}>{formatFullDate(date)}</Text>
-        </View>
-      </View>
-    </View>
-  );
+// Cùng header với khu người mua và người bán, thêm nhãn "Quản trị" để admin luôn biết mình đang ở
+// khu vực có quyền cao. Không có chuông thông báo: backend chưa gửi thông báo nào cho admin, một
+// nút bấm vào chỉ để báo "sắp có" là ngõ cụt.
+export function AdminHeader({ title, date }: AdminHeaderProps) {
+  return <TabHeader subtitle={formatFullDate(date)} title={title} variant="admin" />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.sm,
-  },
-  row: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  copy: { flex: 1, gap: Spacing.xxs },
-  titleRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
-  title: {
-    flexShrink: 1,
-    fontSize: FontSize.titleLg,
-    fontWeight: FontWeight.heavy,
-    letterSpacing: -0.3,
-  },
-  date: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium },
-});

@@ -10,8 +10,6 @@ import { useAuthSession } from '@/hooks/use-auth-session';
 import { withAuth } from '@/lib/auth-session';
 import type { IconName } from '@/components/ui/icon';
 
-const BRAND_NAME = 'LootFast';
-
 type BuyerHeaderProps = {
   title: string;
   subtitle?: string;
@@ -38,7 +36,7 @@ export function BuyerHeader({ title, subtitle, subtitleIcon, onBack }: BuyerHead
         onBack={onBack}
         subtitle={subtitle}
         subtitleIcon={subtitleIcon}
-        title={`${BRAND_NAME} · ${title}`}
+        title={title}
         trailing={
           <>
             <IconButton
@@ -49,7 +47,7 @@ export function BuyerHeader({ title, subtitle, subtitleIcon, onBack }: BuyerHead
                 gpsStatus === 'granted' ? 'on' : gpsStatus === 'checking' ? undefined : 'off'
               }
               onPress={onPressGps}
-              tone="header"
+              tone="hero"
             />
 
             {/* Khách chưa đăng nhập không có thông báo nào để xem, nên chỗ này là lối đăng nhập. */}
@@ -59,14 +57,14 @@ export function BuyerHeader({ title, subtitle, subtitleIcon, onBack }: BuyerHead
                 badgeCount={unreadCount}
                 icon={HomeIcons.bell}
                 onPress={() => setIsNotificationsOpen(true)}
-                tone="header"
+                tone="hero"
               />
             ) : (
               <IconButton
                 accessibilityLabel="Đăng nhập"
                 icon={HomeIcons.login}
                 onPress={withAuth()}
-                tone="header"
+                tone="hero"
               />
             )}
           </>

@@ -1,33 +1,44 @@
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppText } from '@/components/ui/app-text';
-import { Badge } from '@/components/ui/badge';
+import { BrandMark } from '@/components/ui/brand-mark';
+import { HeroBand } from '@/components/ui/hero-band';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { UiIcons } from '@/constants/icons';
 import { Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
-/** Khu đang đứng: `seller` thêm nhãn "Người bán" để người vừa mua vừa bán biết mình ở chế độ nào. */
-export type HeaderVariant = 'buyer' | 'seller';
+/**
+ * Khu đang đứng: `seller` và `admin` thêm nhãn nhỏ cạnh tiêu đề, để người vừa mua vừa bán, hay
+ * admin, luôn biết mình đang ở chế độ nào.
+ */
+export type HeaderVariant = 'buyer' | 'seller' | 'admin';
+
+const VARIANT_LABELS: Record<HeaderVariant, string | null> = {
+  buyer: null,
+  seller: 'Người bán',
+  admin: 'Quản trị',
+};
+
+const LOGO_SIZE = 40;
 
 type TabHeaderProps = {
   title: string;
   /** Một dòng phụ; dài quá sẽ bị cắt để header luôn cùng chiều cao giữa các tab. */
   subtitle?: string;
   subtitleIcon?: IconName;
-  /** Có thì hiện nút quay lại bên trái tiêu đề. */
+  /** Có thì hiện nút quay lại thay cho logo (màn phụ mở từ một tab). */
   onBack?: () => void;
-  /** Cụm nút hành động bên phải (vd. GPS, thông báo). */
+  /** Cụm nút hành động bên phải; nút icon dùng `tone="hero"` để hợp nền xanh. */
   trailing?: ReactNode;
   variant?: HeaderVariant;
 };
 
 /**
- * Header dùng chung cho các tab: cùng chiều cao, cùng cấu trúc (tiêu đề + dòng phụ bên trái,
- * hành động bên phải) để chuyển tab không thấy khung nhảy. Nền trùng nền trang thay vì một mảng
- * màu đậm, để nội dung bên dưới là thứ nổi bật nhất.
+ * Header dùng chung cho mọi tab và màn phụ: cùng dải thương hiệu với Trang chủ, cùng chiều cao,
+ * cùng cấu trúc (logo hoặc nút quay lại, tiêu đề + dòng phụ, hành động bên phải) để chuyển tab
+ * không thấy khung nhảy.
  */
 export function TabHeader({
   title,
@@ -37,16 +48,11 @@ export function TabHeader({
   trailing,
   variant = 'buyer',
 }: TabHeaderProps) {
-  const insets = useSafeAreaInsets();
   const theme = useTheme();
+  const variantLabel = VARIANT_LABELS[variant];
 
   return (
-    <View
-      style={[
-        styles.container,
-        { paddingTop: insets.top + Spacing.sm, backgroundColor: theme.background },
-      ]}
-    >
+    <HeroBand>
       <View style={styles.row}>
         {onBack ? (
           <Pressable
@@ -56,38 +62,45 @@ export function TabHeader({
             onPress={onBack}
             style={({ pressed }) => [
               styles.backButton,
-              { backgroundColor: theme.backgroundElement, borderColor: theme.border },
+              { backgroundColor: theme.heroButton },
               pressed && styles.pressed,
             ]}
           >
-            <Icon name={UiIcons.back} color={theme.text} size={20} />
+            <Icon name={UiIcons.back} color={theme.onHero} size={20} />
           </Pressable>
-        ) : null}
+        ) : (
+          <BrandMark size={LOGO_SIZE} />
+        )}
 
         <View style={styles.copy}>
           <View style={styles.titleRow}>
             <AppText
               accessibilityRole="header"
-              adjustsFontSizeToFit
-              minimumFontScale={0.8}
+              color={theme.onHero}
               numberOfLines={1}
               style={styles.title}
-              variant="titleLg"
+              variant="title"
               weight="heavy"
             >
               {title}
             </AppText>
-            {variant === 'seller' ? <Badge label="Người bán" size="sm" tone="primarySoft" /> : null}
+            {variantLabel ? (
+              <View style={[styles.variantPill, { backgroundColor: theme.heroButton }]}>
+                <AppText color={theme.onHero} variant="micro" weight="heavy">
+                  {variantLabel}
+                </AppText>
+              </View>
+            ) : null}
           </View>
           {subtitle ? (
             <View style={styles.subtitleRow}>
               {subtitleIcon ? (
-                <Icon name={subtitleIcon} color={theme.textSecondary} size={13} />
+                <Icon name={subtitleIcon} color={theme.onHeroMuted} size={13} />
               ) : null}
               <AppText
+                color={theme.onHeroMuted}
                 numberOfLines={1}
                 style={styles.subtitle}
-                tone="textSecondary"
                 variant="footnote"
                 weight="medium"
               >
@@ -99,22 +112,17 @@ export function TabHeader({
 
         {trailing ? <View style={styles.trailing}>{trailing}</View> : null}
       </View>
-    </View>
+    </HeroBand>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.sm,
-  },
   row: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
   backButton: {
     width: 44,
     height: 44,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
     borderRadius: Radius.full,
   },
   pressed: { opacity: 0.8 },
@@ -122,6 +130,11 @@ const styles = StyleSheet.create({
   copy: { flex: 1, minWidth: 0, gap: Spacing.xxs },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   title: { flexShrink: 1, letterSpacing: -0.3 },
+  variantPill: {
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xxs,
+  },
   subtitleRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },
   subtitle: { flexShrink: 1 },
 });

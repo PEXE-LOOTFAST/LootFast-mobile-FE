@@ -58,7 +58,7 @@ export function AdminModerationScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
-      <AdminHeader date={today} />
+      <AdminHeader title="Kiểm duyệt" date={today} />
 
       <KeyboardAwareScrollView
         contentContainerStyle={styles.content}

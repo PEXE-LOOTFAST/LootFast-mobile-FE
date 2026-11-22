@@ -54,7 +54,7 @@ export function StoreApprovalScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
-      <AdminHeader date={new Date()} />
+      <AdminHeader title="Duyệt quán" date={new Date()} />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.body}>

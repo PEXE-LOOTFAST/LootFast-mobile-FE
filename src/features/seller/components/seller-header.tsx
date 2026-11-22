@@ -10,8 +10,6 @@ import { NotificationSheet } from '@/features/home/components/notification-sheet
 import { HomeIcons } from '@/features/home/constants/icons';
 import { useTheme } from '@/hooks/use-theme';
 
-const BRAND_NAME = 'LootFast';
-
 type SellerHeaderProps = {
   title: string;
   subtitle?: string;
@@ -30,7 +28,7 @@ export function SellerHeader({ title, subtitle, subtitleIcon, onBack }: SellerHe
         onBack={onBack}
         subtitle={subtitle}
         subtitleIcon={subtitleIcon}
-        title={`${BRAND_NAME} · ${title}`}
+        title={title}
         variant="seller"
         trailing={
           <IconButton
@@ -38,7 +36,7 @@ export function SellerHeader({ title, subtitle, subtitleIcon, onBack }: SellerHe
             badgeCount={unreadCount}
             icon={HomeIcons.bell}
             onPress={() => setIsNotificationsOpen(true)}
-            tone="header"
+            tone="hero"
           />
         }
       />
@@ -73,7 +71,7 @@ export function SellerHeaderWithAction({
       onBack={onBack}
       subtitle={subtitle}
       subtitleIcon={subtitleIcon}
-      title={`${BRAND_NAME} · ${title}`}
+      title={title}
       variant="seller"
       trailing={
         <Pressable
@@ -82,12 +80,12 @@ export function SellerHeaderWithAction({
           onPress={onPressAction}
           style={({ pressed }) => [
             styles.actionButton,
-            { backgroundColor: theme.primarySoft },
+            { backgroundColor: theme.onHero },
             pressed && styles.pressed,
           ]}
         >
-          <Icon name={actionIcon} color={theme.primary} size={18} />
-          <Text style={[styles.actionLabel, { color: theme.primary }]}>{actionLabel}</Text>
+          <Icon name={actionIcon} color={theme.hero} size={18} />
+          <Text style={[styles.actionLabel, { color: theme.hero }]}>{actionLabel}</Text>
         </Pressable>
       }
     />

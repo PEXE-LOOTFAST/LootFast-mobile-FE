@@ -81,7 +81,7 @@ export function AdminManageScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
-      <AdminHeader date={today} />
+      <AdminHeader title="Quản lý" date={today} />
 
       <ScrollView
         contentContainerStyle={styles.content}
