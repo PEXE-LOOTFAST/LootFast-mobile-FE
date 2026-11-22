@@ -45,7 +45,9 @@ export function TabBar({
       {tabRoutes.map((route) => {
         const isFocused = route.key === focusedKey;
         const isCenter = route.name === centerRoute;
-        const label = descriptors[route.key]?.options.title ?? route.name;
+        const options = descriptors[route.key]?.options;
+        const label = options?.title ?? route.name;
+        const badge = options?.tabBarBadge;
         const icon = icons[route.name];
         if (!icon) return null;
 
@@ -65,7 +67,7 @@ export function TabBar({
         return (
           <Pressable
             key={route.key}
-            accessibilityLabel={label}
+            accessibilityLabel={badge === undefined ? label : `${label}, ${badge} mục cần xử lý`}
             accessibilityRole="tab"
             accessibilityState={{ selected: isFocused }}
             onPress={handlePress}
@@ -78,6 +80,18 @@ export function TabBar({
             ) : (
               <View style={[styles.indicator, isFocused && { backgroundColor: theme.primarySoft }]}>
                 <Icon name={icon} color={color} size={iconSize} />
+                {badge === undefined ? null : (
+                  <View
+                    style={[
+                      styles.badge,
+                      { backgroundColor: theme.danger, borderColor: theme.backgroundElement },
+                    ]}
+                  >
+                    <AppText color={theme.onDanger} variant="micro" weight="heavy">
+                      {typeof badge === 'number' && badge > 99 ? '99+' : badge}
+                    </AppText>
+                  </View>
+                )}
               </View>
             )}
 
@@ -116,6 +130,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: Radius.full,
+  },
+  // Số đếm đỏ ở góc icon (vd. đơn đang chờ lấy), đặt theo `tabBarBadge` của từng màn.
+  badge: {
+    position: 'absolute',
+    top: -Spacing.xxs,
+    right: Spacing.sm,
+    minWidth: 18,
+    height: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.xxs,
   },
   // Nhô lên khỏi thanh tab: marginTop âm bù lại chiều cao dư để nhãn vẫn thẳng hàng.
   centerButton: {
