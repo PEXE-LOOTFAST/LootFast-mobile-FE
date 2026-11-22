@@ -1,9 +1,10 @@
 import type { SellerOrderTab, SellerPickupBucket } from '@/features/seller/types';
 
+// Nhãn ngắn để còn chỗ cho số đếm bên cạnh (vd. "Đang bán · 2") trên màn hẹp.
 export const SELLER_ORDER_TABS: { id: SellerOrderTab; label: string }[] = [
-  { id: 'incoming', label: 'Đơn hàng đến' },
-  { id: 'running', label: 'Deal đang chạy' },
-  { id: 'ended', label: 'Đã dừng bán' },
+  { id: 'incoming', label: 'Đơn đến' },
+  { id: 'running', label: 'Đang bán' },
+  { id: 'ended', label: 'Đã dừng' },
 ];
 
 export const SELLER_PICKUP_BUCKETS: { id: SellerPickupBucket; label: string }[] = [

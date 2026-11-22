@@ -1,5 +1,5 @@
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, type ComponentProps } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
@@ -26,6 +26,7 @@ import { SegmentedTabs } from '@/components/ui/segmented-tabs';
 import { SellerDealCard } from '@/features/seller/components/seller-deal-card';
 import { SellerHeaderWithAction } from '@/features/seller/components/seller-header';
 import { SellerIcons } from '@/features/seller/constants/icons';
+import { useTodayOrders } from '@/features/seller/hooks/use-new-order-alerts';
 import { SELLER_ORDER_TABS } from '@/features/seller/constants/seller-order-tabs';
 import type { SellerDeal, SellerOrderTab } from '@/features/seller/types';
 import { useTheme } from '@/hooks/use-theme';
@@ -66,6 +67,17 @@ export function SellerOrderScreen() {
   const deals = dealDtos.map(toSellerDeal);
   const runningDeals = deals.filter((deal) => deal.status === 'running');
   const endedDeals = deals.filter((deal) => deal.status === 'ended');
+  const { waitingCount } = useTodayOrders();
+  // Số đếm cạnh mỗi mục để biết mục nào có việc mà không phải bấm vào từng mục.
+  const tabCounts: Record<SellerOrderTab, number | undefined> = {
+    incoming: waitingCount,
+    running: dealsQuery.data ? runningDeals.length : undefined,
+    ended: dealsQuery.data ? endedDeals.length : undefined,
+  };
+  const tabItems = SELLER_ORDER_TABS.map((item) => {
+    const count = tabCounts[item.id];
+    return { ...item, label: count ? `${item.label} · ${count}` : item.label };
+  });
 
   // Backend nhận tổng số suất chứ không nhận số còn lại, và bắt gửi kèm version đang giữ để
   // không ghi đè thay đổi của phiên khác.
@@ -123,7 +135,7 @@ export function SellerOrderScreen() {
     });
   };
 
-  const renderDeals = (list: typeof deals, empty: { title: string; description: string }) => {
+  const renderDeals = (list: typeof deals, empty: ComponentProps<typeof EmptyCard>) => {
     if (dealsQuery.isLoading) {
       return <ActivityIndicator color={theme.primary} size="large" style={styles.loader} />;
     }
@@ -157,7 +169,11 @@ export function SellerOrderScreen() {
         actionIcon={SellerIcons.qrCode}
         actionLabel="Quét QR"
         onPressAction={openScanner}
-        subtitle="Deal đang chạy và đơn đến"
+        subtitle={
+          waitingCount > 0
+            ? `${waitingCount} khách sắp tới lấy hôm nay`
+            : 'Đơn đến và deal của quán'
+        }
         title="Đơn hàng"
       />
 
@@ -166,7 +182,7 @@ export function SellerOrderScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.body}>
-          <SegmentedTabs items={SELLER_ORDER_TABS} onChange={setTab} value={tab} />
+          <SegmentedTabs items={tabItems} onChange={setTab} value={tab} />
 
           {updateQuantity.error ? (
             <InlineAlert message={toMerchantDealErrorMessage(updateQuantity.error)} />
@@ -176,8 +192,10 @@ export function SellerOrderScreen() {
 
           {tab === 'running'
             ? renderDeals(runningDeals, {
-                title: 'Chưa có deal đang chạy',
-                description: 'Đăng deal đầu tiên để khách quanh đây thấy quán của bạn.',
+                title: 'Chưa có deal đang bán',
+                description:
+                  'Món còn dư cuối ngày? Đăng deal để khách quanh đây thấy quán của bạn.',
+                action: { label: 'Đăng deal', onPress: () => router.navigate('/seller/new-deal') },
               })
             : null}
 
