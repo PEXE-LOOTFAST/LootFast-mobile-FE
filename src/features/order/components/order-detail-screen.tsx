@@ -1,14 +1,13 @@
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import QRCode from 'react-native-qrcode-svg';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet, Text, View } from 'react-native';
 
+import { TabHeader } from '@/components/ui/tab-header';
 import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
 import { BrandButton } from '@/components/ui/brand-button';
 import { EmptyCard } from '@/components/ui/empty-card';
 import { ErrorState } from '@/components/ui/error-state';
-import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { LoadingState } from '@/components/ui/loading-state';
 import { OrderReviewCard } from '@/features/review/components/order-review-card';
@@ -20,7 +19,6 @@ import {
   Spacing,
   StaticColors,
 } from '@/constants/theme';
-import { HomeIcons } from '@/features/home/constants/icons';
 import {
   toOrderErrorMessage,
   type OrderStatusDto,
@@ -79,20 +77,8 @@ export function OrderDetailScreen() {
     });
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]} edges={['top']}>
-      <View style={[styles.header, { borderBottomColor: theme.border }]}>
-        <Pressable
-          accessibilityLabel="Quay lại"
-          accessibilityRole="button"
-          hitSlop={8}
-          onPress={() => router.back()}
-        >
-          <Icon name={HomeIcons.chevronLeft} color={theme.text} size={22} />
-        </Pressable>
-        <Text accessibilityRole="header" style={[styles.headerTitle, { color: theme.text }]}>
-          Đơn đã giữ
-        </Text>
-      </View>
+    <View style={[styles.screen, { backgroundColor: theme.background }]}>
+      <TabHeader onBack={() => router.back()} title="Đơn đã giữ" />
 
       <KeyboardAwareScrollView
         contentContainerStyle={styles.content}
@@ -259,7 +245,7 @@ export function OrderDetailScreen() {
           </>
         ) : null}
       </KeyboardAwareScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -275,21 +261,7 @@ function Row({ label, value }: { label: string; value: string }) {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1 },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-  },
-  headerTitle: {
-    flex: 1,
-    fontSize: FontSize.title,
-    fontWeight: FontWeight.heavy,
-    letterSpacing: -0.3,
-  },
+  screen: { flex: 1 },
   content: {
     width: '100%',
     maxWidth: MaxContentWidth,

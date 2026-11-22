@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { TabHeader } from '@/components/ui/tab-header';
 import { EmptyCard } from '@/components/ui/empty-card';
 import { ErrorState } from '@/components/ui/error-state';
 import { Icon } from '@/components/ui/icon';
@@ -37,20 +37,8 @@ export function FavoritesScreen() {
   const actionError = toggleDeal.error ?? toggleStore.error;
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]} edges={['top']}>
-      <View style={[styles.header, { borderBottomColor: theme.border }]}>
-        <Pressable
-          accessibilityLabel="Quay lại"
-          accessibilityRole="button"
-          hitSlop={8}
-          onPress={() => router.navigate('/profile')}
-        >
-          <Icon name={ProfileIcons.chevronRight} color={theme.text} size={20} />
-        </Pressable>
-        <Text accessibilityRole="header" style={[styles.title, { color: theme.text }]}>
-          Món yêu thích
-        </Text>
-      </View>
+    <View style={[styles.screen, { backgroundColor: theme.background }]}>
+      <TabHeader onBack={() => router.navigate('/profile')} title="Món yêu thích" />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {!user ? (
@@ -116,7 +104,7 @@ export function FavoritesScreen() {
           </>
         ) : null}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -164,16 +152,7 @@ function StoreRow({ item, onRemove }: { item: FavoriteItemDto; onRemove: () => v
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1 },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-  },
-  title: { fontSize: FontSize.title, fontWeight: FontWeight.heavy, letterSpacing: -0.3 },
+  screen: { flex: 1 },
   content: {
     width: '100%',
     maxWidth: MaxContentWidth,

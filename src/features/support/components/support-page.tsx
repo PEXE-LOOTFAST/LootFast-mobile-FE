@@ -1,11 +1,9 @@
 import { router, type Href } from 'expo-router';
 import type { ReactNode } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { Icon } from '@/components/ui/icon';
-import { FontSize, FontWeight, MaxContentWidth, Spacing } from '@/constants/theme';
-import { SupportIcons } from '@/features/support/constants/icons';
+import { TabHeader } from '@/components/ui/tab-header';
+import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 type SupportPageProps = {
@@ -15,44 +13,26 @@ type SupportPageProps = {
   children: ReactNode;
 };
 
-/** Khung chung của màn Hỗ trợ và màn Chính sách: thanh tiêu đề có nút quay lại và vùng cuộn. */
+/** Khung chung của màn Hỗ trợ và màn Chính sách: header chung có nút quay lại và vùng cuộn. */
 export function SupportPage({ title, fallbackHref, children }: SupportPageProps) {
   const theme = useTheme();
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]} edges={['top']}>
-      <View style={[styles.header, { borderBottomColor: theme.border }]}>
-        <Pressable
-          accessibilityLabel="Quay lại"
-          accessibilityRole="button"
-          hitSlop={8}
-          onPress={() => (router.canGoBack() ? router.back() : router.navigate(fallbackHref))}
-        >
-          <Icon name={SupportIcons.back} color={theme.text} size={22} />
-        </Pressable>
-        <Text accessibilityRole="header" style={[styles.title, { color: theme.text }]}>
-          {title}
-        </Text>
-      </View>
+    <View style={[styles.screen, { backgroundColor: theme.background }]}>
+      <TabHeader
+        onBack={() => (router.canGoBack() ? router.back() : router.navigate(fallbackHref))}
+        title={title}
+      />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {children}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1 },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-  },
-  title: { fontSize: FontSize.title, fontWeight: FontWeight.heavy, letterSpacing: -0.3 },
+  screen: { flex: 1 },
   content: {
     width: '100%',
     maxWidth: MaxContentWidth,

@@ -1,8 +1,9 @@
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { IconButton } from '@/components/ui/icon-button';
+import { TabHeader } from '@/components/ui/tab-header';
 import { EmptyCard } from '@/components/ui/empty-card';
 import { ErrorState } from '@/components/ui/error-state';
 import { Icon } from '@/components/ui/icon';
@@ -50,36 +51,26 @@ export function StoreScreen() {
     : '';
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]} edges={['top']}>
-      <View style={[styles.header, { borderBottomColor: theme.border }]}>
-        <Pressable
-          accessibilityLabel="Quay lại"
-          accessibilityRole="button"
-          hitSlop={8}
-          onPress={() => router.back()}
-        >
-          <Icon name={HomeIcons.chevronLeft} color={theme.text} size={22} />
-        </Pressable>
-        <Text numberOfLines={1} style={[styles.headerTitle, { color: theme.text }]}>
-          {store?.storeName ?? 'Cửa hàng'}
-        </Text>
-
-        {user && store ? (
-          <Pressable
-            accessibilityLabel={isSaved ? 'Bỏ lưu cửa hàng' : 'Lưu cửa hàng'}
-            accessibilityRole="button"
-            disabled={toggleStore.isPending}
-            hitSlop={8}
-            onPress={() => toggleStore.mutate({ merchantId: store.merchantId, isSaved })}
-          >
-            <Icon
-              name={HomeIcons.heart}
-              color={isSaved ? theme.danger : theme.textSecondary}
-              size={22}
+    <View style={[styles.screen, { backgroundColor: theme.background }]}>
+      <TabHeader
+        onBack={() => router.back()}
+        title={store?.storeName ?? 'Cửa hàng'}
+        trailing={
+          user && store ? (
+            // Đã lưu thì nút sáng lên; bấm lúc đang gửi thì bỏ qua để không gửi hai lần.
+            <IconButton
+              accessibilityLabel={isSaved ? 'Bỏ lưu cửa hàng' : 'Lưu cửa hàng'}
+              icon={HomeIcons.heart}
+              isActive={isSaved}
+              onPress={() =>
+                toggleStore.isPending ||
+                toggleStore.mutate({ merchantId: store.merchantId, isSaved })
+              }
+              tone="hero"
             />
-          </Pressable>
-        ) : null}
-      </View>
+          ) : undefined
+        }
+      />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {storeQuery.isLoading ? <LoadingState /> : null}
@@ -213,26 +204,12 @@ export function StoreScreen() {
           </>
         ) : null}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1 },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-  },
-  headerTitle: {
-    flex: 1,
-    fontSize: FontSize.title,
-    fontWeight: FontWeight.heavy,
-    letterSpacing: -0.3,
-  },
+  screen: { flex: 1 },
   content: {
     width: '100%',
     maxWidth: MaxContentWidth,
