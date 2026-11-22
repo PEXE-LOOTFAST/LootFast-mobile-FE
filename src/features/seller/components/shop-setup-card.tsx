@@ -27,7 +27,7 @@ type ShopSetupCardProps = {
 export function getShopSetupSteps({ profile, location, openingHours }: ShopSetupCardProps) {
   return [
     {
-      key: 'profile',
+      key: 'profile' as const,
       label: 'Thông tin cửa hàng',
       description: 'Tên quán, nhóm món, email và số điện thoại',
       done: Boolean(
@@ -38,7 +38,7 @@ export function getShopSetupSteps({ profile, location, openingHours }: ShopSetup
       ),
     },
     {
-      key: 'location',
+      key: 'location' as const,
       label: 'Địa chỉ quán',
       description: 'Địa chỉ và vị trí trên bản đồ để khách tìm tới',
       done: Boolean(
@@ -49,7 +49,7 @@ export function getShopSetupSteps({ profile, location, openingHours }: ShopSetup
       ),
     },
     {
-      key: 'hours',
+      key: 'hours' as const,
       label: 'Giờ mở cửa',
       description: 'Những ngày và khung giờ quán đón khách',
       done: (openingHours?.slots.length ?? 0) > 0,
@@ -57,7 +57,11 @@ export function getShopSetupSteps({ profile, location, openingHours }: ShopSetup
   ];
 }
 
-const openShopInfo = () => router.navigate('/seller/shop-info');
+type SetupStepKey = ReturnType<typeof getShopSetupSteps>[number]['key'];
+
+// Mở trang Cửa hàng và cuộn thẳng tới phần còn thiếu thay vì bắt người bán tự tìm.
+const openShopInfo = (section?: SetupStepKey) =>
+  router.navigate({ pathname: '/seller/shop-info', params: section ? { section } : {} });
 
 /**
  * Danh sách việc cần làm trước khi đăng deal: thanh tiến độ cho biết còn bao xa, từng bước bấm
@@ -118,7 +122,7 @@ export function ShopSetupCard(props: ShopSetupCardProps) {
             accessibilityHint={step.done ? undefined : 'Mở trang Cửa hàng để điền'}
             accessibilityLabel={`${step.label}, ${step.done ? 'đã xong' : 'chưa xong'}`}
             accessibilityRole="button"
-            onPress={openShopInfo}
+            onPress={() => openShopInfo(step.key)}
             style={({ pressed }) => [
               styles.step,
               index > 0 && {
@@ -171,7 +175,7 @@ export function ShopSetupCard(props: ShopSetupCardProps) {
         ))}
       </View>
 
-      <BrandButton onPress={openShopInfo}>
+      <BrandButton onPress={() => openShopInfo(steps.find((step) => !step.done)?.key)}>
         {doneCount === 0 ? 'Bắt đầu điền thông tin quán' : 'Điền tiếp thông tin quán'}
       </BrandButton>
     </Card>

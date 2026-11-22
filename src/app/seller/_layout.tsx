@@ -23,7 +23,7 @@ export default function SellerLayout() {
         options={{ title: 'Đơn hàng', tabBarBadge: waitingCount > 0 ? waitingCount : undefined }}
       />
       <Tabs.Screen name="new-deal" options={{ title: 'Đăng deal' }} />
-      <Tabs.Screen name="shop-info" options={{ title: 'Thông tin quán' }} />
+      <Tabs.Screen name="shop-info" options={{ title: 'Cửa hàng' }} />
       <Tabs.Screen name="settings" options={{ title: 'Cài đặt' }} />
       <Tabs.Screen name="shop" options={{ href: null }} />
       <Tabs.Screen name="plan" options={{ href: null }} />

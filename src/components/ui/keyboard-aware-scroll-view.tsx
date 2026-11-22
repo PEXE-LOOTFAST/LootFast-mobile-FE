@@ -3,9 +3,11 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useImperativeHandle,
   useMemo,
   useRef,
   type ReactNode,
+  type Ref,
 } from 'react';
 import {
   Dimensions,
@@ -32,6 +34,8 @@ type KeyboardAwareScrollViewProps = ScrollViewProps & {
   children: ReactNode;
   /** Phần bị che thêm phía trên bàn phím (vd. dải nút nổi ở đáy) cần chừa ra khi cuộn. */
   bottomOffset?: number;
+  /** Để màn gọi `scrollTo` (vd. cuộn tới mục đang có lỗi). */
+  ref?: Ref<ScrollView | null>;
 };
 
 /**
@@ -44,12 +48,14 @@ export function KeyboardAwareScrollView({
   bottomOffset = 0,
   onScroll,
   scrollEventThrottle,
+  ref,
   ...props
 }: KeyboardAwareScrollViewProps) {
   const keyboard = useKeyboard();
   const { height, top } = keyboard;
   const scrollRef = useRef<ScrollView>(null);
   const scrollY = useRef(0);
+  useImperativeHandle<ScrollView | null, ScrollView | null>(ref, () => scrollRef.current, []);
 
   const scrollFocusedIntoView = useCallback(() => {
     if (!height) return;

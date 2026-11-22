@@ -20,12 +20,17 @@ import { useTheme } from '@/hooks/use-theme';
 import type { Coordinate } from '@/hooks/use-user-location';
 import type { FormErrors } from '@/types/form';
 
+/** Các khối của form, theo thứ tự từ trên xuống. */
+export type ShopSection = 'profile' | 'contact' | 'location' | 'hours';
+
 type ShopInfoFieldsProps = {
   values: ShopInfoValues;
   errors: FormErrors<ShopInfoValues>;
   onChange: <K extends keyof ShopInfoValues>(field: K, value: ShopInfoValues[K]) => void;
   /** Ô giới thiệu quán không bắt buộc nên form đăng ký bán hàng bỏ qua cho gọn. */
   showDescription?: boolean;
+  /** Vị trí đầu mỗi khối (so với khung chứa form), để màn cha cuộn tới đúng khối. */
+  onSectionLayout?: (section: ShopSection, y: number) => void;
 };
 
 /**
@@ -37,6 +42,7 @@ export function ShopInfoFields({
   errors,
   onChange,
   showDescription = true,
+  onSectionLayout,
 }: ShopInfoFieldsProps) {
   const theme = useTheme();
   const categories = useShopCategories();
@@ -62,7 +68,11 @@ export function ShopInfoFields({
 
   return (
     <>
-      <SectionTitle icon={SellerIcons.store} label="Hồ sơ cửa hàng" />
+      <SectionTitle
+        icon={SellerIcons.store}
+        label="Hồ sơ cửa hàng"
+        onLayout={(y) => onSectionLayout?.('profile', y)}
+      />
       <SellerFormCard compact>
         <TextField
           size="compact"
@@ -116,7 +126,11 @@ export function ShopInfoFields({
         </View>
       </SellerFormCard>
 
-      <SectionTitle icon={SellerIcons.person} label="Liên hệ" />
+      <SectionTitle
+        icon={SellerIcons.person}
+        label="Liên hệ"
+        onLayout={(y) => onSectionLayout?.('contact', y)}
+      />
       <SellerFormCard compact>
         <View style={styles.row}>
           <View style={styles.rowWide}>
@@ -147,7 +161,11 @@ export function ShopInfoFields({
         </View>
       </SellerFormCard>
 
-      <SectionTitle icon={SellerIcons.tag} label="Địa chỉ quán" />
+      <SectionTitle
+        icon={SellerIcons.location}
+        label="Địa chỉ quán"
+        onLayout={(y) => onSectionLayout?.('location', y)}
+      />
       <SellerFormCard compact>
         <TextField
           size="compact"
@@ -264,7 +282,11 @@ export function ShopInfoFields({
         </Text>
       </SellerFormCard>
 
-      <SectionTitle icon={SellerIcons.clock} label="Giờ hoạt động" />
+      <SectionTitle
+        icon={SellerIcons.clock}
+        label="Giờ hoạt động"
+        onLayout={(y) => onSectionLayout?.('hours', y)}
+      />
       <OpeningHoursFields errors={errors} onChange={onChange} values={values} />
 
       <LocationPickerModal
@@ -311,12 +333,19 @@ function toCoordinate(latitude: string, longitude: string): Coordinate | null {
   return { latitude: lat, longitude: lng };
 }
 
-function SectionTitle({ icon, label }: { icon: IconName; label: string }) {
+type SectionTitleProps = { icon: IconName; label: string; onLayout?: (y: number) => void };
+
+function SectionTitle({ icon, label, onLayout }: SectionTitleProps) {
   const theme = useTheme();
 
   return (
-    <View style={styles.sectionTitle}>
-      <Icon name={icon} color={theme.text} size={14} />
+    <View
+      onLayout={onLayout ? (event) => onLayout(event.nativeEvent.layout.y) : undefined}
+      style={styles.sectionTitle}
+    >
+      <View style={[styles.sectionIcon, { backgroundColor: theme.primarySoft }]}>
+        <Icon name={icon} color={theme.primary} size={15} />
+      </View>
       <Text accessibilityRole="header" style={[styles.sectionLabel, { color: theme.text }]}>
         {label}
       </Text>
@@ -325,8 +354,20 @@ function SectionTitle({ icon, label }: { icon: IconName; label: string }) {
 }
 
 const styles = StyleSheet.create({
-  sectionTitle: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: Spacing.xxs },
-  sectionLabel: { fontSize: FontSize.bodySm, fontWeight: FontWeight.heavy },
+  sectionTitle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginTop: Spacing.sm,
+  },
+  sectionIcon: {
+    width: 28,
+    height: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: Radius.full,
+  },
+  sectionLabel: { fontSize: FontSize.bodyLg, fontWeight: FontWeight.heavy },
   multiline: { minHeight: 64, textAlignVertical: 'top' },
   group: { gap: Spacing.sm },
   rowWide: { flex: 1.4 },
