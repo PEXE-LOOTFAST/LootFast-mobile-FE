@@ -1,5 +1,5 @@
-import { router } from 'expo-router';
-import { useState } from 'react';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useCallback, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { KeyboardAwareScrollView } from '@/components/ui/keyboard-aware-scroll-view';
@@ -42,6 +42,16 @@ import { showToast } from '@/lib/toast';
 export function SellerOrderScreen() {
   const theme = useTheme();
   const [tab, setTab] = useState<SellerOrderTab>('incoming');
+  // Mở từ ô "Ngay lúc này" ở Báo cáo thì nhảy thẳng tới mục đó. Xoá tham số sau khi dùng để lần sau
+  // bấm thanh tab vẫn giữ mục người bán đang xem.
+  const { view } = useLocalSearchParams<{ view?: SellerOrderTab }>();
+  useFocusEffect(
+    useCallback(() => {
+      if (!view) return;
+      setTab(view);
+      router.setParams({ view: undefined });
+    }, [view]),
+  );
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   // Đổi key mỗi lần mở để máy quét bắt đầu lại từ đầu, không mang trạng thái "đã quét" của lần trước.
   const [scannerKey, setScannerKey] = useState(0);

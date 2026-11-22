@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
+import { FontSize, FontWeight, Radius } from '@/constants/theme';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { Popover } from '@/components/ui/popover';
 import { SellerIcons } from '@/features/seller/constants/icons';
@@ -18,7 +18,8 @@ type MetricCardProps = {
 
 const HINT_WIDTH = 240;
 
-// Thẻ số liệu nửa chiều ngang: nhãn + nút "?" + icon ở trên, con số lớn ở giữa, chú thích ở dưới.
+// Thẻ số liệu nửa chiều ngang: icon + nút "?" ở trên, rồi nhãn một dòng, con số lớn, chú thích.
+// Nhãn có hàng riêng để không bị icon và nút "?" ép xuống hai dòng ở màn hẹp.
 export function MetricCard({ label, value, caption, icon, hint }: MetricCardProps) {
   const theme = useTheme();
   const { ref, anchor, open, close } = useAnchor();
@@ -28,9 +29,9 @@ export function MetricCard({ label, value, caption, icon, hint }: MetricCardProp
       style={[styles.card, { backgroundColor: theme.backgroundElement, borderColor: theme.border }]}
     >
       <View style={styles.topRow}>
-        <Text numberOfLines={2} style={[styles.label, { color: theme.textSecondary }]}>
-          {label}
-        </Text>
+        <View style={[styles.iconBadge, { backgroundColor: theme.primarySoft }]}>
+          <Icon name={icon} color={theme.primary} size={16} />
+        </View>
 
         <Pressable
           ref={ref}
@@ -47,11 +48,11 @@ export function MetricCard({ label, value, caption, icon, hint }: MetricCardProp
         >
           <Icon name={SellerIcons.help} color={theme.textSecondary} size={11} />
         </Pressable>
-
-        <View style={[styles.iconBadge, { backgroundColor: theme.primarySoft }]}>
-          <Icon name={icon} color={theme.primary} size={16} />
-        </View>
       </View>
+
+      <Text numberOfLines={1} style={[styles.label, { color: theme.textSecondary }]}>
+        {label}
+      </Text>
 
       <Text numberOfLines={1} style={[styles.value, { color: theme.text }]}>
         {value}
@@ -82,8 +83,8 @@ const styles = StyleSheet.create({
     borderRadius: Radius.xl,
     padding: 14,
   },
-  topRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 6 },
-  label: { flex: 1, fontSize: FontSize.bodySm, fontWeight: FontWeight.bold, lineHeight: 18 },
+  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  label: { fontSize: FontSize.bodySm, fontWeight: FontWeight.bold, lineHeight: 18 },
   help: {
     width: 18,
     height: 18,
@@ -91,7 +92,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 1,
     borderRadius: Radius.full,
-    marginTop: Spacing.xxs,
   },
   iconBadge: {
     width: 30,

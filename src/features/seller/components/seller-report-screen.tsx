@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
+import { AppText } from '@/components/ui/app-text';
 import { Card } from '@/components/ui/card';
 import { EmptyCard } from '@/components/ui/empty-card';
 import { ErrorState } from '@/components/ui/error-state';
@@ -18,8 +19,11 @@ import { PerformanceChartCard } from '@/features/seller/components/performance-c
 import { PerformanceSummaryCard } from '@/features/seller/components/performance-summary-card';
 import { SegmentedTabs } from '@/components/ui/segmented-tabs';
 import { SellerHeader } from '@/features/seller/components/seller-header';
+import { SellerTodayCard } from '@/features/seller/components/seller-today-card';
+import { ShopSetupCard, getShopSetupSteps } from '@/features/seller/components/shop-setup-card';
 import { TopDealsCard } from '@/features/seller/components/top-deals-card';
 import { SellerIcons } from '@/features/seller/constants/icons';
+import { useMerchantShop } from '@/features/seller/hooks/use-merchant-shop';
 import { countByStatus, pickupRate } from '@/features/seller/report-metrics';
 import { useTheme } from '@/hooks/use-theme';
 import { formatPrice } from '@/lib/format';
@@ -53,13 +57,40 @@ export function SellerReportScreen() {
 
   const query = useMerchantPerformance(from, today);
   const data = query.data;
+  const shop = useMerchantShop();
+  const shopReady = !shop.isLoading && !shop.isError && !shop.profileMissing;
+  const isSetupDone = getShopSetupSteps(shop).every((step) => step.done);
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
-      <SellerHeader subtitle="Doanh thu và hiệu suất deal" title="Báo cáo" />
+      <SellerHeader
+        subtitle={shop.profile?.storeName || 'Doanh thu và hiệu suất deal'}
+        subtitleIcon={shop.profile?.storeName ? SellerIcons.store : undefined}
+        title="Báo cáo"
+      />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.body}>
+          {/* Báo cáo là tab mở đầu của người bán: quán chưa đủ hồ sơ thì việc đầu tiên là điền. */}
+          {shopReady && !isSetupDone ? (
+            <ShopSetupCard
+              location={shop.location}
+              openingHours={shop.openingHours}
+              profile={shop.profile}
+            />
+          ) : null}
+
+          {shopReady && isSetupDone ? <SellerTodayCard /> : null}
+
+          <AppText
+            accessibilityRole="header"
+            style={styles.sectionTitle}
+            variant="bodyLg"
+            weight="heavy"
+          >
+            Kết quả bán hàng
+          </AppText>
+
           <SegmentedTabs items={RANGE_TABS} onChange={setRange} value={range} />
 
           {query.isLoading ? <ReportSkeleton /> : null}
@@ -188,6 +219,7 @@ const styles = StyleSheet.create({
     marginTop: 14,
     paddingHorizontal: Spacing.lg,
   },
+  sectionTitle: { marginTop: Spacing.xs, marginBottom: -Spacing.xs },
   metricsRow: { flexDirection: 'row', gap: Spacing.md },
   skeleton: { gap: Spacing.md },
   skeletonTile: { flex: 1 },

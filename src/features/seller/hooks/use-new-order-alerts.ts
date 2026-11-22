@@ -21,13 +21,7 @@ const startOfDayMs = (ms: number) => {
  * Chỉ chạy khi app đang mở. Báo cả khi app đóng cần push notification từ backend.
  */
 export function useNewOrderAlerts(enabled: boolean) {
-  const dayStart = startOfDayMs(useNow(60_000));
-  const range = useMemo(
-    () => ({ from: new Date(dayStart), to: new Date(dayStart + DAY_MS) }),
-    [dayStart],
-  );
-  const ordersQuery = useMerchantOrders(enabled ? range : null);
-  const orders = ordersQuery.data?.items;
+  const { dayStart, orders, waitingCount } = useTodayOrders(enabled);
 
   // Đơn đã thấy, theo ngày: qua ngày mới thì bắt đầu lại để không báo dồn đơn của ngày mới.
   const seen = useRef<{ day: number; ids: Set<string> } | null>(null);
@@ -57,7 +51,22 @@ export function useNewOrderAlerts(enabled: boolean) {
     );
   }, [orders, dayStart]);
 
+  return { waitingCount };
+}
+
+/**
+ * Đơn có giờ lấy trong hôm nay. Cùng khoá truy vấn ở mọi nơi gọi (thanh tab, Báo cáo, cảnh báo đơn
+ * mới) nên chỉ một lần gọi API, tự làm mới 30 giây/lần.
+ */
+export function useTodayOrders(enabled = true) {
+  const dayStart = startOfDayMs(useNow(60_000));
+  const range = useMemo(
+    () => ({ from: new Date(dayStart), to: new Date(dayStart + DAY_MS) }),
+    [dayStart],
+  );
+  const ordersQuery = useMerchantOrders(enabled ? range : null);
+  const orders = ordersQuery.data?.items;
   const waitingCount = (orders ?? []).filter((order) => order.orderStatus === 'RESERVED').length;
 
-  return { waitingCount };
+  return { dayStart, orders, waitingCount, isLoading: ordersQuery.isLoading };
 }
