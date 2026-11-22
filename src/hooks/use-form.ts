@@ -23,6 +23,19 @@ export function useForm<T extends Record<string, string>>({
     setErrors((current) => (current[field] ? { ...current, [field]: undefined } : current));
   }
 
+  /**
+   * Kiểm tra riêng vài ô, cho form chia nhiều bước: chỉ hiện lỗi của các ô thuộc bước đang làm,
+   * không làm đỏ những ô người dùng chưa tới. Trả về true khi các ô đó đều hợp lệ.
+   */
+  function validateFields(fields: readonly (keyof T)[]) {
+    const all = validate(values);
+    const fieldErrors: FormErrors<T> = {};
+    for (const field of fields) fieldErrors[field] = all[field];
+
+    setErrors((current) => ({ ...current, ...fieldErrors }));
+    return fields.every((field) => !all[field]);
+  }
+
   async function submit() {
     if (isSubmitting) return;
 
@@ -38,5 +51,5 @@ export function useForm<T extends Record<string, string>>({
     }
   }
 
-  return { values, errors, isSubmitting, setField, submit };
+  return { values, errors, isSubmitting, setField, submit, validateFields };
 }

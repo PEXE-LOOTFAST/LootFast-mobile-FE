@@ -18,13 +18,15 @@ const IMAGE_HEIGHT = 148;
 type DealCardProps = {
   deal: Deal;
   onPress?: () => void;
+  /** Tắt ở bản xem trước của người bán: khoảng cách tính theo vị trí từng khách. */
+  showDistance?: boolean;
 };
 
 /**
  * Thẻ deal ảnh lớn phía trên: món ăn là thứ khiến người ta bấm vào, nên ảnh chiếm phần lớn thẻ.
  * Trên ảnh chỉ đặt % giảm, khoảng cách và cảnh báo sắp hết; tên, quán, giá và giờ lấy nằm dưới.
  */
-export function DealCard({ deal, onPress }: DealCardProps) {
+export function DealCard({ deal, onPress, showDistance = true }: DealCardProps) {
   const theme = useTheme();
   const discount = formatDiscount(deal.price, deal.originalPrice);
   const isLowStock = deal.remaining <= LOW_STOCK_THRESHOLD;
@@ -33,12 +35,12 @@ export function DealCard({ deal, onPress }: DealCardProps) {
   return (
     <Pressable
       accessibilityLabel={`${deal.name}, ${deal.store.name}, giá ${formatPrice(deal.price)}, lấy từ ${deal.pickupWindow.start} đến ${deal.pickupWindow.end}`}
-      accessibilityRole="button"
+      accessibilityRole={onPress ? 'button' : undefined}
       onPress={onPress}
       style={({ pressed }) => [
         styles.card,
         { backgroundColor: theme.backgroundElement, borderColor: theme.border },
-        pressed && styles.pressed,
+        pressed && onPress ? styles.pressed : null,
       ]}
     >
       <View style={styles.media}>
@@ -46,12 +48,14 @@ export function DealCard({ deal, onPress }: DealCardProps) {
 
         <View style={styles.overlayTop}>
           {discount ? <Badge label={discount} size="lg" tone="danger" /> : <View />}
-          <View style={[styles.pill, { backgroundColor: theme.backgroundElement }]}>
-            <Icon name={HomeIcons.distance} color={theme.text} size={12} />
-            <AppText variant="footnote" weight="bold">
-              {formatDistance(deal.distanceKm)}
-            </AppText>
-          </View>
+          {showDistance ? (
+            <View style={[styles.pill, { backgroundColor: theme.backgroundElement }]}>
+              <Icon name={HomeIcons.distance} color={theme.text} size={12} />
+              <AppText variant="footnote" weight="bold">
+                {formatDistance(deal.distanceKm)}
+              </AppText>
+            </View>
+          ) : null}
         </View>
 
         {isLowStock ? (
