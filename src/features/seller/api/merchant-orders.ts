@@ -99,7 +99,7 @@ const MESSAGES: Record<string, string> = {
 
 export function toMerchantOrderErrorMessage(error: unknown): string {
   if (error instanceof ApiException) {
-    return MESSAGES[error.code] ?? `Thao tác không thành công (${error.code}). Vui lòng thử lại.`;
+    return MESSAGES[error.code] ?? 'Thao tác không thành công. Vui lòng thử lại.';
   }
 
   return 'Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.';

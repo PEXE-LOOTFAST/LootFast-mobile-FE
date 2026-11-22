@@ -17,6 +17,10 @@ import {
   useUpdateDealQuantity,
 } from '@/features/seller/api/use-merchant-deals';
 import { IncomingOrdersSection } from '@/features/seller/components/incoming-orders-section';
+import {
+  PickupResultSheet,
+  type PickupResult,
+} from '@/features/seller/components/pickup-result-sheet';
 import { QrScannerModal } from '@/features/seller/components/qr-scanner-modal';
 import { SegmentedTabs } from '@/components/ui/segmented-tabs';
 import { SellerDealCard } from '@/features/seller/components/seller-deal-card';
@@ -26,6 +30,7 @@ import { SELLER_ORDER_TABS } from '@/features/seller/constants/seller-order-tabs
 import type { SellerDeal, SellerOrderTab } from '@/features/seller/types';
 import { useTheme } from '@/hooks/use-theme';
 import { confirmAction } from '@/lib/confirm';
+import { haptics } from '@/lib/haptics';
 import { showToast } from '@/lib/toast';
 
 /**
@@ -38,6 +43,9 @@ export function SellerOrderScreen() {
   const theme = useTheme();
   const [tab, setTab] = useState<SellerOrderTab>('incoming');
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  // Đổi key mỗi lần mở để máy quét bắt đầu lại từ đầu, không mang trạng thái "đã quét" của lần trước.
+  const [scannerKey, setScannerKey] = useState(0);
+  const [pickupResult, setPickupResult] = useState<PickupResult | null>(null);
   const dealsQuery = useMerchantDeals();
   const updateQuantity = useUpdateDealQuantity();
   const hideDeal = useHideDeal();
@@ -83,6 +91,28 @@ export function SellerOrderScreen() {
       onError: (error) => showToast(toMerchantDealErrorMessage(error), { tone: 'error' }),
     });
 
+  const openScanner = () => {
+    setPickupResult(null);
+    setScannerKey((key) => key + 1);
+    setIsScannerOpen(true);
+  };
+
+  // Mã QR của khách đã là bằng chứng nhận món nên xác nhận luôn, rồi hiện kết quả to để người bán
+  // biết giao món gì và có phải thu tiền không.
+  const confirmScannedCode = (code: string) => {
+    setPickupResult({ status: 'pending', code });
+    confirmPickup.mutate(code, {
+      onSuccess: (order) => {
+        haptics.success();
+        setPickupResult({ status: 'success', code, order });
+      },
+      onError: (error) => {
+        haptics.error();
+        setPickupResult({ status: 'error', code, message: toMerchantOrderErrorMessage(error) });
+      },
+    });
+  };
+
   const renderDeals = (list: typeof deals, empty: { title: string; description: string }) => {
     if (dealsQuery.isLoading) {
       return <ActivityIndicator color={theme.primary} size="large" style={styles.loader} />;
@@ -116,7 +146,7 @@ export function SellerOrderScreen() {
       <SellerHeaderWithAction
         actionIcon={SellerIcons.qrCode}
         actionLabel="Quét QR"
-        onPressAction={() => setIsScannerOpen(true)}
+        onPressAction={openScanner}
         subtitle="Deal đang chạy và đơn đến"
         title="Đơn hàng"
       />
@@ -151,18 +181,16 @@ export function SellerOrderScreen() {
       </KeyboardAwareScrollView>
 
       <QrScannerModal
-        visible={isScannerOpen}
+        key={scannerKey}
         onClose={() => setIsScannerOpen(false)}
-        onScan={(code) => {
-          confirmPickup.mutate(code, {
-            onSuccess: (order) => {
-              showToast(`Đã xác nhận: khách nhận ${order.dealName}.`, { tone: 'success' });
-            },
-            onError: (error) => {
-              showToast(toMerchantOrderErrorMessage(error), { tone: 'error' });
-            },
-          });
-        }}
+        onScan={confirmScannedCode}
+        visible={isScannerOpen}
+      />
+
+      <PickupResultSheet
+        onClose={() => setPickupResult(null)}
+        onScanAgain={openScanner}
+        result={pickupResult}
       />
     </View>
   );

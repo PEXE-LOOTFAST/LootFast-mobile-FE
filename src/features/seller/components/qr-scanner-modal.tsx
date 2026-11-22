@@ -1,16 +1,18 @@
 import { CameraView, scanFromURLAsync, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
-import { useCallback, useState } from 'react';
-import { Alert, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { FontSize, FontWeight, Spacing, StaticColors } from '@/constants/theme';
+import { FontSize, FontWeight, Radius, Spacing, StaticColors } from '@/constants/theme';
 import { Icon } from '@/components/ui/icon';
 import { BrandButton } from '@/components/ui/brand-button';
 import { HomeIcons } from '@/features/home/constants/icons';
 import { SellerIcons } from '@/features/seller/constants/icons';
 
 const QR_PREFIX = 'lootfast://pickup/';
+const FEEDBACK_MS = 2500;
+const NOT_LOOTFAST = 'Mã này không phải mã nhận món của LootFast. Nhờ khách mở lại đơn trong app.';
 const CODE_PREFIX = 'LF-';
 
 function extractPickupCode(data: string): string | undefined {
@@ -30,6 +32,15 @@ export function QrScannerModal({ visible, onClose, onScan }: QrScannerModalProps
   const insets = useSafeAreaInsets();
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
+  // Báo ngay trên khung camera khi quét trúng mã lạ, thay vì im lặng như thể camera không chạy.
+  const [feedback, setFeedback] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!feedback) return;
+    const timer = setTimeout(() => setFeedback(null), FEEDBACK_MS);
+
+    return () => clearTimeout(timer);
+  }, [feedback]);
 
   const handleResult = useCallback(
     (code: string) => {
@@ -45,6 +56,7 @@ export function QrScannerModal({ visible, onClose, onScan }: QrScannerModalProps
       if (scanned) return;
       const code = extractPickupCode(data);
       if (code) handleResult(code);
+      else setFeedback(NOT_LOOTFAST);
     },
     [scanned, handleResult],
   );
@@ -60,13 +72,13 @@ export function QrScannerModal({ visible, onClose, onScan }: QrScannerModalProps
 
     const barcodes = await scanFromURLAsync(asset.uri, ['qr']);
     if (barcodes.length === 0) {
-      Alert.alert('Không tìm thấy mã QR', 'Ảnh này không chứa mã QR hợp lệ. Chọn ảnh khác.');
+      setFeedback('Không thấy mã QR trong ảnh này. Chọn ảnh khác hoặc quét trực tiếp.');
       return;
     }
 
     const code = extractPickupCode(barcodes[0]!.data);
     if (!code) {
-      Alert.alert('Mã QR không hợp lệ', 'Mã QR này không phải mã lấy hàng của LootFast.');
+      setFeedback(NOT_LOOTFAST);
       return;
     }
 
@@ -140,6 +152,11 @@ export function QrScannerModal({ visible, onClose, onScan }: QrScannerModalProps
               </View>
               <View style={styles.overlayBottom}>
                 <Text style={styles.hint}>Đưa camera vào mã QR trên màn hình khách hàng</Text>
+                {feedback ? (
+                  <View accessibilityLiveRegion="polite" style={styles.feedback}>
+                    <Text style={styles.feedbackText}>{feedback}</Text>
+                  </View>
+                ) : null}
               </View>
             </View>
           </View>
@@ -165,7 +182,7 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.md,
     zIndex: 10,
   },
-  headerButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+  headerButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   title: { color: StaticColors.white, fontSize: FontSize.title, fontWeight: FontWeight.bold },
   permissionContainer: {
     flex: 1,
@@ -196,6 +213,20 @@ const styles = StyleSheet.create({
     fontSize: FontSize.body,
     textAlign: 'center' as const,
     paddingHorizontal: Spacing.xxxl,
+  },
+  feedback: {
+    marginTop: Spacing.lg,
+    marginHorizontal: Spacing.xl,
+    borderRadius: Radius.lg,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+    backgroundColor: StaticColors.white,
+  },
+  feedbackText: {
+    color: StaticColors.black,
+    fontSize: FontSize.bodySm,
+    fontWeight: FontWeight.bold,
+    textAlign: 'center' as const,
   },
   corner: { position: 'absolute' as const, width: CORNER_SIZE, height: CORNER_SIZE },
   cornerTL: {

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
-import { FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import {
   PICKUP_CODE_PREFIX,
@@ -16,11 +16,16 @@ import {
 } from '@/features/seller/api/use-merchant-orders';
 import { IncomingOrderFilters } from '@/features/seller/components/incoming-order-filters';
 import { IncomingOrdersPanel } from '@/features/seller/components/incoming-orders-panel';
+import {
+  PickupResultSheet,
+  type PickupResult,
+} from '@/features/seller/components/pickup-result-sheet';
 import { RejectPaymentModal } from '@/features/seller/components/reject-payment-modal';
 import { PICKUP_CODE_LENGTH } from '@/features/seller/constants/seller-order-tabs';
 import type { SellerPickupBucket } from '@/features/seller/types';
 import { useTheme } from '@/hooks/use-theme';
 import { confirmAction } from '@/lib/confirm';
+import { haptics } from '@/lib/haptics';
 
 const BUCKET_STATUS: Record<SellerPickupBucket, MerchantOrderDto['orderStatus']> = {
   waiting: 'RESERVED',
@@ -46,7 +51,7 @@ export function IncomingOrdersSection() {
   const [bucket, setBucket] = useState<SellerPickupBucket>('waiting');
   const [code, setCode] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [deliveredMessage, setDeliveredMessage] = useState<string | null>(null);
+  const [pickupResult, setPickupResult] = useState<PickupResult | null>(null);
   const [rejecting, setRejecting] = useState<MerchantOrderDto | null>(null);
 
   const range = useMemo(() => {
@@ -79,8 +84,8 @@ export function IncomingOrdersSection() {
     (confirmPayment.isPending ? confirmPayment.variables : null) ??
     (rejectPayment.isPending ? rejectPayment.variables.orderId : null);
 
-  const error =
-    confirmPickup.error ?? confirmPayment.error ?? rejectPayment.error ?? ordersQuery.error;
+  // Lỗi xác nhận nhận món hiện trong thẻ kết quả, không lặp lại ở banner.
+  const error = confirmPayment.error ?? rejectPayment.error ?? ordersQuery.error;
 
   const submitCode = () => {
     if (code.length !== PICKUP_CODE_LENGTH) return;
@@ -89,14 +94,24 @@ export function IncomingOrdersSection() {
       title: 'Xác nhận khách đã nhận món',
       message: `Khách đã nhận đơn có mã ${PICKUP_CODE_PREFIX}${code} tại quán? Không hoàn tác được.`,
       confirmLabel: 'Đã nhận',
-      onConfirm: () =>
+      onConfirm: () => {
+        setPickupResult({ status: 'pending', code });
         confirmPickup.mutate(code, {
           onSuccess: (order) => {
+            haptics.success();
             setCode('');
-            setDeliveredMessage(`Khách đã nhận ${order.dealName} × ${order.quantity}.`);
+            setPickupResult({ status: 'success', code, order });
           },
-          onError: () => setDeliveredMessage(null),
-        }),
+          onError: (pickupError) => {
+            haptics.error();
+            setPickupResult({
+              status: 'error',
+              code,
+              message: toMerchantOrderErrorMessage(pickupError),
+            });
+          },
+        });
+      },
     });
   };
 
@@ -116,10 +131,7 @@ export function IncomingOrdersSection() {
         date={date}
         isSubmittingCode={confirmPickup.isPending}
         isToday={isSameDay(date, new Date())}
-        onChangeCode={(value) => {
-          setCode(value);
-          setDeliveredMessage(null);
-        }}
+        onChangeCode={setCode}
         onChangeDate={setDate}
         onChangeSearch={setSearchQuery}
         onPressToday={() => setDate(startOfDay(new Date()))}
@@ -127,9 +139,6 @@ export function IncomingOrdersSection() {
         searchQuery={searchQuery}
       />
 
-      {deliveredMessage ? (
-        <Text style={[styles.success, { color: theme.primary }]}>{deliveredMessage}</Text>
-      ) : null}
       {error ? <InlineAlert message={toMerchantOrderErrorMessage(error)} /> : null}
 
       {ordersQuery.isLoading ? (
@@ -145,6 +154,8 @@ export function IncomingOrdersSection() {
           orders={visible}
         />
       )}
+
+      <PickupResultSheet onClose={() => setPickupResult(null)} result={pickupResult} />
 
       <RejectPaymentModal
         isSubmitting={rejectPayment.isPending}
@@ -162,6 +173,5 @@ export function IncomingOrdersSection() {
 
 const styles = StyleSheet.create({
   container: { gap: 14 },
-  success: { fontSize: FontSize.bodySm, fontWeight: FontWeight.bold, textAlign: 'center' },
   loader: { marginTop: Spacing.xxl },
 });
