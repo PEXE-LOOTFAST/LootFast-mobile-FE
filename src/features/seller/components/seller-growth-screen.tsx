@@ -11,11 +11,11 @@ import { useTheme } from '@/hooks/use-theme';
 // khi có danh sách thì mỗi chương trình là một thẻ cùng kiểu với thẻ bên dưới.
 export function SellerGrowthScreen() {
   const theme = useTheme();
-  const goToShop = () => router.navigate('/seller/shop');
+  const goToSettings = () => router.navigate('/seller/settings');
 
   return (
     <SellerPageScaffold
-      onPressBack={goToShop}
+      onPressBack={goToSettings}
       subtitle="Các chương trình có điều kiện dành cho deal cuối ngày"
       title="Chương trình tăng trưởng"
     >
@@ -49,10 +49,10 @@ export function SellerGrowthScreen() {
 
       <Text
         accessibilityRole="button"
-        onPress={goToShop}
+        onPress={goToSettings}
         style={[styles.link, { color: theme.primary }]}
       >
-        Quay về Hồ sơ quán
+        Quay về Cài đặt
       </Text>
     </SellerPageScaffold>
   );
