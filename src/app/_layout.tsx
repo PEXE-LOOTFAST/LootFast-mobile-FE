@@ -1,5 +1,6 @@
 import { QueryClientProvider } from '@tanstack/react-query';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
@@ -27,6 +28,10 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        {/* Theo theme của app chứ không theo máy: app mặc định sáng kể cả khi máy để tối, mà
+            'auto' sẽ cho chữ trắng trên nền sáng. Màn nào có nền đậm phía trên thì dùng
+            FocusedStatusBar để đè lên trong lúc đang hiện. */}
+        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="(auth)" />

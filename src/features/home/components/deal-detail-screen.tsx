@@ -1,11 +1,11 @@
-import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { setStatusBarStyle } from 'expo-status-bar';
-import { useCallback, useMemo, useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BrandButton } from '@/components/ui/brand-button';
 import { ErrorState } from '@/components/ui/error-state';
+import { FocusedStatusBar } from '@/components/ui/focused-status-bar';
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { LoadingState } from '@/components/ui/loading-state';
@@ -51,14 +51,6 @@ function goBack() {
 export function DealDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const dealQuery = useDeal(typeof id === 'string' ? id : undefined);
-
-  // Ảnh món tràn lên dưới status bar nên cần icon sáng, giống Trang chủ.
-  useFocusEffect(
-    useCallback(() => {
-      setStatusBarStyle('light');
-      return () => setStatusBarStyle('auto');
-    }, []),
-  );
 
   if (typeof id !== 'string') return <DealNotFound />;
   if (dealQuery.isPending) return <DealDetailLoading />;
@@ -122,6 +114,8 @@ function DealDetail({ deal }: { deal: Deal }) {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
+      {/* Ảnh món tràn lên dưới status bar nên cần chữ sáng; màn tải và màn lỗi giữ màu theo theme. */}
+      <FocusedStatusBar style="light" />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <DealDetailHero
           deal={deal}
