@@ -14,8 +14,11 @@ type IconButtonProps = {
   icon: IconName;
   accessibilityLabel: string;
   onPress?: () => void;
-  /** `header`: nút trong suốt đặt trên header; `surface`: nút có nền và viền trên thẻ/màn. */
-  tone?: 'header' | 'surface';
+  /**
+   * `header`: nút trong suốt đặt trên header; `surface`: nút có nền và viền trên thẻ/màn;
+   * `hero`: nút tròn nền mờ đặt trên dải thương hiệu xanh của Trang chủ.
+   */
+  tone?: 'header' | 'surface' | 'hero';
   badgeCount?: number;
   /** Tô nổi nút khi tính năng nó điều khiển đang bật (vd. bộ lọc đang áp dụng). */
   isActive?: boolean;
@@ -36,12 +39,18 @@ export function IconButton({
 }: IconButtonProps) {
   const theme = useTheme();
   const onHeader = tone === 'header';
-  const iconColor = isActive ? theme.primary : theme.text;
+  const onHero = tone === 'hero';
+  const iconColor = isActive ? theme.primary : onHero ? theme.onHero : theme.text;
   // Viền badge/chấm cùng màu nền phía sau để chúng trông như khoét vào nút.
-  const ringColor = onHeader ? theme.background : theme.backgroundElement;
+  const ringColor = onHero ? theme.hero : onHeader ? theme.background : theme.backgroundElement;
   const surface = isActive
     ? { backgroundColor: theme.primarySoft, borderColor: theme.primary }
     : { backgroundColor: theme.backgroundElement, borderColor: theme.border };
+  const toneStyle = onHero
+    ? [styles.heroButton, { backgroundColor: theme.heroButton }]
+    : onHeader
+      ? styles.headerButton
+      : surface;
 
   return (
     <Pressable
@@ -53,13 +62,9 @@ export function IconButton({
       accessibilityState={{ selected: isActive }}
       hitSlop={Spacing.xs}
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.button,
-        onHeader ? styles.headerButton : surface,
-        pressed && styles.pressed,
-      ]}
+      style={({ pressed }) => [styles.button, toneStyle, pressed && styles.pressed]}
     >
-      <Icon name={icon} color={iconColor} size={onHeader ? 24 : 20} />
+      <Icon name={icon} color={iconColor} size={onHeader || onHero ? 24 : 20} />
 
       {indicator ? (
         <View
@@ -94,6 +99,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
   },
   headerButton: { backgroundColor: 'transparent', borderColor: 'transparent' },
+  heroButton: { borderColor: 'transparent', borderRadius: Radius.full },
   pressed: { opacity: 0.8 },
   dot: {
     position: 'absolute',

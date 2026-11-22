@@ -19,6 +19,15 @@ export const Colors = {
     danger: '#C44636',
     /** Chữ/icon đặt trên nền `danger`. */
     onDanger: '#FFFFFF',
+    /** Dải thương hiệu đầu Trang chủ, cùng tông xanh với icon app. */
+    hero: '#16794B',
+    onHero: '#FFFFFF',
+    /** Dòng phụ trên dải thương hiệu: nhạt hơn chữ chính nhưng vẫn đủ tương phản. */
+    onHeroMuted: '#D3EBDD',
+    /** Vòng tròn trang trí trên dải, gợi lại vòng tròn sáng trong icon app. */
+    heroDecor: '#21885A',
+    /** Nền nút đặt trên dải (vd. chuông thông báo). */
+    heroButton: 'rgba(255, 255, 255, 0.16)',
   },
   // Dark trung tính: nền xám than, các lớp sáng dần để thẻ tách khỏi nền; màu xanh chỉ dùng để
   // nhấn (nút chính, mục đang chọn, giá) thay vì phủ lên mọi lớp như bản cũ.
@@ -37,6 +46,12 @@ export const Colors = {
     border: '#2A2D2B',
     danger: '#FF7369',
     onDanger: '#2B0B06',
+    // Dải tối dịu: xanh lá rất trầm để không chói giữa nền than, chữ vẫn sáng như các màn khác.
+    hero: '#173A27',
+    onHero: '#F2F3F2',
+    onHeroMuted: '#A9CDB8',
+    heroDecor: '#1C4630',
+    heroButton: 'rgba(255, 255, 255, 0.10)',
   },
 } as const;
 

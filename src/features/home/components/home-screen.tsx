@@ -7,15 +7,14 @@ import { SlowLoadingHint } from '@/components/ui/slow-loading-hint';
 import { Spacing } from '@/constants/theme';
 import { getDealErrorMessage } from '@/features/home/api/deals';
 import { useDeals } from '@/features/home/api/use-deals';
-import { BuyerHeader } from '@/features/home/components/buyer-header';
 import { DealCard, DealCardSkeleton } from '@/features/home/components/deal-card';
 import { DealFilterButton } from '@/features/home/components/deal-filter-button';
 import { EmptyDeals } from '@/features/home/components/empty-deals';
+import { HomeHeader } from '@/features/home/components/home-header';
 import { LocationPrompt } from '@/features/home/components/location-prompt';
 import { SearchPanel } from '@/features/home/components/search-panel';
 import { SectionHeader } from '@/features/home/components/section-header';
 import { DEAL_CATEGORIES } from '@/features/home/constants/deal-categories';
-import { HomeIcons } from '@/features/home/constants/icons';
 import { filterDeals, useDealFilters } from '@/features/home/hooks/use-deal-filters';
 import type { Deal } from '@/features/home/types';
 import { useUserLocation } from '@/hooks/use-user-location';
@@ -58,13 +57,8 @@ export function HomeScreen() {
         />
       }
       header={
-        <BuyerHeader
-          subtitle={
-            location.isReady ? `Gần bạn · ${formatRadius(filters.radiusKm)}` : 'Chưa bật vị trí'
-          }
-          subtitleIcon={HomeIcons.location}
-          title="Trang chủ"
-        />
+        // Đang lọc thì tiêu đề mục bên dưới đã đếm số deal phù hợp, header chỉ nói vị trí.
+        <HomeHeader dealCount={filters.isFiltering ? undefined : dealsQuery.data?.length} />
       }
       keyExtractor={(deal) => deal.id}
       listHeader={
