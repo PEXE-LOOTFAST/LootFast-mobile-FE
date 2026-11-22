@@ -128,13 +128,13 @@ export function HomeHeader({ dealCount }: HomeHeaderProps) {
   );
 }
 
-// Deal LootFast chủ yếu mở cuối ngày, nên buổi tối là lúc lời chào rủ đi săn deal.
+// Bốn buổi theo cách nói quen thuộc, phủ kín 24 giờ: sáng 4–11h, trưa 11–13h, chiều 13–18h, tối từ
+// 18h tới hết đêm (khuya vẫn là "buổi tối" để không có giờ nào bị lời chào chung chung).
 function greetingFor(hour: number) {
-  if (hour >= 5 && hour < 11) return 'Chào buổi sáng!';
-  if (hour >= 11 && hour < 14) return 'Trưa nay ăn gì?';
-  if (hour >= 14 && hour < 17) return 'Chào buổi chiều!';
-  if (hour >= 17 && hour < 22) return 'Tối nay săn deal nhé!';
-  return 'Chào bạn!';
+  if (hour >= 4 && hour < 11) return 'Chào buổi sáng!';
+  if (hour >= 11 && hour < 13) return 'Chào buổi trưa!';
+  if (hour >= 13 && hour < 18) return 'Chào buổi chiều!';
+  return 'Chào buổi tối!';
 }
 
 // Ngắn để vừa một dòng cạnh nút Đăng nhập trên máy 360dp; cách bật vị trí đã có thẻ riêng bên
