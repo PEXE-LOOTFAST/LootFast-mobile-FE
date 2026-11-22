@@ -188,6 +188,7 @@ const styles = StyleSheet.create({
   inputRow: { flexDirection: 'row', gap: Spacing.sm },
   searchInput: {
     flex: 1,
+    minWidth: 0,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
@@ -198,6 +199,7 @@ const styles = StyleSheet.create({
   },
   codeInput: {
     flex: 1,
+    minWidth: 0,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
@@ -206,8 +208,11 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     paddingHorizontal: 10,
   },
+  // minWidth 0: trên web ô nhập có bề rộng mặc định và không tự co, đẩy nút xác nhận ra ngoài
+  // màn hình điện thoại.
   input: {
     flex: 1,
+    minWidth: 0,
     fontSize: FontSize.bodySm,
     fontWeight: FontWeight.medium,
     paddingVertical: 0,
