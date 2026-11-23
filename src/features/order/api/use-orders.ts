@@ -42,13 +42,22 @@ export function useCreateOrder() {
   });
 }
 
-export function useOrder(orderId: string | undefined) {
+/**
+ * Một đơn. `live` dùng cho màn đang mở đơn: khi đơn còn đang giữ thì tải lại mỗi 15 giây, để quán xác
+ * nhận chuyển khoản hay quét mã giao món là khách thấy ngay mà không phải kéo để tải lại. Backend
+ * chưa có kênh đẩy (websocket) nên tạm hỏi định kỳ.
+ */
+export function useOrder(orderId: string | undefined, { live = false }: { live?: boolean } = {}) {
   return useQuery({
     enabled: Boolean(orderId),
     queryKey: [...ORDER_QUERY_KEY, orderId],
     queryFn: () => getOrder(orderId as string),
+    refetchInterval: (query) =>
+      live && query.state.data?.orderStatus === 'RESERVED' ? LIVE_ORDER_INTERVAL_MS : false,
   });
 }
+
+const LIVE_ORDER_INTERVAL_MS = 15_000;
 
 export function useCancelOrder() {
   const queryClient = useQueryClient();

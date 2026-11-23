@@ -1,5 +1,7 @@
 import { Image } from 'expo-image';
+import { useQueryClient } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useRef } from 'react';
 import QRCode from 'react-native-qrcode-svg';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -25,7 +27,7 @@ import {
   type PaymentMethodDto,
 } from '@/features/order/api/orders';
 import { toPaymentErrorMessage } from '@/features/order/api/payments';
-import { useCancelOrder, useOrder } from '@/features/order/api/use-orders';
+import { ORDER_QUERY_KEY, useCancelOrder, useOrder } from '@/features/order/api/use-orders';
 import { useChangePaymentMethod, usePaymentInstructions } from '@/features/order/api/use-payments';
 import { useStore } from '@/features/home/api/use-store';
 import { StoreDirections } from '@/features/map/components/store-directions';
@@ -64,7 +66,7 @@ export function OrderDetailScreen() {
   const { id, rating } = useLocalSearchParams<{ id?: string; rating?: string }>();
   // Mở từ thẻ nhắc đánh giá: khách đã chạm sẵn số sao ở đó.
   const initialRating = Math.min(Math.max(Number(rating) || 0, 0), 5);
-  const orderQuery = useOrder(id);
+  const orderQuery = useOrder(id, { live: true });
   const instructionsQuery = usePaymentInstructions(id);
   const changeMethod = useChangePaymentMethod(id);
   const cancelOrder = useCancelOrder();
@@ -72,6 +74,20 @@ export function OrderDetailScreen() {
   const order = orderQuery.data;
   const instructions = instructionsQuery.data;
   const canCancel = order?.orderStatus === 'RESERVED';
+
+  // Đơn vừa đổi trạng thái ở phía quán (tải lại định kỳ phát hiện): làm mới danh sách đơn và hướng
+  // dẫn thanh toán theo, để quay ra tab Đơn hàng không còn thấy trạng thái cũ.
+  const queryClient = useQueryClient();
+  const orderState = order ? `${order.orderStatus}/${order.paymentStatus}` : undefined;
+  const lastOrderState = useRef(orderState);
+  useEffect(() => {
+    if (!orderState) return;
+    if (lastOrderState.current && lastOrderState.current !== orderState) {
+      void queryClient.invalidateQueries({ queryKey: [...ORDER_QUERY_KEY, 'list'] });
+      void queryClient.invalidateQueries({ queryKey: ['payment-instructions', id] });
+    }
+    lastOrderState.current = orderState;
+  }, [orderState, id, queryClient]);
 
   const askToCancel = () =>
     confirmAction({
