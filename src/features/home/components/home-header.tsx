@@ -33,7 +33,7 @@ type HomeHeaderProps = {
 export function HomeHeader({ dealCount }: HomeHeaderProps) {
   const theme = useTheme();
   const now = useNow(5 * 60_000);
-  const { isAuthenticated } = useAuthSession();
+  const { isAuthenticated, isRestoring } = useAuthSession();
   const { data: unreadData } = useUnreadCount(isAuthenticated);
   const {
     ref: gpsRef,
@@ -99,7 +99,7 @@ export function HomeHeader({ dealCount }: HomeHeaderProps) {
               onPress={() => setIsNotificationsOpen(true)}
               tone="hero"
             />
-          ) : (
+          ) : isRestoring ? null : (
             <Pressable
               accessibilityRole="button"
               hitSlop={Spacing.xs}

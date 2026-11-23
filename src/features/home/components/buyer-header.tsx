@@ -18,7 +18,7 @@ type BuyerHeaderProps = {
 };
 
 export function BuyerHeader({ title, subtitle, subtitleIcon, onBack }: BuyerHeaderProps) {
-  const { isAuthenticated } = useAuthSession();
+  const { isAuthenticated, isRestoring } = useAuthSession();
   const { data: unreadData } = useUnreadCount(isAuthenticated);
   const unreadCount = unreadData?.unreadCount ?? 0;
   const {
@@ -59,7 +59,7 @@ export function BuyerHeader({ title, subtitle, subtitleIcon, onBack }: BuyerHead
                 onPress={() => setIsNotificationsOpen(true)}
                 tone="hero"
               />
-            ) : (
+            ) : isRestoring ? null : (
               <IconButton
                 accessibilityLabel="Đăng nhập"
                 icon={HomeIcons.login}

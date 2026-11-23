@@ -5,6 +5,8 @@ const ACCESS_TOKEN_KEY = 'lootfast.access_token';
 const REFRESH_TOKEN_KEY = 'lootfast.refresh_token';
 // Đánh dấu phiên đã đăng nhập qua cổng quản trị, để mở lại app vẫn khôi phục được khu /admin.
 const ADMIN_GATE_KEY = 'lootfast.admin_gate';
+// Tên, email và quyền của tài khoản đang đăng nhập (không có token), để mở app hiện tài khoản ngay.
+const SESSION_USER_KEY = 'lootfast.session_user';
 
 const isWeb = Platform.OS === 'web';
 
@@ -44,11 +46,14 @@ export const tokenStorage = {
   setAdminGate: (isAdmin: boolean) =>
     isAdmin ? setItem(ADMIN_GATE_KEY, '1') : removeItem(ADMIN_GATE_KEY),
   isAdminGate: async () => (await getItem(ADMIN_GATE_KEY)) === '1',
+  getSessionUser: () => getItem(SESSION_USER_KEY),
+  setSessionUser: (json: string) => setItem(SESSION_USER_KEY, json),
   clear: async () => {
     await Promise.all([
       removeItem(ACCESS_TOKEN_KEY),
       removeItem(REFRESH_TOKEN_KEY),
       removeItem(ADMIN_GATE_KEY),
+      removeItem(SESSION_USER_KEY),
     ]);
   },
 };
