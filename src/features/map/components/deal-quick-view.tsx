@@ -7,17 +7,21 @@ import { DealImage } from '@/features/home/components/deal-image';
 import { DealMeta } from '@/features/home/components/deal-meta';
 import { HomeIcons } from '@/features/home/constants/icons';
 import type { Deal } from '@/features/home/types';
+import { StoreDirections } from '@/features/map/components/store-directions';
 import { useTheme } from '@/hooks/use-theme';
-import { formatDiscount, formatDistance, formatPrice } from '@/lib/format';
+import { formatDiscount, formatPrice } from '@/lib/format';
 
 type DealQuickViewProps = {
   deal: Deal;
+  /** Toạ độ quán của ghim đang chọn, để chỉ đường đúng điểm. */
+  latitude?: number;
+  longitude?: number;
   onOpen: () => void;
   onClose: () => void;
 };
 
 // Thẻ xem nhanh nổi trên bản đồ khi chạm vào một ghim: đủ thông tin để quyết định có mở chi tiết.
-export function DealQuickView({ deal, onOpen, onClose }: DealQuickViewProps) {
+export function DealQuickView({ deal, latitude, longitude, onOpen, onClose }: DealQuickViewProps) {
   const theme = useTheme();
   const discount = formatDiscount(deal.price, deal.originalPrice);
 
@@ -55,7 +59,6 @@ export function DealQuickView({ deal, onOpen, onClose }: DealQuickViewProps) {
               icon={HomeIcons.clock}
               label={`${deal.pickupWindow.start}–${deal.pickupWindow.end}`}
             />
-            <DealMeta icon={HomeIcons.distance} label={formatDistance(deal.distanceKm)} />
           </View>
 
           <Text style={[styles.stock, { color: theme.primary }]}>Còn {deal.remaining} phần</Text>
@@ -64,6 +67,15 @@ export function DealQuickView({ deal, onOpen, onClose }: DealQuickViewProps) {
           </Text>
         </View>
       </Pressable>
+
+      <View style={[styles.directions, { borderTopColor: theme.border }]}>
+        <StoreDirections
+          address={deal.store.address}
+          latitude={latitude}
+          longitude={longitude}
+          straightKm={deal.distanceKm}
+        />
+      </View>
 
       <Pressable
         accessibilityLabel="Đóng xem nhanh"
@@ -98,5 +110,10 @@ const styles = StyleSheet.create({
   meta: { flexDirection: 'row', gap: Spacing.md },
   stock: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold },
   address: { fontSize: FontSize.caption },
+  directions: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+  },
   close: { position: 'absolute', top: 10, right: 10, padding: Spacing.xs },
 });

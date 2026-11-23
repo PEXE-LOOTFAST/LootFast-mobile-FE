@@ -27,6 +27,8 @@ import {
 import { toPaymentErrorMessage } from '@/features/order/api/payments';
 import { useCancelOrder, useOrder } from '@/features/order/api/use-orders';
 import { useChangePaymentMethod, usePaymentInstructions } from '@/features/order/api/use-payments';
+import { useStore } from '@/features/home/api/use-store';
+import { StoreDirections } from '@/features/map/components/store-directions';
 import { useTheme } from '@/hooks/use-theme';
 import { confirmAction } from '@/lib/confirm';
 import { formatPrice, formatTime } from '@/lib/format';
@@ -155,6 +157,8 @@ export function OrderDetailScreen() {
               {order.paymentReference ? (
                 <Row label="Mã tham chiếu" value={order.paymentReference} />
               ) : null}
+
+              {canCancel ? <OrderStoreDirections storeId={order.storeId} /> : null}
             </View>
 
             <OrderReviewCard
@@ -267,6 +271,18 @@ function Row({ label, value }: { label: string; value: string }) {
       <Text style={[styles.rowValue, { color: theme.text }]}>{value}</Text>
     </View>
   );
+}
+
+// Đơn đang giữ thì khách sắp phải đến quán: chỉ đường ngay trong đơn thay vì phải mở lại deal.
+function OrderStoreDirections({ storeId }: { storeId: string }) {
+  const store = useStore(storeId).data;
+  if (!store) return null;
+
+  const { addressLine, ward, district, city, latitude, longitude } = store.address;
+  const address = [addressLine, ward, district, city].filter(Boolean).join(', ');
+  if (!address && latitude == null) return null;
+
+  return <StoreDirections address={address} latitude={latitude} longitude={longitude} />;
 }
 
 const styles = StyleSheet.create({

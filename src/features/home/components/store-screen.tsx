@@ -24,6 +24,7 @@ import { useStore } from '@/features/home/api/use-store';
 import { DealCard } from '@/features/home/components/deal-card';
 import { HomeIcons } from '@/features/home/constants/icons';
 import { groupOpeningHours } from '@/features/home/opening-hours';
+import { StoreDirections } from '@/features/map/components/store-directions';
 import { useFavorites, useToggleFavoriteStore } from '@/features/profile/api/use-favorites';
 import { useAuthSession } from '@/hooks/use-auth-session';
 import { useTheme } from '@/hooks/use-theme';
@@ -128,6 +129,14 @@ export function StoreScreen() {
                   <Icon name={HomeIcons.location} color={theme.textSecondary} size={15} />
                   <Text style={[styles.meta, { color: theme.textSecondary }]}>{address}</Text>
                 </View>
+              ) : null}
+
+              {address || store.address.latitude != null ? (
+                <StoreDirections
+                  address={address}
+                  latitude={store.address.latitude}
+                  longitude={store.address.longitude}
+                />
               ) : null}
 
               {hourGroups.length > 0 ? (

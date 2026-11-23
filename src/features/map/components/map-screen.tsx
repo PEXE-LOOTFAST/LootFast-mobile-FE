@@ -71,7 +71,8 @@ export function MapScreen() {
     });
   }, [dealsQuery.data, storeQueries]);
 
-  const selectedDeal = pins.find((pin) => pin.deal.id === selectedDealId)?.deal;
+  const selectedPin = pins.find((pin) => pin.deal.id === selectedDealId);
+  const selectedDeal = selectedPin?.deal;
   const storesLoading = storeQueries.some((query) => query.isPending);
   const storesFailed = storeQueries.some((query) => query.isError);
   const isLoading = dealsQuery.isPending || storesLoading;
@@ -184,6 +185,8 @@ export function MapScreen() {
               {selectedDeal ? (
                 <DealQuickView
                   deal={selectedDeal}
+                  latitude={selectedPin?.latitude}
+                  longitude={selectedPin?.longitude}
                   onClose={() => setSelectedDealId(null)}
                   onOpen={() => handleOpenDeal(selectedDeal.id)}
                 />

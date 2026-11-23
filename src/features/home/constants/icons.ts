@@ -22,6 +22,11 @@ export const HomeIcons = {
   star: { ios: 'star.fill', android: 'star', web: 'star' },
   clock: { ios: 'clock', android: 'schedule', web: 'schedule' },
   distance: { ios: 'location', android: 'near_me', web: 'near_me' },
+  directions: {
+    ios: 'arrow.triangle.turn.up.right.diamond.fill',
+    android: 'directions',
+    web: 'directions',
+  },
   flame: { ios: 'flame.fill', android: 'local_fire_department', web: 'local_fire_department' },
   phone: { ios: 'phone', android: 'call', web: 'call' },
   heart: { ios: 'heart', android: 'favorite', web: 'favorite' },

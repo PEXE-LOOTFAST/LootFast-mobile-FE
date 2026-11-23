@@ -19,6 +19,8 @@ import {
 } from '@/constants/theme';
 import { getDealErrorMessage } from '@/features/home/api/deals';
 import { useDeal } from '@/features/home/api/use-deals';
+import { useStore } from '@/features/home/api/use-store';
+import { StoreDirections } from '@/features/map/components/store-directions';
 import { useFavorites, useToggleFavoriteDeal } from '@/features/profile/api/use-favorites';
 import { useAuthSession } from '@/hooks/use-auth-session';
 import { useNow } from '@/hooks/use-now';
@@ -40,7 +42,7 @@ import { useReservation } from '@/features/home/hooks/use-reservation';
 import { buildPickupSlots } from '@/features/home/pickup-slots';
 import type { Deal } from '@/features/home/types';
 import { useTheme } from '@/hooks/use-theme';
-import { formatDistance, formatPrice } from '@/lib/format';
+import { formatPrice } from '@/lib/format';
 
 // Mở thẳng bằng link (web) thì không có lịch sử để quay lại — đưa về Trang chủ.
 function goBack() {
@@ -164,7 +166,6 @@ function DealDetail({ deal }: { deal: Deal }) {
                       {deal.store.reviewCount})
                     </Text>
                   </View>
-                  <DealMeta icon={HomeIcons.distance} label={formatDistance(deal.distanceKm)} />
                   <DealMeta
                     icon={HomeIcons.clock}
                     label={`${deal.pickupWindow.start}–${deal.pickupWindow.end}`}
@@ -172,6 +173,8 @@ function DealDetail({ deal }: { deal: Deal }) {
                 </View>
               </View>
             </Pressable>
+
+            <DealDirections deal={deal} />
 
             <View style={styles.priceRow}>
               <Text style={[styles.price, { color: theme.primary }]}>
@@ -339,6 +342,20 @@ function DealDetailError({
         Quay lại
       </BrandButton>
     </SafeAreaView>
+  );
+}
+
+// Toạ độ quán nằm ở hồ sơ quán, không có trong deal; truy vấn dùng chung cache với trang quán.
+function DealDirections({ deal }: { deal: Deal }) {
+  const store = useStore(deal.store.merchantId).data;
+
+  return (
+    <StoreDirections
+      address={deal.store.address}
+      latitude={store?.address.latitude}
+      longitude={store?.address.longitude}
+      straightKm={deal.distanceKm}
+    />
   );
 }
 
