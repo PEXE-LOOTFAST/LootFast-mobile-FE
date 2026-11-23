@@ -108,3 +108,11 @@ export const StaticColors = {
   /** Lớp tối quanh khung quét trên nền camera. */
   cameraScrim: 'rgba(0, 0, 0, 0.55)',
 } as const;
+
+/**
+ * Màu logo của bên thứ ba, giữ đúng bản gốc theo hướng dẫn thương hiệu của họ nên không đổi theo
+ * sáng/tối.
+ */
+export const ThirdPartyLogoColors = {
+  google: { blue: '#4285F4', green: '#34A853', yellow: '#FBBC05', red: '#EA4335' },
+} as const;

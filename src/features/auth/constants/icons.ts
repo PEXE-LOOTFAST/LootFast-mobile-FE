@@ -8,7 +8,6 @@ export const AuthIcons = {
   mail: { ios: 'envelope', android: 'mail', web: 'mail' },
   person: { ios: 'person', android: 'person', web: 'person' },
   phone: { ios: 'phone', android: 'call', web: 'call' },
-  google: { ios: 'g.circle', android: 'account_circle', web: 'account_circle' },
   buyer: { ios: 'bag', android: 'shopping_bag', web: 'shopping_bag' },
   seller: { ios: 'storefront', android: 'storefront', web: 'storefront' },
 } satisfies IconMap;

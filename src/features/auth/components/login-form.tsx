@@ -10,6 +10,7 @@ import { toAuthErrorMessage, toSocialErrorMessage } from '@/features/auth/api/au
 import { useSignin } from '@/features/auth/api/use-signin';
 import { isGoogleLoginConfigured, useSocialLogin } from '@/features/auth/api/use-social-login';
 import { FormSection } from '@/features/auth/components/form-section';
+import { GoogleLogo } from '@/features/auth/components/google-logo';
 import { AuthIcons } from '@/features/auth/constants/icons';
 import type { LoginValues } from '@/features/auth/types';
 import { validateLogin } from '@/features/auth/validation';
@@ -103,6 +104,7 @@ export function LoginForm({ initialEmail = '', onSuccess, onForgotPassword }: Lo
 
           <BrandButton
             disabled={isSubmitting}
+            leading={<GoogleLogo />}
             loading={socialLogin.isPending}
             onPress={() => socialLogin.mutate('GOOGLE')}
             variant="outline"

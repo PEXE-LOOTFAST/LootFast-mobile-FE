@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Pressable,
   StyleSheet,
+  View,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
@@ -18,6 +19,8 @@ type BrandButtonProps = {
   disabled?: boolean;
   loading?: boolean;
   style?: StyleProp<ViewStyle>;
+  /** Icon hoặc logo đứng trước nhãn, vd. logo Google. */
+  leading?: ReactNode;
 };
 
 export function BrandButton({
@@ -27,6 +30,7 @@ export function BrandButton({
   disabled = false,
   loading = false,
   style,
+  leading,
 }: BrandButtonProps) {
   const theme = useTheme();
   const isInactive = disabled || loading;
@@ -54,6 +58,13 @@ export function BrandButton({
     >
       {loading ? (
         <ActivityIndicator color={palette.label} />
+      ) : leading ? (
+        <View style={styles.row}>
+          {leading}
+          <AppText color={palette.label} variant="subtitle" weight="bold">
+            {children}
+          </AppText>
+        </View>
       ) : (
         <AppText color={palette.label} variant="subtitle" weight="bold">
           {children}
@@ -72,6 +83,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.lg,
     paddingHorizontal: Spacing.xl,
   },
+  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
   elevated: { boxShadow: Shadow.brand },
   pressed: { opacity: 0.85, transform: [{ scale: 0.99 }] },
   disabled: { opacity: 0.5 },
