@@ -28,10 +28,18 @@ type OrderReviewCardProps = {
   dealName: string;
   /** Chỉ đơn đã hoàn tất (đã nhận món) mới đánh giá được. */
   isCompleted: boolean;
+  /** Số sao khách đã chạm sẵn ở thẻ nhắc đánh giá ngoài trang chủ. */
+  initialRating?: number;
 };
 
 /** Đánh giá của buyer cho một đơn: xem lại đánh giá đã gửi, hoặc viết đánh giá mới (1–5 sao). */
-export function OrderReviewCard({ orderId, storeId, dealName, isCompleted }: OrderReviewCardProps) {
+export function OrderReviewCard({
+  orderId,
+  storeId,
+  dealName,
+  isCompleted,
+  initialRating = 0,
+}: OrderReviewCardProps) {
   const theme = useTheme();
   const profile = useProfile(true);
   // Một tài khoản vừa mua vừa bán có thể đặt món ở chính quán mình; backend cấm đánh giá trường hợp
@@ -39,7 +47,7 @@ export function OrderReviewCard({ orderId, storeId, dealName, isCompleted }: Ord
   const isOwnStore = profile.data?.publicId.toLowerCase() === storeId.toLowerCase();
   const myReview = useMyOrderReview(orderId, isCompleted && profile.isSuccess && !isOwnStore);
   const create = useCreateReview(orderId);
-  const [rating, setRating] = useState(0);
+  const [rating, setRating] = useState(initialRating);
   const [comment, setComment] = useState('');
 
   if (!isCompleted) return null;

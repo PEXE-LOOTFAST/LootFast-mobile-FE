@@ -12,8 +12,9 @@ import {
 export const ORDER_QUERY_KEY = ['orders'];
 
 /** Đơn theo trạng thái, tải thêm từng trang khi người dùng cuộn tới cuối danh sách. */
-export function useOrders(status: OrderListStatusDto) {
+export function useOrders(status: OrderListStatusDto, enabled = true) {
   return useInfiniteQuery({
+    enabled,
     // Có đoạn 'list' để không trùng khoá với useOrder (['orders', orderId]).
     queryKey: [...ORDER_QUERY_KEY, 'list', status],
     queryFn: ({ pageParam }) => getOrders(status, pageParam),

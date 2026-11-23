@@ -23,6 +23,9 @@ import {
 } from '@/features/order/api/orders';
 import { useOrders } from '@/features/order/api/use-orders';
 import { getPickupTiming } from '@/features/order/pickup-timing';
+import { useProfile } from '@/features/profile/api/use-profile';
+import { useMyOrderReview } from '@/features/review/api/use-reviews';
+import { StarRating } from '@/features/review/components/star-rating';
 import { useNow } from '@/hooks/use-now';
 import { useTheme } from '@/hooks/use-theme';
 import { formatPrice, formatShortDate, formatTime } from '@/lib/format';
@@ -179,7 +182,41 @@ function OrderCard({ order, statusLabel }: { order: OrderDto; statusLabel: strin
           {formatPrice(order.totalAmount)}
         </AppText>
       </View>
+      {order.orderStatus === 'COMPLETED' ? <ReviewLine order={order} /> : null}
     </Card>
+  );
+}
+
+/**
+ * Đơn đã nhận món: chưa đánh giá thì mời chấm sao, đã đánh giá thì hiện lại số sao đã cho. Cả thẻ
+ * đã bấm được để mở đơn (thẻ đánh giá nằm đầu trang), nên sao ở đây chỉ để nhìn, không lồng nút.
+ */
+function ReviewLine({ order }: { order: OrderDto }) {
+  const theme = useTheme();
+  const profile = useProfile(true);
+  const isOwnStore = profile.data?.publicId.toLowerCase() === order.storeId.toLowerCase();
+  const review = useMyOrderReview(order.orderId, profile.isSuccess && !isOwnStore);
+
+  if (!review.isSuccess) return null;
+
+  if (review.data) {
+    return (
+      <View style={[styles.reviewLine, { borderTopColor: theme.border }]}>
+        <AppText tone="textSecondary" variant="footnote" weight="bold">
+          Bạn đã đánh giá
+        </AppText>
+        <StarRating value={review.data.review.rating} />
+      </View>
+    );
+  }
+
+  return (
+    <View style={[styles.reviewLine, { borderTopColor: theme.border }]}>
+      <AppText tone="primary" variant="footnote" weight="bold">
+        Chấm sao cho đơn này
+      </AppText>
+      <StarRating size={18} value={0} />
+    </View>
   );
 }
 
@@ -216,4 +253,12 @@ const styles = StyleSheet.create({
   lines: { gap: Spacing.xs },
   infoLine: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   infoText: { flex: 1 },
+  reviewLine: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.md,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    paddingTop: Spacing.sm,
+  },
 });

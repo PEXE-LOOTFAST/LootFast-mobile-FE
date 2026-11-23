@@ -61,7 +61,9 @@ const NO_BANK_NOTE =
  */
 export function OrderDetailScreen() {
   const theme = useTheme();
-  const { id } = useLocalSearchParams<{ id?: string }>();
+  const { id, rating } = useLocalSearchParams<{ id?: string; rating?: string }>();
+  // Mở từ thẻ nhắc đánh giá: khách đã chạm sẵn số sao ở đó.
+  const initialRating = Math.min(Math.max(Number(rating) || 0, 0), 5);
   const orderQuery = useOrder(id);
   const instructionsQuery = usePaymentInstructions(id);
   const changeMethod = useChangePaymentMethod(id);
@@ -111,6 +113,15 @@ export function OrderDetailScreen() {
 
         {order ? (
           <>
+            {/* Đơn đã nhận món thì việc còn lại là đánh giá, nên đưa lên đầu thay vì nằm dưới mã nhận món. */}
+            <OrderReviewCard
+              dealName={order.dealName}
+              initialRating={initialRating}
+              isCompleted={order.orderStatus === 'COMPLETED'}
+              orderId={order.orderId}
+              storeId={order.storeId}
+            />
+
             <View
               style={[
                 styles.card,
@@ -160,13 +171,6 @@ export function OrderDetailScreen() {
 
               {canCancel ? <OrderStoreDirections storeId={order.storeId} /> : null}
             </View>
-
-            <OrderReviewCard
-              isCompleted={order.orderStatus === 'COMPLETED'}
-              orderId={order.orderId}
-              dealName={order.dealName}
-              storeId={order.storeId}
-            />
 
             <View
               style={[

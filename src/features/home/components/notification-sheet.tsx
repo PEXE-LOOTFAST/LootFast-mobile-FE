@@ -184,6 +184,16 @@ export function NotificationSheet({ visible, onClose }: NotificationSheetProps) 
               <Text style={[styles.itemReason, { color: theme.primary }]}>{reason}</Text>
             ) : null}
 
+            {/* Nhận món xong là lúc dễ nhớ nhất để chấm sao; chạm thông báo mở đơn, thẻ đánh giá nằm đầu trang. */}
+            {item.type === 'ORDER_COMPLETED' && role === 'buyer' ? (
+              <View style={styles.reviewCta}>
+                <Icon name={HomeIcons.star} color={theme.primary} size={14} />
+                <Text style={[styles.itemReason, { color: theme.primary }]}>
+                  Chấm sao cho đơn này
+                </Text>
+              </View>
+            ) : null}
+
             <View style={styles.metaRow}>
               <Text style={[styles.itemDate, { color: theme.textSecondary }]}>
                 {[typeLabel, time].filter(Boolean).join(' · ')}
@@ -336,6 +346,7 @@ const styles = StyleSheet.create({
   },
   roleLabel: { fontSize: FontSize.micro, fontWeight: FontWeight.bold },
   itemBody: { fontSize: FontSize.bodySm, lineHeight: 19 },
+  reviewCta: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },
   itemReason: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold },
   metaRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   itemDate: { fontSize: FontSize.footnote, fontWeight: FontWeight.medium },

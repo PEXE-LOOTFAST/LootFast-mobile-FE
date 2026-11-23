@@ -17,6 +17,7 @@ import { SectionHeader } from '@/features/home/components/section-header';
 import { DEAL_CATEGORIES } from '@/features/home/constants/deal-categories';
 import { filterDeals, useDealFilters } from '@/features/home/hooks/use-deal-filters';
 import type { Deal } from '@/features/home/types';
+import { PendingReviewCard } from '@/features/review/components/pending-review-card';
 import { useUserLocation } from '@/hooks/use-user-location';
 import { formatRadius } from '@/lib/format';
 
@@ -63,6 +64,8 @@ export function HomeScreen() {
       keyExtractor={(deal) => deal.id}
       listHeader={
         <>
+          <PendingReviewCard />
+
           <LocationPrompt
             canAskAgain={location.canAskAgain}
             onRequest={requestLocation}
