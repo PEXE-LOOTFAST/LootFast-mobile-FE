@@ -60,7 +60,9 @@ export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
 /** Vì sao deal được gợi ý cho người dùng (chỉ có ở thông báo MATCHING_DEAL). */
 export const MATCH_REASON_LABELS: Record<string, string> = {
   FAVORITE_STORE: 'Vì bạn đã lưu quán này',
-  FAVORITE_ITEM: 'Vì bạn đã lưu món này',
+  // Backend gộp chung hai trường hợp: đúng nhóm món người dùng chọn là yêu thích, hoặc trùng tên món
+  // đã lưu. Nhãn cũ chỉ nói "đã lưu món này" nên sai với trường hợp nhóm món.
+  FAVORITE_ITEM: 'Vì hợp món bạn yêu thích',
   NEARBY_AREA: 'Vì quán ở gần khu vực của bạn',
   BIG_DISCOUNT: 'Vì deal đang giảm giá mạnh',
   SAVED_FILTER: 'Vì khớp bộ lọc bạn đã lưu',
