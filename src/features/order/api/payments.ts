@@ -32,6 +32,8 @@ export function changePaymentMethod(orderId: string, paymentMethod: PaymentMetho
 const MESSAGES: Record<string, string> = {
   UNAUTHORIZED: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
   ORDER_NOT_FOUND: 'Không tìm thấy đơn này.',
+  BANK_ACCOUNT_NOT_FOUND:
+    'Quán chưa thêm tài khoản ngân hàng nên chưa nhận chuyển khoản. Bạn trả tiền mặt khi đến lấy món nhé.',
   PAYMENT_NOT_CONFIGURED: 'Quán chưa thiết lập tài khoản nhận tiền.',
   PAYMENT_STATE_CONFLICT: 'Đơn đã thanh toán nên không đổi phương thức được nữa.',
   INVALID_PAYMENT_AMOUNT: 'Số tiền của đơn không hợp lệ.',

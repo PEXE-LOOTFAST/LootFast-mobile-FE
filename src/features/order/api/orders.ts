@@ -90,6 +90,8 @@ const MESSAGES: Record<string, string> = {
   ORDER_PICKUP_TIME_INVALID: 'Giờ đến lấy không hợp lệ. Chọn lại một khung giờ của deal.',
   RESERVED_ORDER_LIMIT: 'Bạn đang giữ quá nhiều đơn. Hoàn tất bớt rồi đặt tiếp.',
   RESERVED_QUANTITY_LIMIT: `Mỗi deal chỉ giữ tối đa ${ORDER_MAX_QUANTITY} phần chưa lấy cùng lúc. Bạn có thể đã giữ một số phần của deal này, hãy giảm số lượng.`,
+  BANK_ACCOUNT_NOT_FOUND:
+    'Quán chưa thêm tài khoản ngân hàng nên chưa nhận chuyển khoản. Bạn trả tiền mặt khi đến lấy món nhé.',
   IDEMPOTENCY_CONFLICT: 'Đơn đang được xử lý. Chờ một chút rồi thử lại.',
   IDEMPOTENCY_KEY_EXPIRED: 'Yêu cầu đã hết hạn. Vui lòng đặt lại.',
   RESOURCE_BUSY: 'Deal đang có nhiều người đặt. Thử lại sau giây lát.',

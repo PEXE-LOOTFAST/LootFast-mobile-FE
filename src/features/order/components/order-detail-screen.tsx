@@ -50,6 +50,9 @@ const METHOD_NOTES: Record<PaymentMethodDto, string> = {
   BANK_TRANSFER: 'Chuyển khoản theo thông tin bên dưới, ghi đúng nội dung chuyển khoản.',
 };
 
+const NO_BANK_NOTE =
+  'Quán chưa thêm tài khoản ngân hàng khi bạn đặt đơn này, nên đơn chỉ trả được bằng tiền mặt lúc đến lấy món.';
+
 /**
  * Chi tiết một đơn đã giữ, kèm hướng dẫn thanh toán. Mở từ màn deal ngay sau khi đặt — backend
  * chưa có endpoint liệt kê đơn nên chỉ vào được bằng mã đơn.
@@ -95,9 +98,6 @@ export function OrderDetailScreen() {
         ) : null}
         {cancelOrder.error ? (
           <InlineAlert message={toOrderErrorMessage(cancelOrder.error)} />
-        ) : null}
-        {changeMethod.error ? (
-          <InlineAlert message={toPaymentErrorMessage(changeMethod.error)} />
         ) : null}
 
         {!orderQuery.isLoading && !order ? (
@@ -218,18 +218,27 @@ export function OrderDetailScreen() {
                 />
               ) : null}
 
-              {canCancel ? (
-                <BrandButton
-                  loading={changeMethod.isPending}
-                  onPress={() =>
-                    changeMethod.mutate(order.paymentMethod === 'CASH' ? 'BANK_TRANSFER' : 'CASH')
-                  }
-                  variant="outline"
-                >
-                  {order.paymentMethod === 'CASH'
-                    ? 'Chuyển sang chuyển khoản'
-                    : 'Chuyển sang trả tiền mặt'}
-                </BrandButton>
+              {/* Backend chép tài khoản ngân hàng của quán vào đơn lúc đặt. Đơn không có thì không đổi
+                  sang chuyển khoản được, nên báo trước thay vì để khách bấm rồi nhận lỗi. */}
+              {canCancel && order.paymentMethod === 'CASH' && instructions && !instructions.bank ? (
+                <Text style={[styles.note, { color: theme.textSecondary }]}>{NO_BANK_NOTE}</Text>
+              ) : canCancel ? (
+                <>
+                  {changeMethod.error ? (
+                    <InlineAlert message={toPaymentErrorMessage(changeMethod.error)} />
+                  ) : null}
+                  <BrandButton
+                    loading={changeMethod.isPending}
+                    onPress={() =>
+                      changeMethod.mutate(order.paymentMethod === 'CASH' ? 'BANK_TRANSFER' : 'CASH')
+                    }
+                    variant="outline"
+                  >
+                    {order.paymentMethod === 'CASH'
+                      ? 'Chuyển sang chuyển khoản'
+                      : 'Chuyển sang trả tiền mặt'}
+                  </BrandButton>
+                </>
               ) : null}
             </View>
 
