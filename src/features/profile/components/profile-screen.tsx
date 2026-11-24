@@ -22,7 +22,7 @@ import { confirmSignOut } from '@/lib/confirm-sign-out';
 // href: mục mở sang route/tab khác khi bấm (vd. Đơn hàng của tôi → tab Đơn hàng).
 type ProfileItem = { icon: IconName; title: string; subtitle: string; href?: Href };
 
-// Thứ tự các nhóm trên màn: thông tin cá nhân → hoạt động mua sắm → hỗ trợ.
+// Thứ tự các nhóm trên màn: thông tin cá nhân → hoạt động mua sắm → gói dịch vụ → hỗ trợ.
 const ACCOUNT_ITEMS: ProfileItem[] = [
   {
     icon: ProfileIcons.profile,
@@ -35,6 +35,15 @@ const ACCOUNT_ITEMS: ProfileItem[] = [
 const ACTIVITY_ITEMS: ProfileItem[] = [
   { icon: ProfileIcons.orders, title: 'Đơn hàng của tôi', subtitle: '', href: '/orders' },
   { icon: ProfileIcons.favorites, title: 'Món yêu thích', subtitle: '', href: '/favorites' },
+];
+
+const BENEFIT_ITEMS: ProfileItem[] = [
+  {
+    icon: ProfileIcons.premium,
+    title: 'Gói Người mua Cao cấp',
+    subtitle: 'Lưu bộ lọc và nhận thông báo deal phù hợp',
+    href: { pathname: '/premium', params: { from: '/profile' } },
+  },
 ];
 
 const SUPPORT_ITEMS: ProfileItem[] = [
@@ -167,6 +176,7 @@ export function ProfileScreen() {
       ) : null}
       <MenuSection items={toMenuItems(ACCOUNT_ITEMS)} title="TÀI KHOẢN" />
       <MenuSection items={toMenuItems(ACTIVITY_ITEMS)} title="HOẠT ĐỘNG CỦA BẠN" />
+      <MenuSection items={toMenuItems(BENEFIT_ITEMS)} title="QUYỀN LỢI CỦA BẠN" />
       <AppearanceSection />
       <MenuSection items={toMenuItems(SUPPORT_ITEMS)} title="HỖ TRỢ" />
       <Pressable

@@ -5,6 +5,7 @@ export const ProfileIcons = {
   orders: { ios: 'bag.fill', android: 'shopping_bag', web: 'shopping_bag' },
   favorites: { ios: 'heart.fill', android: 'favorite', web: 'favorite' },
   profile: { ios: 'person.fill', android: 'person', web: 'person' },
+  premium: { ios: 'crown.fill', android: 'workspace_premium', web: 'workspace_premium' },
   support: { ios: 'questionmark.circle.fill', android: 'help', web: 'help' },
   seller: { ios: 'storefront.fill', android: 'storefront', web: 'storefront' },
   camera: { ios: 'camera.fill', android: 'photo_camera', web: 'photo_camera' },
