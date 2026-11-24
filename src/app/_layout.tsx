@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { ToastHost } from '@/components/ui/toast-host';
 import { AuthModal } from '@/features/auth/components/auth-modal';
+import { RealtimeSync } from '@/features/realtime/realtime-sync';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { restoreSession } from '@/lib/auth-session';
 import { resumeInterruptedPick } from '@/lib/pick-image';
@@ -38,6 +39,7 @@ export default function RootLayout() {
           <Stack.Screen name="seller" />
           <Stack.Screen name="admin" />
         </Stack>
+        <RealtimeSync />
         <AuthModal />
         <ConfirmDialog />
         <ToastHost />
