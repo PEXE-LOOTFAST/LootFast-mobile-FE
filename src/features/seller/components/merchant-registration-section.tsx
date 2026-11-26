@@ -23,7 +23,6 @@ import { SellerFormCard } from '@/features/seller/components/seller-form-card';
 import { SellerIcons } from '@/features/seller/constants/icons';
 import { useAuthSession } from '@/hooks/use-auth-session';
 import { useTheme } from '@/hooks/use-theme';
-import { ApiException } from '@/lib/api-client';
 import { syncSessionRoles } from '@/lib/auth-session';
 import { formatShortDate } from '@/lib/format';
 import { pickImages, useRecoveredPick } from '@/lib/pick-image';
@@ -163,10 +162,10 @@ export function MerchantRegistrationSection() {
   const { user } = useAuthSession();
   const applicationQuery = useMyMerchantApplication(Boolean(user));
 
-  const notFound =
-    applicationQuery.error instanceof ApiException &&
-    applicationQuery.error.code === 'MERCHANT_APPLICATION_NOT_FOUND';
   const application = applicationQuery.data;
+  // `null` (khác `undefined` lúc đang tải lần đầu) là chưa gửi hồ sơ nào. Tải lại ngầm vẫn giữ giá
+  // trị này nên form không bị gỡ ra giữa chừng.
+  const notFound = application === null;
 
   // Được duyệt thì làm mới token để route tự redirect sang /seller khi thấy MERCHANT role.
   const isApproved = application?.status === 'APPROVED';
@@ -187,7 +186,7 @@ export function MerchantRegistrationSection() {
 
       {applicationQuery.isLoading ? <LoadingState size="small" /> : null}
 
-      {applicationQuery.error && !notFound ? (
+      {applicationQuery.error ? (
         <InlineAlert message={toMerchantApplicationErrorMessage(applicationQuery.error)} />
       ) : null}
 

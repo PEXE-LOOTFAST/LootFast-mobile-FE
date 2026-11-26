@@ -4,6 +4,7 @@ import { ActivityIndicator, StyleSheet, Text } from 'react-native';
 
 import { FontSize } from '@/constants/theme';
 import { BrandButton } from '@/components/ui/brand-button';
+import { ErrorState } from '@/components/ui/error-state';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { TextField } from '@/components/ui/text-field';
 import {
@@ -14,7 +15,6 @@ import { useBankAccount, useUpdateBankAccount } from '@/features/seller/api/use-
 import { SellerFormCard } from '@/features/seller/components/seller-form-card';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import { useTheme } from '@/hooks/use-theme';
-import { ApiException } from '@/lib/api-client';
 
 const BIN_PATTERN = /^\d{6}$/;
 const ACCOUNT_PATTERN = /^\d{6,19}$/;
@@ -35,9 +35,8 @@ export function SellerBankAccountScreen() {
   const accountQuery = useBankAccount();
 
   const account = accountQuery.data;
-  const notConfigured =
-    accountQuery.error instanceof ApiException &&
-    accountQuery.error.code === 'BANK_ACCOUNT_NOT_FOUND';
+  // `null` (khác `undefined` lúc đang tải lần đầu) là quán chưa có tài khoản nhận tiền.
+  const notConfigured = account === null;
 
   return (
     <SellerPageScaffold
@@ -47,7 +46,14 @@ export function SellerBankAccountScreen() {
     >
       {accountQuery.isLoading ? <ActivityIndicator color={theme.primary} /> : null}
 
-      {accountQuery.error && !notConfigured ? (
+      {/* Chưa đọc được tài khoản hiện có thì không mở form trống, kẻo lưu đè lên tài khoản thật. */}
+      {accountQuery.error && account === undefined ? (
+        <ErrorState
+          message={toBankAccountErrorMessage(accountQuery.error)}
+          onRetry={() => void accountQuery.refetch()}
+          retrying={accountQuery.isRefetching}
+        />
+      ) : accountQuery.error ? (
         <InlineAlert message={toBankAccountErrorMessage(accountQuery.error)} />
       ) : null}
 
@@ -57,12 +63,14 @@ export function SellerBankAccountScreen() {
         </Text>
       ) : null}
 
-      {accountQuery.isLoading ? null : <BankAccountForm account={account} />}
+      {/* Chỉ dựng form khi đã có kết quả lần đầu; tải lại ngầm giữ nguyên dữ liệu nên form không
+          bị gỡ ra giữa chừng. */}
+      {account !== undefined ? <BankAccountForm account={account} /> : null}
     </SellerPageScaffold>
   );
 }
 
-function BankAccountForm({ account }: { account?: MerchantBankAccountDto }) {
+function BankAccountForm({ account }: { account: MerchantBankAccountDto | null }) {
   const update = useUpdateBankAccount();
   const [bankBin, setBankBin] = useState(account?.bankBin ?? '');
   const [bankName, setBankName] = useState(account?.bankName ?? '');

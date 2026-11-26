@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   getBankAccount,
   updateBankAccount,
+  type MerchantBankAccountDto,
   type UpdateBankAccountPayload,
 } from '@/features/seller/api/bank-account';
 import { ApiException } from '@/lib/api-client';
@@ -10,17 +11,23 @@ import { ApiException } from '@/lib/api-client';
 const BANK_ACCOUNT_KEY = ['merchant', 'bank-account'];
 
 /**
- * Quán chưa thiết lập tài khoản nhận tiền thì backend trả BANK_ACCOUNT_NOT_FOUND — đó là
- * trạng thái bình thường chứ không phải lỗi, nên không retry và form hiện các ô trống.
+ * Tài khoản nhận tiền của quán; `null` khi quán chưa thiết lập.
+ *
+ * Backend báo "chưa thiết lập" bằng lỗi BANK_ACCOUNT_NOT_FOUND, nhưng đó là trạng thái bình thường
+ * nên đổi thành dữ liệu `null`. Để ở trạng thái lỗi thì mỗi lần tải lại (vd. người bán mở app ngân
+ * hàng chép số tài khoản rồi quay lại) React Query đưa truy vấn về "đang tải" và form đang điền bị
+ * gỡ ra dựng lại từ đầu.
  */
 export function useBankAccount() {
   return useQuery({
     queryKey: BANK_ACCOUNT_KEY,
-    queryFn: getBankAccount,
-    retry: (failureCount, error) => {
-      if (error instanceof ApiException && error.code === 'BANK_ACCOUNT_NOT_FOUND') return false;
-
-      return failureCount < 1;
+    queryFn: async (): Promise<MerchantBankAccountDto | null> => {
+      try {
+        return await getBankAccount();
+      } catch (error) {
+        if (error instanceof ApiException && error.code === 'BANK_ACCOUNT_NOT_FOUND') return null;
+        throw error;
+      }
     },
   });
 }
