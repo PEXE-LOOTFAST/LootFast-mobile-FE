@@ -10,7 +10,7 @@ import {
   formatPlanPeriod,
   type PlanBenefit,
 } from '@/features/premium/components/plan-card';
-import { PremiumCheckout } from '@/features/premium/components/premium-checkout';
+import { PremiumTransfer } from '@/features/premium/components/premium-transfer';
 import { SellerPageScaffold } from '@/features/seller/components/seller-page-scaffold';
 import {
   PLAN_FEATURE_STATUS_LABEL,
@@ -43,8 +43,8 @@ function formatDate(iso: string) {
 }
 
 /**
- * Gói dịch vụ của người bán: so sánh gói Miễn phí với Cao cấp và đăng ký qua VNPay. Giá và thời
- * hạn lấy từ gói backend đang công bố; chưa công bố thì hiện giá dự kiến và khoá nút thanh toán.
+ * Gói dịch vụ của người bán: so sánh gói Miễn phí với Cao cấp và đăng ký bằng chuyển khoản
+ * VietQR. Giá và thời hạn lấy từ gói backend đang công bố; chưa công bố thì dùng giá dự kiến.
  */
 export function SellerPlanScreen({ onBack }: { onBack: () => void }) {
   const theme = useTheme();
@@ -82,10 +82,9 @@ export function SellerPlanScreen({ onBack }: { onBack: () => void }) {
             note={paidEndsAt ? `Hiệu lực đến ${formatDate(paidEndsAt)}` : undefined}
           />
         ) : (
-          <PremiumCheckout
+          <PremiumTransfer
+            audience="MERCHANT"
             durationDays={durationDays}
-            plan={plan}
-            planLoading={planQuery.isPending}
             planName={plan?.name ?? 'Người bán Cao cấp'}
             price={price}
           />

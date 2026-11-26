@@ -11,7 +11,7 @@ import {
   formatPlanPeriod,
   type PlanBenefit,
 } from '@/features/premium/components/plan-card';
-import { PremiumCheckout } from '@/features/premium/components/premium-checkout';
+import { PremiumTransfer } from '@/features/premium/components/premium-transfer';
 import { useBuyerBenefits } from '@/features/profile/api/use-buyer-benefits';
 import { useAuthSession } from '@/hooks/use-auth-session';
 import { useTheme } from '@/hooks/use-theme';
@@ -101,10 +101,9 @@ export function PremiumScreen({ onBack }: PremiumScreenProps) {
             {isPremium ? (
               <CurrentPlanBox note="Cảm ơn bạn đã ủng hộ LootFast" />
             ) : (
-              <PremiumCheckout
+              <PremiumTransfer
+                audience="BUYER"
                 durationDays={durationDays}
-                plan={plan}
-                planLoading={planQuery.isPending}
                 planName={planName}
                 price={price}
               />
