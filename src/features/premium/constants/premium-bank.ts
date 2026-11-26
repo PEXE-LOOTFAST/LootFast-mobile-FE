@@ -3,14 +3,23 @@ import type { PlanAudience } from '@/features/premium/api/premium';
 /**
  * Tài khoản nhận tiền gói Cao cấp. Gói thanh toán bằng chuyển khoản VietQR vào tài khoản này;
  * quản trị viên đối soát sao kê theo nội dung chuyển khoản rồi kích hoạt gói bằng tay
- * (`POST /admin/premium/entitlements`). Số tài khoản vốn đưa công khai cho người chuyển nên đặt ở
- * biến EXPO_PUBLIC_* (nằm trong bundle app) là được.
+ * (`POST /admin/premium/entitlements`). Số tài khoản vốn đưa công khai cho người chuyển nên để
+ * thẳng trong app; biến EXPO_PUBLIC_PREMIUM_* (nếu có) sẽ đè lên, vd. để thử với tài khoản khác.
  */
+const DEFAULT_PREMIUM_BANK = {
+  bin: '970418',
+  bankName: 'BIDV',
+  accountNumber: '7501037646',
+  accountName: 'DUONG TRUNG KIEN',
+};
+
 export const PREMIUM_BANK = {
-  bin: process.env.EXPO_PUBLIC_PREMIUM_BANK_BIN?.trim() ?? '',
-  bankName: process.env.EXPO_PUBLIC_PREMIUM_BANK_NAME?.trim() ?? '',
-  accountNumber: process.env.EXPO_PUBLIC_PREMIUM_ACCOUNT_NUMBER?.trim() ?? '',
-  accountName: process.env.EXPO_PUBLIC_PREMIUM_ACCOUNT_NAME?.trim() ?? '',
+  bin: process.env.EXPO_PUBLIC_PREMIUM_BANK_BIN?.trim() || DEFAULT_PREMIUM_BANK.bin,
+  bankName: process.env.EXPO_PUBLIC_PREMIUM_BANK_NAME?.trim() || DEFAULT_PREMIUM_BANK.bankName,
+  accountNumber:
+    process.env.EXPO_PUBLIC_PREMIUM_ACCOUNT_NUMBER?.trim() || DEFAULT_PREMIUM_BANK.accountNumber,
+  accountName:
+    process.env.EXPO_PUBLIC_PREMIUM_ACCOUNT_NAME?.trim() || DEFAULT_PREMIUM_BANK.accountName,
 };
 
 /** Đủ thông tin dựng mã VietQR: BIN 6 chữ số, số tài khoản 6–19 chữ số và tên chủ tài khoản. */
