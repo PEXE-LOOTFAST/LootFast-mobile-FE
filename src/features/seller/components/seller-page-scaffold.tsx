@@ -15,6 +15,11 @@ type SellerPageScaffoldProps = {
    * khác (logo + chuông), vì tab không có "màn trước" để quay về.
    */
   onPressBack?: () => void;
+  /**
+   * Màn phụ mở cho người mua (vd. đăng ký bán hàng) thì bỏ nhãn "Người bán" trên header, vì tài
+   * khoản lúc đó chưa phải người bán.
+   */
+  forBuyer?: boolean;
   children: ReactNode;
 };
 
@@ -22,6 +27,7 @@ export function SellerPageScaffold({
   title,
   subtitle,
   onPressBack,
+  forBuyer = false,
   children,
 }: SellerPageScaffoldProps) {
   const theme = useTheme();
@@ -29,7 +35,12 @@ export function SellerPageScaffold({
   return (
     <View style={[styles.screen, { backgroundColor: theme.background }]}>
       {onPressBack ? (
-        <TabHeader onBack={onPressBack} subtitle={subtitle} title={title} variant="seller" />
+        <TabHeader
+          onBack={onPressBack}
+          subtitle={subtitle}
+          title={title}
+          variant={forBuyer ? 'buyer' : 'seller'}
+        />
       ) : (
         <SellerHeader subtitle={subtitle} title={title} />
       )}

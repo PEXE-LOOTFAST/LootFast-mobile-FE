@@ -5,8 +5,9 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-nati
 import { FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { BrandButton } from '@/components/ui/brand-button';
 import { EmptyCard } from '@/components/ui/empty-card';
-import { Icon } from '@/components/ui/icon';
+import { Icon, type IconName } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
+import { LoadingState } from '@/components/ui/loading-state';
 import { TextField } from '@/components/ui/text-field';
 import {
   toMerchantApplicationErrorMessage,
@@ -34,16 +35,16 @@ const LICENSE_NUMBER_PATTERN = /^\d{10,14}$/;
 const STATUS_COPY: Record<MerchantApplicationStatusDto, { title: string; description: string }> = {
   UPLOADING: {
     title: 'Đang tải giấy phép lên',
-    description: 'Ảnh giấy phép đang được xử lý. Quay lại sau ít phút để xem kết quả.',
+    description: 'Ảnh giấy phép đang được xử lý. Trang này tự cập nhật khi xong.',
   },
   UPLOAD_FAILED: {
     title: 'Tải giấy phép thất bại',
-    description: 'Ảnh giấy phép chưa lên được hệ thống. Hãy gửi lại hồ sơ với ảnh rõ nét hơn.',
+    description: 'Ảnh giấy phép chưa lên được hệ thống. Chọn lại ảnh bên dưới rồi gửi lại hồ sơ.',
   },
   PENDING: {
     title: 'Hồ sơ đang chờ duyệt',
     description:
-      'Quản trị viên sẽ xem xét giấy phép của bạn. Bạn sẽ dùng được khu người bán ngay khi hồ sơ được duyệt.',
+      'Quản trị viên sẽ xem xét giấy phép của bạn. Trang này tự cập nhật, bạn sẽ vào được khu người bán ngay khi hồ sơ được duyệt.',
   },
   APPROVED: {
     title: 'Hồ sơ đã được duyệt',
@@ -53,6 +54,103 @@ const STATUS_COPY: Record<MerchantApplicationStatusDto, { title: string; descrip
     title: 'Hồ sơ bị từ chối',
     description: 'Xem lý do bên dưới, chuẩn bị lại giấy tờ rồi gửi hồ sơ mới.',
   },
+};
+
+type StepState = 'done' | 'active' | 'failed' | 'todo';
+
+const STEP_LABELS = ['Gửi hồ sơ', 'Chờ duyệt', 'Kết quả'] as const;
+
+// Trạng thái từng bước của tiến trình duyệt, để khách biết hồ sơ đang ở đâu.
+const STEP_STATES: Record<MerchantApplicationStatusDto, [StepState, StepState, StepState]> = {
+  UPLOADING: ['active', 'todo', 'todo'],
+  UPLOAD_FAILED: ['failed', 'todo', 'todo'],
+  PENDING: ['done', 'active', 'todo'],
+  APPROVED: ['done', 'done', 'done'],
+  REJECTED: ['done', 'done', 'failed'],
+};
+
+// Bước đang chạy dùng icon đồng hồ, bước chưa tới không có icon.
+const STEP_ICONS: Record<StepState, IconName | null> = {
+  done: SellerIcons.check,
+  active: SellerIcons.clock,
+  failed: SellerIcons.close,
+  todo: null,
+};
+
+function ReviewSteps({ status }: { status: MerchantApplicationStatusDto }) {
+  const theme = useTheme();
+  const steps = STEP_LABELS.map((label, i) => ({ label, state: STEP_STATES[status][i] ?? 'todo' }));
+  const colorOf = (state: StepState) =>
+    state === 'done' || state === 'active'
+      ? theme.primary
+      : state === 'failed'
+        ? theme.danger
+        : theme.textSecondary;
+
+  return (
+    <View
+      accessibilityLabel={steps
+        .map(({ label, state }) => `${label}: ${STEP_A11Y[state]}`)
+        .join(', ')}
+      accessible
+      style={styles.steps}
+    >
+      {steps.map(({ label, state }, index) => {
+        const color = colorOf(state);
+        const icon = STEP_ICONS[state];
+        const filled = state === 'done';
+
+        return (
+          <View key={label} style={styles.step}>
+            <View style={styles.stepTrack}>
+              <View
+                style={[
+                  styles.stepLine,
+                  { backgroundColor: index === 0 ? 'transparent' : theme.border },
+                ]}
+              />
+              <View
+                style={[
+                  styles.stepDot,
+                  {
+                    backgroundColor: filled ? color : theme.backgroundElement,
+                    borderColor: state === 'todo' ? theme.border : color,
+                  },
+                ]}
+              >
+                {icon ? (
+                  <Icon name={icon} color={filled ? theme.onPrimary : color} size={14} />
+                ) : null}
+              </View>
+              <View
+                style={[
+                  styles.stepLine,
+                  {
+                    backgroundColor: index === steps.length - 1 ? 'transparent' : theme.border,
+                  },
+                ]}
+              />
+            </View>
+            <Text
+              style={[
+                styles.stepLabel,
+                { color: state === 'todo' ? theme.textSecondary : theme.text },
+              ]}
+            >
+              {label}
+            </Text>
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
+const STEP_A11Y: Record<StepState, string> = {
+  done: 'xong',
+  active: 'đang xử lý',
+  failed: 'không thành công',
+  todo: 'chưa tới',
 };
 
 function toDateLabel(value: string) {
@@ -87,21 +185,17 @@ export function MerchantRegistrationSection() {
         />
       ) : null}
 
-      {applicationQuery.isLoading ? <ActivityIndicator /> : null}
+      {applicationQuery.isLoading ? <LoadingState size="small" /> : null}
 
       {applicationQuery.error && !notFound ? (
         <InlineAlert message={toMerchantApplicationErrorMessage(applicationQuery.error)} />
       ) : null}
 
-      {application && application.status !== 'REJECTED' ? (
-        <ApplicationStatusCard application={application} />
-      ) : null}
+      {application ? <ApplicationStatusCard application={application} /> : null}
 
-      {application?.status === 'REJECTED' ? (
-        <>
-          <ApplicationStatusCard application={application} />
-          <SubmitApplicationForm />
-        </>
+      {/* Backend nhận hồ sơ mới sau khi bị từ chối hoặc ảnh tải lên hỏng: điền sẵn số giấy phép cũ. */}
+      {application?.status === 'REJECTED' || application?.status === 'UPLOAD_FAILED' ? (
+        <SubmitApplicationForm initialLicenseNumber={application.businessLicenseNumber} resubmit />
       ) : null}
 
       {notFound ? <SubmitApplicationForm /> : null}
@@ -126,6 +220,8 @@ function ApplicationStatusCard({ application }: { application: MyMerchantApplica
           {copy.title}
         </Text>
       </View>
+
+      <ReviewSteps status={application.status} />
 
       <Text style={[styles.cardBody, { color: theme.textSecondary }]}>{copy.description}</Text>
 
@@ -152,10 +248,17 @@ function ApplicationStatusCard({ application }: { application: MyMerchantApplica
   );
 }
 
-function SubmitApplicationForm() {
+function SubmitApplicationForm({
+  initialLicenseNumber = '',
+  resubmit = false,
+}: {
+  initialLicenseNumber?: string;
+  /** Gửi lại sau khi bị từ chối hoặc tải ảnh lỗi: đổi lời dẫn và nhãn nút cho đúng việc. */
+  resubmit?: boolean;
+}) {
   const theme = useTheme();
   const submit = useSubmitMerchantApplication();
-  const [licenseNumber, setLicenseNumber] = useState('');
+  const [licenseNumber, setLicenseNumber] = useState(initialLicenseNumber);
   const [license, setLicense] = useState<{ uri: string; mimeType?: string; name?: string }>();
   const [formError, setFormError] = useState<string>();
 
@@ -200,8 +303,9 @@ function SubmitApplicationForm() {
   return (
     <>
       <Text style={[styles.intro, { color: theme.textSecondary }]}>
-        Gửi giấy phép kinh doanh để đăng ký bán hàng. Quản trị viên sẽ xem xét và duyệt hồ sơ của
-        bạn.
+        {resubmit
+          ? 'Kiểm tra lại số giấy phép, chọn ảnh giấy phép rõ nét rồi gửi lại hồ sơ.'
+          : 'Gửi giấy phép kinh doanh để đăng ký bán hàng. Quản trị viên sẽ xem xét và duyệt hồ sơ của bạn.'}
       </Text>
 
       <View style={styles.sectionTitle}>
@@ -253,7 +357,7 @@ function SubmitApplicationForm() {
       {formError ? <InlineAlert message={formError} /> : null}
 
       <BrandButton loading={submit.isPending} onPress={() => void handleSubmit()}>
-        Gửi hồ sơ đăng ký
+        {resubmit ? 'Gửi lại hồ sơ' : 'Gửi hồ sơ đăng ký'}
       </BrandButton>
     </>
   );
@@ -273,6 +377,19 @@ const styles = StyleSheet.create({
   },
   cardBody: { fontSize: FontSize.bodySm, lineHeight: 20 },
   facts: { gap: Spacing.xs },
+  steps: { flexDirection: 'row' },
+  step: { flex: 1, alignItems: 'center', gap: 6 },
+  stepTrack: { flexDirection: 'row', alignItems: 'center', alignSelf: 'stretch' },
+  stepLine: { flex: 1, height: 2 },
+  stepDot: {
+    width: 26,
+    height: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: Radius.full,
+    borderWidth: 2,
+  },
+  stepLabel: { fontSize: FontSize.footnote, fontWeight: FontWeight.bold, textAlign: 'center' },
   fact: { fontSize: FontSize.bodySm, fontWeight: FontWeight.medium },
   picker: {
     overflow: 'hidden',

@@ -12,6 +12,7 @@ export default function MerchantApplicationRoute() {
 
   return (
     <SellerPageScaffold
+      forBuyer
       onPressBack={() => router.back()}
       subtitle="Gửi giấy phép kinh doanh để đăng ký bán hàng trên LootFast"
       title="Đăng ký bán hàng"

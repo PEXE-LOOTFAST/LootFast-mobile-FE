@@ -18,6 +18,15 @@ export function useMyMerchantApplication(enabled: boolean) {
     enabled,
     queryKey: MY_APPLICATION_KEY,
     queryFn: getMyMerchantApplication,
+    // Ảnh đang tải lên thì vài giây là xong; hồ sơ chờ duyệt thì xem lại mỗi phút để khách không
+    // phải thoát ra vào lại mới biết kết quả.
+    refetchInterval: (query) => {
+      const status = query.state.data?.status;
+      if (status === 'UPLOADING') return 5_000;
+      if (status === 'PENDING') return 60_000;
+
+      return false;
+    },
     retry: (failureCount, error) => {
       if (error instanceof ApiException && error.code === 'MERCHANT_APPLICATION_NOT_FOUND') {
         return false;
