@@ -98,6 +98,9 @@ const MESSAGES: Record<string, string> = {
   ORDER_NOT_FOUND: 'Không tìm thấy đơn này.',
   ORDER_NOT_CANCELLABLE: 'Đơn này không huỷ được nữa.',
   ORDER_CANCEL_WINDOW_CLOSED: 'Đã quá hạn huỷ — chỉ huỷ được trước giờ hẹn lấy 30 phút.',
+  // Huỷ đơn đã báo chuyển khoản hoặc đã được xác nhận thanh toán.
+  PAYMENT_STATE_CONFLICT:
+    'Đơn đã chuyển khoản nên không tự huỷ được. Hãy liên hệ quán nếu cần huỷ.',
 };
 
 export function toOrderErrorMessage(error: unknown): string {

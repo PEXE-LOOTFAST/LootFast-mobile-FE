@@ -15,7 +15,8 @@ import { useTheme } from '@/hooks/use-theme';
 type BrandButtonProps = {
   children: ReactNode;
   onPress?: () => void;
-  variant?: 'primary' | 'secondary' | 'outline';
+  /** danger: viền và chữ đỏ, cho thao tác huỷ hoặc xoá. */
+  variant?: 'primary' | 'secondary' | 'outline' | 'danger';
   disabled?: boolean;
   loading?: boolean;
   style?: StyleProp<ViewStyle>;
@@ -39,6 +40,7 @@ export function BrandButton({
     primary: { background: theme.primary, border: theme.primary, label: theme.onPrimary },
     secondary: { background: theme.primarySoft, border: theme.primarySoft, label: theme.primary },
     outline: { background: theme.backgroundElement, border: theme.border, label: theme.text },
+    danger: { background: theme.backgroundElement, border: theme.danger, label: theme.danger },
   }[variant];
 
   return (
