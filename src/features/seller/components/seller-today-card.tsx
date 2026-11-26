@@ -20,7 +20,8 @@ export function SellerTodayCard() {
 
   const running = (dealsQuery.data?.items ?? [])
     .map(toSellerDeal)
-    .filter((deal) => deal.status === 'running');
+    // Nháp chưa lên trang người mua nên không tính là đang bán.
+    .filter((deal) => deal.status === 'running' && !deal.isDraft);
   const portionsLeft = running.reduce(
     (sum, deal) => sum + Math.max(deal.portionsTotal - deal.portionsSold, 0),
     0,

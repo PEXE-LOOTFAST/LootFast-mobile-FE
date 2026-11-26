@@ -10,9 +10,11 @@ import { toMerchantDealErrorMessage } from '@/features/seller/api/merchant-deals
 import { toMerchantOrderErrorMessage } from '@/features/seller/api/merchant-orders';
 import { useConfirmPickup } from '@/features/seller/api/use-merchant-orders';
 import {
+  isRemovedDraft,
   toSellerDeal,
   useHideDeal,
   useMerchantDeals,
+  useRemoveDraft,
   useRestoreDeal,
   useUpdateDealQuantity,
 } from '@/features/seller/api/use-merchant-deals';
@@ -61,9 +63,11 @@ export function SellerOrderScreen() {
   const updateQuantity = useUpdateDealQuantity();
   const hideDeal = useHideDeal();
   const restoreDeal = useRestoreDeal();
+  const removeDraft = useRemoveDraft();
   const confirmPickup = useConfirmPickup();
 
-  const dealDtos = dealsQuery.data?.items ?? [];
+  // Nháp người bán đã xoá vẫn nằm trong danh sách backend trả về (trạng thái REMOVED): bỏ hẳn đi.
+  const dealDtos = (dealsQuery.data?.items ?? []).filter((deal) => !isRemovedDraft(deal));
   const deals = dealDtos.map(toSellerDeal);
   const runningDeals = deals.filter((deal) => deal.status === 'running');
   const endedDeals = deals.filter((deal) => deal.status === 'ended');
@@ -103,6 +107,20 @@ export function SellerOrderScreen() {
       onConfirm: () =>
         hideDeal.mutate(deal.id, {
           onSuccess: () => showToast('Đã tạm dừng deal', { tone: 'success' }),
+          onError: (error) => showToast(toMerchantDealErrorMessage(error), { tone: 'error' }),
+        }),
+    });
+
+  const deleteDraft = (deal: SellerDeal) =>
+    confirmAction({
+      title: 'Xoá bản nháp?',
+      message: `Bản nháp “${deal.name}” sẽ bị xoá cùng ảnh đã thêm. Thao tác không hoàn tác được.`,
+      confirmLabel: 'Xoá nháp',
+      cancelLabel: 'Giữ lại',
+      isDestructive: true,
+      onConfirm: () =>
+        removeDraft.mutate(deal.id, {
+          onSuccess: () => showToast('Đã xoá bản nháp', { tone: 'success' }),
           onError: (error) => showToast(toMerchantDealErrorMessage(error), { tone: 'error' }),
         }),
     });
@@ -154,6 +172,7 @@ export function SellerOrderScreen() {
             onPressDetail={() =>
               router.navigate({ pathname: '/seller/deal-images', params: { dealId: deal.id } })
             }
+            onPressDeleteDraft={() => deleteDraft(deal)}
             onPressPause={() => pauseDeal(deal)}
             onPressResume={() => resumeDeal(deal)}
             portionsLeft={Math.max(deal.portionsTotal - deal.portionsSold, 0)}

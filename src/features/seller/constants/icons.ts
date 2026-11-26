@@ -16,6 +16,7 @@ export const SellerIcons = {
   code: { ios: 'number', android: 'tag', web: 'tag' },
   pause: { ios: 'pause.circle', android: 'pause_circle', web: 'pause_circle' },
   back: { ios: 'chevron.left', android: 'arrow_back', web: 'arrow_back' },
+  trash: { ios: 'trash', android: 'delete', web: 'delete' },
   close: { ios: 'xmark', android: 'close', web: 'close' },
   check: { ios: 'checkmark', android: 'check', web: 'check' },
   store: { ios: 'storefront', android: 'storefront', web: 'storefront' },

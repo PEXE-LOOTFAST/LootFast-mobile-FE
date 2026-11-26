@@ -16,8 +16,10 @@ export type SellerDeal = {
   pickupWindow: { start: string; end: string };
   /** Mốc khách còn đặt được, dạng "19:35 · 11/10" (giờ VN); sau mốc này deal ẩn khỏi người mua. */
   saleEndsLabel: string;
+  /** Bản nháp: chưa đăng nên khách chưa thấy, người bán xoá được. */
+  isDraft: boolean;
   /** Vì sao deal dừng bán — chỉ có ở deal đã kết thúc. */
-  endedReason?: 'sold-out' | 'expired' | 'paused';
+  endedReason?: 'sold-out' | 'expired' | 'paused' | 'removed';
   /** Deal đang hiện với người mua, tạm dừng được. */
   canPause: boolean;
   /** Deal đã tạm dừng mà vẫn còn trong giờ bán, mở lại được. */

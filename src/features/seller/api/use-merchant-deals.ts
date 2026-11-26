@@ -17,9 +17,31 @@ import {
 } from '@/features/seller/api/merchant-deals';
 import { toTimeInput, vietnamDateKey } from '@/features/seller/deal-schedule';
 import type { SellerDeal } from '@/features/seller/types';
+import { apiRequest } from '@/lib/api-client';
 import { formatTime } from '@/lib/format';
 
 export const MERCHANT_DEALS_QUERY_KEY = ['merchant', 'deals'];
+
+/**
+ * Backend không có API xoá hẳn deal: "xoá nháp" là gỡ deal (`POST .../remove`), vốn bắt buộc có lý
+ * do. App gửi lý do cố định này để sau đó nhận ra đâu là nháp người bán tự xoá và ẩn khỏi danh sách,
+ * vì danh sách deal của quán vẫn trả cả deal đã gỡ.
+ */
+const DRAFT_REMOVAL_REASON = 'Người bán xoá bản nháp';
+
+// Backend có trả lý do gỡ nhưng kiểu MerchantDealDto chưa khai báo trường này.
+type ListedDeal = MerchantDealDto & { removalReason?: string | null };
+
+export function isRemovedDraft(deal: ListedDeal) {
+  return deal.status === 'REMOVED' && deal.removalReason === DRAFT_REMOVAL_REASON;
+}
+
+function removeMerchantDeal(dealId: string, reason: string) {
+  return apiRequest<MerchantDealDto>(`/merchants/me/deals/${dealId}/remove`, {
+    method: 'POST',
+    body: { reason },
+  });
+}
 
 /**
  * Backend có 5 trạng thái, màn Đơn hàng chỉ chia hai nhóm: còn bán được hay không. DRAFT cũng
@@ -33,7 +55,13 @@ export function toSellerDeal(deal: MerchantDealDto): SellerDeal {
   const isOpen = Date.now() < new Date(deal.saleEndsAt).getTime();
   const isRunning = deal.status === 'DRAFT' || (deal.status === 'ACTIVE' && isOpen);
   const endedReason: SellerDeal['endedReason'] =
-    deal.status === 'SOLD_OUT' ? 'sold-out' : deal.status === 'HIDDEN' ? 'paused' : 'expired';
+    deal.status === 'SOLD_OUT'
+      ? 'sold-out'
+      : deal.status === 'HIDDEN'
+        ? 'paused'
+        : deal.status === 'REMOVED'
+          ? 'removed'
+          : 'expired';
 
   return {
     id: deal.dealId,
@@ -42,6 +70,7 @@ export function toSellerDeal(deal: MerchantDealDto): SellerDeal {
     emoji: '🍱',
     imageUrl: deal.primaryImageUrl ?? '',
     status: isRunning ? 'running' : 'ended',
+    isDraft: deal.status === 'DRAFT',
     portionsTotal: deal.totalQuantity,
     portionsSold: deal.totalQuantity - deal.remainingQuantity,
     price: deal.discountedPrice,
@@ -130,6 +159,10 @@ export function useUpdateMerchantDeal() {
     ({ dealId, payload }: { dealId: string; payload: CreateMerchantDealPayload }) =>
       updateMerchantDeal(dealId, payload),
   );
+}
+
+export function useRemoveDraft() {
+  return useDealMutation((dealId: string) => removeMerchantDeal(dealId, DRAFT_REMOVAL_REASON));
 }
 
 export function useHideDeal() {

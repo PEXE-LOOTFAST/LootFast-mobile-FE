@@ -16,6 +16,7 @@ type SellerDealCardProps = {
   portionsLeft: number;
   onChangePortionsLeft: (portionsLeft: number) => void;
   onPressDetail: () => void;
+  onPressDeleteDraft: () => void;
   onPressPause: () => void;
   onPressResume: () => void;
 };
@@ -24,6 +25,7 @@ const ENDED_REASON_LABELS = {
   'sold-out': 'Hết hàng',
   expired: 'Hết giờ',
   paused: 'Tạm dừng',
+  removed: 'Đã gỡ',
 } as const;
 
 /**
@@ -35,11 +37,15 @@ export function SellerDealCard({
   portionsLeft,
   onChangePortionsLeft,
   onPressDetail,
+  onPressDeleteDraft,
   onPressPause,
   onPressResume,
 }: SellerDealCardProps) {
   const theme = useTheme();
   const isRunning = deal.status === 'running';
+  // Nháp nằm chung mục "đang chạy" để người bán thấy mà đăng tiếp, nhưng chưa bán gì nên không có
+  // nút chỉnh số phần, và gọi đúng là "Bản nháp".
+  const isSelling = isRunning && !deal.isDraft;
   const discount = formatDiscount(deal.price, deal.originalPrice);
   const sold = Math.max(deal.portionsTotal - portionsLeft, 0);
   const soldRatio = deal.portionsTotal > 0 ? sold / deal.portionsTotal : 0;
@@ -57,9 +63,15 @@ export function SellerDealCard({
               {deal.name}
             </AppText>
             <Badge
-              label={isRunning ? 'Đang bán' : ENDED_REASON_LABELS[deal.endedReason ?? 'expired']}
+              label={
+                deal.isDraft
+                  ? 'Bản nháp'
+                  : isRunning
+                    ? 'Đang bán'
+                    : ENDED_REASON_LABELS[deal.endedReason ?? 'expired']
+              }
               size="sm"
-              tone={isRunning ? 'primarySoft' : 'neutral'}
+              tone={isSelling ? 'primarySoft' : 'neutral'}
             />
           </View>
 
@@ -82,13 +94,15 @@ export function SellerDealCard({
           <View style={styles.metaRow}>
             <Icon name={SellerIcons.clock} color={theme.textSecondary} size={13} />
             <AppText numberOfLines={1} style={styles.meta} tone="textSecondary" variant="footnote">
-              {isRunning
-                ? `Nhận đặt đến ${deal.saleEndsLabel}`
-                : deal.canResume
-                  ? `Mở bán lại được đến ${deal.saleEndsLabel}`
-                  : deal.endedReason === 'sold-out'
-                    ? `Khung giờ ${deal.pickupWindow.start}–${deal.pickupWindow.end}`
-                    : `Đã đóng từ ${deal.saleEndsLabel}`}
+              {deal.isDraft
+                ? `Chưa đăng · bán đến ${deal.saleEndsLabel}`
+                : isRunning
+                  ? `Nhận đặt đến ${deal.saleEndsLabel}`
+                  : deal.canResume
+                    ? `Mở bán lại được đến ${deal.saleEndsLabel}`
+                    : deal.endedReason === 'sold-out'
+                      ? `Khung giờ ${deal.pickupWindow.start}–${deal.pickupWindow.end}`
+                      : `Đã đóng từ ${deal.saleEndsLabel}`}
             </AppText>
           </View>
         </View>
@@ -118,7 +132,7 @@ export function SellerDealCard({
         </View>
       </View>
 
-      {isRunning ? (
+      {isSelling ? (
         <View style={[styles.stepper, { backgroundColor: theme.primarySoft }]}>
           <View style={styles.stepperCopy}>
             <AppText variant="bodySm" weight="bold">
@@ -159,9 +173,23 @@ export function SellerDealCard({
           ]}
         >
           <AppText variant="bodySm" weight="bold">
-            Ảnh và chi tiết
+            {deal.isDraft ? 'Thêm ảnh và đăng' : 'Ảnh và chi tiết'}
           </AppText>
         </Pressable>
+
+        {deal.isDraft ? (
+          <Pressable
+            accessibilityLabel={`Xoá bản nháp ${deal.name}`}
+            accessibilityRole="button"
+            onPress={onPressDeleteDraft}
+            style={({ pressed }) => [styles.footerLink, pressed && styles.pressed]}
+          >
+            <Icon name={SellerIcons.trash} color={theme.danger} size={16} />
+            <AppText tone="danger" variant="bodySm" weight="bold">
+              Xoá nháp
+            </AppText>
+          </Pressable>
+        ) : null}
 
         {deal.canPause ? (
           <Pressable
